@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Fake Live Stream</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html, body { width:100vw; height:100vh; overflow:hidden; background:#000;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    color:#fff; user-select:none; -webkit-user-select:none; }
+  #video { position:fixed; inset:0; width:100%; height:100%; object-fit:cover;
+    transform:scaleX(-1); z-index:1; background:#000; }
+  #overlay { position:fixed; inset:0; z-index:2; pointer-events:none; }
+
+  #top { position:absolute; top:0; left:0; right:0; padding:12px 14px 10px;
+    background:linear-gradient(180deg,rgba(0,0,0,.75),rgba(0,0,0,0));
+    padding-top: calc(12px + env(safe-area-inset-top)); }
+  #top .row { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
+  .live { background:#ff2850; color:#fff; font-weight:700; font-size:12px;
+    padding:3px 8px; border-radius:5px; letter-spacing:.5px; }
+  .stat { font-size:15px; font-weight:700; }
+  .stat small { font-size:13px; font-weight:500; opacity:.9; }
+  .right-stats { position:absolute; top:calc(12px + env(safe-area-inset-top));
+    right:14px; text-align:right; font-size:13px; }
+  .right-stats div { margin-bottom:4px; }
+  .hypebar { width:100%; height:4px; background:rgba(255,255,255,.15);
+    border-radius:2px; overflow:hidden; margin-top:6px; }
+  .hypebar > i { display:block; height:100%; width:0%;
+    background:linear-gradient(90deg,#ff5050,#ffb040); transition:width .3s; }
+
+  #chat { position:absolute; left:0; right:0; bottom:60px; top:auto; height:60%;
+    overflow:hidden; padding:0 12px; }
+  .msg { display:flex; align-items:flex-start; gap:8px; margin-bottom:8px;
+    animation:slideup .25s ease-out; }
+  .msg.reply { margin-left:26px; border-left:2px solid rgba(255,255,255,.15);
+    padding-left:8px; }
+  .msg.reply .text::before { content:"↳ "; opacity:.5; }
+  @keyframes slideup { from{opacity:0; transform:translateY(12px);} to{opacity:1;} }
+  .av { flex:0 0 26px; width:26px; height:26px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:13px; font-weight:700; color:#fff; }
+  .body { flex:1; min-width:0; }
+  .nick { font-size:13px; font-weight:700; margin-bottom:1px; }
+  .text { font-size:14px; color:#eee; line-height:1.25; word-wrap:break-word; }
+
+  #emojis { position:absolute; inset:0; overflow:hidden; }
+  .emoji { position:absolute; font-size:26px; will-change:transform,opacity; }
+
+  #notes { position:absolute; top:100px; left:12px; right:12px; }
+  .note { background:rgba(20,20,30,.85); border-left:3px solid #ffd700;
+    border-radius:8px; padding:8px 12px; margin-bottom:6px; font-size:13px;
+    animation:notein .35s ease-out; backdrop-filter:blur(8px); }
+  .note b { display:block; font-size:14px; margin-bottom:2px; }
+  .note small { opacity:.85; font-size:12px; }
+  @keyframes notein { from{transform:translateY(-14px); opacity:0;} to{transform:none;opacity:1;} }
+
+  #banner { position:absolute; top:30%; left:20px; right:20px;
+    background:rgba(0,0,0,.9); border-radius:16px; padding:18px 20px;
+    display:none; backdrop-filter:blur(12px);
+    border:2px solid #fff; animation:bannerin .45s cubic-bezier(.2,1.3,.4,1);
+    box-shadow:0 0 40px rgba(255,200,80,.35); }
+  #banner .b-title { font-size:19px; font-weight:800; margin-bottom:6px; }
+  #banner .b-sub { font-size:13px; opacity:.9; margin-bottom:8px; }
+  #banner .b-nick { font-size:24px; font-weight:800; }
+  @keyframes bannerin {
+    0% { transform:scale(.4); opacity:0; }
+    60% { transform:scale(1.08); opacity:1; }
+    100% { transform:scale(1); } }
+
+  #controls { position:absolute; bottom:14px; left:14px; right:14px;
+    display:flex; gap:8px; pointer-events:auto; }
+  #controls button { flex:1; background:rgba(255,255,255,.15);
+    border:1px solid rgba(255,255,255,.3); color:#fff; padding:11px 8px;
+    border-radius:10px; font-size:13px; font-weight:600; cursor:pointer;
+    backdrop-filter:blur(8px); }
+  #controls button:active { background:rgba(255,255,255,.3); }
+
+  #start { position:fixed; inset:0; z-index:10; background:#0a0a14;
+    display:flex; flex-direction:column; align-items:center;
+    justify-content:center; padding:30px; text-align:center; }
+  #start h1 { font-size:24px; margin-bottom:14px; }
+  #start p { font-size:14px; opacity:.8; margin-bottom:24px; line-height:1.5; }
+  #start button { background:#ff2850; color:#fff; border:none;
+    padding:16px 32px; border-radius:12px; font-size:16px; font-weight:700; }
+
+  .shake { animation: shake .4s; }
+  @keyframes shake {
+    0%,100%{transform:none;}
+    20%{transform:translate(-4px,2px);}
+    40%{transform:translate(4px,-2px);}
+    60%{transform:translate(-3px,-1px);}
+    80%{transform:translate(3px,1px);}
+  }
+</style>
+</head>
+<body>
+
+<video id="video" autoplay playsinline muted></video>
+
+<div id="overlay">
+  <div id="top">
+    <div class="row">
+      <span class="live">LIVE</span>
+      <span class="stat">👁 <span id="viewers">1 240</span></span>
+      <span class="stat"><small>❤ <span id="likes">34 200</span></small></span>
+    </div>
+    <div class="hypebar"><i id="hype"></i></div>
+  </div>
+
+  <div class="right-stats">
+    <div>💎 <span id="coins">0</span></div>
+  </div>
+
+  <div id="notes"></div>
+  <div id="banner"></div>
+  <div id="emojis"></div>
+  <div id="chat"></div>
+
+  <div id="controls">
+    <button id="btnBig">🔥 Большой ивент</button>
+    <button id="btnSmall">✨ Малый ивент</button>
+    <button id="btnMute">🔊</button>
+  </div>
+</div>
+
+<div id="start">
+  <h1>🎥 Fake Live Stream</h1>
+  <p>Разреши доступ к камере, чтобы увидеть себя с маской стрима.<br>
+     Нажми «Старт», затем разреши в Safari доступ к камере.</p>
+  <button id="startBtn">▶ Старт</button>
+</div>
+
+<script>
+// ============ СОСТОЯНИЕ ============
+const state = {
+  viewers: 1240, tv: 1240, likes: 34200, coins: 0, hype: 0.0, lastEvent: Date.now(),
+  muted: false,
+};
+
+// ============ ДАННЫЕ ============
+const NICKS = ["xXx_Shadow_xXx","kotik_2024","AlexTop","moon_girl","NEON_777",
+  "pro_gamer_01","dark_wolf","Lera_K","sigma_boy","n00b_master","kotopes",
+  "SkyLine","T1m0xa","vibe_check","pixel_dust","banan4ik","Zloi_Kot",
+  "milky_way","frost_01","danil_top"];
+
+// ============ РЕЗИДЕНТЫ ЧАТА (всегда онлайн) ============
+// kind: spam  — спамит тупыми сообщениями
+//       hater — хейтер, душнит
+//       simp  — пишет комплименты
+//       clown — шутит/кринжует
+//       asker — постоянно задаёт вопросы
+const RESIDENTS = [
+  { nick: "67_kid",           color:"#ff5c5c", kind:"spam",
+    lines:["67","67 67","67??","шестьдесят семь","67forever","67!!!"] },
+  { nick: "skibidi_sigma",    color:"#c88cff", kind:"spam",
+    lines:["скибиди","скибиди доп доп","🗿🗿🗿","сигма","гигачад","ризз"] },
+  { nick: "fan_67",           color:"#ff78b4", kind:"spam",
+    lines:["67","67 топ","кто 67 тот топ","67 67 67 67","да 67"] },
+  { nick: "хейтер2000",       color:"#ff3c3c", kind:"hater",
+    lines:["ну такое","и это стрим?","фу","скучно","удали стрим",
+           "раньше было лучше","кто это вообще смотрит","кринж"] },
+  { nick: "toxic_boy",        color:"#ff2020", kind:"hater",
+    lines:["лох","позор","микро помой","не стрими лучше","гавно",
+           "иди работай","кто тебя смотрит"] },
+  { nick: "Lera_Simp",        color:"#ff96dc", kind:"simp",
+    lines:["ты лучший 💕","люблю тебя","ты такой милый","женись на мне",
+           "самый красивый","❤️❤️❤️","мужчина мечты"] },
+  { nick: "kotik_lover",      color:"#ffb4dc", kind:"simp",
+    lines:["обожаю тебя","ты солнышко ☀️","самый топ","милашка 😍",
+           "твой фанат","подписалась на всё"] },
+  { nick: "vibe_clown",       color:"#ffce56", kind:"clown",
+    lines:["😂😂😂","я под столом","ахахаха","жиза","кек",
+           "ору не могу","вот это поворот","лол"] },
+  { nick: "cringe_lord",      color:"#ff9f40", kind:"clown",
+    lines:["пупупу","труляля","ммммм вкусно","я обожаю кушать",
+           "эщкере","амонгас","да да да","сосиска"] },
+  { nick: "вопрос_мастер",    color:"#4bc0c0", kind:"asker",
+    lines:["сколько тебе лет?","откуда стримишь?","какой у тебя комп?",
+           "во что играешь?","а микро какой?","а кот есть?","а ты женат?",
+           "а кем работаешь?"] },
+  { nick: "Pro_Ktoto",        color:"#9966ff", kind:"asker",
+    lines:["что за музыка играет?","а OBS у тебя какой?","а сколько донатов за час?",
+           "а подписчиков сколько?","а план на стрим есть?"] },
+];
+
+// Обычные случайные зрители (появляются/уходят)
+const COMPLIMENTS = ["ты топ 🔥","стрим огонь!","лучший!","как всегда на высоте",
+  "го за подписку","респект 👏","красава","это было мощно","ору с этого 😂",
+  "атмосфера топ","подписался ✅","продолжай!","у тебя талант","смотрю уже час",
+  "это контент 💯","топчик","жиза братан","так держать!","ты гений"];
+const QUESTIONS = ["а сколько тебе лет?","откуда стримишь?","какой у тебя пк?",
+  "будешь ещё сегодня?","го в доту?","что за музыка?","ты кушал?","а микро норм?"];
+const REACTIONS = ["😂😂😂","💀","ну это сильно","я не могу 😭","жиза","🤡",
+  "ахахах","согласен полностью","братан ты гений","это база","жесть",
+  "не верю глазам","вот это да","пупупу","мама я в телевизоре"];
+const EMOJIS = ["🔥","❤️","😂","👏","💯","⚡","🎉","😎","🤯","✨","💎","🚀"];
+
+const BLOGGERS = [
+  ["Buster","#00c8ff"],["Mellstroy","#ff3c3c"],["LITVIN","#ffd700"],
+  ["Bratishkinoff","#8cff8c"],["Sqwoz Bab","#c88cff"],["Kai Cenat","#ff8c3c"],
+  ["xQc","#5ab4ff"],["IShowSpeed","#ff50b4"],["Drake","#ffc878"],
+  ["Danya Milokhin","#b4dcff"],
+];
+const DONATORS = ["Whale_777","KingDonater","MegaBoss","Anonym","RichBoi",
+  "DiamondHand","TopDon","ShadowWallet","CryptoKing","PapaDoner"];
+const AMOUNTS = [50,100,200,500,1000,2000,5000,10000];
+const DONATE_COMMENTS = ["за контент 💎","на новый микро","продолжай братан",
+  "ты лучший!","лови краба 🦀","на пиццу 🍕","с меня подписка","держись!",
+  "это тебе 🔥","респект"];
+const COLORS = ["#ff6384","#36a2eb","#ffce56","#4bc0c0","#9966ff","#ff9f40","#2ecc71","#e74c3c"];
+
+const rnd = a => a[Math.floor(Math.random()*a.length)];
+const ri  = (a,b) => Math.floor(Math.random()*(b-a+1))+a;
+
+// ============ «ПАМЯТЬ» ЧАТА для реакций ============
+// Храним последние сообщения, чтобы боты могли на них отвечать
+const recentMessages = [];  // {nick, text, time, isResident, kind}
+const MAX_MEMORY = 12;
+
+function rememberMessage(m) {
+  recentMessages.push(m);
+  if (recentMessages.length > MAX_MEMORY) recentMessages.shift();
+}
+
+// ============ ЗВУКИ ============
+let audioCtx = null;
+function initAudio() {
+  if (!audioCtx) {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    audioCtx = new AC();
+  }
+  if (audioCtx.state === "suspended") audioCtx.resume();
+}
+
+function tone(freq, dur, vol=0.25, type="sine", delay=0, slideTo=null) {
+  if (state.muted || !audioCtx) return;
+  const t0 = audioCtx.currentTime + delay;
+  const osc = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  osc.type = type;
+  osc.frequency.setValueAtTime(freq, t0);
+  if (slideTo) osc.frequency.exponentialRampToValueAtTime(slideTo, t0 + dur);
+  g.gain.setValueAtTime(0.0001, t0);
+  g.gain.exponentialRampToValueAtTime(vol, t0 + 0.01);
+  g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+  osc.connect(g).connect(audioCtx.destination);
+  osc.start(t0); osc.stop(t0 + dur + 0.05);
+}
+
+function sfxDonateSmall() { tone(880, 0.10, 0.22); tone(1320, 0.13, 0.22, "sine", 0.08); }
+function sfxDonateBig() {
+  [523,659,784,1047,1319].forEach((f,i)=>tone(f,0.20,0.20,"triangle",i*0.06));
+  tone(2093,0.60,0.12,"sine",0.30);
+}
+function sfxBlogger() {
+  tone(200, 0.55, 0.20, "sine", 0, 1400);
+  tone(523,0.55,0.10,"sine",0.05); tone(659,0.55,0.10,"sine",0.05); tone(784,0.55,0.10,"sine",0.05);
+}
+function sfxViewer() { tone(1200, 0.06, 0.13); }
+function sfxPop()    { tone(1800, 0.04, 0.14, "square"); tone(900, 0.06, 0.10); }
+function sfxLike()   { tone(1500, 0.05, 0.10, "triangle"); }
+function sfxReply()  { tone(1300, 0.05, 0.08, "triangle"); tone(1700, 0.06, 0.07, "triangle", 0.05); }
+
+// ============ DOM ============
+const chatEl = document.getElementById("chat");
+const notesEl = document.getElementById("notes");
+const bannerEl = document.getElementById("banner");
+const emojisEl = document.getElementById("emojis");
+const viewersEl = document.getElementById("viewers");
+const likesEl = document.getElementById("likes");
+const coinsEl = document.getElementById("coins");
+const hypeEl = document.getElementById("hype");
+const fmt = n => Math.floor(n).toLocaleString("ru-RU").replace(/,/g," ");
+
+// ============ СПАВН ЧАТА ============
+function spawnChat(text=null, nick=null, color=null, opts={}) {
+  nick = nick || rnd(NICKS);
+  if (text === null) {
+    const r = Math.random();
+    text = r < 0.55 ? rnd(COMPLIMENTS) : r < 0.85 ? rnd(REACTIONS) : rnd(QUESTIONS);
+  }
+  color = color || rnd(COLORS);
+  const el = document.createElement("div");
+  el.className = "msg" + (opts.reply ? " reply" : "");
+  el.innerHTML = `
+    <div class="av" style="background:${color}">${nick[0].toUpperCase()}</div>
+    <div class="body">
+      <div class="nick" style="color:${color}">${nick}</div>
+      <div class="text">${text}</div>
+    </div>`;
+  chatEl.appendChild(el);
+  while (chatEl.children.length > 40) chatEl.removeChild(chatEl.firstChild);
+  setTimeout(() => { if (el.parentNode) el.remove(); }, 12000);
+
+  // запоминаем для реакций
+  rememberMessage({
+    nick, text, time: Date.now(),
+    isResident: !!opts.isResident,
+    kind: opts.kind || null,
+  });
+}
+
+function spawnNote(text, sub="", color="#ffd700") {
+  const el = document.createElement("div");
+  el.className = "note";
+  el.style.borderLeftColor = color;
+  el.innerHTML = `<b style="color:${color}">${text}</b>${sub ? `<small>${sub}</small>` : ""}`;
+  notesEl.appendChild(el);
+  setTimeout(() => { if (el.parentNode) el.remove(); }, 4500);
+}
+
+function spawnBanner(text, sub, color, nick) {
+  bannerEl.innerHTML = `
+    <div class="b-title" style="color:${color}">${text}</div>
+    ${sub ? `<div class="b-sub">${sub}</div>` : ""}
+    ${nick ? `<div class="b-nick" style="color:${color}">${nick}</div>` : ""}`;
+  bannerEl.style.borderColor = color;
+  bannerEl.style.boxShadow = `0 0 40px ${color}66`;
+  bannerEl.style.display = "block";
+  clearTimeout(spawnBanner._t);
+  spawnBanner._t = setTimeout(() => { bannerEl.style.display = "none"; }, 4000);
+}
+
+function boom(emoji, count=16) {
+  for (let i=0; i<count; i++) {
+    const el = document.createElement("div");
+    el.className = "emoji";
+    el.textContent = emoji;
+    el.style.left = ri(20, window.innerWidth-40) + "px";
+    el.style.bottom = "60px";
+    el.style.fontSize = ri(20, 32) + "px";
+    emojisEl.appendChild(el);
+    const vx = (Math.random()-0.5) * 40;
+    const vy = ri(180, 320);
+    el.animate([
+      { transform:"translate(0,0)", opacity:1 },
+      { transform:`translate(${vx}px,-${vy}px)`, opacity:0 }
+    ], { duration: ri(1400,2200), easing:"ease-out" })
+    .onfinish = () => el.remove();
+  }
+}
+
+function shake() {
+  document.getElementById("overlay").classList.add("shake");
+  setTimeout(() => document.getElementById("overlay").classList.remove("shake"), 400);
+}
+
+// ============ РЕАКЦИИ БОТОВ НА ДРУГИХ БОТОВ ============
+// Разные типы резидентов по-разному реагируют на разные типы сообщений
+
+// Ответы на СПАМ (67, скибиди и т.п.)
+const REPLY_TO_SPAM = [
+  "67 67 67", "67 топ", "сам 67", "67???", "да 67", "67 навсегда",
+  "иди учись", "хватит спамить", "забаньте его", "модер забань",
+  "опять этот 67", "67 уже в печёнках", "😂 67 снова",
+];
+// Ответы на ХЕЙТ
+const REPLY_TO_HATE = [
+  "сам такой", "не нравится — выйди", "хейтер детектед", "завидуй молча",
+  "ты кто вообще", "а ты кто такой?", "лох сам", "ахахах хейтер",
+  "тебя мама учила?", "слабая попытка", "не смешно", "выйди отсюда",
+];
+// Ответы на СИМП-сообщения
+const REPLY_TO_SIMP = [
+  "фууу", "кринж", "иди отсюда", "😂😂😂", "simp детектед",
+  "он тебя не заметит", "хахах simp", "кринжово", "жесть",
+];
+// Ответы на ВОПРОСЫ
+const REPLY_TO_QUESTION = [
+  "а сам как думаешь?", "он говорил уже", "перемотай стрим",
+  "загугли", "ну ты и спросил", "очевидно же",
+  "он уже отвечал 5 раз", "в описании есть",
+];
+// Ответы на КЛОУНА
+const REPLY_TO_CLOWN = [
+  "😂😂😂", "я тоже ору", "жиза", "ахахах",
+  "ты жжёшь", "ору с тебя", "кек",
+];
+// Универсальные «затычки» — если непонятно, о чём речь
+const GENERIC_REPLY = [
+  "согласен", "база", "ну да", "это точно", "плюсую",
+  "жиза братан", "ты прав", "реально",
+  "+1", "💯", "вот это да",
+];
+
+function pickReplyFor(prevMsg) {
+  if (!prevMsg) return rnd(GENERIC_REPLY);
+  if (prevMsg.kind === "spam")     return rnd(REPLY_TO_SPAM);
+  if (prevMsg.kind === "hater")    return rnd(REPLY_TO_HATE);
+  if (prevMsg.kind === "simp")     return rnd(REPLY_TO_SIMP);
+  if (prevMsg.kind === "asker")    return rnd(REPLY_TO_QUESTION);
+  if (prevMsg.kind === "clown")    return rnd(REPLY_TO_CLOWN);
+  // реакция на обычное сообщение зрителя
+  const t = prevMsg.text.toLowerCase();
+  if (t.includes("67"))            return rnd(REPLY_TO_SPAM);
+  if (t.includes("скибиди"))       return rnd(REPLY_TO_SPAM);
+  if (/\?$/.test(prevMsg.text))    return rnd(REPLY_TO_QUESTION);
+  if (prevMsg.text.includes("😂") || prevMsg.text.includes("🤡")) return rnd(REPLY_TO_CLOWN);
+  return rnd(GENERIC_REPLY);
+}
+
+// Реакция: житель отвечает на предыдущее сообщение (иногда другому жителю)
+function residentReply() {
+  // ищем последнее сообщение от резидента (не старше 4 секунд)
+  const now = Date.now();
+  const candidates = recentMessages.filter(m =>
+    m.isResident && (now - m.time) < 4000
+  );
+  // если нашли — отвечаем именно им (взаимодействие ботов)
+  const target = candidates.length > 0 ? rnd(candidates) : null;
+  // выбираем другого резидента (не того, кому отвечаем)
+  let responder;
+  do { responder = rnd(RESIDENTS); } while (target && responder.nick === target.nick);
+
+  const reply = pickReplyFor(target);
+  spawnChat(reply, responder.nick, responder.color, {
+    isResident: true, kind: responder.kind, reply: true
+  });
+  sfxReply();
+}
+
+// Спам от резидента (из его родных фраз)
+function residentSpam(resident) {
+  const text = rnd(resident.lines);
+  spawnChat(text, resident.nick, resident.color, {
+    isResident: true, kind: resident.kind
+  });
+}
+
+// ============ СОБЫТИЯ СТРИМА ============
+function bigEvent() {
+  if (Math.random() < 0.55) {
+    const [name, color] = rnd(BLOGGERS);
+    spawnBanner(`⭐ ${name} зашёл`, "топ-блогер 🎉", color, name);
+    spawnNote(`${name} зашёл`, "известный блогер", color);
+    sfxBlogger();
+    state.tv += ri(4000, 15000);
+    state.likes += ri(3000, 9000);
+    state.hype = Math.min(1, state.hype + 0.6);
+    boom("🔥", 20);
+    for (let i=0; i<8; i++) {
+      setTimeout(() => spawnChat(rnd([`${name} тут!`,"ооо это же он","го го го 🔥",`${name} привет!`,"легенда!"])), i*120);
+    }
+    // резиденты реагируют
+    setTimeout(() => residentSpam(rnd(RESIDENTS.filter(r=>r.kind==="spam"))), 400);
+    setTimeout(() => residentSpam(rnd(RESIDENTS.filter(r=>r.kind==="clown"))), 900);
+  } else {
+    const d = rnd(DONATORS);
+    const a = rnd([1000,2000,5000,10000]);
+    const c = rnd(DONATE_COMMENTS);
+    spawnBanner(`💎 ${d} → ${a.toLocaleString("ru-RU")} ₽`, c, "#ff50b4", d);
+    spawnNote(`${d} +${a.toLocaleString("ru-RU")} ₽`, c, "#ff78c8");
+    sfxDonateBig();
+    state.coins += a * 10;
+    state.tv += ri(1000, 4000);
+    state.hype = Math.min(1, state.hype + 0.6);
+    boom("💎", 18);
+    // резиденты реагируют
+    setTimeout(() => spawnChat("вау донат 💎","Lera_Simp","#ff96dc",
+      {isResident:true,kind:"simp"}), 500);
+    setTimeout(() => spawnChat("дай мне тоже","67_kid","#ff5c5c",
+      {isResident:true,kind:"spam"}), 900);
+  }
+  state.lastEvent = Date.now();
+  shake();
+}
+
+function smallEvent() {
+  const r = Math.random();
+  if (r < 0.35) {
+    state.likes += ri(80, 500);
+    state.hype = Math.min(1, state.hype + 0.08);
+    sfxLike();
+    boom(rnd(["❤️","🔥","👍"]), 6);
+  } else if (r < 0.7) {
+    boom(rnd(EMOJIS), ri(4, 9));
+    sfxPop();
+  } else {
+    const d = rnd(DONATORS);
+    const a = rnd([50,100,200,500]);
+    state.coins += a * 10;
+    spawnNote(`${d} +${a} ₽`, rnd(DONATE_COMMENTS), "#ff96dc");
+    sfxDonateSmall();
+    boom("💎", 5);
+  }
+  state.lastEvent = Date.now();
+}
+
+// ============ ОБНОВЛЕНИЕ СЧЁТЧИКОВ ============
+let lastTick = performance.now();
+function updateCounters(dt) {
+  state.hype = Math.max(0, state.hype - dt * 0.18);
+  state.tv += 4 * dt + state.hype * 500 * dt;
+  state.viewers += (state.tv - state.viewers) * Math.min(1, dt * 2.2);
+  if (Date.now() - state.lastEvent > 15000) state.tv *= (1 - 0.01 * dt);
+
+  viewersEl.textContent = fmt(state.viewers);
+  likesEl.textContent = fmt(state.likes);
+  coinsEl.textContent = fmt(state.coins);
+  hypeEl.style.width = (state.hype * 100) + "%";
+}
+
+// ============ ЦИКЛ ============
+let lastChat = 0, lastEv = 0, lastNotify = 0, lastLike = 0,
+    lastResident = 0, lastReply = 0;
+
+function loop(now) {
+  const dt = (now - lastTick) / 1000;
+  lastTick = now;
+
+  // Обычный чат
+  const chatInterval = Math.max(0.2, 1.4 - state.hype * 1.05) * 1000;
+  if (now - lastChat > chatInterval) { spawnChat(); lastChat = now; }
+
+  // РЕЗИДЕНТЫ: спам от постоянных персонажей
+  // Чем выше хайп, тем чаще они спамят
+  const resInterval = (2000 - state.hype * 1400) + Math.random() * 1500;
+  if (now - lastResident > resInterval) {
+    const resident = rnd(RESIDENTS);
+    residentSpam(resident);
+    lastResident = now;
+  }
+
+  // ОТВЕТЫ БОТОВ ДРУГ ДРУГУ
+  // С вероятностью, зависящей от хайпа — резидент отвечает на чужое сообщение
+  const replyChance = 0.4 + state.hype * 0.4;
+  if (now - lastReply > (900 + Math.random() * 1800) && Math.random() < replyChance) {
+    residentReply();
+    lastReply = now;
+  }
+
+  // события
+  if (now - lastEv > (3000 + Math.random() * 3000)) {
+    if (Math.random() < 0.32 + state.hype * 0.4) bigEvent();
+    else smallEvent();
+    lastEv = now;
+  }
+
+  // вход зрителя
+  if (now - lastNotify > (5000 + Math.random() * 5000)) {
+    const n = rnd(NICKS);
+    spawnNote(`${n} зашёл`, "", "#78c8ff");
+    sfxViewer();
+    lastNotify = now;
+  }
+
+  // авто-лайки
+  if (now - lastLike > (600 + Math.random() * 1000)) {
+    state.likes += ri(3, 25);
+    if (state.hype > 0.3) boom(rnd(["❤️","🔥"]), 2);
+    lastLike = now;
+  }
+
+  updateCounters(dt);
+  requestAnimationFrame(loop);
+}
+
+// ============ КАМЕРА ============
+async function startCamera() {
+  const video = document.getElementById("video");
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 720 } },
+      audio: false
+    });
+    video.srcObject = stream;
+    await video.play();
+    return true;
+  } catch (err) {
+    alert("Не удалось получить доступ к камере: " + err.message +
+          "\n\nОткрой ссылку в Safari и разреши камеру.");
+    return false;
+  }
+}
+
+// ============ СТАРТ ============
+document.getElementById("startBtn").addEventListener("click", async () => {
+  initAudio();
+  const ok = await startCamera();
+  if (ok) {
+    document.getElementById("start").style.display = "none";
+    setTimeout(() => {
+      spawnNote("Запиши экран iPhone", "Пункт управления → Запись экрана", "#8cff8c");
+    }, 800);
+    requestAnimationFrame(loop);
+  }
+});
+
+document.getElementById("btnBig").addEventListener("click", bigEvent);
+document.getElementById("btnSmall").addEventListener("click", smallEvent);
+document.getElementById("btnMute").addEventListener("click", (e) => {
+  state.muted = !state.muted;
+  e.target.textContent = state.muted ? "🔇" : "🔊";
+});
+
+document.body.addEventListener("touchstart", initAudio, { once: true });
+document.body.addEventListener("click", initAudio, { once: true });
+</script>
+</body>
+</html>
