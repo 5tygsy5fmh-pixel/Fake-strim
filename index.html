@@ -44,9 +44,10 @@ html, body { width:100%; height:100%; overflow:hidden; background:#000;
   z-index:10; }
 .host { display:flex; align-items:center; gap:8px; min-width:0; }
 .host-av { width:36px; height:36px; border-radius:50%; flex:0 0 36px;
-  background:#e8e0d8; overflow:hidden;
+  background:#25d366; overflow:hidden;
+  display:flex; align-items:center; justify-content:center;
+  font-size:20px; font-weight:700; color:#fff;
   box-shadow:0 0 0 2px rgba(255,255,255,.6); }
-.host-av svg { width:100%; height:100%; display:block; }
 .host-name { font-size:14px; font-weight:700; max-width:110px;
   overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .verified { width:13px; height:13px; border-radius:50%; background:#20a8f0;
@@ -64,8 +65,9 @@ html, body { width:100%; height:100%; overflow:hidden; background:#000;
   justify-content:center; pointer-events:auto; cursor:pointer; }
 .close-x svg { width:22px; height:22px; }
 
-.rail { position:absolute; right:6px; bottom:auto; top:22%;
-  display:flex; flex-direction:column; gap:16px; align-items:center;
+/* Кнопки — выше */
+.rail { position:absolute; right:6px; top:14%;
+  display:flex; flex-direction:column; gap:18px; align-items:center;
   pointer-events:auto; z-index:9; }
 .rb { width:40px; height:40px; display:flex; align-items:center;
   justify-content:center; cursor:pointer; position:relative;
@@ -78,15 +80,6 @@ html, body { width:100%; height:100%; overflow:hidden; background:#000;
 .rb.red-active.on svg line { stroke:#ff2850 !important; }
 .rb.pulse { animation:rpls .35s ease-out; }
 @keyframes rpls { 0%{transform:scale(1);} 50%{transform:scale(1.2);} 100%{transform:scale(1);} }
-
-.rail-av { position:relative; margin-bottom:6px; }
-.rail-av .host-av { width:42px; height:42px; flex:0 0 42px;
-  box-shadow:0 0 0 2px #fff; }
-.rail-av .plus { position:absolute; bottom:-6px; left:50%;
-  transform:translateX(-50%); width:18px; height:18px;
-  background:#ff2850; border-radius:50%; display:flex;
-  align-items:center; justify-content:center; font-size:13px;
-  font-weight:800; color:#fff; border:2px solid #000; }
 
 .comments { position:absolute; left:12px; right:80px; bottom:110px;
   max-height:50%; overflow:hidden; display:flex; flex-direction:column;
@@ -209,7 +202,7 @@ body.banner-show .comments { opacity:0; transform:translateY(20px); }
 <div id="ui">
   <div class="top">
     <div class="host">
-      <div class="host-av" id="hostAvTop"></div>
+      <div class="host-av">G</div>
       <div class="host-name">grand-cat</div>
       <div class="verified">✓</div>
       <div class="chev">▼</div>
@@ -240,11 +233,6 @@ body.banner-show .comments { opacity:0; transform:translateY(20px); }
   <div class="toast" id="toast"></div>
 
   <div class="rail">
-    <div class="rail-av">
-      <div class="host-av" id="hostAvRail" style="width:42px;height:42px;flex:0 0 42px;"></div>
-      <div class="plus">+</div>
-    </div>
-
     <div class="rb red-active" id="rbRec" title="Запись">
       <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8">
         <circle cx="12" cy="12" r="9"/>
@@ -307,70 +295,12 @@ const state = {
   isRecording: false,
 };
 
-// ============ АВАТАРКА GRAND-CAT (майнкрафт-кот с алмазом) ============
-const HOST_AVATAR_SVG = `
-<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
-  <rect width="64" height="64" fill="#e8e2d8"/>
-  <path d="M0 48 Q16 44 32 50 T64 46" stroke="#ccc4b8" stroke-width="0.8" fill="none"/>
-  <path d="M0 54 Q20 50 40 56 T64 52" stroke="#ccc4b8" stroke-width="0.8" fill="none"/>
-  <path d="M0 60 Q16 58 32 62 T64 58" stroke="#ccc4b8" stroke-width="0.6" fill="none"/>
-
-  <ellipse cx="32" cy="46" rx="16" ry="11" fill="#e0d8d0"/>
-  <ellipse cx="23" cy="48" rx="4" ry="2" fill="#a89c90" opacity="0.4"/>
-  <ellipse cx="41" cy="48" rx="4" ry="2" fill="#a89c90" opacity="0.4"/>
-
-  <rect x="18" y="38" width="28" height="17" fill="#5ac8d8" stroke="#3aa4b4" stroke-width="0.8"/>
-  <rect x="20" y="40" width="7" height="4" fill="#8ee8f4"/>
-  <rect x="37" y="40" width="7" height="4" fill="#8ee8f4"/>
-  <rect x="20" y="49" width="24" height="3" fill="#3aa4b4"/>
-  <rect x="30" y="40" width="4" height="12" fill="#3aa4b4"/>
-  <rect x="18" y="38" width="28" height="1" fill="#8ee8f4"/>
-
-  <ellipse cx="32" cy="24" rx="14" ry="11" fill="#e8e0d8"/>
-
-  <rect x="17" y="9" width="30" height="10" fill="#5ac8d8"/>
-  <rect x="17" y="19" width="5" height="8" fill="#5ac8d8"/>
-  <rect x="42" y="19" width="5" height="8" fill="#5ac8d8"/>
-  <rect x="20" y="11" width="5" height="3" fill="#8ee8f4"/>
-  <rect x="32" y="11" width="3" height="3" fill="#8ee8f4"/>
-  <rect x="39" y="11" width="5" height="3" fill="#8ee8f4"/>
-  <rect x="17" y="18" width="30" height="1" fill="#3aa4b4"/>
-  <rect x="17" y="9" width="30" height="1" fill="#8ee8f4"/>
-
-  <ellipse cx="26" cy="26" rx="3" ry="4" fill="#1a3a2a"/>
-  <ellipse cx="38" cy="26" rx="3" ry="4" fill="#1a3a2a"/>
-  <circle cx="27" cy="25" r="1" fill="#fff"/>
-  <circle cx="39" cy="25" r="1" fill="#fff"/>
-
-  <path d="M30 30 L34 30 L32 32 Z" fill="#e8a0a0"/>
-  <path d="M32 32 L32 34" stroke="#8a7060" stroke-width="0.6"/>
-  <path d="M32 34 Q30 36 28 34.5" stroke="#8a7060" stroke-width="0.6" fill="none"/>
-  <path d="M32 34 Q34 36 36 34.5" stroke="#8a7060" stroke-width="0.6" fill="none"/>
-
-  <line x1="14" y1="28" x2="23" y2="29" stroke="#a89888" stroke-width="0.5"/>
-  <line x1="14" y1="32" x2="23" y2="32" stroke="#a89888" stroke-width="0.5"/>
-  <line x1="41" y1="29" x2="50" y2="28" stroke="#a89888" stroke-width="0.5"/>
-  <line x1="41" y1="32" x2="50" y2="32" stroke="#a89888" stroke-width="0.5"/>
-
-  <g transform="translate(40, 36) rotate(45)">
-    <rect x="-4" y="-1.4" width="20" height="2.8" fill="#7ce8f4" stroke="#3aa4b4" stroke-width="0.4"/>
-    <rect x="-1" y="-1.4" width="2" height="2.8" fill="#8ee8f4"/>
-    <rect x="-6" y="-3" width="3" height="6" fill="#5a4a30"/>
-    <rect x="-8" y="-2" width="2" height="4" fill="#3aa4b4"/>
-  </g>
-
-  <ellipse cx="43" cy="47" rx="6" ry="4" fill="#e8e0d8"/>
-  <circle cx="41" cy="46" r="0.8" fill="#a89888"/>
-  <circle cx="43" cy="46" r="0.8" fill="#a89888"/>
-  <circle cx="45" cy="46" r="0.8" fill="#a89888"/>
-</svg>`;
-
 // ============ ГЕНЕРАТОР НИКОВ ============
 const NICK_PRE = ["dark","pro","mega","ultra","super","tiny","angry","happy",
   "sleepy","hungry","epic","cool","bad","best","real","cyber","neo","pixel",
   "retro","cosmic","alpha","beta","omega","night","day","moon","sun","star",
   "shadow","light","fire","ice","storm","thunder","sneaky","silent","crazy",
-  "wild","lazy","fuzzy","fluffy","chill","mad","slick","swift","lucky","happy",
+  "wild","lazy","fuzzy","fluffy","chill","mad","slick","swift","lucky",
   "sad","lonely","brave","mighty","lil","big","small","young","old","sweet",
   "sour","spicy","chilly","warm","frost","blaze","aqua","terra","wind","sand",
   "snow","rain","mist","cloud","dusk","dawn","horizon","galaxy","comet","nova"];
@@ -439,11 +369,7 @@ const AVATAR_COLORS = ["#ff6384","#36a2eb","#ffce56","#4bc0c0","#9966ff",
 function randomAvatar() {
   const emoji = rnd(AVATAR_EMOJIS);
   const [c1, c2] = rnd(AVATAR_GRADIENTS);
-  return {
-    emoji,
-    color: c1,
-    gradient: `linear-gradient(135deg, ${c1}, ${c2})`,
-  };
+  return { emoji, color: c1, gradient: `linear-gradient(135deg, ${c1}, ${c2})` };
 }
 
 // ============ ДАННЫЕ ============
@@ -536,9 +462,6 @@ const DONATE_REASONS = [
 const GENERIC_CHAT = ["жиза","база","согласен","+1","💯","это точно",
   "ну да","ты прав","😂","вот это да","реально","плюсую"];
 
-const SUBSCRIBERS = ["kotik_new","Мария_К","Ivan_Play","moonlight",
-  "no_name_777","xX_Pro_Xx","sunny_day","Alex228","MaxPower","Kira_Sun"];
-
 const DONATORS = ["Whale_777","KingDonater","MegaBoss","Anonym","RichBoi",
   "DiamondHand","TopDon","ShadowWallet","CryptoKing","PapaDoner"];
 const DONATE_AMOUNTS = [50,100,200,500,1000,2000,5000,10000];
@@ -603,13 +526,12 @@ function toast(text) {
   toastEl.textContent = text;
   toastEl.classList.add("show");
   clearTimeout(toast._t);
-  toastEl._t = setTimeout(() => toastEl.classList.remove("show"), 2200);
+  toast._t = setTimeout(() => toastEl.classList.remove("show"), 2200);
 }
 
 function markActivity() { state.lastActivity = Date.now(); }
 
 function spawnChat(text=null, nick=null, color=null, opts={}) {
-  // Генерируем уникальные ник и аватар если не переданы явно
   const isResident = !!opts.isResident;
   if (!nick && !isResident) nick = randomNick();
   if (!nick) nick = rnd(RESIDENTS).nick;
@@ -629,7 +551,6 @@ function spawnChat(text=null, nick=null, color=null, opts={}) {
     }
   }
 
-  // Аватарка: у резидентов — буква, у обычных — случайный эмодзи+градиент
   let avHTML;
   if (isResident) {
     avHTML = `<div class="cm-av" style="background:${color}">${nick[0].toUpperCase()}</div>`;
@@ -1144,10 +1065,6 @@ $("rbPiP").addEventListener("click", e => {
   if (state.pipActive) exitPiP(); else enterPiP();
 });
 $("closeX").addEventListener("click", () => { if (confirm("Закрыть стрим?")) location.reload(); });
-
-// Устанавливаем SVG аватарки grand-cat
-$("hostAvTop").innerHTML = HOST_AVATAR_SVG;
-$("hostAvRail").innerHTML = HOST_AVATAR_SVG;
 
 $("startBtn").addEventListener("click", async () => {
   initAudio();
