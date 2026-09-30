@@ -43,9 +43,9 @@ html, body { width:100%; height:100%; overflow:hidden; background:#000;
   display:flex; align-items:center; justify-content:space-between; gap:8px;
   z-index:10; }
 .host { display:flex; align-items:center; gap:8px; min-width:0; }
-.host-av { width:34px; height:34px; border-radius:50%; flex:0 0 34px;
-  background:#000; overflow:hidden;
-  box-shadow:0 0 0 2px rgba(255,255,255,.5); }
+.host-av { width:36px; height:36px; border-radius:50%; flex:0 0 36px;
+  background:#e8e0d8; overflow:hidden;
+  box-shadow:0 0 0 2px rgba(255,255,255,.6); }
 .host-av svg { width:100%; height:100%; display:block; }
 .host-name { font-size:14px; font-weight:700; max-width:110px;
   overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
@@ -80,7 +80,7 @@ html, body { width:100%; height:100%; overflow:hidden; background:#000;
 @keyframes rpls { 0%{transform:scale(1);} 50%{transform:scale(1.2);} 100%{transform:scale(1);} }
 
 .rail-av { position:relative; margin-bottom:6px; }
-.rail-av .host-av { width:40px; height:40px; flex:0 0 40px;
+.rail-av .host-av { width:42px; height:42px; flex:0 0 42px;
   box-shadow:0 0 0 2px #fff; }
 .rail-av .plus { position:absolute; bottom:-6px; left:50%;
   transform:translateX(-50%); width:18px; height:18px;
@@ -100,7 +100,7 @@ html, body { width:100%; height:100%; overflow:hidden; background:#000;
 @keyframes cmin { from{opacity:0; transform:translateY(12px);} to{opacity:1;} }
 .cm-av { flex:0 0 26px; width:26px; height:26px; border-radius:50%;
   display:flex; align-items:center; justify-content:center;
-  font-size:12px; font-weight:800; }
+  font-size:15px; line-height:1; }
 .cm-body { flex:1; min-width:0; }
 .cm-nick { font-size:11px; opacity:.75; margin-bottom:1px; }
 .cm-text { font-size:13px; line-height:1.3; word-break:break-word; }
@@ -177,7 +177,6 @@ body.banner-show .comments { opacity:0; transform:translateY(20px); }
 .shake { animation:shk .4s; }
 @keyframes shk { 0%,100%{transform:none;} 20%{transform:translate(-3px,2px);} 40%{transform:translate(3px,-2px);} 60%{transform:translate(-2px,-1px);} 80%{transform:translate(2px,1px);} }
 
-/* Индикатор записи */
 .rec-badge { position:absolute; top:calc(12px + env(safe-area-inset-top));
   left:50%; transform:translateX(-50%); display:none;
   background:rgba(0,0,0,.75); padding:5px 12px; border-radius:16px;
@@ -210,29 +209,7 @@ body.banner-show .comments { opacity:0; transform:translateY(20px); }
 <div id="ui">
   <div class="top">
     <div class="host">
-      <div class="host-av">
-        <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-          <rect width="64" height="64" fill="#7cc6d6"/>
-          <rect x="18" y="20" width="28" height="24" fill="#c8b8a8"/>
-          <polygon points="18,20 22,10 28,20" fill="#c8b8a8" stroke="#8a7a6a" stroke-width="1"/>
-          <polygon points="36,20 42,10 46,20" fill="#c8b8a8" stroke="#8a7a6a" stroke-width="1"/>
-          <polygon points="21,18 23,13 26,18" fill="#e8b8b8"/>
-          <polygon points="38,18 41,13 43,18" fill="#e8b8b8"/>
-          <rect x="16" y="14" width="32" height="8" fill="#5ac8d8" stroke="#3aa4b4" stroke-width="1"/>
-          <rect x="16" y="18" width="4" height="14" fill="#5ac8d8" stroke="#3aa4b4" stroke-width="1"/>
-          <rect x="44" y="18" width="4" height="14" fill="#5ac8d8" stroke="#3aa4b4" stroke-width="1"/>
-          <rect x="20" y="12" width="4" height="4" fill="#8ee8f4"/>
-          <rect x="40" y="12" width="4" height="4" fill="#8ee8f4"/>
-          <rect x="24" y="28" width="5" height="6" fill="#4a8a3a"/>
-          <rect x="35" y="28" width="5" height="6" fill="#4a8a3a"/>
-          <rect x="25" y="30" width="2" height="3" fill="#000"/>
-          <rect x="36" y="30" width="2" height="3" fill="#000"/>
-          <rect x="30" y="37" width="4" height="3" fill="#e88a8a"/>
-          <rect x="20" y="44" width="24" height="14" fill="#5ac8d8" stroke="#3aa4b4" stroke-width="1"/>
-          <rect x="22" y="46" width="6" height="4" fill="#8ee8f4"/>
-          <rect x="36" y="46" width="6" height="4" fill="#8ee8f4"/>
-        </svg>
-      </div>
+      <div class="host-av" id="hostAvTop"></div>
       <div class="host-name">grand-cat</div>
       <div class="verified">✓</div>
       <div class="chev">▼</div>
@@ -264,30 +241,10 @@ body.banner-show .comments { opacity:0; transform:translateY(20px); }
 
   <div class="rail">
     <div class="rail-av">
-      <div class="host-av" style="width:40px;height:40px;flex:0 0 40px;">
-        <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-          <rect width="64" height="64" fill="#7cc6d6"/>
-          <rect x="18" y="20" width="28" height="24" fill="#c8b8a8"/>
-          <polygon points="18,20 22,10 28,20" fill="#c8b8a8" stroke="#8a7a6a" stroke-width="1"/>
-          <polygon points="36,20 42,10 46,20" fill="#c8b8a8" stroke="#8a7a6a" stroke-width="1"/>
-          <polygon points="21,18 23,13 26,18" fill="#e8b8b8"/>
-          <polygon points="38,18 41,13 43,18" fill="#e8b8b8"/>
-          <rect x="16" y="14" width="32" height="8" fill="#5ac8d8" stroke="#3aa4b4" stroke-width="1"/>
-          <rect x="16" y="18" width="4" height="14" fill="#5ac8d8" stroke="#3aa4b4" stroke-width="1"/>
-          <rect x="44" y="18" width="4" height="14" fill="#5ac8d8" stroke="#3aa4b4" stroke-width="1"/>
-          <rect x="20" y="12" width="4" height="4" fill="#8ee8f4"/>
-          <rect x="40" y="12" width="4" height="4" fill="#8ee8f4"/>
-          <rect x="24" y="28" width="5" height="6" fill="#4a8a3a"/>
-          <rect x="35" y="28" width="5" height="6" fill="#4a8a3a"/>
-          <rect x="25" y="30" width="2" height="3" fill="#000"/>
-          <rect x="36" y="30" width="2" height="3" fill="#000"/>
-          <rect x="30" y="37" width="4" height="3" fill="#e88a8a"/>
-        </svg>
-      </div>
+      <div class="host-av" id="hostAvRail" style="width:42px;height:42px;flex:0 0 42px;"></div>
       <div class="plus">+</div>
     </div>
 
-    <!-- ЗАПИСЬ (бывшая кнопка трансляции экрана) -->
     <div class="rb red-active" id="rbRec" title="Запись">
       <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8">
         <circle cx="12" cy="12" r="9"/>
@@ -350,11 +307,146 @@ const state = {
   isRecording: false,
 };
 
-const NICKS = ["xXx_Shadow","kotik_2024","AlexTop","moon_girl","NEON_777",
-  "pro_gamer_01","dark_wolf","Lera_K","sigma_boy","n00b_master","kotopes",
-  "SkyLine","T1m0xa","vibe_check","pixel_dust","banan4ik","Zloi_Kot",
-  "milky_way","frost_01","danil_top"];
+// ============ АВАТАРКА GRAND-CAT (майнкрафт-кот с алмазом) ============
+const HOST_AVATAR_SVG = `
+<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+  <rect width="64" height="64" fill="#e8e2d8"/>
+  <path d="M0 48 Q16 44 32 50 T64 46" stroke="#ccc4b8" stroke-width="0.8" fill="none"/>
+  <path d="M0 54 Q20 50 40 56 T64 52" stroke="#ccc4b8" stroke-width="0.8" fill="none"/>
+  <path d="M0 60 Q16 58 32 62 T64 58" stroke="#ccc4b8" stroke-width="0.6" fill="none"/>
 
+  <ellipse cx="32" cy="46" rx="16" ry="11" fill="#e0d8d0"/>
+  <ellipse cx="23" cy="48" rx="4" ry="2" fill="#a89c90" opacity="0.4"/>
+  <ellipse cx="41" cy="48" rx="4" ry="2" fill="#a89c90" opacity="0.4"/>
+
+  <rect x="18" y="38" width="28" height="17" fill="#5ac8d8" stroke="#3aa4b4" stroke-width="0.8"/>
+  <rect x="20" y="40" width="7" height="4" fill="#8ee8f4"/>
+  <rect x="37" y="40" width="7" height="4" fill="#8ee8f4"/>
+  <rect x="20" y="49" width="24" height="3" fill="#3aa4b4"/>
+  <rect x="30" y="40" width="4" height="12" fill="#3aa4b4"/>
+  <rect x="18" y="38" width="28" height="1" fill="#8ee8f4"/>
+
+  <ellipse cx="32" cy="24" rx="14" ry="11" fill="#e8e0d8"/>
+
+  <rect x="17" y="9" width="30" height="10" fill="#5ac8d8"/>
+  <rect x="17" y="19" width="5" height="8" fill="#5ac8d8"/>
+  <rect x="42" y="19" width="5" height="8" fill="#5ac8d8"/>
+  <rect x="20" y="11" width="5" height="3" fill="#8ee8f4"/>
+  <rect x="32" y="11" width="3" height="3" fill="#8ee8f4"/>
+  <rect x="39" y="11" width="5" height="3" fill="#8ee8f4"/>
+  <rect x="17" y="18" width="30" height="1" fill="#3aa4b4"/>
+  <rect x="17" y="9" width="30" height="1" fill="#8ee8f4"/>
+
+  <ellipse cx="26" cy="26" rx="3" ry="4" fill="#1a3a2a"/>
+  <ellipse cx="38" cy="26" rx="3" ry="4" fill="#1a3a2a"/>
+  <circle cx="27" cy="25" r="1" fill="#fff"/>
+  <circle cx="39" cy="25" r="1" fill="#fff"/>
+
+  <path d="M30 30 L34 30 L32 32 Z" fill="#e8a0a0"/>
+  <path d="M32 32 L32 34" stroke="#8a7060" stroke-width="0.6"/>
+  <path d="M32 34 Q30 36 28 34.5" stroke="#8a7060" stroke-width="0.6" fill="none"/>
+  <path d="M32 34 Q34 36 36 34.5" stroke="#8a7060" stroke-width="0.6" fill="none"/>
+
+  <line x1="14" y1="28" x2="23" y2="29" stroke="#a89888" stroke-width="0.5"/>
+  <line x1="14" y1="32" x2="23" y2="32" stroke="#a89888" stroke-width="0.5"/>
+  <line x1="41" y1="29" x2="50" y2="28" stroke="#a89888" stroke-width="0.5"/>
+  <line x1="41" y1="32" x2="50" y2="32" stroke="#a89888" stroke-width="0.5"/>
+
+  <g transform="translate(40, 36) rotate(45)">
+    <rect x="-4" y="-1.4" width="20" height="2.8" fill="#7ce8f4" stroke="#3aa4b4" stroke-width="0.4"/>
+    <rect x="-1" y="-1.4" width="2" height="2.8" fill="#8ee8f4"/>
+    <rect x="-6" y="-3" width="3" height="6" fill="#5a4a30"/>
+    <rect x="-8" y="-2" width="2" height="4" fill="#3aa4b4"/>
+  </g>
+
+  <ellipse cx="43" cy="47" rx="6" ry="4" fill="#e8e0d8"/>
+  <circle cx="41" cy="46" r="0.8" fill="#a89888"/>
+  <circle cx="43" cy="46" r="0.8" fill="#a89888"/>
+  <circle cx="45" cy="46" r="0.8" fill="#a89888"/>
+</svg>`;
+
+// ============ ГЕНЕРАТОР НИКОВ ============
+const NICK_PRE = ["dark","pro","mega","ultra","super","tiny","angry","happy",
+  "sleepy","hungry","epic","cool","bad","best","real","cyber","neo","pixel",
+  "retro","cosmic","alpha","beta","omega","night","day","moon","sun","star",
+  "shadow","light","fire","ice","storm","thunder","sneaky","silent","crazy",
+  "wild","lazy","fuzzy","fluffy","chill","mad","slick","swift","lucky","happy",
+  "sad","lonely","brave","mighty","lil","big","small","young","old","sweet",
+  "sour","spicy","chilly","warm","frost","blaze","aqua","terra","wind","sand",
+  "snow","rain","mist","cloud","dusk","dawn","horizon","galaxy","comet","nova"];
+
+const NICK_ROOT = ["cat","wolf","fox","dragon","ninja","hacker","gamer","player",
+  "boy","girl","kid","dude","bro","guy","friend","legend","master","boss",
+  "king","queen","lord","knight","mage","witch","ghost","demon","angel",
+  "robot","bot","troll","panda","tiger","lion","bear","puppy","kitten",
+  "star","vibe","soul","spirit","reaper","hunter","rider","walker","seeker",
+  "sniper","warrior","samurai","viking","pirate","cowboy","alien","zombie",
+  "vampire","dwarf","elf","orc","goblin","titan","phoenix","pegasus","sphinx"];
+
+const NICK_SUF = ["", "", "", "", "01","07","13","22","47","69","77","88","99",
+  "100","123","2000","2020","2024","228","333","420","555","666","777","888",
+  "999","xX","Xx","YT","TV","GG","OP","PRO","TOP","GOD"];
+
+const usedNicks = new Set();
+function randomNick() {
+  for (let i = 0; i < 60; i++) {
+    const r = Math.random();
+    let nick;
+    if (r < 0.28) {
+      nick = rnd(NICK_PRE) + "_" + rnd(NICK_ROOT);
+    } else if (r < 0.50) {
+      nick = rnd(NICK_ROOT) + "_" + rnd(NICK_SUF.filter(s => s));
+    } else if (r < 0.68) {
+      nick = "xX_" + rnd(NICK_ROOT) + "_Xx";
+    } else if (r < 0.82) {
+      nick = rnd(NICK_PRE) + rnd(NICK_ROOT) + ri(1, 999);
+    } else if (r < 0.92) {
+      nick = rnd(NICK_ROOT) + ri(1, 99);
+    } else {
+      nick = rnd(NICK_PRE).toUpperCase() + rnd(NICK_ROOT).toUpperCase();
+    }
+    if (!usedNicks.has(nick)) {
+      usedNicks.add(nick);
+      return nick;
+    }
+  }
+  return "user" + ri(1000, 99999);
+}
+
+// ============ ГЕНЕРАТОР АВАТАРОК ============
+const AVATAR_EMOJIS = [
+  "🐱","🐶","🦊","🐼","🐯","🦁","🐸","🐵","🐰","🐻","🐨","🐷",
+  "🦄","🐲","🦖","🐙","🦋","🐝","🐢","🦉","🦅","🐺","🐗","🦔","🐹","🐭",
+  "🍕","🍔","🌮","🍣","🍩","🍪","🎂","🍎","🍓","🍑","🍒","🥑","🍉","🍇",
+  "⚽","🏀","🎮","🎲","🎯","🎸","🎧","🎤","🎬","📱","💻","🖥️","🎨","📷",
+  "🌈","⭐","✨","💫","🔥","❄️","⚡","💧","🌊","🌸","🌺","🌻","🌙","☀️",
+  "👾","🤖","👻","💀","🎃","🦸","🦹","🧙","🧛","🧜","🧚","🦕","🐊","🦈",
+  "🍄","🌵","🌴","🍀","🌿","🎈","🎁","🎀","🎨","🎭","🎪","🎢","🎯","🎳"
+];
+const AVATAR_GRADIENTS = [
+  ["#ff6384","#ff9a5c"], ["#36a2eb","#5ce1e6"], ["#ffce56","#ffb84d"],
+  ["#4bc0c0","#6ee7b7"], ["#9966ff","#c88cff"], ["#ff9f40","#ffcc70"],
+  ["#2ecc71","#a2e8b8"], ["#e74c3c","#ff8c66"], ["#f093fb","#f5576c"],
+  ["#4facfe","#00f2fe"], ["#43e97b","#38f9d7"], ["#fa709a","#fee140"],
+  ["#a18cd1","#fbc2eb"], ["#f6d365","#fda085"], ["#a1c4fd","#c2e9fb"],
+  ["#d4fc79","#96e6a1"], ["#fbc2eb","#a6c1ee"], ["#fdcbf1","#e6dee9"],
+  ["#c1dfc4","#deecdd"], ["#ffecd2","#fcb69f"]
+];
+const AVATAR_COLORS = ["#ff6384","#36a2eb","#ffce56","#4bc0c0","#9966ff",
+  "#ff9f40","#2ecc71","#e74c3c","#f093fb","#4facfe","#43e97b","#fa709a",
+  "#a18cd1","#f6d365","#a1c4fd","#d4fc79","#fbc2eb","#ff8a80","#80d8ff","#b388ff"];
+
+function randomAvatar() {
+  const emoji = rnd(AVATAR_EMOJIS);
+  const [c1, c2] = rnd(AVATAR_GRADIENTS);
+  return {
+    emoji,
+    color: c1,
+    gradient: `linear-gradient(135deg, ${c1}, ${c2})`,
+  };
+}
+
+// ============ ДАННЫЕ ============
 const RESIDENTS = [
   { nick:"67_kid", color:"#ff5c5c", kind:"spam",
     lines:["67","67 67","67??","шестьдесят семь","67forever","67!!!"] },
@@ -451,7 +543,6 @@ const DONATORS = ["Whale_777","KingDonater","MegaBoss","Anonym","RichBoi",
   "DiamondHand","TopDon","ShadowWallet","CryptoKing","PapaDoner"];
 const DONATE_AMOUNTS = [50,100,200,500,1000,2000,5000,10000];
 
-const COLORS = ["#ff6384","#36a2eb","#ffce56","#4bc0c0","#9966ff","#ff9f40","#2ecc71","#e74c3c"];
 const rnd = a => a[Math.floor(Math.random()*a.length)];
 const ri  = (a,b) => Math.floor(Math.random()*(b-a+1))+a;
 
@@ -512,15 +603,19 @@ function toast(text) {
   toastEl.textContent = text;
   toastEl.classList.add("show");
   clearTimeout(toast._t);
-  toast._t = setTimeout(() => toastEl.classList.remove("show"), 2200);
+  toastEl._t = setTimeout(() => toastEl.classList.remove("show"), 2200);
 }
 
-function markActivity() {
-  state.lastActivity = Date.now();
-}
+function markActivity() { state.lastActivity = Date.now(); }
 
 function spawnChat(text=null, nick=null, color=null, opts={}) {
-  nick = nick || rnd(NICKS);
+  // Генерируем уникальные ник и аватар если не переданы явно
+  const isResident = !!opts.isResident;
+  if (!nick && !isResident) nick = randomNick();
+  if (!nick) nick = rnd(RESIDENTS).nick;
+  if (!color && !isResident) color = rnd(AVATAR_COLORS);
+  if (!color) color = "#ff6384";
+
   if (text === null) {
     if (currentTopic && Date.now() < currentTopic.expires && Math.random() < 0.75) {
       text = rnd(currentTopic.replies);
@@ -533,23 +628,30 @@ function spawnChat(text=null, nick=null, color=null, opts={}) {
       }
     }
   }
-  color = color || rnd(COLORS);
+
+  // Аватарка: у резидентов — буква, у обычных — случайный эмодзи+градиент
+  let avHTML;
+  if (isResident) {
+    avHTML = `<div class="cm-av" style="background:${color}">${nick[0].toUpperCase()}</div>`;
+  } else {
+    const av = randomAvatar();
+    avHTML = `<div class="cm-av" style="background:${av.gradient}">${av.emoji}</div>`;
+  }
+
   const el = document.createElement("div");
   el.className = "cm" + (opts.reply ? " reply" : "");
   el.innerHTML = `
-    <div class="cm-av" style="background:${color}">${nick[0].toUpperCase()}</div>
+    ${avHTML}
     <div class="cm-body">
-      <div class="cm-nick">${nick}</div>
+      <div class="cm-nick" style="color:${color}">${nick}</div>
       <div class="cm-text">${text}</div>
     </div>`;
   commentsEl.appendChild(el);
   while (commentsEl.children.length > 22) commentsEl.removeChild(commentsEl.firstChild);
   setTimeout(() => { if (el.parentNode) el.remove(); }, 13000);
   pipAdd(nick, text, color, !!opts.reply);
-  rememberMessage({ nick, text, time:Date.now(),
-    isResident:!!opts.isResident, kind:opts.kind || null });
-  // обычный (не резидент) чат = активность
-  if (!opts.isResident) markActivity();
+  rememberMessage({ nick, text, time:Date.now(), isResident, kind:opts.kind || null });
+  if (!isResident) markActivity();
 }
 
 function spawnNote(text, sub="", color="#ffd700", cls="") {
@@ -667,7 +769,7 @@ function donationEvent() {
 
 function subscriptionEvent() {
   markActivity();
-  const nick = rnd(SUBSCRIBERS);
+  const nick = randomNick();
   spawnNote(`${nick} подписался!`, "новый подписчик ✅", "#8cff8c", "sub");
   state.hype = Math.min(1, state.hype + 0.2);
   sfx.subscribe();
@@ -680,10 +782,6 @@ function subscriptionEvent() {
 let lastTick = performance.now();
 function updateCounters(dt) {
   state.hype = Math.max(0, state.hype - dt*0.18);
-
-  // Логика зрителей:
-  // Если активность была < 12 сек назад — растём по 28/сек (≈2500 за 1.5 мин).
-  // Если тишина > 12 сек — постепенно падаем.
   const idleTime = (Date.now() - state.lastActivity) / 1000;
   if (idleTime < 12) {
     state.tv += 28 * dt;
@@ -691,7 +789,6 @@ function updateCounters(dt) {
     state.tv -= 15 * dt;
     if (state.tv < 300) state.tv = 300;
   }
-
   state.viewers += (state.tv - state.viewers) * Math.min(1, dt * 1.5);
   const v = state.viewers;
   let label;
@@ -850,28 +947,19 @@ pipVideo.addEventListener("leavepictureinpicture", () => {
   state.pipActive = false; $("rbPiP").classList.remove("on");
 });
 
-// ============ ЗАПИСЬ (MediaRecorder) ============
+// ============ ЗАПИСЬ ============
 let mediaRecorder = null;
 let recChunks = [];
 
 function startRecording() {
   try {
-    // Берём тот же поток, что и PiP (canvas c камерой + субтитрами + чатом)
     const stream = pipCanvas.captureStream(30);
-
-    // подбор mimeType
     let mime = "";
-    const tries = [
-      "video/mp4;codecs=h264",
-      "video/mp4",
-      "video/webm;codecs=vp9",
-      "video/webm;codecs=vp8",
-      "video/webm"
-    ];
+    const tries = ["video/mp4;codecs=h264","video/mp4",
+                   "video/webm;codecs=vp9","video/webm;codecs=vp8","video/webm"];
     for (const t of tries) {
       if (window.MediaRecorder && MediaRecorder.isTypeSupported(t)) { mime = t; break; }
     }
-
     mediaRecorder = new MediaRecorder(stream, mime ? { mimeType: mime } : undefined);
     recChunks = [];
     mediaRecorder.ondataavailable = (e) => {
@@ -887,30 +975,22 @@ function startRecording() {
         const stamp = new Date().toISOString().replace(/[:.]/g,"-").slice(0,19);
         a.href = url;
         a.download = `grand-cat-${stamp}.${ext}`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
         setTimeout(() => URL.revokeObjectURL(url), 15000);
         toast("💾 Видео сохранено");
-      } catch (err) {
-        toast("Ошибка сохранения: " + err.message);
-      }
+      } catch (err) { toast("Ошибка сохранения: " + err.message); }
     };
     mediaRecorder.start(1000);
     state.isRecording = true;
     $("recDot").style.display = "block";
     $("recBadge").classList.add("show");
     toast("🔴 Запись начата");
-  } catch (e) {
-    toast("Ошибка записи: " + (e.message || "недоступно"));
-  }
+  } catch (e) { toast("Ошибка записи: " + (e.message || "недоступно")); }
 }
 
 function stopRecording() {
   try {
-    if (mediaRecorder && mediaRecorder.state !== "inactive") {
-      mediaRecorder.stop();
-    }
+    if (mediaRecorder && mediaRecorder.state !== "inactive") mediaRecorder.stop();
   } catch (e) {}
   state.isRecording = false;
   $("recDot").style.display = "none";
@@ -918,11 +998,9 @@ function stopRecording() {
 }
 
 function toggleRecording() {
-  if (state.isRecording) stopRecording();
-  else startRecording();
+  if (state.isRecording) stopRecording(); else startRecording();
 }
 
-// ============ ЦИКЛ ============
 let lastChat=0, lastEv=0, lastNotify=0, lastResident=0, lastAutoEmoji=0;
 const donationCooldown = 60000;
 const subCooldown = 45000;
@@ -959,7 +1037,6 @@ function loop(now) {
   requestAnimationFrame(loop);
 }
 
-// ============ КАМЕРА ============
 async function startCamera() {
   try {
     const stream = await navigator.mediaDevices.getUserMedia({
@@ -981,7 +1058,6 @@ async function flipCamera() {
   await startCamera();
 }
 
-// ============ МИКРОФОН ============
 let recognition = null;
 let micRunning = false;
 
@@ -1059,7 +1135,6 @@ function pulse(el) {
   setTimeout(() => el.classList.remove("pulse"), 380);
 }
 
-// ============ КНОПКИ ============
 $("rbRec").addEventListener("click", e => { pulse(e.currentTarget); toggleRecording(); });
 $("rbFlip").addEventListener("click", e => { pulse(e.currentTarget); flipCamera(); });
 $("rbMic").addEventListener("click", e => { pulse(e.currentTarget); toggleMic(); });
@@ -1069,6 +1144,10 @@ $("rbPiP").addEventListener("click", e => {
   if (state.pipActive) exitPiP(); else enterPiP();
 });
 $("closeX").addEventListener("click", () => { if (confirm("Закрыть стрим?")) location.reload(); });
+
+// Устанавливаем SVG аватарки grand-cat
+$("hostAvTop").innerHTML = HOST_AVATAR_SVG;
+$("hostAvRail").innerHTML = HOST_AVATAR_SVG;
 
 $("startBtn").addEventListener("click", async () => {
   initAudio();
