@@ -8,9 +8,12 @@
 <title>LIVE</title>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-html, body { width:100%; height:100%; overflow:hidden; background:#000;
+html { width:100%; height:100%; overflow:hidden; background:#000; position:fixed; }
+body { width:100%; height:100%; overflow:hidden; background:#000;
   font-family:-apple-system,"Segoe UI",Roboto,sans-serif; color:#fff;
-  user-select:none; -webkit-user-select:none; position:fixed; }
+  user-select:none; -webkit-user-select:none;
+  position:fixed; top:0; left:0;
+  overscroll-behavior:none; }
 
 #cam, #screen {
   position:fixed; top:0; left:0;
@@ -44,7 +47,7 @@ html, body { width:100%; height:100%; overflow:hidden; background:#000;
   z-index:10; }
 .host { display:flex; align-items:center; gap:8px; min-width:0; }
 .host-av { width:36px; height:36px; border-radius:50%; flex:0 0 36px;
-  background:#25d366; overflow:hidden;
+  background:#25a4d3; overflow:hidden;
   display:flex; align-items:center; justify-content:center;
   font-size:20px; font-weight:700; color:#fff;
   box-shadow:0 0 0 2px rgba(255,255,255,.6); }
@@ -65,7 +68,6 @@ html, body { width:100%; height:100%; overflow:hidden; background:#000;
   justify-content:center; pointer-events:auto; cursor:pointer; }
 .close-x svg { width:22px; height:22px; }
 
-/* Кнопки — выше */
 .rail { position:absolute; right:6px; top:14%;
   display:flex; flex-direction:column; gap:18px; align-items:center;
   pointer-events:auto; z-index:9; }
@@ -179,12 +181,18 @@ body.banner-show .comments { opacity:0; transform:translateY(20px); }
 .rec-badge.show { display:flex; }
 .rec-badge .dot { width:8px; height:8px; border-radius:50%; background:#ff3838;
   animation:dotPulse 1.2s ease-in-out infinite; }
+
+/* Пустой слой для тапа — по нему определяем «тап в пустоту» */
+#tapLayer { position:fixed; inset:0; z-index:1;
+  -webkit-tap-highlight-color:transparent; }
 </style>
 </head>
 <body>
 
 <video id="cam" autoplay playsinline muted></video>
 <video id="pipVideo" autoplay muted style="display:none"></video>
+
+<div id="tapLayer"></div>
 
 <div class="rec-badge" id="recBadge">
   <span class="dot"></span>
@@ -295,7 +303,6 @@ const state = {
   isRecording: false,
 };
 
-// ============ ГЕНЕРАТОР НИКОВ ============
 const NICK_PRE = ["dark","pro","mega","ultra","super","tiny","angry","happy",
   "sleepy","hungry","epic","cool","bad","best","real","cyber","neo","pixel",
   "retro","cosmic","alpha","beta","omega","night","day","moon","sun","star",
@@ -322,28 +329,17 @@ function randomNick() {
   for (let i = 0; i < 60; i++) {
     const r = Math.random();
     let nick;
-    if (r < 0.28) {
-      nick = rnd(NICK_PRE) + "_" + rnd(NICK_ROOT);
-    } else if (r < 0.50) {
-      nick = rnd(NICK_ROOT) + "_" + rnd(NICK_SUF.filter(s => s));
-    } else if (r < 0.68) {
-      nick = "xX_" + rnd(NICK_ROOT) + "_Xx";
-    } else if (r < 0.82) {
-      nick = rnd(NICK_PRE) + rnd(NICK_ROOT) + ri(1, 999);
-    } else if (r < 0.92) {
-      nick = rnd(NICK_ROOT) + ri(1, 99);
-    } else {
-      nick = rnd(NICK_PRE).toUpperCase() + rnd(NICK_ROOT).toUpperCase();
-    }
-    if (!usedNicks.has(nick)) {
-      usedNicks.add(nick);
-      return nick;
-    }
+    if (r < 0.28) nick = rnd(NICK_PRE) + "_" + rnd(NICK_ROOT);
+    else if (r < 0.50) nick = rnd(NICK_ROOT) + "_" + rnd(NICK_SUF.filter(s => s));
+    else if (r < 0.68) nick = "xX_" + rnd(NICK_ROOT) + "_Xx";
+    else if (r < 0.82) nick = rnd(NICK_PRE) + rnd(NICK_ROOT) + ri(1, 999);
+    else if (r < 0.92) nick = rnd(NICK_ROOT) + ri(1, 99);
+    else nick = rnd(NICK_PRE).toUpperCase() + rnd(NICK_ROOT).toUpperCase();
+    if (!usedNicks.has(nick)) { usedNicks.add(nick); return nick; }
   }
   return "user" + ri(1000, 99999);
 }
 
-// ============ ГЕНЕРАТОР АВАТАРОК ============
 const AVATAR_EMOJIS = [
   "🐱","🐶","🦊","🐼","🐯","🦁","🐸","🐵","🐰","🐻","🐨","🐷",
   "🦄","🐲","🦖","🐙","🦋","🐝","🐢","🦉","🦅","🐺","🐗","🦔","🐹","🐭",
@@ -372,7 +368,6 @@ function randomAvatar() {
   return { emoji, color: c1, gradient: `linear-gradient(135deg, ${c1}, ${c2})` };
 }
 
-// ============ ДАННЫЕ ============
 const RESIDENTS = [
   { nick:"67_kid", color:"#ff5c5c", kind:"spam",
     lines:["67","67 67","67??","шестьдесят семь","67forever","67!!!"] },
@@ -775,9 +770,7 @@ function renderPiP() {
     pipCtx.textBaseline = "middle";
     let t = pipCaption;
     const maxW = W - 40;
-    while (pipCtx.measureText(t).width > maxW && t.length > 1) {
-      t = t.slice(0, -1);
-    }
+    while (pipCtx.measureText(t).width > maxW && t.length > 1) t = t.slice(0, -1);
     pipCtx.fillText(t, W/2, videoH + captionH/2);
   }
 
@@ -868,7 +861,6 @@ pipVideo.addEventListener("leavepictureinpicture", () => {
   state.pipActive = false; $("rbPiP").classList.remove("on");
 });
 
-// ============ ЗАПИСЬ ============
 let mediaRecorder = null;
 let recChunks = [];
 
@@ -1065,6 +1057,25 @@ $("rbPiP").addEventListener("click", e => {
   if (state.pipActive) exitPiP(); else enterPiP();
 });
 $("closeX").addEventListener("click", () => { if (confirm("Закрыть стрим?")) location.reload(); });
+
+// ============ СКРЫТИЕ ПАНЕЛИ SAFARI ПО ТАПУ ============
+function hideSafariBar() {
+  // пытаемся войти в fullscreen если поддерживается
+  try {
+    const el = document.documentElement;
+    if (el.requestFullscreen) { el.requestFullscreen({ navigationUI: "hide" }).catch(()=>{}); return; }
+    if (el.webkitRequestFullscreen) { el.webkitRequestFullscreen(); return; }
+  } catch (e) {}
+  // для iOS Safari — хак со скроллом
+  try {
+    window.scrollTo(0, 1);
+    setTimeout(() => window.scrollTo(0, 0), 60);
+  } catch (e) {}
+}
+
+// Тап по «пустому» слою = скрыть панель
+$("tapLayer").addEventListener("click", hideSafariBar);
+$("tapLayer").addEventListener("touchstart", hideSafariBar, { passive: true });
 
 $("startBtn").addEventListener("click", async () => {
   initAudio();
