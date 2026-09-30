@@ -12,18 +12,12 @@ html { width:100%; height:100%; overflow:hidden; background:#000; position:fixed
 body { width:100%; height:100%; overflow:hidden; background:#000;
   font-family:-apple-system,"Segoe UI",Roboto,sans-serif; color:#fff;
   user-select:none; -webkit-user-select:none;
-  position:fixed; top:0; left:0;
-  overscroll-behavior:none; }
+  position:fixed; top:0; left:0; overscroll-behavior:none; }
 
-#cam, #screen {
-  position:fixed; top:0; left:0;
+#cam { position:fixed; top:0; left:0;
   width:100vw; height:100vh;
   object-fit:cover; -webkit-object-fit:cover;
-  object-position:center center;
-  background:#000; z-index:1;
-}
-#cam { transform:scaleX(-1); }
-#screen { display:none; }
+  background:#000; z-index:1; transform:scaleX(-1); }
 #ui { position:fixed; inset:0; z-index:2; pointer-events:none; }
 
 #island { position:absolute; top:calc(8px + env(safe-area-inset-top)); left:50%;
@@ -32,8 +26,6 @@ body { width:100%; height:100%; overflow:hidden; background:#000;
   border-radius:22px; padding:4px 12px 4px 4px; height:34px; z-index:5;
   box-shadow:0 6px 20px rgba(0,0,0,.7), 0 0 0 1px rgba(255,255,255,.08);
   transition:opacity .25s, transform .35s cubic-bezier(.2,1.3,.4,1); }
-#islandCam { width:26px; height:26px; border-radius:50%; object-fit:cover;
-  background:#1a1a1a; transform:scaleX(-1); }
 .island-info { display:flex; align-items:center; gap:6px; }
 .island-dot { width:8px; height:8px; border-radius:50%; background:#ff3838;
   box-shadow:0 0 8px #ff3838; animation:dotPulse 1.4s ease-in-out infinite; }
@@ -83,14 +75,25 @@ body { width:100%; height:100%; overflow:hidden; background:#000;
 .rb.pulse { animation:rpls .35s ease-out; }
 @keyframes rpls { 0%{transform:scale(1);} 50%{transform:scale(1.2);} 100%{transform:scale(1);} }
 
-.comments { position:absolute; left:12px; right:80px; bottom:110px;
-  max-height:50%; overflow:hidden; display:flex; flex-direction:column;
-  justify-content:flex-end; gap:7px; transition:all .35s ease;
-  z-index:3; }
+/* ЧАТ — скроллится */
+.comments {
+  position:absolute; left:12px; right:80px; bottom:110px;
+  max-height:52%;
+  overflow-y:auto; overflow-x:hidden;
+  display:flex; flex-direction:column; gap:7px;
+  padding-top:28px; padding-bottom:6px;
+  z-index:3; pointer-events:auto;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain;
+  scrollbar-width:none;
+  -webkit-mask-image:linear-gradient(180deg,transparent 0%,#000 14%,#000 100%);
+  mask-image:linear-gradient(180deg,transparent 0%,#000 14%,#000 100%);
+}
+.comments::-webkit-scrollbar { display:none; }
 .cm { display:flex; align-items:flex-start; gap:8px; background:rgba(0,0,0,.42);
   backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
   padding:7px 12px 7px 8px; border-radius:20px; max-width:100%;
-  animation:cmin .28s ease-out; }
+  animation:cmin .28s ease-out; flex:0 0 auto; }
 .cm.reply { margin-left:26px; background:rgba(0,0,0,.55); }
 @keyframes cmin { from{opacity:0; transform:translateY(12px);} to{opacity:1;} }
 .cm-av { flex:0 0 26px; width:26px; height:26px; border-radius:50%;
@@ -111,7 +114,7 @@ body.banner-show .comments { opacity:0; transform:translateY(20px); }
 .caption.interim { opacity:.75; font-style:italic; }
 @keyframes capIn { from{opacity:0; transform:translateY(6px);} to{opacity:1;} }
 
-.hearts { position:absolute; right:20px; bottom:auto; top:60%;
+.hearts { position:absolute; right:20px; top:60%;
   width:60px; height:40vh; overflow:visible; pointer-events:none;
   z-index:3; }
 .heart { position:absolute; bottom:0; font-size:26px;
@@ -119,7 +122,7 @@ body.banner-show .comments { opacity:0; transform:translateY(20px); }
 
 .notes { position:absolute; top:80px; left:12px; right:12px;
   display:flex; flex-direction:column; gap:6px;
-  align-items:flex-start; z-index:8; }
+  align-items:flex-start; z-index:8; pointer-events:none; }
 .note { background:linear-gradient(135deg, rgba(0,0,0,.85), rgba(40,10,60,.85));
   backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
   padding:10px 14px; border-radius:14px; font-size:13px;
@@ -140,13 +143,11 @@ body.banner-show .comments { opacity:0; transform:translateY(20px); }
   backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
   border:2px solid #fff; box-shadow:0 8px 60px rgba(255,200,80,.5);
   display:none; animation:bnin .5s cubic-bezier(.2,1.3,.4,1);
-  text-align:center; z-index:50; }
-.banner .b-nick { font-size:15px; font-weight:600; margin-bottom:8px;
-  opacity:.85; }
+  text-align:center; z-index:50; pointer-events:none; }
+.banner .b-nick { font-size:15px; font-weight:600; margin-bottom:8px; opacity:.85; }
 .banner .b-amount { font-size:32px; font-weight:900;
   margin-bottom:10px; letter-spacing:-.5px; }
-.banner .b-text { font-size:15px; opacity:.95; line-height:1.45;
-  font-weight:500; }
+.banner .b-text { font-size:15px; opacity:.95; line-height:1.45; font-weight:500; }
 @keyframes bnin {
   0%{transform:scale(.5); opacity:0;}
   60%{transform:scale(1.05); opacity:1;}
@@ -182,9 +183,21 @@ body.banner-show .comments { opacity:0; transform:translateY(20px); }
 .rec-badge .dot { width:8px; height:8px; border-radius:50%; background:#ff3838;
   animation:dotPulse 1.2s ease-in-out infinite; }
 
-/* Пустой слой для тапа — по нему определяем «тап в пустоту» */
-#tapLayer { position:fixed; inset:0; z-index:1;
-  -webkit-tap-highlight-color:transparent; }
+#tapLayer { position:fixed; inset:0; z-index:1; -webkit-tap-highlight-color:transparent; }
+
+/* Модалка сохранения видео */
+#saveModal { position:fixed; inset:0; z-index:100; background:rgba(0,0,0,.85);
+  display:none; flex-direction:column; align-items:center; justify-content:center;
+  padding:30px; text-align:center; }
+#saveModal.show { display:flex; }
+#saveModal .sm-title { font-size:20px; font-weight:800; margin-bottom:8px; }
+#saveModal .sm-sub { font-size:13px; opacity:.7; margin-bottom:24px;
+  line-height:1.5; }
+#saveModal .sm-btn { background:#ff2850; color:#fff; border:none;
+  padding:14px 28px; border-radius:26px; font-size:15px; font-weight:700;
+  margin-bottom:10px; min-width:200px; cursor:pointer; }
+#saveModal .sm-btn.secondary { background:rgba(255,255,255,.15);
+  color:#fff; }
 </style>
 </head>
 <body>
@@ -200,7 +213,6 @@ body.banner-show .comments { opacity:0; transform:translateY(20px); }
 </div>
 
 <div id="island">
-  <video id="islandCam" autoplay playsinline muted></video>
   <div class="island-info">
     <span class="island-dot"></span>
     <span class="island-txt">REC</span>
@@ -286,6 +298,13 @@ body.banner-show .comments { opacity:0; transform:translateY(20px); }
   </div>
 </div>
 
+<div id="saveModal">
+  <div class="sm-title">🎬 Видео готово</div>
+  <div class="sm-sub" id="smSub">Нажми «Сохранить» — откроется меню iPhone, там выбери «Сохранить в Фото» или «Файлы»</div>
+  <button class="sm-btn" id="smSave">📥 Сохранить видео</button>
+  <button class="sm-btn secondary" id="smClose">Закрыть</button>
+</div>
+
 <div id="start">
   <h1>🎥 Fake Live Stream</h1>
   <p>grand-cat ведёт стрим. Разреши камеру и микрофон — боты отвечают по теме, слова идут в субтитры.</p>
@@ -303,6 +322,7 @@ const state = {
   isRecording: false,
 };
 
+// ============ ГЕНЕРАТОР НИКОВ ============
 const NICK_PRE = ["dark","pro","mega","ultra","super","tiny","angry","happy",
   "sleepy","hungry","epic","cool","bad","best","real","cyber","neo","pixel",
   "retro","cosmic","alpha","beta","omega","night","day","moon","sun","star",
@@ -311,7 +331,6 @@ const NICK_PRE = ["dark","pro","mega","ultra","super","tiny","angry","happy",
   "sad","lonely","brave","mighty","lil","big","small","young","old","sweet",
   "sour","spicy","chilly","warm","frost","blaze","aqua","terra","wind","sand",
   "snow","rain","mist","cloud","dusk","dawn","horizon","galaxy","comet","nova"];
-
 const NICK_ROOT = ["cat","wolf","fox","dragon","ninja","hacker","gamer","player",
   "boy","girl","kid","dude","bro","guy","friend","legend","master","boss",
   "king","queen","lord","knight","mage","witch","ghost","demon","angel",
@@ -319,11 +338,9 @@ const NICK_ROOT = ["cat","wolf","fox","dragon","ninja","hacker","gamer","player"
   "star","vibe","soul","spirit","reaper","hunter","rider","walker","seeker",
   "sniper","warrior","samurai","viking","pirate","cowboy","alien","zombie",
   "vampire","dwarf","elf","orc","goblin","titan","phoenix","pegasus","sphinx"];
-
-const NICK_SUF = ["", "", "", "", "01","07","13","22","47","69","77","88","99",
+const NICK_SUF = ["","","","","01","07","13","22","47","69","77","88","99",
   "100","123","2000","2020","2024","228","333","420","555","666","777","888",
   "999","xX","Xx","YT","TV","GG","OP","PRO","TOP","GOD"];
-
 const usedNicks = new Set();
 function randomNick() {
   for (let i = 0; i < 60; i++) {
@@ -347,21 +364,18 @@ const AVATAR_EMOJIS = [
   "⚽","🏀","🎮","🎲","🎯","🎸","🎧","🎤","🎬","📱","💻","🖥️","🎨","📷",
   "🌈","⭐","✨","💫","🔥","❄️","⚡","💧","🌊","🌸","🌺","🌻","🌙","☀️",
   "👾","🤖","👻","💀","🎃","🦸","🦹","🧙","🧛","🧜","🧚","🦕","🐊","🦈",
-  "🍄","🌵","🌴","🍀","🌿","🎈","🎁","🎀","🎨","🎭","🎪","🎢","🎯","🎳"
-];
+  "🍄","🌵","🌴","🍀","🌿","🎈","🎁","🎀","🎨","🎭","🎪","🎢","🎯","🎳"];
 const AVATAR_GRADIENTS = [
-  ["#ff6384","#ff9a5c"], ["#36a2eb","#5ce1e6"], ["#ffce56","#ffb84d"],
-  ["#4bc0c0","#6ee7b7"], ["#9966ff","#c88cff"], ["#ff9f40","#ffcc70"],
-  ["#2ecc71","#a2e8b8"], ["#e74c3c","#ff8c66"], ["#f093fb","#f5576c"],
-  ["#4facfe","#00f2fe"], ["#43e97b","#38f9d7"], ["#fa709a","#fee140"],
-  ["#a18cd1","#fbc2eb"], ["#f6d365","#fda085"], ["#a1c4fd","#c2e9fb"],
-  ["#d4fc79","#96e6a1"], ["#fbc2eb","#a6c1ee"], ["#fdcbf1","#e6dee9"],
-  ["#c1dfc4","#deecdd"], ["#ffecd2","#fcb69f"]
-];
+  ["#ff6384","#ff9a5c"],["#36a2eb","#5ce1e6"],["#ffce56","#ffb84d"],
+  ["#4bc0c0","#6ee7b7"],["#9966ff","#c88cff"],["#ff9f40","#ffcc70"],
+  ["#2ecc71","#a2e8b8"],["#e74c3c","#ff8c66"],["#f093fb","#f5576c"],
+  ["#4facfe","#00f2fe"],["#43e97b","#38f9d7"],["#fa709a","#fee140"],
+  ["#a18cd1","#fbc2eb"],["#f6d365","#fda085"],["#a1c4fd","#c2e9fb"],
+  ["#d4fc79","#96e6a1"],["#fbc2eb","#a6c1ee"],["#fdcbf1","#e6dee9"],
+  ["#c1dfc4","#deecdd"],["#ffecd2","#fcb69f"]];
 const AVATAR_COLORS = ["#ff6384","#36a2eb","#ffce56","#4bc0c0","#9966ff",
   "#ff9f40","#2ecc71","#e74c3c","#f093fb","#4facfe","#43e97b","#fa709a",
   "#a18cd1","#f6d365","#a1c4fd","#d4fc79","#fbc2eb","#ff8a80","#80d8ff","#b388ff"];
-
 function randomAvatar() {
   const emoji = rnd(AVATAR_EMOJIS);
   const [c1, c2] = rnd(AVATAR_GRADIENTS);
@@ -415,10 +429,53 @@ const THEMES = [
   { name:"любовь",
     keys:["любл","люблю","скуча","нрав","обожа","сердц"],
     replies:["аааа ❤️","мы тоже тебя любим","милота","взаимно","я растаял 💕"] },
-  { name:"вопрос",
-    keys:["почему","зачем","как ","что ","где ","когда ","сколько"],
-    replies:["сложный вопрос","а сам как думаешь?","хм, интересно",
-             "ну я думаю да","загугли лучше","вот это вопрос"] },
+];
+
+// Ответы ботов на вопросы
+const ANSWER_REPLIES = [
+  "хороший вопрос!",
+  "думаю да",
+  "думаю нет",
+  "хм, не уверен",
+  "ну я думаю так",
+  "да, скорее всего",
+  "нет, вряд ли",
+  "это зависит",
+  "как по мне — да",
+  "по-любому да",
+  "а сам как думаешь?",
+  "а ты как считаешь?",
+  "интересно, я об этом не думал",
+  "хм, сложно сказать",
+  "ну вроде да",
+  "честно — не знаю",
+  "да, точно",
+  "ну не совсем",
+  "я тоже так думаю",
+  "логично же"
+];
+// Если вопрос про «как»/«почему» — можно дать более осмысленный ответ
+const WHY_REPLIES = [
+  "потому что так надо",
+  "потому что интересно",
+  "а почему нет?",
+  "потому что так и есть",
+  "хм, потому что...",
+  "потому что модно",
+];
+const HOW_REPLIES = [
+  "легко!",
+  "просто делай как я",
+  "сначала так, потом так",
+  "не так уж и сложно",
+  "нужно попробовать",
+];
+const WHAT_REPLIES = [
+  "это что-то интересное",
+  "не знаю точно",
+  "ну это...",
+  "что-то крутое",
+  "вроде так",
 ];
 
 const EMOJIS_BY_THEME = {
@@ -429,7 +486,6 @@ const EMOJIS_BY_THEME = {
   "приветствие":["🥰","❤️","👍","😂","🗿"],
   "погода":     ["🥰","👍","❤️","🗿"],
   "любовь":     ["🥰","❤️","😂","🤣"],
-  "вопрос":     ["🤯","👍","😂","🗿"],
 };
 const EMOJIS_ALL = ["🥰","👍","🤮","👎","❤️","😂","🤣","🤯","🗿"];
 
@@ -441,7 +497,6 @@ const DONATE_BY_THEME = {
   "приветствие":["с приветом 👋","за то что заметил","привет от фаната","здарова!"],
   "погода":    ["за тёплую погоду","пусть будет солнце ☀️","за настроение"],
   "любовь":    ["люблю тебя! ❤️","за то что ты есть","сердечко тебе","ты классный"],
-  "вопрос":    ["за хороший вопрос","спасибо за ответ!","ты объяснил, держи"],
 };
 
 const DONATE_REASONS = [
@@ -459,7 +514,6 @@ const GENERIC_CHAT = ["жиза","база","согласен","+1","💯","эт
 
 const DONATORS = ["Whale_777","KingDonater","MegaBoss","Anonym","RichBoi",
   "DiamondHand","TopDon","ShadowWallet","CryptoKing","PapaDoner"];
-const DONATE_AMOUNTS = [50,100,200,500,1000,2000,5000,10000];
 
 const rnd = a => a[Math.floor(Math.random()*a.length)];
 const ri  = (a,b) => Math.floor(Math.random()*(b-a+1))+a;
@@ -480,6 +534,27 @@ function detectThemes(text) {
   for (const th of THEMES) if (th.keys.some(k => t.includes(k))) found.push(th);
   return found;
 }
+
+// Проверяем, является ли фраза вопросом
+function isQuestion(text) {
+  if (!text) return false;
+  const t = text.trim().toLowerCase();
+  if (t.endsWith("?")) return true;
+  const start = ["что","кто","где","когда","почему","зачем","как",
+                 "сколько","какой","какая","какие","куда","откуда",
+                 "чей","чья","можно ли","правда ли","верно ли"];
+  for (const w of start) if (t.startsWith(w)) return true;
+  return false;
+}
+
+function pickAnswer(text) {
+  const t = (text||"").toLowerCase();
+  if (t.startsWith("почему") || t.startsWith("зачем")) return rnd(WHY_REPLIES);
+  if (t.startsWith("как") || t.startsWith("можно ли")) return rnd(HOW_REPLIES);
+  if (t.startsWith("что") || t.startsWith("кто")) return rnd(WHAT_REPLIES);
+  return rnd(ANSWER_REPLIES);
+}
+
 function pickEmoji() {
   if (currentTopic && Date.now() < currentTopic.expires
       && EMOJIS_BY_THEME[currentTopic.name]) {
@@ -508,6 +583,7 @@ function tone(freq, dur, vol=0.25, type="sine", delay=0, slideTo=null) {
 const sfx = {
   donateBig: () => { [523,659,784,1047,1319].forEach((f,i)=>tone(f,0.20,0.20,"triangle",i*0.06));
                      tone(2093,0.6,0.12,"sine",0.30); },
+  donateSmall: () => { tone(660,0.15,0.20); tone(880,0.20,0.20,"sine",0.1); },
   subscribe: () => { tone(660,0.15,0.20); tone(880,0.15,0.20,"sine",0.10);
                      tone(1320,0.25,0.22,"sine",0.20); },
   pop:       () => { tone(1800,0.04,0.14,"square"); tone(900,0.06,0.10); },
@@ -526,6 +602,47 @@ function toast(text) {
 
 function markActivity() { state.lastActivity = Date.now(); }
 
+// ============ СКРОЛЛ ЧАТА ============
+let autoScroll = true;
+let scrollTimer = null;
+commentsEl.addEventListener("scroll", () => {
+  const nearBottom = commentsEl.scrollHeight - commentsEl.scrollTop
+                    - commentsEl.clientHeight < 30;
+  if (!nearBottom) {
+    autoScroll = false;
+    clearTimeout(scrollTimer);
+    scrollTimer = setTimeout(() => {
+      autoScroll = true;
+      smoothScrollToBottom();
+    }, 2000);
+  } else {
+    autoScroll = true;
+    clearTimeout(scrollTimer);
+  }
+});
+commentsEl.addEventListener("touchstart", () => {
+  clearTimeout(scrollTimer);
+  const nearBottom = commentsEl.scrollHeight - commentsEl.scrollTop
+                    - commentsEl.clientHeight < 30;
+  if (!nearBottom) autoScroll = false;
+});
+commentsEl.addEventListener("touchend", () => {
+  clearTimeout(scrollTimer);
+  scrollTimer = setTimeout(() => {
+    autoScroll = true;
+    smoothScrollToBottom();
+  }, 2000);
+});
+
+function smoothScrollToBottom() {
+  try {
+    commentsEl.scrollTo({ top: commentsEl.scrollHeight, behavior: "smooth" });
+  } catch (e) {
+    commentsEl.scrollTop = commentsEl.scrollHeight;
+  }
+}
+
+// ============ СПАВН ЧАТА ============
 function spawnChat(text=null, nick=null, color=null, opts={}) {
   const isResident = !!opts.isResident;
   if (!nick && !isResident) nick = randomNick();
@@ -563,8 +680,10 @@ function spawnChat(text=null, nick=null, color=null, opts={}) {
       <div class="cm-text">${text}</div>
     </div>`;
   commentsEl.appendChild(el);
-  while (commentsEl.children.length > 22) commentsEl.removeChild(commentsEl.firstChild);
-  setTimeout(() => { if (el.parentNode) el.remove(); }, 13000);
+  // Храним больше сообщений, чтобы было что листать
+  while (commentsEl.children.length > 60) commentsEl.removeChild(commentsEl.firstChild);
+  setTimeout(() => { if (el.parentNode) el.remove(); }, 45000);
+  if (autoScroll) smoothScrollToBottom();
   pipAdd(nick, text, color, !!opts.reply);
   rememberMessage({ nick, text, time:Date.now(), isResident, kind:opts.kind || null });
   if (!isResident) markActivity();
@@ -650,21 +769,47 @@ function showCaption(text, isInterim) {
   }
 }
 
+// ============ РЕАКЦИЯ НА РЕЧЬ ============
 function onUserSpoke(text) {
   if (!text || text.trim().length < 2) return;
   markActivity();
   const themes = detectThemes(text);
   if (themes.length > 0) setTopic(rnd(themes));
-  const n = ri(3, 5);
+
+  const question = isQuestion(text);
+  const n = question ? ri(4, 6) : ri(3, 5);
+
   for (let i = 0; i < n; i++) {
-    setTimeout(() => spawnChat(), i * ri(180, 420));
+    setTimeout(() => {
+      if (question && Math.random() < 0.7) {
+        // Отвечаем на вопрос
+        spawnChat(pickAnswer(text));
+      } else if (currentTopic && Date.now() < currentTopic.expires
+                 && Math.random() < 0.75) {
+        spawnChat(rnd(currentTopic.replies));
+      } else {
+        spawnChat();
+      }
+    }, i * ri(180, 420));
   }
   state.hype = Math.min(1, state.hype + 0.15);
 }
 
+// ============ ПРОГРЕССИВНЫЕ ДОНАТЫ ============
+function pickDonateAmount() {
+  const v = state.viewers;
+  if (v < 40000)      return ri(10, 50);
+  if (v < 50000)      return ri(50, 100);
+  if (v < 100000)     return ri(100, 1000);
+  if (v < 500000)     return ri(500, 5000);
+  if (v < 1000000)    return ri(1000, 10000);
+  if (v < 5000000)    return ri(5000, 50000);
+  return ri(10000, 100000);
+}
+
 function donationEvent() {
   markActivity();
-  const d = rnd(DONATORS), a = rnd(DONATE_AMOUNTS);
+  const d = rnd(DONATORS), a = pickDonateAmount();
   let reason;
   if (currentTopic && Date.now() < currentTopic.expires
       && DONATE_BY_THEME[currentTopic.name] && Math.random() < 0.7) {
@@ -675,8 +820,8 @@ function donationEvent() {
   spawnBanner(d, a, reason, "#ff50b4");
   spawnNote(`${d} задонатил ${a.toLocaleString("ru-RU")} ₽`, reason, "#ff78c8", "donate");
   state.hype = Math.min(1, state.hype + 0.5);
-  sfx.donateBig();
-  boom("💎", 14);
+  if (a >= 1000) sfx.donateBig(); else sfx.donateSmall();
+  boom("💎", 10 + Math.min(20, Math.floor(a / 200)));
   setTimeout(() => spawnChat(rnd(["вау донат 💎","спасибо!","щедро!","ого!","топ"])), 300);
   setTimeout(() => spawnChat(rnd(["респект","красава","щедрый!"])), 800);
   state.lastEvent = Date.now();
@@ -695,6 +840,16 @@ function subscriptionEvent() {
   state.lastEvent = Date.now();
 }
 
+// ============ ФОРМАТ ЧИСЛА ЗРИТЕЛЕЙ ============
+function formatViewers(v) {
+  if (v >= 1000000) {
+    const m = v / 1000000;
+    return (m >= 10 ? Math.floor(m) : m.toFixed(1)) + " млн";
+  }
+  if (v >= 1000) return (v/1000).toFixed(1) + "K";
+  return String(Math.floor(v));
+}
+
 let lastTick = performance.now();
 function updateCounters(dt) {
   state.hype = Math.max(0, state.hype - dt*0.18);
@@ -706,14 +861,10 @@ function updateCounters(dt) {
     if (state.tv < 300) state.tv = 300;
   }
   state.viewers += (state.tv - state.viewers) * Math.min(1, dt * 1.5);
-  const v = state.viewers;
-  let label;
-  if (v >= 1000000) label = (v/1000000).toFixed(1) + "M";
-  else if (v >= 1000) label = (v/1000).toFixed(1) + "K";
-  else label = Math.floor(v);
-  $("viewers").textContent = label;
+  $("viewers").textContent = formatViewers(state.viewers);
 }
 
+// ============ PiP ============
 const pipCanvas = document.createElement("canvas");
 pipCanvas.width = 540; pipCanvas.height = 960;
 const pipCtx = pipCanvas.getContext("2d");
@@ -726,7 +877,6 @@ function pipAdd(nick, text, color, isReply) {
   pipHistory.push({ nick, text, color, isReply, t: Date.now() });
   while (pipHistory.length > 12) pipHistory.shift();
 }
-
 function drawCovered(ctx, video, W, H, mirror) {
   if (!video || video.readyState < 2 || !video.videoWidth) return;
   const vw = video.videoWidth, vh = video.videoHeight;
@@ -738,7 +888,6 @@ function drawCovered(ctx, video, W, H, mirror) {
     ctx.drawImage(video, W-dx-dw, dy, dw, dh); ctx.restore();
   } else ctx.drawImage(video, dx, dy, dw, dh);
 }
-
 function roundRect(ctx, x, y, w, h, r) {
   ctx.beginPath();
   ctx.moveTo(x+r, y);
@@ -757,9 +906,7 @@ function renderPiP() {
 
   pipCtx.fillStyle = "#000";
   pipCtx.fillRect(0, 0, W, H);
-
-  const cam = $("cam");
-  drawCovered(pipCtx, cam, W, videoH, state.facing === "user");
+  drawCovered(pipCtx, $("cam"), W, videoH, state.facing === "user");
 
   pipCtx.fillStyle = "#0a0a0a";
   pipCtx.fillRect(0, videoH, W, captionH);
@@ -794,9 +941,8 @@ function renderPiP() {
     let finalText = m.text;
     const maxW = W - 60 - nickW;
     pipCtx.font = `500 ${size}px -apple-system,sans-serif`;
-    while (pipCtx.measureText(finalText).width > maxW && finalText.length > 1) {
+    while (pipCtx.measureText(finalText).width > maxW && finalText.length > 1)
       finalText = finalText.slice(0, -1);
-    }
     pipCtx.fillStyle = m.color || "#fff";
     pipCtx.font = `700 ${size}px -apple-system,sans-serif`;
     const x = m.isReply ? 30 : 16;
@@ -817,10 +963,7 @@ function renderPiP() {
   pipCtx.fillText("LIVE", 26, 28);
 
   pipCtx.fillStyle = "rgba(0,0,0,.55)";
-  const v = state.viewers;
-  const vTxt = v >= 1000000 ? (v/1000000).toFixed(1) + "M"
-             : v >= 1000 ? (v/1000).toFixed(1) + "K"
-             : Math.floor(v);
+  const vTxt = formatViewers(state.viewers);
   pipCtx.font = "700 14px -apple-system,sans-serif";
   const vw2 = pipCtx.measureText(vTxt).width + 34;
   roundRect(pipCtx, 80, 14, vw2, 26, 6);
@@ -848,7 +991,6 @@ function enterPiP() {
     } else toast("PiP не поддерживается");
   } catch (e) { toast("PiP: " + e.message); }
 }
-
 async function exitPiP() {
   try {
     if (document.pictureInPictureElement) await document.exitPictureInPicture();
@@ -861,15 +1003,25 @@ pipVideo.addEventListener("leavepictureinpicture", () => {
   state.pipActive = false; $("rbPiP").classList.remove("on");
 });
 
+// ============ ЗАПИСЬ ============
 let mediaRecorder = null;
 let recChunks = [];
+let lastBlob = null;
+let lastFilename = "";
 
 function startRecording() {
   try {
     const stream = pipCanvas.captureStream(30);
+    // Пробуем MP4 первым — iOS его понимает нативно
     let mime = "";
-    const tries = ["video/mp4;codecs=h264","video/mp4",
-                   "video/webm;codecs=vp9","video/webm;codecs=vp8","video/webm"];
+    const tries = [
+      "video/mp4;codecs=avc1",
+      "video/mp4;codecs=h264",
+      "video/mp4",
+      "video/webm;codecs=vp9",
+      "video/webm;codecs=vp8",
+      "video/webm"
+    ];
     for (const t of tries) {
       if (window.MediaRecorder && MediaRecorder.isTypeSupported(t)) { mime = t; break; }
     }
@@ -881,16 +1033,18 @@ function startRecording() {
     mediaRecorder.onstop = () => {
       try {
         const type = mediaRecorder.mimeType || "video/webm";
-        const blob = new Blob(recChunks, { type });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        const ext = type.includes("mp4") ? "mp4" : "webm";
+        const isMp4 = type.includes("mp4");
+        const ext = isMp4 ? "mp4" : "webm";
         const stamp = new Date().toISOString().replace(/[:.]/g,"-").slice(0,19);
-        a.href = url;
-        a.download = `grand-cat-${stamp}.${ext}`;
-        document.body.appendChild(a); a.click(); document.body.removeChild(a);
-        setTimeout(() => URL.revokeObjectURL(url), 15000);
-        toast("💾 Видео сохранено");
+        const filename = `grand-cat-${stamp}.${ext}`;
+        const blob = new Blob(recChunks, { type });
+        lastBlob = blob;
+        lastFilename = filename;
+        // Показываем модалку с кнопкой «Сохранить»
+        $("saveModal").classList.add("show");
+        $("smSub").textContent = isMp4
+          ? "Нажми «Сохранить» — откроется меню iPhone, там выбери «Сохранить в Фото» или «Файлы»"
+          : "Файл в формате WebM (iOS его не всегда открывает). Нажми «Сохранить» и выбери «Сохранить в Файлы», затем открой в VLC или конвертируй.";
       } catch (err) { toast("Ошибка сохранения: " + err.message); }
     };
     mediaRecorder.start(1000);
@@ -914,6 +1068,37 @@ function toggleRecording() {
   if (state.isRecording) stopRecording(); else startRecording();
 }
 
+// Сохранение через Share Sheet iOS
+async function saveVideoFile() {
+  if (!lastBlob) return;
+  const file = new File([lastBlob], lastFilename, { type: lastBlob.type });
+  // Пытаемся использовать Share API (работает на iPhone)
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    try {
+      await navigator.share({ files: [file], title: lastFilename });
+      toast("✅ Сохранено");
+      $("saveModal").classList.remove("show");
+      return;
+    } catch (e) {
+      if (e.name === "AbortError") return; // пользователь отменил
+    }
+  }
+  // Fallback — обычная загрузка
+  try {
+    const url = URL.createObjectURL(lastBlob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = lastFilename;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 30000);
+    toast("💾 Файл скачан");
+    $("saveModal").classList.remove("show");
+  } catch (e) {
+    toast("Не удалось сохранить: " + e.message);
+  }
+}
+
+// ============ ЦИКЛ ============
 let lastChat=0, lastEv=0, lastNotify=0, lastResident=0, lastAutoEmoji=0;
 const donationCooldown = 60000;
 const subCooldown = 45000;
@@ -938,8 +1123,7 @@ function loop(now) {
   if (state.emojisOn) {
     const autoInt = 700 + Math.random() * 900;
     if (now - lastAutoEmoji > autoInt) {
-      const batch = ri(1, 3);
-      boom(pickEmoji(), batch);
+      boom(pickEmoji(), ri(1, 3));
       lastAutoEmoji = now;
     }
   }
@@ -1058,22 +1242,19 @@ $("rbPiP").addEventListener("click", e => {
 });
 $("closeX").addEventListener("click", () => { if (confirm("Закрыть стрим?")) location.reload(); });
 
-// ============ СКРЫТИЕ ПАНЕЛИ SAFARI ПО ТАПУ ============
+// Модалка сохранения
+$("smSave").addEventListener("click", saveVideoFile);
+$("smClose").addEventListener("click", () => $("saveModal").classList.remove("show"));
+
+// Скрытие панели Safari по тапу в пустоту
 function hideSafariBar() {
-  // пытаемся войти в fullscreen если поддерживается
   try {
     const el = document.documentElement;
     if (el.requestFullscreen) { el.requestFullscreen({ navigationUI: "hide" }).catch(()=>{}); return; }
     if (el.webkitRequestFullscreen) { el.webkitRequestFullscreen(); return; }
   } catch (e) {}
-  // для iOS Safari — хак со скроллом
-  try {
-    window.scrollTo(0, 1);
-    setTimeout(() => window.scrollTo(0, 0), 60);
-  } catch (e) {}
+  try { window.scrollTo(0, 1); setTimeout(() => window.scrollTo(0, 0), 60); } catch (e) {}
 }
-
-// Тап по «пустому» слою = скрыть панель
 $("tapLayer").addEventListener("click", hideSafariBar);
 $("tapLayer").addEventListener("touchstart", hideSafariBar, { passive: true });
 
