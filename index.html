@@ -42,7 +42,7 @@ body.screen-mode #island { opacity:1; transform:translateX(-50%) scale(1); }
   padding-top:calc(12px + env(safe-area-inset-top));
   background:linear-gradient(180deg,rgba(0,0,0,.65) 0%,rgba(0,0,0,0) 100%);
   display:flex; align-items:center; justify-content:space-between; gap:8px;
-  transition:opacity .3s; }
+  transition:opacity .3s; z-index:10; }
 body.screen-mode .top { opacity:.55; }
 .host { display:flex; align-items:center; gap:8px; min-width:0; }
 .host-av { width:34px; height:34px; border-radius:50%; flex:0 0 34px;
@@ -58,8 +58,6 @@ body.screen-mode .top { opacity:.55; }
 .top-right { display:flex; align-items:center; gap:8px; }
 .live-badge { background:#ff2850; padding:3px 7px; border-radius:4px;
   font-size:11px; font-weight:800; letter-spacing:.5px; }
-
-/* Иконка просмотров — SVG как на фото */
 .viewers { display:flex; align-items:center; gap:5px;
   background:rgba(0,0,0,.5); padding:4px 8px; border-radius:5px;
   font-size:12px; font-weight:700; }
@@ -68,11 +66,9 @@ body.screen-mode .top { opacity:.55; }
   justify-content:center; pointer-events:auto; cursor:pointer; }
 .close-x svg { width:22px; height:22px; }
 
-/* Правый рельс — кнопки меньше и выше как на фото */
-.rail { position:absolute; right:6px; bottom:auto;
-  top:22%; /* выше, чем было */
+.rail { position:absolute; right:6px; bottom:auto; top:22%;
   display:flex; flex-direction:column; gap:16px; align-items:center;
-  pointer-events:auto; transition:top .3s; }
+  pointer-events:auto; transition:top .3s; z-index:9; }
 body.screen-mode .rail { top:70px; }
 .rb { width:40px; height:40px; display:flex; align-items:center;
   justify-content:center; cursor:pointer; position:relative;
@@ -80,8 +76,10 @@ body.screen-mode .rail { top:70px; }
 .rb:active { transform:scale(.82); }
 .rb svg { width:28px; height:28px; display:block;
   filter:drop-shadow(0 2px 5px rgba(0,0,0,.75)); }
-.rb.on svg path, .rb.on svg circle, .rb.on svg rect, .rb.on svg polyline,
-.rb.on svg line { stroke:#ff2850 !important; }
+/* Красная подсветка ТОЛЬКО для экрана и PiP */
+.rb.red-active.on svg path, .rb.red-active.on svg circle,
+.rb.red-active.on svg rect, .rb.red-active.on svg polyline,
+.rb.red-active.on svg line { stroke:#ff2850 !important; }
 .rb.pulse { animation:rpls .35s ease-out; }
 @keyframes rpls { 0%{transform:scale(1);} 50%{transform:scale(1.2);} 100%{transform:scale(1);} }
 
@@ -96,7 +94,8 @@ body.screen-mode .rail { top:70px; }
 
 .comments { position:absolute; left:12px; right:80px; bottom:110px;
   max-height:50%; overflow:hidden; display:flex; flex-direction:column;
-  justify-content:flex-end; gap:7px; transition:all .35s ease; }
+  justify-content:flex-end; gap:7px; transition:all .35s ease;
+  z-index:3; }
 .cm { display:flex; align-items:flex-start; gap:8px; background:rgba(0,0,0,.42);
   backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
   padding:7px 12px 7px 8px; border-radius:20px; max-width:100%;
@@ -109,6 +108,9 @@ body.screen-mode .rail { top:70px; }
 .cm-body { flex:1; min-width:0; }
 .cm-nick { font-size:11px; opacity:.75; margin-bottom:1px; }
 .cm-text { font-size:13px; line-height:1.3; word-break:break-word; }
+
+/* Прячем чат на время баннера — чтобы прочитать донат */
+body.banner-show .comments { opacity:0; transform:translateY(20px); }
 
 body.screen-mode .comments { left:6px; right:72px; top:70px; bottom:auto;
   max-height:calc(100vh - 220px); justify-content:flex-start; gap:5px;
@@ -126,20 +128,19 @@ body.screen-mode .cm-text { font-size:11px; line-height:1.25; }
 body.screen-mode .cm:nth-child(odd)  { align-self:flex-start; }
 body.screen-mode .cm:nth-child(even) { align-self:flex-end; }
 
-/* СУБТИТРЫ — в реальном времени, крупные */
 .caption { position:absolute; left:16px; right:80px; bottom:56px;
   text-align:center; font-size:17px; font-weight:800; padding:10px 16px;
   background:rgba(0,0,0,.72); border-radius:14px; display:none;
   backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
   animation:capIn .15s ease-out; line-height:1.3;
-  text-shadow:0 1px 3px rgba(0,0,0,.8); }
+  text-shadow:0 1px 3px rgba(0,0,0,.8); z-index:4; }
 .caption.interim { opacity:.75; font-style:italic; }
 @keyframes capIn { from{opacity:0; transform:translateY(6px);} to{opacity:1;} }
 body.screen-mode .caption { right:72px; bottom:24px; font-size:13px; padding:7px 11px; }
 
 .hearts { position:absolute; right:20px; bottom:auto; top:60%;
   width:60px; height:40vh; overflow:visible; pointer-events:none;
-  transition:all .35s; }
+  transition:all .35s; z-index:3; }
 .heart { position:absolute; bottom:0; font-size:26px;
   will-change:transform,opacity; }
 body.screen-mode .hearts { right:auto; left:6px; bottom:auto; top:70px;
@@ -148,7 +149,7 @@ body.screen-mode .heart { bottom:auto; top:0; }
 
 .notes { position:absolute; top:80px; left:12px; right:12px;
   display:flex; flex-direction:column; gap:6px; transition:top .3s;
-  align-items:flex-start; }
+  align-items:flex-start; z-index:8; }
 body.screen-mode .notes { top:56px; opacity:.85; }
 .note { background:linear-gradient(135deg, rgba(0,0,0,.85), rgba(40,10,60,.85));
   backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
@@ -164,22 +165,45 @@ body.screen-mode .notes { top:56px; opacity:.85; }
 @keyframes ntin { from{transform:translateX(-30px) scale(.9); opacity:0;}
   to{transform:none; opacity:1;} }
 
-.banner { position:absolute; top:28%; left:22px; right:22px;
-  padding:18px 20px; border-radius:18px; background:rgba(0,0,0,.9);
-  backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
-  border:2px solid #fff; box-shadow:0 0 40px rgba(255,200,80,.45);
-  display:none; animation:bnin .5s cubic-bezier(.2,1.3,.4,1); transition:top .3s;
-  text-align:center; }
-body.screen-mode .banner { top:20%; left:14px; right:14px; padding:14px 16px; }
-.banner .gift-icon { font-size:60px; line-height:1; margin-bottom:8px;
-  animation:giftPop .6s cubic-bezier(.2,1.5,.4,1); }
-@keyframes giftPop { 0%{transform:scale(0) rotate(-30deg);}
-  60%{transform:scale(1.2) rotate(10deg);} 100%{transform:scale(1) rotate(0);} }
-.banner .b-nick { font-size:16px; font-weight:700; margin-bottom:6px; opacity:.9; }
-.banner .b-gift { font-size:22px; font-weight:800; margin-bottom:6px; }
-.banner .b-text { font-size:14px; opacity:.9; line-height:1.4; }
+/* БОЛЬШОЙ БАННЕР — поверх всего */
+.banner { position:absolute; top:24%; left:16px; right:16px;
+  padding:22px 20px; border-radius:20px;
+  background:linear-gradient(135deg, rgba(20,10,30,.98), rgba(40,10,60,.98));
+  backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
+  border:2px solid #fff; box-shadow:0 8px 60px rgba(255,200,80,.5);
+  display:none; animation:bnin .5s cubic-bezier(.2,1.3,.4,1);
+  text-align:center; z-index:50; }
+.banner .b-nick { font-size:15px; font-weight:600; margin-bottom:8px;
+  opacity:.85; }
+.banner .b-amount { font-size:32px; font-weight:900;
+  margin-bottom:10px; letter-spacing:-.5px; }
+.banner .b-text { font-size:15px; opacity:.95; line-height:1.45;
+  font-weight:500; }
+@keyframes bnin {
+  0%{transform:scale(.5); opacity:0;}
+  60%{transform:scale(1.05); opacity:1;}
+  100%{transform:scale(1);}
+}
 
-#start { position:fixed; inset:0; z-index:30; background:#0a0a14;
+/* Панель эмодзи — как в TikTok */
+.emoji-panel { position:absolute; left:0; right:0; bottom:0; z-index:30;
+  background:linear-gradient(180deg,rgba(15,15,25,.98),rgba(10,10,20,.98));
+  border-top-left-radius:22px; border-top-right-radius:22px;
+  padding:14px 14px calc(18px + env(safe-area-inset-bottom));
+  pointer-events:auto;
+  transform:translateY(110%); transition:transform .3s cubic-bezier(.2,1,.3,1);
+  box-shadow:0 -10px 40px rgba(0,0,0,.6); }
+.emoji-panel.show { transform:translateY(0); }
+.emoji-panel h3 { font-size:14px; margin-bottom:12px; opacity:.85;
+  font-weight:600; display:flex; justify-content:space-between;
+  align-items:center; }
+.emoji-grid { display:grid; grid-template-columns:repeat(6, 1fr); gap:6px; }
+.emoji-item { font-size:30px; text-align:center; padding:8px 0;
+  border-radius:12px; cursor:pointer;
+  transition:transform .12s, background .15s; }
+.emoji-item:active { transform:scale(.85); background:rgba(255,255,255,.15); }
+
+#start { position:fixed; inset:0; z-index:40; background:#0a0a14;
   display:flex; flex-direction:column; align-items:center;
   justify-content:center; padding:30px; text-align:center; }
 #start h1 { font-size:24px; margin-bottom:14px; }
@@ -268,7 +292,6 @@ body.screen-mode .banner { top:20%; left:14px; right:14px; padding:14px 16px; }
   <div class="caption" id="caption"></div>
   <div class="toast" id="toast"></div>
 
-  <!-- Кнопки меньше и выше -->
   <div class="rail">
     <div class="rail-av">
       <div class="host-av" style="width:40px;height:40px;flex:0 0 40px;">
@@ -294,11 +317,11 @@ body.screen-mode .banner { top:20%; left:14px; right:14px; padding:14px 16px; }
       <div class="plus">+</div>
     </div>
 
-    <!-- Пип -->
-    <div class="rb" id="rbPiP" title="Маленькое окно">
+    <!-- PiP — краснеет когда активен -->
+    <div class="rb red-active" id="rbPiP" title="Маленькое окно">
       <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linejoin="round">
         <rect x="2" y="4" width="20" height="16" rx="2"/>
-        <rect x="12" y="12" width="8" height="6" rx="1" fill="#fff" stroke="none"/>
+        <rect x="12" y="12" width="8" height="6" rx="1" fill="none"/>
       </svg>
     </div>
 
@@ -313,7 +336,7 @@ body.screen-mode .banner { top:20%; left:14px; right:14px; padding:14px 16px; }
     </div>
 
     <!-- Трансляция экрана -->
-    <div class="rb" id="rbScreen" title="Трансляция экрана">
+    <div class="rb red-active" id="rbScreen" title="Трансляция экрана">
       <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linejoin="round">
         <rect x="3" y="4" width="18" height="13" rx="2"/>
         <line x1="8" y1="20" x2="16" y2="20"/>
@@ -322,18 +345,18 @@ body.screen-mode .banner { top:20%; left:14px; right:14px; padding:14px 16px; }
       </svg>
     </div>
 
-    <!-- Микрофон (авто, тап = мьют) -->
-    <div class="rb on" id="rbMic" title="Микрофон">
+    <!-- Микрофон — БЕЛЫЙ всегда, перечёркнут при мьюте -->
+    <div class="rb" id="rbMic" title="Микрофон">
       <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
         <rect x="9" y="3" width="6" height="12" rx="3"/>
         <path d="M5 11a7 7 0 0 0 14 0"/>
         <line x1="12" y1="18" x2="12" y2="22"/>
         <line x1="8" y1="22" x2="16" y2="22"/>
-        <line id="micSlash" x1="4" y1="4" x2="20" y2="20" style="display:none"/>
+        <line id="micSlash" x1="4" y1="4" x2="20" y2="20" stroke="#fff" stroke-width="2.2" style="display:none"/>
       </svg>
     </div>
 
-    <!-- Эмодзи -->
+    <!-- Кнопка эмодзи — открывает панель -->
     <div class="rb" id="rbEmoji" title="Эмодзи">
       <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round">
         <circle cx="12" cy="12" r="9"/>
@@ -345,17 +368,23 @@ body.screen-mode .banner { top:20%; left:14px; right:14px; padding:14px 16px; }
   </div>
 </div>
 
+<!-- Панель эмодзи -->
+<div class="emoji-panel" id="emojiPanel">
+  <h3>Эмодзи <span style="font-size:11px;opacity:.6">тап → полетит 🚀</span></h3>
+  <div class="emoji-grid" id="emojiGrid"></div>
+</div>
+
 <div id="start">
   <h1>🎥 Fake Live Stream</h1>
-  <p>grand-cat ведёт стрим. Разреши камеру и микрофон — боты отвечают по теме, а твои слова идут в субтитры.</p>
+  <p>grand-cat ведёт стрим. Разреши камеру и микрофон — боты отвечают по теме, слова идут в субтитры.</p>
   <button id="startBtn">▶ Старт</button>
 </div>
 
 <script>
 const state = {
-  viewers: 1240, tv: 1240, likes: 34200, coins: 0, hype: 0.3,
+  viewers: 1240, tv: 1240, likes: 34200, hype: 0.3,
   muted: false, screenOn: false, micOn: false, micMuted: false, facing: "user",
-  pipActive: false,
+  pipActive: false, lastEvent: Date.now(),
 };
 
 const NICKS = ["xXx_Shadow","kotik_2024","AlexTop","moon_girl","NEON_777",
@@ -416,7 +445,6 @@ const THEMES = [
              "ну я думаю да","загугли лучше","вот это вопрос"] },
 ];
 
-// Тематические донаты — под событие
 const DONATE_BY_THEME = {
   "музыка":    ["за трек 🎵","на новый трек","включи ещё такой!","музыка топ, держи"],
   "игры":      ["на катку!","за ранг!","го в пати, это тебе","за игровой скилл"],
@@ -428,12 +456,10 @@ const DONATE_BY_THEME = {
   "вопрос":    ["за хороший вопрос","спасибо за ответ!","ты объяснил, держи"],
 };
 
-// Причины донатов — когда блогер попросил или чтобы заметили
 const DONATE_REASONS = [
   "за то что заметил моё сообщение",
   "чтобы ты увидел моё сообщение 👀",
   "ты просил поддержать — держи",
-  "ты сказал что нужно — на!",
   "прочитай моё сообщение, пожалуйста",
   "за то что ответил мне ранее",
   "чтобы ты заметил меня",
@@ -450,11 +476,17 @@ const DONATORS = ["Whale_777","KingDonater","MegaBoss","Anonym","RichBoi",
   "DiamondHand","TopDon","ShadowWallet","CryptoKing","PapaDoner"];
 const DONATE_AMOUNTS = [50,100,200,500,1000,2000,5000,10000];
 
+const EMOJI_LIST = ["🔥","❤️","😂","👏","💯","⚡","🎉","😎","🤯","✨","💎","🚀",
+  "😍","🥰","👍","🙌","💪","🤩","😭","🥳","🤣","😅","👀","💀",
+  "🦄","🌈","⭐","🍕","🐱","🐶"];
+
+// Автопоток смайликов — рандом
+const AUTO_EMOJIS = ["❤️","🔥","😂","💯","👍","🎉","😎","⚡","✨","😍","🙌","👏"];
+
 const COLORS = ["#ff6384","#36a2eb","#ffce56","#4bc0c0","#9966ff","#ff9f40","#2ecc71","#e74c3c"];
 const rnd = a => a[Math.floor(Math.random()*a.length)];
 const ri  = (a,b) => Math.floor(Math.random()*(b-a+1))+a;
 
-// ============ КОНТЕКСТ ============
 let currentTopic = null;
 const recentMessages = [];
 function rememberMessage(m) {
@@ -491,15 +523,13 @@ function tone(freq, dur, vol=0.25, type="sine", delay=0, slideTo=null) {
   o.start(t0); o.stop(t0+dur+0.05);
 }
 const sfx = {
-  donateSmall: () => { tone(880,0.10,0.22); tone(1320,0.13,0.22,"sine",0.08); },
-  donateBig:   () => { [523,659,784,1047,1319].forEach((f,i)=>tone(f,0.20,0.20,"triangle",i*0.06));
-                       tone(2093,0.6,0.12,"sine",0.30); },
-  subscribe:   () => { tone(660,0.15,0.20); tone(880,0.15,0.20,"sine",0.10);
-                       tone(1320,0.25,0.22,"sine",0.20); },
-  viewer:      () => tone(1200,0.06,0.13),
-  pop:         () => { tone(1800,0.04,0.14,"square"); tone(900,0.06,0.10); },
-  like:        () => tone(1500,0.05,0.10,"triangle"),
-  reply:       () => { tone(1300,0.05,0.08,"triangle"); tone(1700,0.06,0.07,"triangle",0.05); },
+  donateBig: () => { [523,659,784,1047,1319].forEach((f,i)=>tone(f,0.20,0.20,"triangle",i*0.06));
+                     tone(2093,0.6,0.12,"sine",0.30); },
+  subscribe: () => { tone(660,0.15,0.20); tone(880,0.15,0.20,"sine",0.10);
+                     tone(1320,0.25,0.22,"sine",0.20); },
+  viewer:    () => tone(1200,0.06,0.13),
+  pop:       () => { tone(1800,0.04,0.14,"square"); tone(900,0.06,0.10); },
+  like:      () => tone(1500,0.05,0.10,"triangle"),
 };
 
 const $ = id => document.getElementById(id);
@@ -513,7 +543,6 @@ function toast(text) {
   toast._t = setTimeout(() => toastEl.classList.remove("show"), 2200);
 }
 
-// ============ ЧАТ ============
 function spawnChat(text=null, nick=null, color=null, opts={}) {
   nick = nick || rnd(NICKS);
   if (text === null) {
@@ -557,15 +586,21 @@ function spawnNote(text, sub="", color="#ffd700", cls="") {
   setTimeout(() => { if (el.parentNode) el.remove(); }, 5000);
 }
 
-function spawnBanner(text, sub, color) {
+// БАННЕР ПОВЕРХ ВСЕГО + скрытие чата пока показан
+function spawnBanner(nick, amount, reason, color) {
   bannerEl.innerHTML = `
-    <div class="b-gift" style="color:${color}">${text}</div>
-    ${sub ? `<div class="b-text">${sub}</div>` : ""}`;
+    <div class="b-nick">${nick}</div>
+    <div class="b-amount" style="color:${color}">💎 ${amount.toLocaleString("ru-RU")} ₽</div>
+    <div class="b-text">${reason}</div>`;
   bannerEl.style.borderColor = color;
-  bannerEl.style.boxShadow = `0 0 40px ${color}66`;
+  bannerEl.style.boxShadow = `0 8px 60px ${color}88`;
   bannerEl.style.display = "block";
+  document.body.classList.add("banner-show");
   clearTimeout(spawnBanner._t);
-  spawnBanner._t = setTimeout(() => { bannerEl.style.display = "none"; }, 4200);
+  spawnBanner._t = setTimeout(() => {
+    bannerEl.style.display = "none";
+    document.body.classList.remove("banner-show");
+  }, 5000);
 }
 
 function boom(emoji, count=16) {
@@ -574,13 +609,13 @@ function boom(emoji, count=16) {
     el.className = "heart"; el.textContent = emoji;
     el.style.right = (Math.random()*40) + "px";
     el.style.left = "auto";
-    el.style.fontSize = ri(20,34) + "px";
+    el.style.fontSize = ri(22,36) + "px";
     heartsEl.appendChild(el);
-    const vx = (Math.random()-0.5)*30;
+    const vx = (Math.random()-0.5)*40;
     const vy = document.body.classList.contains("screen-mode") ? ri(220,400) : -ri(220,400);
     el.animate([
-      { transform:"translate(0,0)", opacity:1 },
-      { transform:`translate(${vx}px,${vy}px)`, opacity:0 }
+      { transform:"translate(0,0) scale(.5)", opacity:1 },
+      { transform:`translate(${vx}px,${vy}px) scale(1.2)`, opacity:0 }
     ], { duration: ri(1500,2400), easing:"ease-out" }).onfinish = () => el.remove();
   }
 }
@@ -613,7 +648,7 @@ function residentSpam(resident) {
     { isResident:true, kind:resident.kind });
 }
 
-// ============ СУБТИТРЫ + РЕАКЦИЯ НА РЕЧЬ ============
+// ============ СУБТИТРЫ ============
 function showCaption(text, isInterim) {
   captionEl.textContent = text;
   captionEl.style.display = "block";
@@ -635,21 +670,18 @@ function onUserSpoke(text) {
   state.hype = Math.min(1, state.hype + 0.15);
 }
 
-// ============ ДОНАТЫ (раз в минуту) ============
+// ============ ДОНАТЫ ============
 function donationEvent() {
   const d = rnd(DONATORS), a = rnd(DONATE_AMOUNTS);
   let reason;
-  // Если есть активная тема — донат по теме
   if (currentTopic && Date.now() < currentTopic.expires
       && DONATE_BY_THEME[currentTopic.name] && Math.random() < 0.7) {
     reason = rnd(DONATE_BY_THEME[currentTopic.name]);
   } else {
-    // Иначе — «попросил» / «чтобы заметили»
     reason = rnd(DONATE_REASONS);
   }
+  spawnBanner(d, a, reason, "#ff50b4");
   spawnNote(`${d} задонатил ${a.toLocaleString("ru-RU")} ₽`, reason, "#ff78c8", "donate");
-  spawnBanner(`💎 ${a.toLocaleString("ru-RU")} ₽`, `${d}: ${reason}`, "#ff50b4");
-  state.coins += a * 10;
   state.tv += ri(500, 2000);
   state.hype = Math.min(1, state.hype + 0.5);
   sfx.donateBig();
@@ -690,6 +722,8 @@ const pipCtx = pipCanvas.getContext("2d");
 const pipVideo = $("pipVideo");
 let pipStream = null;
 const pipHistory = [];
+let pipCaption = "";
+
 function pipAdd(nick, text, color, isReply) {
   pipHistory.push({ nick, text, color, isReply, t: Date.now() });
   while (pipHistory.length > 12) pipHistory.shift();
@@ -719,28 +753,50 @@ function roundRect(ctx, x, y, w, h, r) {
 
 function renderPiP() {
   const W = pipCanvas.width, H = pipCanvas.height;
-  const videoH = Math.floor(H * 0.68);
+  const videoH = Math.floor(H * 0.60);
+  const captionH = 60;
+  const chatH = H - videoH - captionH;
+
   pipCtx.fillStyle = "#000";
   pipCtx.fillRect(0, 0, W, H);
+
   const cam = $("cam"), screen = $("screen");
   const useScreen = state.screenOn && screen.readyState >= 2 && screen.videoWidth;
   if (useScreen) drawCovered(pipCtx, screen, W, videoH, false);
   else drawCovered(pipCtx, cam, W, videoH, state.facing === "user");
 
+  // СУБТИТРЫ под видео
+  pipCtx.fillStyle = "#0a0a0a";
+  pipCtx.fillRect(0, videoH, W, captionH);
+  if (pipCaption) {
+    pipCtx.fillStyle = "#fff";
+    pipCtx.font = "700 22px -apple-system,sans-serif";
+    pipCtx.textAlign = "center";
+    pipCtx.textBaseline = "middle";
+    let t = pipCaption;
+    const maxW = W - 40;
+    while (pipCtx.measureText(t).width > maxW && t.length > 1) {
+      t = t.slice(0, -1);
+    }
+    pipCtx.fillText(t, W/2, videoH + captionH/2);
+  }
+
+  // Чат в чёрной области
   pipCtx.fillStyle = "#000";
-  pipCtx.fillRect(0, videoH, W, H - videoH);
+  pipCtx.fillRect(0, videoH + captionH, W, chatH);
   pipCtx.fillStyle = "rgba(255,255,255,.15)";
-  pipCtx.fillRect(0, videoH, W, 2);
+  pipCtx.fillRect(0, videoH + captionH, W, 2);
+  pipCtx.fillRect(0, videoH, W, 1);
 
   const now = Date.now();
-  const items = pipHistory.filter(m => now - m.t < 15000).slice(-7);
+  const items = pipHistory.filter(m => now - m.t < 15000).slice(-6);
   pipCtx.textBaseline = "middle";
   pipCtx.textAlign = "left";
-  let y = videoH + 30;
-  const lineH = 40;
+  let y = videoH + captionH + 26;
+  const lineH = 38;
   for (let i = items.length - 1; i >= 0; i--) {
     const m = items[i];
-    const size = 20;
+    const size = 19;
     pipCtx.font = `700 ${size}px -apple-system,sans-serif`;
     const nickW = pipCtx.measureText(m.nick + ": ").width;
     let finalText = m.text;
@@ -757,15 +813,16 @@ function renderPiP() {
     pipCtx.font = `500 ${size}px -apple-system,sans-serif`;
     pipCtx.fillText(finalText, x + nickW, y);
     y += lineH;
-    if (y > H - 20) break;
+    if (y > H - 10) break;
   }
 
+  // LIVE + просмотры сверху
   pipCtx.fillStyle = "#ff2850";
   roundRect(pipCtx, 14, 14, 58, 26, 6);
   pipCtx.fill();
   pipCtx.fillStyle = "#fff";
   pipCtx.font = "800 14px -apple-system,sans-serif";
-  pipCtx.textAlign = "left"; pipCtx.textBaseline = "middle";
+  pipCtx.textAlign = "left";
   pipCtx.fillText("LIVE", 26, 28);
 
   pipCtx.fillStyle = "rgba(0,0,0,.55)";
@@ -774,7 +831,6 @@ function renderPiP() {
   const vw2 = pipCtx.measureText(vTxt).width + 34;
   roundRect(pipCtx, 80, 14, vw2, 26, 6);
   pipCtx.fill();
-  // eye icon
   pipCtx.strokeStyle = "#fff"; pipCtx.lineWidth = 1.8;
   pipCtx.beginPath();
   pipCtx.ellipse(92, 27, 8, 5, 0, 0, Math.PI*2);
@@ -812,9 +868,9 @@ pipVideo.addEventListener("leavepictureinpicture", () => {
 });
 
 // ============ ЦИКЛ ============
-let lastChat=0, lastEv=0, lastNotify=0, lastLike=0, lastResident=0;
-let donationCooldown = 60000; // 1 минута
-let subCooldown = 45000;
+let lastChat=0, lastEv=0, lastNotify=0, lastLike=0, lastResident=0, lastAutoEmoji=0;
+const donationCooldown = 60000;
+const subCooldown = 45000;
 
 function loop(now) {
   const dt = (now - lastTick) / 1000;
@@ -826,21 +882,23 @@ function loop(now) {
   const resInt = (3500 - state.hype * 1500) + Math.random() * 1500;
   if (now - lastResident > resInt) { residentSpam(rnd(RESIDENTS)); lastResident = now; }
 
-  // Донат раз в минуту
   if (now - lastEv > donationCooldown + Math.random()*20000) {
-    donationEvent();
-    lastEv = now;
+    donationEvent(); lastEv = now;
   }
-  // Подписка реже
   if (now - lastNotify > subCooldown + Math.random()*20000) {
-    subscriptionEvent();
-    lastNotify = now;
+    subscriptionEvent(); lastNotify = now;
   }
 
   if (now - lastLike > (600 + Math.random()*1000)) {
-    state.likes += ri(3, 25);
-    if (state.hype > 0.3) boom(rnd(["❤️","🔥"]), 2);
-    lastLike = now;
+    state.likes += ri(3, 25); lastLike = now;
+  }
+
+  // СМАЙЛИКИ АВТОМАТИЧЕСКИ — постоянно
+  const autoInt = 700 + Math.random() * 900;
+  if (now - lastAutoEmoji > autoInt) {
+    const batch = ri(1, 3);
+    boom(rnd(AUTO_EMOJIS), batch);
+    lastAutoEmoji = now;
   }
 
   updateCounters(dt);
@@ -898,7 +956,7 @@ async function toggleScreen() {
   } catch (e) { toast("Отменено"); }
 }
 
-// ============ МИКРОФОН АВТОМАТИЧЕСКИЙ ============
+// ============ МИКРОФОН ============
 let recognition = null;
 let micRunning = false;
 
@@ -910,7 +968,7 @@ function startMicAuto() {
     recognition = new SR();
     recognition.lang = "ru-RU";
     recognition.continuous = true;
-    recognition.interimResults = true; // ← вот это даёт субтитры без задержки
+    recognition.interimResults = true;
     recognition.onresult = (e) => {
       let interim = "", final = "";
       for (let i = e.resultIndex; i < e.results.length; i++) {
@@ -918,19 +976,19 @@ function startMicAuto() {
         if (e.results[i].isFinal) final += t;
         else interim += t;
       }
-      // Если мьют — не показываем субтитры и не реагируем
       if (state.micMuted) return;
-      if (interim) showCaption(interim, true);
+      if (interim) { showCaption(interim, true); pipCaption = interim; }
       if (final) {
         showCaption(final, false);
+        pipCaption = final;
         onUserSpoke(final.trim());
+        setTimeout(() => { if (pipCaption === final) pipCaption = ""; }, 2500);
       }
     };
     recognition.onerror = (e) => {
       if (e.error === "not-allowed") toast("Разреши микрофон");
     };
     recognition.onend = () => {
-      // Перезапускаем если не выключен вручную
       if (state.micOn && !state.micMuted) {
         micRunning = false;
         setTimeout(() => { if (state.micOn && !state.micMuted) startMicAuto(); }, 300);
@@ -941,24 +999,20 @@ function startMicAuto() {
     recognition.start();
     micRunning = true;
     state.micOn = true;
-    $("rbMic").classList.add("on");
     $("micSlash").style.display = "none";
   } catch (e) { console.error(e); }
 }
 
 function toggleMic() {
   if (!state.micMuted) {
-    // Мьютим
     state.micMuted = true;
     $("micSlash").style.display = "block";
-    $("rbMic").classList.remove("on");
     toast("🔇 Микрофон выключен");
     captionEl.style.display = "none";
+    pipCaption = "";
   } else {
-    // Включаем
     state.micMuted = false;
     $("micSlash").style.display = "none";
-    $("rbMic").classList.add("on");
     toast("🎤 Микрофон включён");
     if (!micRunning) startMicAuto();
   }
@@ -969,14 +1023,30 @@ function pulse(el) {
   setTimeout(() => el.classList.remove("pulse"), 380);
 }
 
+// ============ ПАНЕЛЬ ЭМОДЗИ ============
+function buildEmojiPanel() {
+  const grid = $("emojiGrid");
+  grid.innerHTML = "";
+  EMOJI_LIST.forEach(e => {
+    const el = document.createElement("div");
+    el.className = "emoji-item";
+    el.textContent = e;
+    el.addEventListener("click", () => {
+      boom(e, 20);
+      sfx.pop();
+      $("emojiPanel").classList.remove("show");
+    });
+    grid.appendChild(el);
+  });
+}
+
 // ============ КНОПКИ ============
 $("rbScreen").addEventListener("click", e => { pulse(e.currentTarget); toggleScreen(); });
 $("rbFlip").addEventListener("click", e => { pulse(e.currentTarget); flipCamera(); });
 $("rbMic").addEventListener("click", e => { pulse(e.currentTarget); toggleMic(); });
 $("rbEmoji").addEventListener("click", e => {
   pulse(e.currentTarget);
-  boom(rnd(["🔥","❤️","😂","👏","💯","⚡","🎉","😎","🤯","✨","💎","🚀"]), 18);
-  sfx.pop();
+  $("emojiPanel").classList.toggle("show");
 });
 $("rbPiP").addEventListener("click", e => {
   pulse(e.currentTarget);
@@ -984,10 +1054,20 @@ $("rbPiP").addEventListener("click", e => {
 });
 $("closeX").addEventListener("click", () => { if (confirm("Закрыть стрим?")) location.reload(); });
 
+// Клик вне панели — закрыть
+document.addEventListener("touchstart", (e) => {
+  const p = $("emojiPanel");
+  if (p.classList.contains("show") && !p.contains(e.target)
+      && e.target.id !== "rbEmoji" && !e.target.closest("#rbEmoji")) {
+    p.classList.remove("show");
+  }
+}, true);
+
 $("startBtn").addEventListener("click", async () => {
   initAudio();
   const ok = await startCamera();
   if (!ok) return;
+  buildEmojiPanel();
   pipStream = pipCanvas.captureStream(30);
   pipVideo.srcObject = pipStream;
   pipVideo.muted = true;
