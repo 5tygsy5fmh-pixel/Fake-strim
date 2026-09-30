@@ -8,11 +8,17 @@
 <title>LIVE</title>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-html, body { width:100vw; height:100vh; overflow:hidden; background:#000;
+html, body { width:100%; height:100%; overflow:hidden; background:#000;
   font-family:-apple-system,"Segoe UI",Roboto,sans-serif; color:#fff;
-  user-select:none; -webkit-user-select:none; }
-#cam, #screen { position:fixed; inset:0; width:100%; height:100%;
-  object-fit:cover; background:#000; z-index:1; }
+  user-select:none; -webkit-user-select:none; position:fixed; }
+
+#cam, #screen {
+  position:fixed; top:0; left:0;
+  width:100vw; height:100vh;
+  object-fit:cover; -webkit-object-fit:cover;
+  object-position:center center; -webkit-object-position:center center;
+  background:#000; z-index:1;
+}
 #cam { transform:scaleX(-1); }
 #screen { display:none; }
 #ui { position:fixed; inset:0; z-index:2; pointer-events:none; }
@@ -34,7 +40,7 @@ body.screen-mode #island { opacity:1; transform:translateX(-50%) scale(1); }
 
 .top { position:absolute; top:0; left:0; right:0; padding:14px 12px 40px;
   padding-top:calc(14px + env(safe-area-inset-top));
-  background:linear-gradient(180deg,rgba(0,0,0,.6) 0%,rgba(0,0,0,0) 100%);
+  background:linear-gradient(180deg,rgba(0,0,0,.65) 0%,rgba(0,0,0,0) 100%);
   display:flex; align-items:center; justify-content:space-between; gap:8px;
   transition:opacity .3s; }
 body.screen-mode .top { opacity:.55; }
@@ -59,7 +65,6 @@ body.screen-mode .top { opacity:.55; }
   justify-content:center; pointer-events:auto; cursor:pointer; }
 .close-x svg { width:22px; height:22px; }
 
-/* ============ ПРАВАЯ КОЛОНКА — SVG иконки в стиле TikTok ============ */
 .rail { position:absolute; right:6px; bottom:170px;
   display:flex; flex-direction:column; gap:18px; align-items:center;
   pointer-events:auto; transition:bottom .3s; }
@@ -76,7 +81,6 @@ body.screen-mode .rail { bottom:auto; top:70px; }
 .rb.pulse { animation:rpls .35s ease-out; }
 @keyframes rpls { 0%{transform:scale(1);} 50%{transform:scale(1.2);} 100%{transform:scale(1);} }
 
-/* Аватарка хоста в rail (как в TikTok слева) */
 .rail-av { position:relative; margin-bottom:8px; }
 .rail-av .host-av { width:46px; height:46px; flex:0 0 46px;
   box-shadow:0 0 0 2px #fff; }
@@ -89,11 +93,11 @@ body.screen-mode .rail { bottom:auto; top:70px; }
 .comments { position:absolute; left:12px; right:88px; bottom:96px;
   max-height:50%; overflow:hidden; display:flex; flex-direction:column;
   justify-content:flex-end; gap:7px; transition:all .35s ease; }
-.cm { display:flex; align-items:flex-start; gap:8px; background:rgba(0,0,0,.38);
+.cm { display:flex; align-items:flex-start; gap:8px; background:rgba(0,0,0,.42);
   backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
   padding:7px 12px 7px 8px; border-radius:20px; max-width:100%;
   animation:cmin .28s ease-out; }
-.cm.reply { margin-left:26px; background:rgba(0,0,0,.52); }
+.cm.reply { margin-left:26px; background:rgba(0,0,0,.55); }
 @keyframes cmin { from{opacity:0; transform:translateY(12px);} to{opacity:1;} }
 .cm-av { flex:0 0 26px; width:26px; height:26px; border-radius:50%;
   display:flex; align-items:center; justify-content:center;
@@ -134,36 +138,66 @@ body.screen-mode .hearts { right:auto; left:6px; bottom:auto; top:70px;
 body.screen-mode .heart { bottom:auto; top:0; }
 
 .notes { position:absolute; top:90px; left:12px; right:12px;
-  display:flex; flex-direction:column; gap:6px; transition:top .3s; }
+  display:flex; flex-direction:column; gap:6px; transition:top .3s;
+  align-items:flex-start; }
 body.screen-mode .notes { top:56px; opacity:.85; }
-.note { background:rgba(0,0,0,.78);
+.note { background:linear-gradient(135deg, rgba(0,0,0,.85), rgba(40,10,60,.85));
   backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
-  padding:9px 12px; border-radius:12px; font-size:13px;
-  border-left:3px solid #ffd700; animation:ntin .35s ease-out; }
-.note b { display:block; color:#ffd700; margin-bottom:2px; font-size:14px; }
+  padding:10px 14px; border-radius:14px; font-size:13px;
+  border:1px solid rgba(255,255,255,.15);
+  animation:ntin .4s cubic-bezier(.2,1.3,.4,1); max-width:calc(100% - 90px); }
+.note b { display:block; font-size:14px; margin-bottom:2px; }
 .note small { opacity:.85; font-size:12px; }
-body.screen-mode .note { padding:6px 10px; font-size:11px; }
-body.screen-mode .note b { font-size:12px; }
-@keyframes ntin { from{transform:translateX(-20px); opacity:0;} to{transform:none; opacity:1;} }
+.note.donate b { color:#ff96dc; }
+.note.sub b { color:#8cff8c; }
+.note.donate { border-left:3px solid #ff50b4; }
+.note.sub { border-left:3px solid #8cff8c; }
+@keyframes ntin { from{transform:translateX(-30px) scale(.9); opacity:0;}
+  to{transform:none; opacity:1;} }
 
 .banner { position:absolute; top:28%; left:22px; right:22px;
-  padding:18px 20px; border-radius:18px; background:rgba(0,0,0,.88);
+  padding:18px 20px; border-radius:18px; background:rgba(0,0,0,.9);
   backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
   border:2px solid #fff; box-shadow:0 0 40px rgba(255,200,80,.45);
-  display:none; animation:bnin .5s cubic-bezier(.2,1.3,.4,1); transition:top .3s; }
+  display:none; animation:bnin .5s cubic-bezier(.2,1.3,.4,1); transition:top .3s;
+  text-align:center; }
 body.screen-mode .banner { top:20%; left:14px; right:14px; padding:14px 16px; }
-body.screen-mode .banner .t { font-size:15px; }
-body.screen-mode .banner .n { font-size:18px; }
-.banner .t { font-size:18px; font-weight:800; margin-bottom:6px; }
-.banner .s { font-size:13px; opacity:.9; margin-bottom:6px; }
-.banner .n { font-size:22px; font-weight:800; }
-@keyframes bnin {
-  0%{transform:scale(.4); opacity:0;}
-  60%{transform:scale(1.06); opacity:1;}
-  100%{transform:scale(1);}
-}
+.banner .gift-icon { font-size:60px; line-height:1; margin-bottom:8px;
+  animation:giftPop .6s cubic-bezier(.2,1.5,.4,1); }
+@keyframes giftPop { 0%{transform:scale(0) rotate(-30deg);}
+  60%{transform:scale(1.2) rotate(10deg);} 100%{transform:scale(1) rotate(0);} }
+.banner .b-nick { font-size:16px; font-weight:700; margin-bottom:6px; opacity:.9; }
+.banner .b-gift { font-size:22px; font-weight:800; margin-bottom:6px; }
+.banner .b-text { font-size:14px; opacity:.9; line-height:1.4; }
 
-#start { position:fixed; inset:0; z-index:10; background:#0a0a14;
+/* ============ ПАНЕЛЬ ПОДАРКОВ ============ */
+.gift-panel { position:absolute; left:0; right:0; bottom:0; z-index:20;
+  background:linear-gradient(180deg,rgba(15,15,25,.98),rgba(10,10,20,.98));
+  border-top-left-radius:22px; border-top-right-radius:22px;
+  padding:16px 14px calc(20px + env(safe-area-inset-bottom));
+  pointer-events:auto;
+  transform:translateY(110%); transition:transform .35s cubic-bezier(.2,1,.3,1);
+  max-height:65vh; overflow-y:auto;
+  box-shadow:0 -10px 40px rgba(0,0,0,.6); }
+.gift-panel.show { transform:translateY(0); }
+.gift-panel h3 { font-size:16px; margin-bottom:14px;
+  display:flex; justify-content:space-between; align-items:center; }
+.gift-panel h3 span { font-size:13px; opacity:.7; font-weight:400; }
+.gift-panel .close-g { font-size:22px; opacity:.7; cursor:pointer;
+  padding:4px 10px; }
+.gift-grid { display:grid; grid-template-columns:repeat(4, 1fr); gap:12px; }
+.gift-item { display:flex; flex-direction:column; align-items:center;
+  gap:6px; padding:12px 6px; border-radius:14px;
+  background:rgba(255,255,255,.06); cursor:pointer;
+  transition:transform .12s, background .15s; }
+.gift-item:active { transform:scale(.9); background:rgba(255,255,255,.15); }
+.gift-item .gi { font-size:36px; line-height:1; }
+.gift-item .gn { font-size:11px; opacity:.85; text-align:center;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  max-width:100%; }
+.gift-item .gp { font-size:11px; font-weight:700; color:#ffd700; }
+
+#start { position:fixed; inset:0; z-index:30; background:#0a0a14;
   display:flex; flex-direction:column; align-items:center;
   justify-content:center; padding:30px; text-align:center; }
 #start h1 { font-size:24px; margin-bottom:14px; }
@@ -200,43 +234,27 @@ body.screen-mode .banner .n { font-size:18px; }
 <div id="ui">
   <div class="top">
     <div class="host">
-      <div class="host-av" id="hostAvTop">
-        <!-- Аватарка — майнкрафт-кот с алмазной бронёй -->
+      <div class="host-av">
         <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-          <!-- задний фон -->
           <rect width="64" height="64" fill="#7cc6d6"/>
-          <!-- голова кота -->
           <rect x="18" y="20" width="28" height="24" fill="#c8b8a8"/>
-          <!-- уши -->
           <polygon points="18,20 22,10 28,20" fill="#c8b8a8" stroke="#8a7a6a" stroke-width="1"/>
           <polygon points="36,20 42,10 46,20" fill="#c8b8a8" stroke="#8a7a6a" stroke-width="1"/>
           <polygon points="21,18 23,13 26,18" fill="#e8b8b8"/>
           <polygon points="38,18 41,13 43,18" fill="#e8b8b8"/>
-          <!-- алмазный шлем -->
           <rect x="16" y="14" width="32" height="8" fill="#5ac8d8" stroke="#3aa4b4" stroke-width="1"/>
           <rect x="16" y="18" width="4" height="14" fill="#5ac8d8" stroke="#3aa4b4" stroke-width="1"/>
           <rect x="44" y="18" width="4" height="14" fill="#5ac8d8" stroke="#3aa4b4" stroke-width="1"/>
           <rect x="20" y="12" width="4" height="4" fill="#8ee8f4"/>
           <rect x="40" y="12" width="4" height="4" fill="#8ee8f4"/>
-          <!-- глаза -->
           <rect x="24" y="28" width="5" height="6" fill="#4a8a3a"/>
           <rect x="35" y="28" width="5" height="6" fill="#4a8a3a"/>
           <rect x="25" y="30" width="2" height="3" fill="#000"/>
           <rect x="36" y="30" width="2" height="3" fill="#000"/>
-          <!-- нос -->
           <rect x="30" y="37" width="4" height="3" fill="#e88a8a"/>
-          <!-- усы -->
-          <line x1="20" y1="38" x2="27" y2="39" stroke="#5a4a3a" stroke-width="1"/>
-          <line x1="20" y1="42" x2="27" y2="41" stroke="#5a4a3a" stroke-width="1"/>
-          <line x1="37" y1="39" x2="44" y2="38" stroke="#5a4a3a" stroke-width="1"/>
-          <line x1="37" y1="41" x2="44" y2="42" stroke="#5a4a3a" stroke-width="1"/>
-          <!-- алмазная броня (нагрудник) -->
           <rect x="20" y="44" width="24" height="14" fill="#5ac8d8" stroke="#3aa4b4" stroke-width="1"/>
           <rect x="22" y="46" width="6" height="4" fill="#8ee8f4"/>
           <rect x="36" y="46" width="6" height="4" fill="#8ee8f4"/>
-          <rect x="22" y="52" width="20" height="3" fill="#3aa4b4"/>
-          <!-- меч -->
-          <rect x="44" y="34" width="4" height="22" fill="#7ce8f4" stroke="#3aa4b4" stroke-width="1" transform="rotate(20 46 45)"/>
         </svg>
       </div>
       <div class="host-name">grand-cat</div>
@@ -262,9 +280,7 @@ body.screen-mode .banner .n { font-size:18px; }
   <div class="caption" id="caption"></div>
   <div class="toast" id="toast"></div>
 
-  <!-- ПРАВАЯ КОЛОНКА как в TikTok -->
   <div class="rail">
-    <!-- Аватарка хоста -->
     <div class="rail-av">
       <div class="host-av" style="width:46px;height:46px;flex:0 0 46px;">
         <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
@@ -284,17 +300,12 @@ body.screen-mode .banner .n { font-size:18px; }
           <rect x="25" y="30" width="2" height="3" fill="#000"/>
           <rect x="36" y="30" width="2" height="3" fill="#000"/>
           <rect x="30" y="37" width="4" height="3" fill="#e88a8a"/>
-          <rect x="20" y="44" width="24" height="14" fill="#5ac8d8" stroke="#3aa4b4" stroke-width="1"/>
-          <rect x="22" y="46" width="6" height="4" fill="#8ee8f4"/>
-          <rect x="36" y="46" width="6" height="4" fill="#8ee8f4"/>
-          <rect x="22" y="52" width="20" height="3" fill="#3aa4b4"/>
         </svg>
       </div>
       <div class="plus">+</div>
     </div>
 
-    <!-- 1. Подарок / большой ивент -->
-    <div class="rb" id="rbEvent" title="Подарок">
+    <div class="rb" id="rbGift" title="Подарок">
       <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linejoin="round">
         <rect x="3" y="8" width="18" height="4" rx="1"/>
         <rect x="5" y="12" width="14" height="9" rx="1"/>
@@ -304,7 +315,6 @@ body.screen-mode .banner .n { font-size:18px; }
       </svg>
     </div>
 
-    <!-- 2. Трансляция экрана -->
     <div class="rb" id="rbScreen" title="Трансляция экрана">
       <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linejoin="round">
         <rect x="3" y="4" width="18" height="13" rx="2"/>
@@ -314,7 +324,6 @@ body.screen-mode .banner .n { font-size:18px; }
       </svg>
     </div>
 
-    <!-- 3. Смена камеры -->
     <div class="rb" id="rbFlip" title="Сменить камеру">
       <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
         <path d="M3 12a9 9 0 0 1 15-6.7l2 2"/>
@@ -324,7 +333,6 @@ body.screen-mode .banner .n { font-size:18px; }
       </svg>
     </div>
 
-    <!-- 4. Микрофон -->
     <div class="rb" id="rbMic" title="Слушать меня">
       <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
         <rect x="9" y="3" width="6" height="12" rx="3"/>
@@ -334,7 +342,6 @@ body.screen-mode .banner .n { font-size:18px; }
       </svg>
     </div>
 
-    <!-- 5. Всплеск эмодзи -->
     <div class="rb" id="rbEmoji" title="Эмодзи">
       <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round">
         <circle cx="12" cy="12" r="9"/>
@@ -344,15 +351,6 @@ body.screen-mode .banner .n { font-size:18px; }
       </svg>
     </div>
 
-    <!-- 6. Поделиться -->
-    <div class="rb" id="rbShare" title="Поделиться">
-      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M22 2L11 13"/>
-        <polygon points="22 2 15 22 11 13 2 9 22 2"/>
-      </svg>
-    </div>
-
-    <!-- 7. PiP -->
     <div class="rb" id="rbPiP" title="Маленькое окно">
       <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linejoin="round">
         <rect x="2" y="4" width="20" height="16" rx="2"/>
@@ -362,17 +360,23 @@ body.screen-mode .banner .n { font-size:18px; }
   </div>
 </div>
 
+<!-- ПАНЕЛЬ ПОДАРКОВ -->
+<div class="gift-panel" id="giftPanel">
+  <h3>Подарки <span id="coinsLabel">💎 0</span></h3>
+  <div class="gift-grid" id="giftGrid"></div>
+</div>
+
 <div id="start">
   <h1>🎥 Fake Live Stream</h1>
-  <p>grand-cat ведёт стрим. Разреши камеру и микрофон — боты будут слушать тебя и отвечать.</p>
+  <p>grand-cat ведёт стрим. Разреши камеру и микрофон — боты будут отвечать по теме.</p>
   <button id="startBtn">▶ Старт</button>
 </div>
 
 <script>
 const state = {
-  viewers: 1240, tv: 1240, likes: 34200, coins: 0, hype: 0.3,
+  viewers: 1240, tv: 1240, likes: 34200, coins: 50000, hype: 0.3,
   muted: false, screenOn: false, micOn: false, facing: "user",
-  lastEvent: Date.now(), pipActive: false,
+  pipActive: false,
 };
 
 const NICKS = ["xXx_Shadow","kotik_2024","AlexTop","moon_girl","NEON_777",
@@ -384,118 +388,166 @@ const RESIDENTS = [
   { nick:"67_kid", color:"#ff5c5c", kind:"spam",
     lines:["67","67 67","67??","шестьдесят семь","67forever","67!!!"] },
   { nick:"skibidi_sigma", color:"#c88cff", kind:"spam",
-    lines:["скибиди","скибиди доп доп","🗿🗿🗿","сигма","гигачад","ризз"] },
+    lines:["скибиди","скибиди доп доп","🗿🗿🗿","сигма","гигачад"] },
   { nick:"fan_67", color:"#ff78b4", kind:"spam",
-    lines:["67","67 топ","кто 67 тот топ","67 67 67 67","да 67"] },
+    lines:["67","67 топ","кто 67 тот топ","да 67"] },
   { nick:"хейтер2000", color:"#ff3c3c", kind:"hater",
-    lines:["ну такое","и это стрим?","фу","скучно","удали стрим",
-           "раньше было лучше","кто это смотрит","кринж"] },
+    lines:["ну такое","и это стрим?","фу","скучно","кринж"] },
   { nick:"toxic_boy", color:"#ff2020", kind:"hater",
-    lines:["лох","позор","микро помой","не стрими лучше","иди работай"] },
+    lines:["лох","позор","не стрими лучше","иди работай"] },
   { nick:"Lera_Simp", color:"#ff96dc", kind:"simp",
-    lines:["ты лучший 💕","люблю тебя","ты такой милый","женись на мне",
-           "самый красивый","❤️❤️❤️"] },
+    lines:["ты лучший 💕","люблю тебя","ты такой милый","самый красивый"] },
   { nick:"kotik_lover", color:"#ffb4dc", kind:"simp",
-    lines:["обожаю тебя","ты солнышко ☀️","самый топ","милашка 😍","твой фанат"] },
+    lines:["обожаю тебя","ты солнышко ☀️","самый топ","милашка 😍"] },
   { nick:"vibe_clown", color:"#ffce56", kind:"clown",
-    lines:["😂😂😂","я под столом","ахахаха","жиза","кек","ору не могу"] },
+    lines:["😂😂😂","я под столом","ахахаха","ору не могу"] },
   { nick:"cringe_lord", color:"#ff9f40", kind:"clown",
-    lines:["пупупу","труляля","эщкере","амонгас","да да да","сосиска"] },
-  { nick:"вопрос_мастер", color:"#4bc0c0", kind:"asker",
-    lines:["сколько тебе лет?","откуда стримишь?","какой комп?",
-           "во что играешь?","а кот есть?","а ты женат?"] },
-  { nick:"Pro_Ktoto", color:"#9966ff", kind:"asker",
-    lines:["что за музыка?","а OBS какой?","а сколько донатов за час?"] },
+    lines:["пупупу","эщкере","амонгас","сосиска"] },
 ];
 
 const THEMES = [
-  { keys:["музык","песн","трек","бит","рэп","петь","спеть","слушаю","плейлист"],
-    replies:["что за трек?","топ трек 🔥","поставь ещё","у тебя вкус","качает"] },
-  { keys:["игр","дот","кс","фортнайт","майнкрафт","роблокс","катк","ранг","пати"],
-    replies:["катка?","какой ранг?","го в пати","я тоже играю","топ момент"] },
-  { keys:["ед","куш","пицц","бургер","пельмен","борщ","голод","вкусн","поел"],
-    replies:["дай мне 🍕","приятного!","а я голодный","вкусно выглядит"] },
-  { keys:["работ","устал","зарплат","начальник","офис","школ","учеб","экзамен"],
-    replies:["держиcь","я тоже устал","выходные близко","не сдавайся"] },
-  { keys:["привет","здравствуй","хай","hi","hello","салют","здарова"],
-    replies:["привет 👋","хай","и тебе привет","приветик"] },
-  { keys:["пока","до связи","пойду","ухожу"],
-    replies:["давай!","приходи ещё","пока 👋","до связи"] },
-  { keys:["любл","люблю","скуча","нрав","обожа","сердц"],
-    replies:["аааа ❤️","мы тоже тебя любим","милота","взаимно"] },
-  { keys:["почему","зачем","как ","что ","где "],
-    replies:["сложный вопрос","а сам как думаешь?","хм, интересно","загугли"] },
+  { name:"музыка",
+    keys:["музык","песн","трек","бит","рэп","петь","спеть","слушаю","плейлист","биток"],
+    replies:["что за трек?","топ трек 🔥","поставь ещё","у тебя вкус",
+             "качает","плейлист в студию","под этот трек кайф","трек топ"] },
+  { name:"игры",
+    keys:["игр","дот","кс","фортнайт","майнкрафт","роблокс","катк","ранг","пати","кот в майне"],
+    replies:["катка?","какой ранг?","го в пати","я тоже играю","топ момент",
+             "скинь ник","мейн какой?","побед много?"] },
+  { name:"еда",
+    keys:["ед","куш","пицц","бургер","пельмен","борщ","голод","вкусн","поел","обед","ужин"],
+    replies:["дай мне 🍕","приятного!","а я голодный","вкусно выглядит",
+             "тоже хочу","что за блюдо?","рецепт дай"] },
+  { name:"работа",
+    keys:["работ","устал","зарплат","начальник","офис","школ","учеб","экзамен"],
+    replies:["держиcь","я тоже устал","выходные близко","не сдавайся",
+             "работа не волк","отдых тоже нужен"] },
+  { name:"приветствие",
+    keys:["привет","здравствуй","хай","hi","hello","салют","здарова"],
+    replies:["привет 👋","хай","и тебе привет","приветик","здарова, grand-cat!"] },
+  { name:"погода",
+    keys:["погод","дожд","снег","солнц","жарко","холодно","ветер"],
+    replies:["у нас дождь","а у нас солнце ☀️","холодно сегодня","погода топ"] },
+  { name:"любовь",
+    keys:["любл","люблю","скуча","нрав","обожа","сердц"],
+    replies:["аааа ❤️","мы тоже тебя любим","милота","взаимно","я растаял 💕"] },
+  { name:"вопрос",
+    keys:["почему","зачем","как ","что ","где ","когда ","сколько"],
+    replies:["сложный вопрос","а сам как думаешь?","хм, интересно",
+             "ну я думаю да","загугли лучше","вот это вопрос"] },
 ];
 
-const COMPLIMENTS = ["grand-cat топ 🔥","стрим огонь!","лучший кот!","как всегда на высоте",
-  "го за подписку","респект 👏","красава","это было мощно","ору с этого 😂",
-  "атмосфера топ","подписался ✅","продолжай!","у тебя талант","смотрю уже час"];
-const QUESTIONS = ["а сколько тебе лет?","откуда стримишь?","какой у тебя пк?",
-  "будешь ещё сегодня?","го в майнкрафт?","что за музыка?","ты кушал?"];
-const REACTIONS = ["😂😂😂","💀","ну это сильно","я не могу 😭","жиза","🤡",
-  "ахахах","согласен полностью","братан ты гений","это база","жесть"];
+const GENERIC_CHAT = ["жиза","база","согласен","+1","💯","это точно",
+  "ну да","ты прав","😂","вот это да","реально","плюсую"];
+
+const COMPLIMENTS = ["grand-cat топ 🔥","стрим огонь!","лучший кот!",
+  "как всегда на высоте","го за подписку","респект 👏","красава","это было мощно"];
+const REACTIONS = ["😂😂😂","💀","ну это сильно","жиза","🤡","ахахах"];
 const EMOJIS = ["🔥","❤️","😂","👏","💯","⚡","🎉","😎","🤯","✨","💎","🚀"];
 
-const BLOGGERS = [
-  ["Buster","#00c8ff"],["Mellstroy","#ff3c3c"],["LITVIN","#ffd700"],
-  ["Bratishkinoff","#8cff8c"],["Sqwoz Bab","#c88cff"],["Kai Cenat","#ff8c3c"],
-  ["xQc","#5ab4ff"],["IShowSpeed","#ff50b4"],["Drake","#ffc878"],
-];
+const SUBSCRIBERS = ["kotik_new","Мария_К","Ivan_Play","moonlight",
+  "no_name_777","xX_Pro_Xx","sunny_day","Alex228","MaxPower","Kira_Sun"];
+
 const DONATORS = ["Whale_777","KingDonater","MegaBoss","Anonym","RichBoi",
   "DiamondHand","TopDon","ShadowWallet","CryptoKing","PapaDoner"];
-const DONATE_COMMENTS = ["за контент 💎","на новый микро","продолжай братан",
-  "ты лучший!","лови краба 🦀","на пиццу 🍕","с меня подписка","держиcь!"];
-const COLORS = ["#ff6384","#36a2eb","#ffce56","#4bc0c0","#9966ff","#ff9f40","#2ecc71","#e74c3c"];
+const DONATE_AMOUNTS = [50,100,200,500,1000,2000,5000,10000];
+const DONATE_COMMENTS = ["за контент 💎","продолжай","ты лучший!","респект",
+  "с меня подписка","держиcь!","это тебе 🔥"];
 
+// TikTok-style gifts
+const GIFTS = [
+  { id:"rose",    icon:"🌹", name:"Роза",       price:1 },
+  { id:"finger",  icon:"🫰", name:"Сердечко",   price:5 },
+  { id:"donut",   icon:"🍩", name:"Пончик",     price:30 },
+  { id:"guitar",  icon:"🎸", name:"Гитара",     price:199 },
+  { id:"glasses", icon:"🕶️", name:"Очки",       price:199 },
+  { id:"cake",    icon:"🍰", name:"Торт",       price:500 },
+  { id:"star",    icon:"⭐", name:"Звезда",     price:1000 },
+  { id:"crown",   icon:"👑", name:"Корона",     price:5000 },
+  { id:"galaxy",  icon:"🌌", name:"Галактика",  price:5000 },
+  { id:"lion",    icon:"🦁", name:"Лев",        price:30000 },
+];
+
+// AI-тексты подарков по теме (или нейтральные если темы нет)
+const GIFT_AI = {
+  rose:    ["спасибо за розу 🌹","розочка — мило!","ты меня балуешь ❤️"],
+  finger:  ["сердечко 🫰 спасибо!","милота!","люблю тебя 💕"],
+  donut:   ["пончик 🍩 спасибо!","вкусно!","хочу такой же"],
+  guitar:  ["гитара 🎸 играй!","топ подарок!","качает!"],
+  glasses: ["очки 🕶️ стильно!","круто!","модно!"],
+  cake:    ["торт 🍰 спасибо!","угощай!","праздник!"],
+  star:    ["звезда ⭐ спасибо!","ты сияешь!","звёздный!"],
+  crown:   ["корона 👑 спасибо!","ты король!","легенда!"],
+  galaxy:  ["галактика 🌌 вау!","космос!","невероятно!"],
+  lion:    ["ЛЕВ 🦁 спасибо!","царь зверей!","ты монстр!"],
+};
+
+// AI-тексты подарков под конкретную тему
+const GIFT_BY_THEME = {
+  "музыка":     "включи трек под настроение 🎵",
+  "игры":       "го в катку с тобой!",
+  "еда":        "на пиццу кинь тоже 🍕",
+  "работа":     "отдохни немного 😌",
+  "приветствие":"привет от grand-cat!",
+  "погода":     "хорошей погоды ☀️",
+  "любовь":     "люблю тебя! ❤️",
+  "вопрос":     "спасибо за ответ!",
+};
+
+const COLORS = ["#ff6384","#36a2eb","#ffce56","#4bc0c0","#9966ff","#ff9f40","#2ecc71","#e74c3c"];
 const rnd = a => a[Math.floor(Math.random()*a.length)];
 const ri  = (a,b) => Math.floor(Math.random()*(b-a+1))+a;
 
+// ============ КОНТЕКСТ РАЗГОВОРА ============
+let currentTopic = null;         // { name, replies, expires }
 const recentMessages = [];
 function rememberMessage(m) {
   recentMessages.push(m);
-  if (recentMessages.length > 12) recentMessages.shift();
+  if (recentMessages.length > 15) recentMessages.shift();
 }
 
-const pipHistory = [];
-function pipAdd(nick, text, color, isReply) {
-  pipHistory.push({ nick, text, color, isReply, t: Date.now() });
-  while (pipHistory.length > 14) pipHistory.shift();
+function setTopic(theme) {
+  if (!theme) return;
+  currentTopic = { name:theme.name, replies:theme.replies, expires: Date.now() + 20000 };
 }
 
+function detectThemes(text) {
+  const t = (text||"").toLowerCase();
+  const found = [];
+  for (const th of THEMES) if (th.keys.some(k => t.includes(k))) found.push(th);
+  return found;
+}
+
+// ============ ЗВУК ============
 let audioCtx = null;
 function initAudio() {
-  if (!audioCtx) {
-    const AC = window.AudioContext || window.webkitAudioContext;
-    audioCtx = new AC();
-  }
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   if (audioCtx.state === "suspended") audioCtx.resume();
 }
 function tone(freq, dur, vol=0.25, type="sine", delay=0, slideTo=null) {
   if (state.muted || !audioCtx) return;
   const t0 = audioCtx.currentTime + delay;
-  const osc = audioCtx.createOscillator();
-  const g = audioCtx.createGain();
-  osc.type = type;
-  osc.frequency.setValueAtTime(freq, t0);
-  if (slideTo) osc.frequency.exponentialRampToValueAtTime(slideTo, t0 + dur);
+  const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+  o.type = type; o.frequency.setValueAtTime(freq, t0);
+  if (slideTo) o.frequency.exponentialRampToValueAtTime(slideTo, t0+dur);
   g.gain.setValueAtTime(0.0001, t0);
-  g.gain.exponentialRampToValueAtTime(vol, t0 + 0.01);
-  g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
-  osc.connect(g).connect(audioCtx.destination);
-  osc.start(t0); osc.stop(t0 + dur + 0.05);
+  g.gain.exponentialRampToValueAtTime(vol, t0+0.01);
+  g.gain.exponentialRampToValueAtTime(0.0001, t0+dur);
+  o.connect(g).connect(audioCtx.destination);
+  o.start(t0); o.stop(t0+dur+0.05);
 }
 const sfx = {
   donateSmall: () => { tone(880,0.10,0.22); tone(1320,0.13,0.22,"sine",0.08); },
   donateBig:   () => { [523,659,784,1047,1319].forEach((f,i)=>tone(f,0.20,0.20,"triangle",i*0.06));
                        tone(2093,0.6,0.12,"sine",0.30); },
-  blogger:     () => { tone(200,0.55,0.20,"sine",0,1400);
-                       tone(523,0.55,0.10,"sine",0.05);
-                       tone(659,0.55,0.10,"sine",0.05);
-                       tone(784,0.55,0.10,"sine",0.05); },
+  subscribe:   () => { tone(660,0.15,0.20); tone(880,0.15,0.20,"sine",0.10);
+                       tone(1320,0.25,0.22,"sine",0.20); },
   viewer:      () => tone(1200,0.06,0.13),
   pop:         () => { tone(1800,0.04,0.14,"square"); tone(900,0.06,0.10); },
   like:        () => tone(1500,0.05,0.10,"triangle"),
   reply:       () => { tone(1300,0.05,0.08,"triangle"); tone(1700,0.06,0.07,"triangle",0.05); },
+  gift:        () => { [784,988,1175,1568].forEach((f,i)=>tone(f,0.15,0.18,"triangle",i*0.05));
+                       tone(2093,0.35,0.10,"sine",0.2); },
 };
 
 const $ = id => document.getElementById(id);
@@ -509,11 +561,22 @@ function toast(text) {
   toast._t = setTimeout(() => toastEl.classList.remove("show"), 2200);
 }
 
+// ============ ЧАТ ============
 function spawnChat(text=null, nick=null, color=null, opts={}) {
   nick = nick || rnd(NICKS);
   if (text === null) {
-    const r = Math.random();
-    text = r < 0.55 ? rnd(COMPLIMENTS) : r < 0.85 ? rnd(REACTIONS) : rnd(QUESTIONS);
+    // Контекстный выбор: по теме или реакция на предыдущее сообщение
+    if (currentTopic && Date.now() < currentTopic.expires && Math.random() < 0.75) {
+      text = rnd(currentTopic.replies);
+    } else {
+      const prevRes = recentMessages.filter(m => m.isResident).slice(-1)[0];
+      if (prevRes && Math.random() < 0.5) {
+        text = pickReplyFor(prevRes);
+        opts.reply = true;
+      } else {
+        text = rnd(GENERIC_CHAT);
+      }
+    }
   }
   color = color || rnd(COLORS);
   const el = document.createElement("div");
@@ -534,32 +597,32 @@ function spawnChat(text=null, nick=null, color=null, opts={}) {
     isResident:!!opts.isResident, kind:opts.kind || null });
 }
 
-function spawnNote(text, sub="", color="#ffd700") {
+function spawnNote(text, sub="", color="#ffd700", cls="") {
   const el = document.createElement("div");
-  el.className = "note";
+  el.className = "note " + cls;
   el.style.borderLeftColor = color;
   el.innerHTML = `<b style="color:${color}">${text}</b>${sub ? `<small>${sub}</small>` : ""}`;
   notesEl.appendChild(el);
-  setTimeout(() => { if (el.parentNode) el.remove(); }, 4500);
+  setTimeout(() => { if (el.parentNode) el.remove(); }, 5000);
 }
 
-function spawnBanner(text, sub, color, nick) {
+function spawnBanner(giftIcon, nick, giftName, aiText, color) {
   bannerEl.innerHTML = `
-    <div class="t" style="color:${color}">${text}</div>
-    ${sub ? `<div class="s">${sub}</div>` : ""}
-    ${nick ? `<div class="n" style="color:${color}">${nick}</div>` : ""}`;
+    <div class="gift-icon">${giftIcon}</div>
+    <div class="b-nick">${nick}</div>
+    <div class="b-gift" style="color:${color}">${giftName}</div>
+    <div class="b-text">${aiText}</div>`;
   bannerEl.style.borderColor = color;
   bannerEl.style.boxShadow = `0 0 40px ${color}66`;
   bannerEl.style.display = "block";
   clearTimeout(spawnBanner._t);
-  spawnBanner._t = setTimeout(() => { bannerEl.style.display = "none"; }, 4000);
+  spawnBanner._t = setTimeout(() => { bannerEl.style.display = "none"; }, 4200);
 }
 
 function boom(emoji, count=16) {
   for (let i=0; i<count; i++) {
     const el = document.createElement("div");
-    el.className = "heart";
-    el.textContent = emoji;
+    el.className = "heart"; el.textContent = emoji;
     el.style.right = (Math.random()*40) + "px";
     el.style.left = "auto";
     el.style.fontSize = ri(20,34) + "px";
@@ -574,46 +637,27 @@ function boom(emoji, count=16) {
 }
 
 function shakeUI() {
-  const ui = document.getElementById("ui");
+  const ui = $("ui");
   ui.classList.add("shake");
   setTimeout(() => ui.classList.remove("shake"), 420);
 }
 
-const REPLY_TO_SPAM     = ["67 67 67","67 топ","сам 67","67???","да 67",
-  "хватит спамить","забаньте его","опять этот 67","😂 67 снова"];
-const REPLY_TO_HATE     = ["сам такой","не нравится — выйди","хейтер детектед",
-  "завидуй молча","а ты кто такой?","лох сам","ахахах хейтер"];
-const REPLY_TO_SIMP     = ["фууу","кринж","иди отсюда","😂😂😂","simp детектед",
-  "он тебя не заметит","кринжово"];
-const REPLY_TO_QUESTION = ["а сам как думаешь?","он говорил уже","перемотай стрим",
-  "загугли","ну ты и спросил","очевидно же"];
-const REPLY_TO_CLOWN    = ["😂😂😂","я тоже ору","жиза","ахахах","ты жжёшь"];
-const GENERIC_REPLY     = ["согласен","база","ну да","это точно","плюсую",
-  "жиза братан","ты прав","+1","💯"];
+// Реакции ботов на сообщения других ботов
+const REPLY_TO_SPAM     = ["67 67 67","сам 67","67???","хватит спамить","опять этот 67"];
+const REPLY_TO_HATE     = ["сам такой","не нравится — выйди","хейтер детектед","завидуй молча"];
+const REPLY_TO_SIMP     = ["фууу","кринж","simp детектед","он тебя не заметит"];
+const REPLY_TO_CLOWN    = ["😂😂😂","я тоже ору","жиза","ты жжёшь"];
 
 function pickReplyFor(prev) {
-  if (!prev) return rnd(GENERIC_REPLY);
-  if (prev.kind === "spam")     return rnd(REPLY_TO_SPAM);
-  if (prev.kind === "hater")    return rnd(REPLY_TO_HATE);
-  if (prev.kind === "simp")     return rnd(REPLY_TO_SIMP);
-  if (prev.kind === "asker")    return rnd(REPLY_TO_QUESTION);
-  if (prev.kind === "clown")    return rnd(REPLY_TO_CLOWN);
+  if (!prev) return rnd(GENERIC_CHAT);
+  if (prev.kind === "spam")  return rnd(REPLY_TO_SPAM);
+  if (prev.kind === "hater") return rnd(REPLY_TO_HATE);
+  if (prev.kind === "simp")  return rnd(REPLY_TO_SIMP);
+  if (prev.kind === "clown") return rnd(REPLY_TO_CLOWN);
   const t = (prev.text||"").toLowerCase();
   if (t.includes("67") || t.includes("скибиди")) return rnd(REPLY_TO_SPAM);
-  if (/\?$/.test(prev.text)) return rnd(REPLY_TO_QUESTION);
   if (prev.text.includes("😂") || prev.text.includes("🤡")) return rnd(REPLY_TO_CLOWN);
-  return rnd(GENERIC_REPLY);
-}
-
-function residentReply() {
-  const now = Date.now();
-  const candidates = recentMessages.filter(m => m.isResident && (now - m.time) < 4500);
-  const target = candidates.length > 0 ? rnd(candidates) : null;
-  let responder;
-  do { responder = rnd(RESIDENTS); } while (target && responder.nick === target.nick);
-  spawnChat(pickReplyFor(target), responder.nick, responder.color,
-    { isResident:true, kind:responder.kind, reply:true });
-  sfx.reply();
+  return rnd(GENERIC_CHAT);
 }
 
 function residentSpam(resident) {
@@ -621,68 +665,94 @@ function residentSpam(resident) {
     { isResident:true, kind:resident.kind });
 }
 
-function detectThemes(text) {
-  const t = (text||"").toLowerCase();
-  const found = [];
-  for (const th of THEMES) if (th.keys.some(k => t.includes(k))) found.push(th);
-  return found;
-}
-
+// ============ РЕЧЬ ============
 function onUserSpoke(text) {
   if (!text || text.trim().length < 2) return;
   captionEl.textContent = text;
   captionEl.style.display = "block";
   clearTimeout(captionEl._t);
   captionEl._t = setTimeout(() => { captionEl.style.display = "none"; }, 3500);
+
   const themes = detectThemes(text);
+  if (themes.length > 0) setTopic(rnd(themes));
+
   const n = ri(3, 5);
   for (let i = 0; i < n; i++) {
-    setTimeout(() => {
-      if (themes.length > 0 && Math.random() < 0.75) spawnChat(rnd(rnd(themes).replies));
-      else spawnChat();
-    }, i * ri(180, 420));
+    setTimeout(() => spawnChat(), i * ri(180, 420));
   }
-  if (Math.random() < 0.6) setTimeout(() => residentReply(), ri(400, 900));
   state.hype = Math.min(1, state.hype + 0.15);
 }
 
-function bigEvent() {
-  if (Math.random() < 0.55) {
-    const [name, color] = rnd(BLOGGERS);
-    spawnBanner(`⭐ ${name} зашёл`, "топ-блогер 🎉", color, name);
-    spawnNote(`${name} зашёл`, "известный блогер", color);
-    sfx.blogger();
-    state.tv += ri(4000, 15000); state.likes += ri(3000, 9000);
-    state.hype = Math.min(1, state.hype + 0.6); boom("🔥", 20);
-    for (let i=0; i<8; i++)
-      setTimeout(() => spawnChat(rnd([`${name} тут!`,"ооо это же он","го го го 🔥",`${name} привет!`])), i*120);
-  } else {
-    const d = rnd(DONATORS), a = rnd([1000,2000,5000,10000]), c = rnd(DONATE_COMMENTS);
-    spawnBanner(`💎 ${d} → ${a.toLocaleString("ru-RU")} ₽`, c, "#ff50b4", d);
-    spawnNote(`${d} +${a.toLocaleString("ru-RU")} ₽`, c, "#ff78c8");
-    sfx.donateBig();
-    state.coins += a*10; state.tv += ri(1000,4000);
-    state.hype = Math.min(1, state.hype + 0.6); boom("💎", 18);
-  }
-  state.lastEvent = Date.now(); shakeUI();
+// ============ СОБЫТИЯ ============
+function donationEvent() {
+  const d = rnd(DONATORS), a = rnd(DONATE_AMOUNTS), c = rnd(DONATE_COMMENTS);
+  spawnNote(`${d} задонатил ${a.toLocaleString("ru-RU")} ₽`, c, "#ff78c8", "donate");
+  state.coins += a * 10;
+  state.tv += ri(500, 3000);
+  state.hype = Math.min(1, state.hype + 0.5);
+  sfx.donateBig();
+  boom("💎", 14);
+  // 2-3 бота реагируют на донат
+  setTimeout(() => spawnChat(rnd(["вау донат 💎","спасибо за донат!","щедро!","ого!","топ"])), 300);
+  setTimeout(() => spawnChat(rnd(["респект за донат","красава","щедрый!"])), 700);
+  state.lastEvent = Date.now();
+  shakeUI();
 }
 
-function smallEvent() {
-  const r = Math.random();
-  if (r < 0.35) {
-    state.likes += ri(80,500); state.hype = Math.min(1, state.hype + 0.08);
-    sfx.like(); boom(rnd(["❤️","🔥","👍"]), 6);
-  } else if (r < 0.7) {
-    boom(rnd(EMOJIS), ri(4,9)); sfx.pop();
-  } else {
-    const d = rnd(DONATORS), a = rnd([50,100,200,500]);
-    state.coins += a*10;
-    spawnNote(`${d} +${a} ₽`, rnd(DONATE_COMMENTS), "#ff96dc");
-    sfx.donateSmall(); boom("💎", 5);
-  }
+function subscriptionEvent() {
+  const nick = rnd(SUBSCRIBERS);
+  spawnNote(`${nick} подписался!`, "новый подписчик ✅", "#8cff8c", "sub");
+  state.tv += ri(50, 300);
+  state.hype = Math.min(1, state.hype + 0.2);
+  sfx.subscribe();
+  boom("❤️", 8);
+  setTimeout(() => spawnChat(rnd(["добро пожаловать!","привет новенький","спасибо за подписку!","+1 подписчик 🎉"])), 350);
   state.lastEvent = Date.now();
 }
 
+// ============ ПОДАРКИ ============
+function sendGift(gift) {
+  const nick = rnd(NICKS.concat(DONATORS));
+  const color = rnd(COLORS);
+  // AI-текст: сначала тематический, если есть тема
+  let aiText;
+  if (currentTopic && Date.now() < currentTopic.expires && GIFT_BY_THEME[currentTopic.name]) {
+    aiText = GIFT_BY_THEME[currentTopic.name];
+  } else {
+    aiText = rnd(GIFT_AI[gift.id] || ["спасибо!"]);
+  }
+  spawnBanner(gift.icon, nick, gift.name, aiText, color);
+  // Всплывающая надпись в углу
+  spawnNote(`${nick} подарил ${gift.icon} ${gift.name}`, aiText, "#ffd700", "donate");
+  sfx.gift();
+  boom(gift.icon, 16);
+  state.hype = Math.min(1, state.hype + 0.7);
+  // 2-3 бота реагируют
+  setTimeout(() => spawnChat(rnd(["вау " + gift.icon, "топ подарок!", "спасибо!",
+    gift.icon + " " + gift.icon, "респект за подарок!"])), 400);
+  setTimeout(() => spawnChat(rnd(["щедро!","круто!","ого!"])), 800);
+  // закрываем панель
+  $("giftPanel").classList.remove("show");
+  state.lastEvent = Date.now();
+  shakeUI();
+}
+
+function buildGiftPanel() {
+  const grid = $("giftGrid");
+  grid.innerHTML = "";
+  GIFTS.forEach(g => {
+    const el = document.createElement("div");
+    el.className = "gift-item";
+    el.innerHTML = `
+      <div class="gi">${g.icon}</div>
+      <div class="gn">${g.name}</div>
+      <div class="gp">💎 ${g.price.toLocaleString("ru-RU")}</div>`;
+    el.addEventListener("click", () => sendGift(g));
+    grid.appendChild(el);
+  });
+}
+
+// ============ СЧЁТЧИКИ ============
 let lastTick = performance.now();
 function updateCounters(dt) {
   state.hype = Math.max(0, state.hype - dt*0.18);
@@ -691,15 +761,20 @@ function updateCounters(dt) {
   if (Date.now() - state.lastEvent > 15000) state.tv *= (1 - 0.01*dt);
   const v = state.viewers;
   $("viewers").textContent = v > 999 ? (v/1000).toFixed(1) + "K" : Math.floor(v);
+  $("coinsLabel").textContent = "💎 " + state.coins.toLocaleString("ru-RU");
 }
 
-// ============ PiP CANVAS ============
+// ============ PiP ============
 const pipCanvas = document.createElement("canvas");
-pipCanvas.width = 540;
-pipCanvas.height = 960;
+pipCanvas.width = 540; pipCanvas.height = 960;
 const pipCtx = pipCanvas.getContext("2d");
 const pipVideo = $("pipVideo");
 let pipStream = null;
+const pipHistory = [];
+function pipAdd(nick, text, color, isReply) {
+  pipHistory.push({ nick, text, color, isReply, t: Date.now() });
+  while (pipHistory.length > 12) pipHistory.shift();
+}
 
 function drawCovered(ctx, video, W, H, mirror) {
   if (!video || video.readyState < 2 || !video.videoWidth) return;
@@ -709,11 +784,8 @@ function drawCovered(ctx, video, W, H, mirror) {
   const dx = (W-dw)/2, dy = (H-dh)/2;
   if (mirror) {
     ctx.save(); ctx.translate(W, 0); ctx.scale(-1, 1);
-    ctx.drawImage(video, W-dx-dw, dy, dw, dh);
-    ctx.restore();
-  } else {
-    ctx.drawImage(video, dx, dy, dw, dh);
-  }
+    ctx.drawImage(video, W-dx-dw, dy, dw, dh); ctx.restore();
+  } else ctx.drawImage(video, dx, dy, dw, dh);
 }
 
 function roundRect(ctx, x, y, w, h, r) {
@@ -728,92 +800,71 @@ function roundRect(ctx, x, y, w, h, r) {
 
 function renderPiP() {
   const W = pipCanvas.width, H = pipCanvas.height;
+  // Видео сверху (70% высоты)
+  const videoH = Math.floor(H * 0.68);
   pipCtx.fillStyle = "#000";
   pipCtx.fillRect(0, 0, W, H);
   const cam = $("cam"), screen = $("screen");
   const useScreen = state.screenOn && screen.readyState >= 2 && screen.videoWidth;
-  if (useScreen) drawCovered(pipCtx, screen, W, H, false);
-  else drawCovered(pipCtx, cam, W, H, state.facing === "user");
-  const grad = pipCtx.createLinearGradient(0, H*0.55, 0, H);
-  grad.addColorStop(0, "rgba(0,0,0,0)");
-  grad.addColorStop(1, "rgba(0,0,0,0.75)");
-  pipCtx.fillStyle = grad;
-  pipCtx.fillRect(0, H*0.55, W, H*0.45);
+  if (useScreen) drawCovered(pipCtx, screen, W, videoH, false);
+  else drawCovered(pipCtx, cam, W, videoH, state.facing === "user");
+
+  // ЧЁРНАЯ РАМКА С СООБЩЕНИЯМИ снизу
+  pipCtx.fillStyle = "#000";
+  pipCtx.fillRect(0, videoH, W, H - videoH);
+  // тонкая разделительная линия
+  pipCtx.fillStyle = "rgba(255,255,255,.15)";
+  pipCtx.fillRect(0, videoH, W, 2);
+
   const now = Date.now();
-  const items = pipHistory.filter(m => now - m.t < 12000).slice(-9);
-  let y = H - 40;
-  pipCtx.textBaseline = "bottom";
+  const items = pipHistory.filter(m => now - m.t < 15000).slice(-7);
+  pipCtx.textBaseline = "middle";
+  pipCtx.textAlign = "left";
+  let y = videoH + 30;
+  const lineH = 40;
   for (let i = items.length - 1; i >= 0; i--) {
     const m = items[i];
     const size = 20;
-    pipCtx.font = `600 ${size}px -apple-system,sans-serif`;
+    // Ник
+    pipCtx.font = `700 ${size}px -apple-system,sans-serif`;
     const nickW = pipCtx.measureText(m.nick + ": ").width;
+    // Обрезка текста
     let finalText = m.text;
-    const maxW = W - 100;
-    while (pipCtx.measureText(finalText).width + nickW > maxW && finalText.length > 1) {
+    const maxW = W - 60 - nickW;
+    pipCtx.font = `500 ${size}px -apple-system,sans-serif`;
+    while (pipCtx.measureText(finalText).width > maxW && finalText.length > 1) {
       finalText = finalText.slice(0, -1);
     }
-    const padX = 12, padY = 8;
-    const lineW = nickW + pipCtx.measureText(finalText).width;
-    const x = m.isReply ? 40 : 20;
-    pipCtx.fillStyle = "rgba(0,0,0,0.5)";
-    roundRect(pipCtx, x, y - size - padY, lineW + padX*2, size + padY*2, 14);
-    pipCtx.fill();
+    // Ник цветной
     pipCtx.fillStyle = m.color || "#fff";
     pipCtx.font = `700 ${size}px -apple-system,sans-serif`;
-    pipCtx.fillText(m.nick + ":", x + padX, y);
+    const x = m.isReply ? 30 : 16;
+    pipCtx.fillText(m.nick + ":", x, y);
+    // Текст белый
     pipCtx.fillStyle = "#f0f0f0";
     pipCtx.font = `500 ${size}px -apple-system,sans-serif`;
-    pipCtx.fillText(finalText, x + padX + nickW, y);
-    y -= size + padY * 2 + 4;
-    if (y < H * 0.4) break;
+    pipCtx.fillText(finalText, x + nickW, y);
+    y += lineH;
+    if (y > H - 20) break;
   }
-  if (state.screenOn) {
-    const iw = 130, ih = 40, ix = (W - iw)/2, iy = 20;
-    pipCtx.fillStyle = "#000";
-    roundRect(pipCtx, ix, iy, iw, ih, 20);
-    pipCtx.fill();
-    if (cam.readyState >= 2 && cam.videoWidth) {
-      pipCtx.save();
-      pipCtx.beginPath();
-      pipCtx.arc(ix + 20, iy + ih/2, 14, 0, Math.PI*2);
-      pipCtx.closePath();
-      pipCtx.clip();
-      const px = ix + 20, py = iy + ih/2;
-      pipCtx.translate(px*2, 0);
-      pipCtx.scale(-1, 1);
-      const vw = cam.videoWidth, vh = cam.videoHeight;
-      const s = Math.max(28/vw, 28/vh);
-      const dw = vw*s, dh = vh*s;
-      pipCtx.drawImage(cam, px - dw/2, py - dh/2, dw, dh);
-      pipCtx.restore();
-    }
-    const dotX = ix + iw - 60, dotY = iy + ih/2;
-    const pulse = 0.5 + 0.5*Math.sin(now/400);
-    pipCtx.fillStyle = `rgba(255,56,56,${0.6 + 0.4*pulse})`;
-    pipCtx.beginPath(); pipCtx.arc(dotX, dotY, 5, 0, Math.PI*2); pipCtx.fill();
-    pipCtx.fillStyle = "#fff";
-    pipCtx.font = "800 14px -apple-system,sans-serif";
-    pipCtx.textBaseline = "middle";
-    pipCtx.fillText("REC", dotX + 10, dotY);
-    pipCtx.textBaseline = "bottom";
-  }
+
+  // LIVE сверху
   pipCtx.fillStyle = "#ff2850";
-  roundRect(pipCtx, 16, 16, 60, 26, 6);
+  roundRect(pipCtx, 14, 14, 58, 26, 6);
   pipCtx.fill();
   pipCtx.fillStyle = "#fff";
   pipCtx.font = "800 14px -apple-system,sans-serif";
-  pipCtx.textBaseline = "middle";
-  pipCtx.fillText("LIVE", 30, 29);
-  pipCtx.fillStyle = "rgba(0,0,0,.5)";
+  pipCtx.textAlign = "left"; pipCtx.textBaseline = "middle";
+  pipCtx.fillText("LIVE", 26, 28);
+
+  pipCtx.fillStyle = "rgba(0,0,0,.55)";
   const vTxt = "👁 " + (state.viewers > 999 ? (state.viewers/1000).toFixed(1) + "K" : Math.floor(state.viewers));
   pipCtx.font = "700 14px -apple-system,sans-serif";
   const vw2 = pipCtx.measureText(vTxt).width + 20;
-  roundRect(pipCtx, 84, 16, vw2, 26, 6);
+  roundRect(pipCtx, 80, 14, vw2, 26, 6);
   pipCtx.fill();
   pipCtx.fillStyle = "#fff";
-  pipCtx.fillText(vTxt, 94, 29);
-  pipCtx.textBaseline = "bottom";
+  pipCtx.fillText(vTxt, 90, 28);
 }
 
 function enterPiP() {
@@ -839,42 +890,50 @@ async function exitPiP() {
     toast("PiP выключен");
   } catch (e) {}
 }
-
 pipVideo.addEventListener("leavepictureinpicture", () => {
   state.pipActive = false; $("rbPiP").classList.remove("on");
 });
 
-let lastChat = 0, lastEv = 0, lastNotify = 0, lastLike = 0,
-    lastResident = 0, lastReply = 0;
+// ============ ЦИКЛ ============
+let lastChat=0, lastEv=0, lastNotify=0, lastLike=0, lastResident=0;
 
 function loop(now) {
   const dt = (now - lastTick) / 1000;
   lastTick = now;
-  const chatInt = Math.max(0.25, 1.5 - state.hype * 1.05) * 1000;
+
+  // Чат: спавн раз в 1.2–2 сек (реже чем раньше)
+  const chatInt = Math.max(0.8, 2.2 - state.hype * 1.2) * 1000;
   if (now - lastChat > chatInt) { spawnChat(); lastChat = now; }
-  const resInt = (2200 - state.hype * 1400) + Math.random() * 1500;
+
+  // Резиденты спамят раз в 3–5 сек
+  const resInt = (3500 - state.hype * 1500) + Math.random() * 1500;
   if (now - lastResident > resInt) { residentSpam(rnd(RESIDENTS)); lastResident = now; }
-  if (now - lastReply > (900 + Math.random()*1800) && Math.random() < 0.4 + state.hype*0.4) {
-    residentReply(); lastReply = now;
-  }
-  if (now - lastEv > (3500 + Math.random()*3500)) {
-    (Math.random() < 0.32 + state.hype*0.4 ? bigEvent : smallEvent)();
+
+  // Донат раз в 8–15 сек
+  if (now - lastEv > (8000 + Math.random()*7000)) {
+    donationEvent();
     lastEv = now;
   }
-  if (now - lastNotify > (5000 + Math.random()*5000)) {
-    spawnNote(`${rnd(NICKS)} зашёл`, "", "#78c8ff"); sfx.viewer(); lastNotify = now;
+
+  // Подписка раз в 6–12 сек
+  if (now - lastNotify > (6000 + Math.random()*6000)) {
+    subscriptionEvent();
+    lastNotify = now;
   }
+
   if (now - lastLike > (600 + Math.random()*1000)) {
     state.likes += ri(3, 25);
     if (state.hype > 0.3) boom(rnd(["❤️","🔥"]), 2);
     lastLike = now;
   }
+
   updateCounters(dt);
   renderPiP();
   if (state.pipActive && pipVideo.paused) pipVideo.play().catch(()=>{});
   requestAnimationFrame(loop);
 }
 
+// ============ КАМЕРА ============
 async function startCamera() {
   try {
     const stream = await navigator.mediaDevices.getUserMedia({
@@ -923,10 +982,11 @@ async function toggleScreen() {
   } catch (e) { toast("Отменено"); }
 }
 
+// ============ МИКРОФОН ============
 let recognition = null;
 function startMic() {
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) { toast("Браузер не поддерживает распознавание речи"); return false; }
+  if (!SR) { toast("Распознавание речи не поддерживается"); return false; }
   if (state.micOn) {
     state.micOn = false;
     if (recognition) { try { recognition.stop(); } catch(e){} }
@@ -947,7 +1007,7 @@ function startMic() {
     recognition.start();
     state.micOn = true;
     $("rbMic").classList.add("on");
-    toast("🎤 Микрофон включён — говори!"); return true;
+    toast("🎤 Микрофон включён"); return true;
   } catch (e) { toast("Ошибка микрофона"); return false; }
 }
 
@@ -956,30 +1016,17 @@ function pulse(el) {
   setTimeout(() => el.classList.remove("pulse"), 380);
 }
 
-// Обработчики кнопок
-$("rbEvent").addEventListener("click", e => {
+// ============ КНОПКИ ============
+$("rbGift").addEventListener("click", e => {
   pulse(e.currentTarget);
-  bigEvent();
-  toast("🎁 Большой ивент!");
+  $("giftPanel").classList.toggle("show");
 });
 $("rbScreen").addEventListener("click", e => { pulse(e.currentTarget); toggleScreen(); });
 $("rbFlip").addEventListener("click", e => { pulse(e.currentTarget); flipCamera(); });
 $("rbMic").addEventListener("click", e => { pulse(e.currentTarget); startMic(); });
 $("rbEmoji").addEventListener("click", e => {
   pulse(e.currentTarget);
-  boom(rnd(EMOJIS), 18);
-  sfx.pop();
-});
-$("rbShare").addEventListener("click", async (e) => {
-  pulse(e.currentTarget);
-  const url = location.href;
-  if (navigator.share) {
-    try { await navigator.share({ title: "grand-cat стрим", url }); }
-    catch (err) {}
-  } else {
-    try { await navigator.clipboard.writeText(url); toast("Ссылка скопирована"); }
-    catch (err) { toast("Не удалось скопировать"); }
-  }
+  boom(rnd(EMOJIS), 18); sfx.pop();
 });
 $("rbPiP").addEventListener("click", e => {
   pulse(e.currentTarget);
@@ -987,17 +1034,27 @@ $("rbPiP").addEventListener("click", e => {
 });
 $("closeX").addEventListener("click", () => { if (confirm("Закрыть стрим?")) location.reload(); });
 
+// Закрыть панель подарков при тапе вне её
+document.addEventListener("touchstart", (e) => {
+  const p = $("giftPanel");
+  if (p.classList.contains("show") && !p.contains(e.target)
+      && e.target.id !== "rbGift" && !e.target.closest("#rbGift")) {
+    p.classList.remove("show");
+  }
+}, true);
+
 $("startBtn").addEventListener("click", async () => {
   initAudio();
   const ok = await startCamera();
   if (!ok) return;
+  buildGiftPanel();
   pipStream = pipCanvas.captureStream(30);
   pipVideo.srcObject = pipStream;
   pipVideo.muted = true;
   try { await pipVideo.play(); } catch(e) {}
   try { await navigator.mediaDevices.getUserMedia({ audio: true }); startMic(); } catch (e) {}
   $("start").style.display = "none";
-  setTimeout(() => spawnNote("grand-cat в эфире!", "🎤 — микрофон, 🎁 — донат, 📺 — PiP", "#8cff8c"), 500);
+  setTimeout(() => spawnNote("grand-cat в эфире!", "🎁 — подарки, 🎤 — микрофон", "#8cff8c", "sub"), 500);
   requestAnimationFrame(loop);
 });
 
