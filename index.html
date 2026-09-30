@@ -415,7 +415,6 @@ const THEMES = [
              "ну я думаю да","загугли лучше","вот это вопрос"] },
 ];
 
-// Эмодзи по темам — с 🗿
 const EMOJIS_BY_THEME = {
   "музыка":     ["🥰","❤️","👍","🤯","😂","🤣","🗿"],
   "игры":       ["👍","🤯","😂","🤣","❤️","🗿"],
@@ -983,16 +982,15 @@ function toggleMic() {
   }
 }
 
+// Без всплывающих надписей
 function toggleEmojis() {
   state.emojisOn = !state.emojisOn;
   if (state.emojisOn) {
     $("emojiSlash").style.display = "none";
     $("rbEmoji").classList.add("on");
-    toast("😊 Смайлики включены");
   } else {
     $("emojiSlash").style.display = "block";
     $("rbEmoji").classList.remove("on");
-    toast("😊 Смайлики выключены");
   }
 }
 
