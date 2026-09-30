@@ -29,7 +29,6 @@ html, body { width:100%; height:100%; overflow:hidden; background:#000;
   border-radius:22px; padding:4px 12px 4px 4px; height:34px; z-index:5;
   box-shadow:0 6px 20px rgba(0,0,0,.7), 0 0 0 1px rgba(255,255,255,.08);
   transition:opacity .25s, transform .35s cubic-bezier(.2,1.3,.4,1); }
-body.screen-mode #island { opacity:1; transform:translateX(-50%) scale(1); }
 #islandCam { width:26px; height:26px; border-radius:50%; object-fit:cover;
   background:#1a1a1a; transform:scaleX(-1); }
 .island-info { display:flex; align-items:center; gap:6px; }
@@ -42,8 +41,7 @@ body.screen-mode #island { opacity:1; transform:translateX(-50%) scale(1); }
   padding-top:calc(12px + env(safe-area-inset-top));
   background:linear-gradient(180deg,rgba(0,0,0,.65) 0%,rgba(0,0,0,0) 100%);
   display:flex; align-items:center; justify-content:space-between; gap:8px;
-  transition:opacity .3s; z-index:10; }
-body.screen-mode .top { opacity:.55; }
+  z-index:10; }
 .host { display:flex; align-items:center; gap:8px; min-width:0; }
 .host-av { width:34px; height:34px; border-radius:50%; flex:0 0 34px;
   background:#000; overflow:hidden;
@@ -68,8 +66,7 @@ body.screen-mode .top { opacity:.55; }
 
 .rail { position:absolute; right:6px; bottom:auto; top:22%;
   display:flex; flex-direction:column; gap:16px; align-items:center;
-  pointer-events:auto; transition:top .3s; z-index:9; }
-body.screen-mode .rail { top:70px; }
+  pointer-events:auto; z-index:9; }
 .rb { width:40px; height:40px; display:flex; align-items:center;
   justify-content:center; cursor:pointer; position:relative;
   transition:transform .12s cubic-bezier(.2,1.4,.4,1); }
@@ -110,22 +107,6 @@ body.screen-mode .rail { top:70px; }
 
 body.banner-show .comments { opacity:0; transform:translateY(20px); }
 
-body.screen-mode .comments { left:6px; right:72px; top:70px; bottom:auto;
-  max-height:calc(100vh - 220px); justify-content:flex-start; gap:5px;
-  padding-top:4px; padding-bottom:8px; overflow-y:auto; overflow-x:hidden;
-  scrollbar-width:none;
-  -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 85%,transparent 100%);
-  mask-image:linear-gradient(180deg,#000 0%,#000 85%,transparent 100%); }
-body.screen-mode .comments::-webkit-scrollbar { display:none; }
-body.screen-mode .cm { max-width:58%; padding:5px 11px 5px 6px;
-  border-radius:16px; background:rgba(0,0,0,.55); }
-body.screen-mode .cm.reply { margin-left:0; background:rgba(0,0,0,.68); }
-body.screen-mode .cm-av { flex:0 0 20px; width:20px; height:20px; font-size:10px; }
-body.screen-mode .cm-nick { font-size:9px; }
-body.screen-mode .cm-text { font-size:11px; line-height:1.25; }
-body.screen-mode .cm:nth-child(odd)  { align-self:flex-start; }
-body.screen-mode .cm:nth-child(even) { align-self:flex-end; }
-
 .caption { position:absolute; left:16px; right:80px; bottom:56px;
   text-align:center; font-size:17px; font-weight:800; padding:10px 16px;
   background:rgba(0,0,0,.72); border-radius:14px; display:none;
@@ -134,21 +115,16 @@ body.screen-mode .cm:nth-child(even) { align-self:flex-end; }
   text-shadow:0 1px 3px rgba(0,0,0,.8); z-index:4; }
 .caption.interim { opacity:.75; font-style:italic; }
 @keyframes capIn { from{opacity:0; transform:translateY(6px);} to{opacity:1;} }
-body.screen-mode .caption { right:72px; bottom:24px; font-size:13px; padding:7px 11px; }
 
 .hearts { position:absolute; right:20px; bottom:auto; top:60%;
   width:60px; height:40vh; overflow:visible; pointer-events:none;
-  transition:all .35s; z-index:3; }
+  z-index:3; }
 .heart { position:absolute; bottom:0; font-size:26px;
   will-change:transform,opacity; }
-body.screen-mode .hearts { right:auto; left:6px; bottom:auto; top:70px;
-  width:60px; height:calc(100vh - 220px); }
-body.screen-mode .heart { bottom:auto; top:0; }
 
 .notes { position:absolute; top:80px; left:12px; right:12px;
-  display:flex; flex-direction:column; gap:6px; transition:top .3s;
+  display:flex; flex-direction:column; gap:6px;
   align-items:flex-start; z-index:8; }
-body.screen-mode .notes { top:56px; opacity:.85; }
 .note { background:linear-gradient(135deg, rgba(0,0,0,.85), rgba(40,10,60,.85));
   backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
   padding:10px 14px; border-radius:14px; font-size:13px;
@@ -200,13 +176,28 @@ body.screen-mode .notes { top:56px; opacity:.85; }
 
 .shake { animation:shk .4s; }
 @keyframes shk { 0%,100%{transform:none;} 20%{transform:translate(-3px,2px);} 40%{transform:translate(3px,-2px);} 60%{transform:translate(-2px,-1px);} 80%{transform:translate(2px,1px);} }
+
+/* Индикатор записи */
+.rec-badge { position:absolute; top:calc(12px + env(safe-area-inset-top));
+  left:50%; transform:translateX(-50%); display:none;
+  background:rgba(0,0,0,.75); padding:5px 12px; border-radius:16px;
+  font-size:12px; font-weight:800; color:#fff; z-index:60;
+  align-items:center; gap:6px;
+  backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); }
+.rec-badge.show { display:flex; }
+.rec-badge .dot { width:8px; height:8px; border-radius:50%; background:#ff3838;
+  animation:dotPulse 1.2s ease-in-out infinite; }
 </style>
 </head>
 <body>
 
 <video id="cam" autoplay playsinline muted></video>
-<video id="screen" autoplay playsinline muted></video>
 <video id="pipVideo" autoplay muted style="display:none"></video>
+
+<div class="rec-badge" id="recBadge">
+  <span class="dot"></span>
+  <span>REC</span>
+</div>
 
 <div id="island">
   <video id="islandCam" autoplay playsinline muted></video>
@@ -253,7 +244,7 @@ body.screen-mode .notes { top:56px; opacity:.85; }
           <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/>
           <circle cx="12" cy="12" r="3"/>
         </svg>
-        <span id="viewers">1.2K</span>
+        <span id="viewers">30.0K</span>
       </span>
       <div class="close-x" id="closeX">
         <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round">
@@ -296,10 +287,11 @@ body.screen-mode .notes { top:56px; opacity:.85; }
       <div class="plus">+</div>
     </div>
 
-    <div class="rb red-active" id="rbPiP" title="Маленькое окно">
-      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linejoin="round">
-        <rect x="2" y="4" width="20" height="16" rx="2"/>
-        <rect x="12" y="12" width="8" height="6" rx="1" fill="none"/>
+    <!-- ЗАПИСЬ (бывшая кнопка трансляции экрана) -->
+    <div class="rb red-active" id="rbRec" title="Запись">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8">
+        <circle cx="12" cy="12" r="9"/>
+        <circle id="recDot" cx="12" cy="12" r="4" fill="#ff2850" stroke="none" style="display:none"/>
       </svg>
     </div>
 
@@ -309,15 +301,6 @@ body.screen-mode .notes { top:56px; opacity:.85; }
         <polyline points="20 4 20 9 15 9"/>
         <path d="M21 12a9 9 0 0 1-15 6.7l-2-2"/>
         <polyline points="4 20 4 15 9 15"/>
-      </svg>
-    </div>
-
-    <div class="rb red-active" id="rbScreen" title="Трансляция экрана">
-      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linejoin="round">
-        <rect x="3" y="4" width="18" height="13" rx="2"/>
-        <line x1="8" y1="20" x2="16" y2="20"/>
-        <line x1="12" y1="17" x2="12" y2="20"/>
-        <polygon points="10,8 15,10.5 10,13" fill="#fff" stroke="none"/>
       </svg>
     </div>
 
@@ -340,6 +323,13 @@ body.screen-mode .notes { top:56px; opacity:.85; }
         <line id="emojiSlash" x1="4" y1="4" x2="20" y2="20" stroke="#fff" stroke-width="2.2" style="display:none"/>
       </svg>
     </div>
+
+    <div class="rb red-active" id="rbPiP" title="Маленькое окно">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linejoin="round">
+        <rect x="2" y="4" width="20" height="16" rx="2"/>
+        <rect x="12" y="12" width="8" height="6" rx="1" fill="none"/>
+      </svg>
+    </div>
   </div>
 </div>
 
@@ -351,10 +341,13 @@ body.screen-mode .notes { top:56px; opacity:.85; }
 
 <script>
 const state = {
-  viewers: 1240, tv: 1240, likes: 34200, hype: 0.3,
-  muted: false, screenOn: false, micOn: false, micMuted: false,
+  viewers: 30000, tv: 30000, likes: 342000, hype: 0.3,
+  muted: false, micOn: false, micMuted: false,
   emojisOn: true, facing: "user",
-  pipActive: false, lastEvent: Date.now(),
+  pipActive: false,
+  lastEvent: Date.now(),
+  lastActivity: Date.now(),
+  isRecording: false,
 };
 
 const NICKS = ["xXx_Shadow","kotik_2024","AlexTop","moon_girl","NEON_777",
@@ -522,6 +515,10 @@ function toast(text) {
   toast._t = setTimeout(() => toastEl.classList.remove("show"), 2200);
 }
 
+function markActivity() {
+  state.lastActivity = Date.now();
+}
+
 function spawnChat(text=null, nick=null, color=null, opts={}) {
   nick = nick || rnd(NICKS);
   if (text === null) {
@@ -547,12 +544,12 @@ function spawnChat(text=null, nick=null, color=null, opts={}) {
     </div>`;
   commentsEl.appendChild(el);
   while (commentsEl.children.length > 22) commentsEl.removeChild(commentsEl.firstChild);
-  if (document.body.classList.contains("screen-mode"))
-    commentsEl.scrollTop = commentsEl.scrollHeight;
   setTimeout(() => { if (el.parentNode) el.remove(); }, 13000);
   pipAdd(nick, text, color, !!opts.reply);
   rememberMessage({ nick, text, time:Date.now(),
     isResident:!!opts.isResident, kind:opts.kind || null });
+  // обычный (не резидент) чат = активность
+  if (!opts.isResident) markActivity();
 }
 
 function spawnNote(text, sub="", color="#ffd700", cls="") {
@@ -589,7 +586,7 @@ function boom(emoji, count=16) {
     el.style.fontSize = ri(22,36) + "px";
     heartsEl.appendChild(el);
     const vx = (Math.random()-0.5)*40;
-    const vy = document.body.classList.contains("screen-mode") ? ri(220,400) : -ri(220,400);
+    const vy = -ri(220,400);
     el.animate([
       { transform:"translate(0,0) scale(.5)", opacity:1 },
       { transform:`translate(${vx}px,${vy}px) scale(1.2)`, opacity:0 }
@@ -637,6 +634,7 @@ function showCaption(text, isInterim) {
 
 function onUserSpoke(text) {
   if (!text || text.trim().length < 2) return;
+  markActivity();
   const themes = detectThemes(text);
   if (themes.length > 0) setTopic(rnd(themes));
   const n = ri(3, 5);
@@ -647,6 +645,7 @@ function onUserSpoke(text) {
 }
 
 function donationEvent() {
+  markActivity();
   const d = rnd(DONATORS), a = rnd(DONATE_AMOUNTS);
   let reason;
   if (currentTopic && Date.now() < currentTopic.expires
@@ -657,7 +656,6 @@ function donationEvent() {
   }
   spawnBanner(d, a, reason, "#ff50b4");
   spawnNote(`${d} задонатил ${a.toLocaleString("ru-RU")} ₽`, reason, "#ff78c8", "donate");
-  state.tv += ri(500, 2000);
   state.hype = Math.min(1, state.hype + 0.5);
   sfx.donateBig();
   boom("💎", 14);
@@ -668,9 +666,9 @@ function donationEvent() {
 }
 
 function subscriptionEvent() {
+  markActivity();
   const nick = rnd(SUBSCRIBERS);
   spawnNote(`${nick} подписался!`, "новый подписчик ✅", "#8cff8c", "sub");
-  state.tv += ri(50, 300);
   state.hype = Math.min(1, state.hype + 0.2);
   sfx.subscribe();
   boom("❤️", 8);
@@ -682,11 +680,25 @@ function subscriptionEvent() {
 let lastTick = performance.now();
 function updateCounters(dt) {
   state.hype = Math.max(0, state.hype - dt*0.18);
-  state.tv += 4*dt + state.hype*500*dt;
-  state.viewers += (state.tv - state.viewers) * Math.min(1, dt*2.2);
-  if (Date.now() - state.lastEvent > 15000) state.tv *= (1 - 0.01*dt);
+
+  // Логика зрителей:
+  // Если активность была < 12 сек назад — растём по 28/сек (≈2500 за 1.5 мин).
+  // Если тишина > 12 сек — постепенно падаем.
+  const idleTime = (Date.now() - state.lastActivity) / 1000;
+  if (idleTime < 12) {
+    state.tv += 28 * dt;
+  } else {
+    state.tv -= 15 * dt;
+    if (state.tv < 300) state.tv = 300;
+  }
+
+  state.viewers += (state.tv - state.viewers) * Math.min(1, dt * 1.5);
   const v = state.viewers;
-  $("viewers").textContent = v > 999 ? (v/1000).toFixed(1) + "K" : Math.floor(v);
+  let label;
+  if (v >= 1000000) label = (v/1000000).toFixed(1) + "M";
+  else if (v >= 1000) label = (v/1000).toFixed(1) + "K";
+  else label = Math.floor(v);
+  $("viewers").textContent = label;
 }
 
 const pipCanvas = document.createElement("canvas");
@@ -733,10 +745,8 @@ function renderPiP() {
   pipCtx.fillStyle = "#000";
   pipCtx.fillRect(0, 0, W, H);
 
-  const cam = $("cam"), screen = $("screen");
-  const useScreen = state.screenOn && screen.readyState >= 2 && screen.videoWidth;
-  if (useScreen) drawCovered(pipCtx, screen, W, videoH, false);
-  else drawCovered(pipCtx, cam, W, videoH, state.facing === "user");
+  const cam = $("cam");
+  drawCovered(pipCtx, cam, W, videoH, state.facing === "user");
 
   pipCtx.fillStyle = "#0a0a0a";
   pipCtx.fillRect(0, videoH, W, captionH);
@@ -796,7 +806,10 @@ function renderPiP() {
   pipCtx.fillText("LIVE", 26, 28);
 
   pipCtx.fillStyle = "rgba(0,0,0,.55)";
-  const vTxt = (state.viewers > 999 ? (state.viewers/1000).toFixed(1) + "K" : Math.floor(state.viewers));
+  const v = state.viewers;
+  const vTxt = v >= 1000000 ? (v/1000000).toFixed(1) + "M"
+             : v >= 1000 ? (v/1000).toFixed(1) + "K"
+             : Math.floor(v);
   pipCtx.font = "700 14px -apple-system,sans-serif";
   const vw2 = pipCtx.measureText(vTxt).width + 34;
   roundRect(pipCtx, 80, 14, vw2, 26, 6);
@@ -837,6 +850,79 @@ pipVideo.addEventListener("leavepictureinpicture", () => {
   state.pipActive = false; $("rbPiP").classList.remove("on");
 });
 
+// ============ ЗАПИСЬ (MediaRecorder) ============
+let mediaRecorder = null;
+let recChunks = [];
+
+function startRecording() {
+  try {
+    // Берём тот же поток, что и PiP (canvas c камерой + субтитрами + чатом)
+    const stream = pipCanvas.captureStream(30);
+
+    // подбор mimeType
+    let mime = "";
+    const tries = [
+      "video/mp4;codecs=h264",
+      "video/mp4",
+      "video/webm;codecs=vp9",
+      "video/webm;codecs=vp8",
+      "video/webm"
+    ];
+    for (const t of tries) {
+      if (window.MediaRecorder && MediaRecorder.isTypeSupported(t)) { mime = t; break; }
+    }
+
+    mediaRecorder = new MediaRecorder(stream, mime ? { mimeType: mime } : undefined);
+    recChunks = [];
+    mediaRecorder.ondataavailable = (e) => {
+      if (e.data && e.data.size > 0) recChunks.push(e.data);
+    };
+    mediaRecorder.onstop = () => {
+      try {
+        const type = mediaRecorder.mimeType || "video/webm";
+        const blob = new Blob(recChunks, { type });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        const ext = type.includes("mp4") ? "mp4" : "webm";
+        const stamp = new Date().toISOString().replace(/[:.]/g,"-").slice(0,19);
+        a.href = url;
+        a.download = `grand-cat-${stamp}.${ext}`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 15000);
+        toast("💾 Видео сохранено");
+      } catch (err) {
+        toast("Ошибка сохранения: " + err.message);
+      }
+    };
+    mediaRecorder.start(1000);
+    state.isRecording = true;
+    $("recDot").style.display = "block";
+    $("recBadge").classList.add("show");
+    toast("🔴 Запись начата");
+  } catch (e) {
+    toast("Ошибка записи: " + (e.message || "недоступно"));
+  }
+}
+
+function stopRecording() {
+  try {
+    if (mediaRecorder && mediaRecorder.state !== "inactive") {
+      mediaRecorder.stop();
+    }
+  } catch (e) {}
+  state.isRecording = false;
+  $("recDot").style.display = "none";
+  $("recBadge").classList.remove("show");
+}
+
+function toggleRecording() {
+  if (state.isRecording) stopRecording();
+  else startRecording();
+}
+
+// ============ ЦИКЛ ============
 let lastChat=0, lastEv=0, lastNotify=0, lastResident=0, lastAutoEmoji=0;
 const donationCooldown = 60000;
 const subCooldown = 45000;
@@ -873,6 +959,7 @@ function loop(now) {
   requestAnimationFrame(loop);
 }
 
+// ============ КАМЕРА ============
 async function startCamera() {
   try {
     const stream = await navigator.mediaDevices.getUserMedia({
@@ -894,33 +981,7 @@ async function flipCamera() {
   await startCamera();
 }
 
-async function toggleScreen() {
-  if (state.screenOn) {
-    const s = $("screen");
-    if (s.srcObject) { s.srcObject.getTracks().forEach(t => t.stop()); s.srcObject = null; }
-    s.style.display = "none";
-    $("cam").style.display = "block";
-    state.screenOn = false;
-    document.body.classList.remove("screen-mode");
-    $("rbScreen").classList.remove("on");
-    toast("Вернулись к камере"); return;
-  }
-  try {
-    if (!navigator.mediaDevices.getDisplayMedia) {
-      toast("На iPhone — используй штатную Запись экрана"); return;
-    }
-    const stream = await navigator.mediaDevices.getDisplayMedia({ video: true });
-    const s = $("screen");
-    s.srcObject = stream; s.style.display = "block";
-    $("cam").style.display = "none";
-    state.screenOn = true;
-    document.body.classList.add("screen-mode");
-    $("rbScreen").classList.add("on");
-    toast("Трансляция экрана");
-    stream.getVideoTracks()[0].onended = () => { if (state.screenOn) toggleScreen(); };
-  } catch (e) { toast("Отменено"); }
-}
-
+// ============ МИКРОФОН ============
 let recognition = null;
 let micRunning = false;
 
@@ -982,7 +1043,6 @@ function toggleMic() {
   }
 }
 
-// Без всплывающих надписей
 function toggleEmojis() {
   state.emojisOn = !state.emojisOn;
   if (state.emojisOn) {
@@ -999,7 +1059,8 @@ function pulse(el) {
   setTimeout(() => el.classList.remove("pulse"), 380);
 }
 
-$("rbScreen").addEventListener("click", e => { pulse(e.currentTarget); toggleScreen(); });
+// ============ КНОПКИ ============
+$("rbRec").addEventListener("click", e => { pulse(e.currentTarget); toggleRecording(); });
 $("rbFlip").addEventListener("click", e => { pulse(e.currentTarget); flipCamera(); });
 $("rbMic").addEventListener("click", e => { pulse(e.currentTarget); toggleMic(); });
 $("rbEmoji").addEventListener("click", e => { pulse(e.currentTarget); toggleEmojis(); });
@@ -1022,7 +1083,7 @@ $("startBtn").addEventListener("click", async () => {
     startMicAuto();
   } catch (e) {}
   $("start").style.display = "none";
-  setTimeout(() => spawnNote("grand-cat в эфире!", "🎤 — мьют, 😊 — смайлики", "#8cff8c", "sub"), 500);
+  setTimeout(() => spawnNote("grand-cat в эфире!", "🔴 — запись, 🎤 — мьют", "#8cff8c", "sub"), 500);
   requestAnimationFrame(loop);
 });
 
