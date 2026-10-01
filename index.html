@@ -102,9 +102,10 @@ body.banner-show .comments{opacity:0;transform:translateY(20px);}
 #evPlayhead::before{content:"";position:absolute;top:-6px;left:-5px;width:13px;height:13px;background:#fff;border-radius:50%;box-shadow:0 0 6px rgba(0,0,0,.5);}
 #evTime{text-align:center;font-size:12px;opacity:.7;margin-top:8px;}
 .ev-actions{display:flex;gap:8px;margin-bottom:14px;}
-.ev-act{flex:1;padding:11px 6px;border-radius:12px;border:none;background:rgba(255,255,255,.1);color:#fff;font-size:12px;font-weight:700;cursor:pointer;}
+.ev-act{flex:1;padding:11px 4px;border-radius:12px;border:none;background:rgba(255,255,255,.1);color:#fff;font-size:10px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;line-height:1;}
 .ev-act:active{background:rgba(255,255,255,.2);transform:scale(.96);}
-.ev-act.ev-del{background:rgba(255,50,80,.3);}
+.ev-act svg{width:24px;height:24px;display:block;}
+.ev-act.ev-del{background:rgba(255,50,80,.25);}
 .ev-btns{display:flex;gap:10px;}
 .ev-btns button{flex:1;padding:12px;border-radius:12px;border:none;font-size:14px;font-weight:700;cursor:pointer;}
 .ev-save{background:#25f4ee;color:#000;}
@@ -224,12 +225,11 @@ body.banner-show .comments{opacity:0;transform:translateY(20px);}
 .settings-section{padding:8px 20px 4px;font-size:12px;text-transform:uppercase;letter-spacing:.8px;color:rgba(255,255,255,.4);font-weight:700;}
 </style>
 </head>
-  <body>
+<body>
 
 <video id="cam" autoplay playsinline muted></video>
 <video id="pipVideo" autoplay muted style="display:none"></video>
 <div id="tapLayer"></div>
-
 <div class="rec-badge" id="recBadge"><span class="dot"></span><span>REC</span></div>
 
 <div id="ui">
@@ -242,12 +242,10 @@ body.banner-show .comments{opacity:0;transform:translateY(20px);}
     <div class="top-right">
       <span class="live-badge">LIVE</span>
       <span class="viewers">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
         <span id="viewers">30.0K</span>
       </span>
-      <div class="close-x" id="closeX">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
-      </div>
+      <div class="close-x" id="closeX"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></div>
     </div>
   </div>
   <div class="notes" id="notes"></div>
@@ -257,19 +255,19 @@ body.banner-show .comments{opacity:0;transform:translateY(20px);}
   <div class="caption" id="caption"></div>
   <div class="toast" id="toast"></div>
   <div class="rail">
-    <div class="rb red-active" id="rbRec" title="Запись">
+    <div class="rb red-active" id="rbRec">
       <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><circle id="recDot" cx="12" cy="12" r="4" fill="#ff2850" stroke="none" style="display:none"/></svg>
     </div>
-    <div class="rb" id="rbFlip" title="Камера">
-      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15-6.7l2 2"/><polyline points="20 4 20 9 15 9"/><path d="M21 12a9 9 0 0 1-15 6.7l-2-2"/><polyline points="4 20 4 15 9 15"/></svg>
+    <div class="rb" id="rbFlip">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round"><path d="M3 12a9 9 0 0 1 15-6.7l2 2"/><polyline points="20 4 20 9 15 9"/><path d="M21 12a9 9 0 0 1-15 6.7l-2-2"/><polyline points="4 20 4 15 9 15"/></svg>
     </div>
-    <div class="rb" id="rbMic" title="Микрофон">
-      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/><line id="micSlash" x1="4" y1="4" x2="20" y2="20" stroke="#fff" stroke-width="2.2" style="display:none"/></svg>
+    <div class="rb" id="rbMic">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/><line id="micSlash" x1="4" y1="4" x2="20" y2="20" stroke="#fff" stroke-width="2.2" style="display:none"/></svg>
     </div>
-    <div class="rb on" id="rbEmoji" title="Смайлики">
+    <div class="rb on" id="rbEmoji">
       <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="9" cy="10" r="1" fill="#fff" stroke="none"/><circle cx="15" cy="10" r="1" fill="#fff" stroke="none"/><path d="M8.5 14.5s1.3 2 3.5 2 3.5-2 3.5-2"/><line id="emojiSlash" x1="4" y1="4" x2="20" y2="20" stroke="#fff" stroke-width="2.2" style="display:none"/></svg>
     </div>
-    <div class="rb red-active" id="rbPiP" title="PiP">
+    <div class="rb red-active" id="rbPiP">
       <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><rect x="12" y="12" width="8" height="6" rx="1"/></svg>
     </div>
   </div>
@@ -287,7 +285,7 @@ body.banner-show .comments{opacity:0;transform:translateY(20px);}
   <div class="menu-mid"><div class="logo" id="menuAvatar">G</div></div>
   <div class="menu-bottom">
     <div class="menu-btn" id="btnInbox">
-      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M21 12c0 4.4-4 8-9 8-1.6 0-3.1-.4-4.4-1.1L3 20l1.2-3.9C3.5 15 3 13.6 3 12c0-4.4 4-8 9-8s9 3.6 9 8z"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M21 12c0 4.4-4 8-9 8-1.6 0-3.1-.4-4.4-1.1L3 20l1.2-3.9C3.5 15 3 13.6 3 12c0-4.4 4-8 9-8s9 3.6 9 8z"/></svg>
       <span>Входящие</span>
       <div class="badge" id="inboxBadge" style="display:none">0</div>
     </div>
@@ -295,121 +293,27 @@ body.banner-show .comments{opacity:0;transform:translateY(20px);}
       <div class="plus-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
     </div>
     <div class="menu-btn" id="btnAccount">
-      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-7 8-7s8 3 8 7"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-7 8-7s8 3 8 7"/></svg>
       <span>Аккаунт</span>
     </div>
   </div>
 </div>
 
-<div class="panel" id="panelInbox">
-  <div class="panel-head">
-    <div class="back" data-close="1"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><polyline points="15 6 9 12 15 18"/></svg></div>
-    <div class="title">Сообщения</div>
-  </div>
-  <div class="panel-body" id="inboxBody"></div>
-</div>
-
-<div class="panel" id="panelChat">
-  <div class="panel-head">
-    <div class="back" data-close="1"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><polyline points="15 6 9 12 15 18"/></svg></div>
-    <div class="chat-head-av" id="chatHeadAv">🐱</div>
-    <div class="title" id="chatHeadName">nick</div>
-  </div>
-  <div class="chat-messages" id="chatMessages"></div>
-  <div class="chat-input-row">
-    <input id="chatInput" type="text" placeholder="Сообщение..." autocomplete="off">
-    <button id="chatSend"><svg viewBox="0 0 24 24" fill="#fff" stroke="none"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg></button>
-  </div>
-</div>
-
-<div class="panel" id="panelAccount">
-  <div class="panel-head">
-    <div class="back" data-close="1"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><polyline points="15 6 9 12 15 18"/></svg></div>
-    <div class="title">Аккаунт</div>
-  </div>
-  <div class="panel-body">
-    <div class="account-body">
-      <div class="account-av" id="accAvatar">G</div>
-      <div class="account-name" id="accName">grand-cat</div>
-      <div class="account-handle" id="accHandle">@grand_cat</div>
-      <div class="account-stats">
-        <div class="acc-stat" id="statFollowersBtn" style="cursor:pointer"><div class="n" id="accFollowers">0</div><div class="l">подписчики</div></div>
-        <div class="acc-stat" id="statFollowingBtn" style="cursor:pointer"><div class="n" id="accFollowing">0</div><div class="l">подписки</div></div>
-        <div class="acc-stat" id="statCrystalsBtn" style="cursor:pointer"><div class="n" id="accCrystalsStat">0</div><div class="l">кристаллы</div></div>
-      </div>
-      <div class="account-item" id="itemMyStreams"><div class="ic">🎬</div><div class="lb">Мои стримы</div><div class="ar">›</div></div>
-      <div class="account-item" id="itemStats"><div class="ic">📊</div><div class="lb">Статистика</div><div class="ar">›</div></div>
-      <div class="account-item" id="itemSettings"><div class="ic">⚙️</div><div class="lb">Настройки</div><div class="ar">›</div></div>
-    </div>
-  </div>
-</div>
-
-<div class="panel" id="panelSettings">
-  <div class="panel-head">
-    <div class="back" data-close="1"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><polyline points="15 6 9 12 15 18"/></svg></div>
-    <div class="title">Настройки</div>
-  </div>
-  <div class="panel-body">
-    <div class="account-body" style="padding-top:10px;">
-      <div class="settings-section">Профиль</div>
-      <div class="account-item" id="itemEdit"><div class="ic">✏️</div><div class="lb">Изменить ник и аватар</div><div class="ar">›</div></div>
-      <div class="settings-section" style="margin-top:12px;">Общение</div>
-      <div class="account-item" id="itemSwearing"><div class="ic">🤬</div><div class="lb">Маты (18+)</div><div class="toggle" id="toggleSwearing"></div></div>
-      <div class="settings-section" style="margin-top:12px;">Запись</div>
-      <div class="account-item" id="itemAutoRec"><div class="ic">🔴</div><div class="lb">Автозапись при старте стрима</div><div class="toggle" id="toggleAutoRec"></div></div>
-      <div class="settings-section" style="margin-top:12px;">О приложении</div>
-      <div class="account-item"><div class="ic">ℹ️</div><div class="lb">Версия 1.0</div></div>
-    </div>
-  </div>
-</div>
-
-<div class="panel" id="panelMyStreams">
-  <div class="panel-head">
-    <div class="back" data-close="1"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><polyline points="15 6 9 12 15 18"/></svg></div>
-    <div class="title">Мои стримы</div>
-  </div>
-  <div class="panel-body" id="myStreamsBody"></div>
-</div>
-
-<div class="panel" id="panelStats">
-  <div class="panel-head">
-    <div class="back" data-close="1"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><polyline points="15 6 9 12 15 18"/></svg></div>
-    <div class="title">Статистика</div>
-  </div>
-  <div class="panel-body">
-    <div class="stat-grid">
-      <div class="stat-card"><div class="lbl">Всего стримов</div><div class="val cyan" id="stStreams">0</div></div>
-      <div class="stat-card"><div class="lbl">Кристаллов собрано</div><div class="val pink" id="stCrystals">0</div></div>
-      <div class="stat-card" id="stFollowersCard" style="cursor:pointer"><div class="lbl">Подписчиков</div><div class="val green" id="stFollowers">0</div></div>
-      <div class="stat-card"><div class="lbl">Сообщений ботов</div><div class="val yellow" id="stMessages">0</div></div>
-      <div class="stat-card" id="stDialogsCard" style="cursor:pointer"><div class="lbl">Диалогов</div><div class="val cyan" id="stDialogs">0</div></div>
-      <div class="stat-card"><div class="lbl">Донатов</div><div class="val pink" id="stDonations">0</div></div>
-    </div>
-  </div>
-</div>
-
-<div class="panel" id="panelFollowers">
-  <div class="panel-head">
-    <div class="back" data-close="1"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><polyline points="15 6 9 12 15 18"/></svg></div>
-    <div class="title" id="followersTitle">Подписчики</div>
-  </div>
-  <div class="panel-body" id="followersBody"></div>
-</div>
-
-<div class="panel" id="panelFollowing">
-  <div class="panel-head">
-    <div class="back" data-close="1"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><polyline points="15 6 9 12 15 18"/></svg></div>
-    <div class="title">Подписки (диалоги)</div>
-  </div>
-  <div class="panel-body" id="followingBody"></div>
-</div>
+<div class="panel" id="panelInbox"><div class="panel-head"><div class="back" data-close="1"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><polyline points="15 6 9 12 15 18"/></svg></div><div class="title">Сообщения</div></div><div class="panel-body" id="inboxBody"></div></div>
+<div class="panel" id="panelChat"><div class="panel-head"><div class="back" data-close="1"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><polyline points="15 6 9 12 15 18"/></svg></div><div class="chat-head-av" id="chatHeadAv">🐱</div><div class="title" id="chatHeadName">nick</div></div><div class="chat-messages" id="chatMessages"></div><div class="chat-input-row"><input id="chatInput" type="text" placeholder="Сообщение..." autocomplete="off"><button id="chatSend"><svg viewBox="0 0 24 24" fill="#fff"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg></button></div></div>
+<div class="panel" id="panelAccount"><div class="panel-head"><div class="back" data-close="1"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><polyline points="15 6 9 12 15 18"/></svg></div><div class="title">Аккаунт</div></div><div class="panel-body"><div class="account-body"><div class="account-av" id="accAvatar">G</div><div class="account-name" id="accName">grand-cat</div><div class="account-handle" id="accHandle">@grand_cat</div><div class="account-stats"><div class="acc-stat" id="statFollowersBtn" style="cursor:pointer"><div class="n" id="accFollowers">0</div><div class="l">подписчики</div></div><div class="acc-stat" id="statFollowingBtn" style="cursor:pointer"><div class="n" id="accFollowing">0</div><div class="l">подписки</div></div><div class="acc-stat" id="statCrystalsBtn" style="cursor:pointer"><div class="n" id="accCrystalsStat">0</div><div class="l">кристаллы</div></div></div><div class="account-item" id="itemMyStreams"><div class="ic">🎬</div><div class="lb">Мои стримы</div><div class="ar">›</div></div><div class="account-item" id="itemStats"><div class="ic">📊</div><div class="lb">Статистика</div><div class="ar">›</div></div><div class="account-item" id="itemSettings"><div class="ic">⚙️</div><div class="lb">Настройки</div><div class="ar">›</div></div></div></div></div>
+<div class="panel" id="panelSettings"><div class="panel-head"><div class="back" data-close="1"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><polyline points="15 6 9 12 15 18"/></svg></div><div class="title">Настройки</div></div><div class="panel-body"><div class="account-body" style="padding-top:10px;"><div class="settings-section">Профиль</div><div class="account-item" id="itemEdit"><div class="ic">✏️</div><div class="lb">Изменить ник и аватар</div><div class="ar">›</div></div><div class="settings-section" style="margin-top:12px;">Общение</div><div class="account-item" id="itemSwearing"><div class="ic">🤬</div><div class="lb">Маты (18+)</div><div class="toggle" id="toggleSwearing"></div></div><div class="settings-section" style="margin-top:12px;">Запись</div><div class="account-item" id="itemAutoRec"><div class="ic">🔴</div><div class="lb">Автозапись при старте стрима</div><div class="toggle" id="toggleAutoRec"></div></div><div class="settings-section" style="margin-top:12px;">О приложении</div><div class="account-item"><div class="ic">ℹ️</div><div class="lb">Версия 1.0</div></div></div></div></div>
+<div class="panel" id="panelMyStreams"><div class="panel-head"><div class="back" data-close="1"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><polyline points="15 6 9 12 15 18"/></svg></div><div class="title">Мои стримы</div></div><div class="panel-body" id="myStreamsBody"></div></div>
+<div class="panel" id="panelStats"><div class="panel-head"><div class="back" data-close="1"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><polyline points="15 6 9 12 15 18"/></svg></div><div class="title">Статистика</div></div><div class="panel-body"><div class="stat-grid"><div class="stat-card"><div class="lbl">Всего стримов</div><div class="val cyan" id="stStreams">0</div></div><div class="stat-card"><div class="lbl">Кристаллов собрано</div><div class="val pink" id="stCrystals">0</div></div><div class="stat-card" id="stFollowersCard" style="cursor:pointer"><div class="lbl">Подписчиков</div><div class="val green" id="stFollowers">0</div></div><div class="stat-card"><div class="lbl">Сообщений ботов</div><div class="val yellow" id="stMessages">0</div></div><div class="stat-card" id="stDialogsCard" style="cursor:pointer"><div class="lbl">Диалогов</div><div class="val cyan" id="stDialogs">0</div></div><div class="stat-card"><div class="lbl">Донатов</div><div class="val pink" id="stDonations">0</div></div></div></div></div>
+<div class="panel" id="panelFollowers"><div class="panel-head"><div class="back" data-close="1"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><polyline points="15 6 9 12 15 18"/></svg></div><div class="title" id="followersTitle">Подписчики</div></div><div class="panel-body" id="followersBody"></div></div>
+<div class="panel" id="panelFollowing"><div class="panel-head"><div class="back" data-close="1"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><polyline points="15 6 9 12 15 18"/></svg></div><div class="title">Подписки (диалоги)</div></div><div class="panel-body" id="followingBody"></div></div>
 
 <div id="editModal">
   <div class="box">
     <h3>Изменить профиль</h3>
     <div class="modal-av-wrap"><div class="modal-av" id="modalAvPreview">G</div></div>
     <div class="av-hint">Превью твоей аватарки</div>
-    <label>Аватар (любой символ или эмодзи)</label>
+    <label>Аватар</label>
     <input type="text" id="editAvatarChar" maxlength="8" placeholder="🐱 или G" class="av-input">
     <label>Цвет фона</label>
     <div class="color-grid" id="colorGrid"></div>
@@ -420,26 +324,23 @@ body.banner-show .comments{opacity:0;transform:translateY(20px);}
     <label>Цвет символа</label>
     <div class="color-grid" id="textGrid"></div>
     <input type="color" id="editTextColorPicker" value="#ffffff" class="color-input">
-    <div class="hint-emoji">ℹ️ Работает только для букв и знаков. Эмодзи всегда цветные.</div>
+    <div class="hint-emoji">ℹ️ Цвет символа — только для букв и знаков</div>
     <label>Быстрый выбор эмодзи</label>
     <div class="emoji-grid" id="editEmojiGrid"></div>
     <label>Никнейм</label>
     <input type="text" id="editNick" maxlength="20" placeholder="grand-cat">
-    <div class="btns">
-      <button class="cancel" id="editCancel">Отмена</button>
-      <button class="save" id="editSave">Сохранить</button>
-    </div>
+    <div class="btns"><button class="cancel" id="editCancel">Отмена</button><button class="save" id="editSave">Сохранить</button></div>
   </div>
 </div>
 
 <div id="videoViewer">
   <video id="vvVideo" controls playsinline></video>
   <div id="vvHead">
-    <div class="vv-btn" id="vvBack"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 6 9 12 15 18"/></svg></div>
+    <div class="vv-btn" id="vvBack"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><polyline points="15 6 9 12 15 18"/></svg></div>
     <div class="vv-title" id="vvTitle">Видео</div>
     <div class="vv-actions">
-      <div class="vv-btn" id="vvEdit"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
-      <div class="vv-btn" id="vvSave"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>
+      <div class="vv-btn" id="vvEdit"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
+      <div class="vv-btn" id="vvSave"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>
     </div>
   </div>
 </div>
@@ -458,8 +359,34 @@ body.banner-show .comments{opacity:0;transform:translateY(20px);}
       <div id="evTime">0:00 / 0:00</div>
     </div>
     <div class="ev-actions">
-      <button class="ev-act" id="evSplit">⬛ Разделить</button>
-      <button class="ev-act ev-del" id="evDelete">🗑 Удалить</button>
+      <button class="ev-act" id="evTrim">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="6" cy="6" r="3"/>
+          <circle cx="6" cy="18" r="3"/>
+          <line x1="20" y1="4" x2="8.12" y2="15.88"/>
+          <line x1="14.47" y1="14.48" x2="20" y2="20"/>
+          <line x1="8.12" y1="8.12" x2="12" y2="12"/>
+        </svg>
+        <span>Обрезать</span>
+      </button>
+      <button class="ev-act" id="evSplit">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="8,4 4,4 4,20 8,20"/>
+          <polyline points="16,4 20,4 20,20 16,20"/>
+          <line x1="12" y1="3" x2="12" y2="21"/>
+        </svg>
+        <span>Разделить</span>
+      </button>
+      <button class="ev-act ev-del" id="evDelete">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="3 6 5 6 21 6"/>
+          <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+          <path d="M10 11v6"/>
+          <path d="M14 11v6"/>
+          <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+        </svg>
+        <span>Удалить</span>
+      </button>
     </div>
     <div class="ev-progress" id="evProgress"></div>
     <div class="ev-btns">
@@ -508,9 +435,7 @@ function addFollowerBot(nick,emoji,gradient){
   if(followersList.find(function(f){return f.nick===nick;}))return;
   followersList.push({nick:nick,emoji:emoji,gradient:gradient,t:Date.now()});
   if(followersList.length>200)followersList.shift();
-  saveFollowersList();
-  state.followers=followersList.length;
-  saveStats();updateFollowersUI();
+  saveFollowersList();state.followers=followersList.length;saveStats();updateFollowersUI();
 }
 var chats={};
 try{chats=JSON.parse(localStorage.getItem('gc_chats')||'{}');}catch(e){chats={};}
@@ -1017,25 +942,25 @@ function drawCovered(ctx,video,W,H,mirror){
   else ctx.drawImage(video,dx,dy,dw,dh);
 }
 function roundRect(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
+
+// PiP — КАМЕРА НА ВЕСЬ ЭКРАН
 function renderPiP(){
   var W=pipCanvas.width,H=pipCanvas.height;
-  var videoH=Math.floor(H*0.60),captionH=60,chatH=H-videoH-captionH;
   pipCtx.fillStyle="#000";pipCtx.fillRect(0,0,W,H);
-  drawCovered(pipCtx,$("cam"),W,videoH,state.facing==="user");
-  pipCtx.fillStyle="#0a0a0a";pipCtx.fillRect(0,videoH,W,captionH);
-  if(pipCaption){
-    pipCtx.fillStyle="#fff";pipCtx.font="700 22px -apple-system,sans-serif";
-    pipCtx.textAlign="center";pipCtx.textBaseline="middle";
-    var t=pipCaption;while(pipCtx.measureText(t).width>W-40&&t.length>1)t=t.slice(0,-1);
-    pipCtx.fillText(t,W/2,videoH+captionH/2);
-  }
-  pipCtx.fillStyle="#000";pipCtx.fillRect(0,videoH+captionH,W,chatH);
-  pipCtx.fillStyle="rgba(255,255,255,.15)";
-  pipCtx.fillRect(0,videoH+captionH,W,2);pipCtx.fillRect(0,videoH,W,1);
+  drawCovered(pipCtx,$("cam"),W,H,state.facing==="user");
+
   var now=Date.now();
   var items=pipHistory.filter(function(m){return now-m.t<15000;}).slice(-6);
   pipCtx.textBaseline="middle";pipCtx.textAlign="left";
-  var y=videoH+captionH+26;var lineH=38;
+  var lineH=36;
+  var y=H-40;
+  if(items.length){
+    var g2=pipCtx.createLinearGradient(0,H-40-lineH*items.length-30,0,H);
+    g2.addColorStop(0,"rgba(0,0,0,0)");
+    g2.addColorStop(1,"rgba(0,0,0,.85)");
+    pipCtx.fillStyle=g2;
+    pipCtx.fillRect(0,H-40-lineH*items.length-30,W,lineH*items.length+60);
+  }
   for(var i=items.length-1;i>=0;i--){
     var m=items[i],size=19;
     pipCtx.font="700 "+size+"px -apple-system,sans-serif";
@@ -1043,26 +968,71 @@ function renderPiP(){
     var ft=m.text;var maxW=W-60-nickW;
     pipCtx.font="500 "+size+"px -apple-system,sans-serif";
     while(pipCtx.measureText(ft).width>maxW&&ft.length>1)ft=ft.slice(0,-1);
+    var x=m.isReply?30:16;
+    var totalW=nickW+pipCtx.measureText(ft).width;
+    pipCtx.fillStyle="rgba(0,0,0,.5)";
+    roundRect(pipCtx,x-8,y-14,totalW+16,28,14);pipCtx.fill();
     pipCtx.fillStyle=m.color||"#fff";
     pipCtx.font="700 "+size+"px -apple-system,sans-serif";
-    pipCtx.fillText(m.nick+":",16,y);
+    pipCtx.fillText(m.nick+":",x,y);
     pipCtx.fillStyle="#f0f0f0";
     pipCtx.font="500 "+size+"px -apple-system,sans-serif";
-    pipCtx.fillText(ft,16+nickW,y);
-    y+=lineH;if(y>H-10)break;
+    pipCtx.fillText(ft,x+nickW,y);
+    y-=lineH;
+    if(y<40)break;
+  }
+  if(pipCaption){
+    pipCtx.font="700 22px -apple-system,sans-serif";
+    pipCtx.textAlign="center";pipCtx.textBaseline="middle";
+    var t=pipCaption;
+    while(pipCtx.measureText(t).width>W-40&&t.length>1)t=t.slice(0,-1);
+    var capW=pipCtx.measureText(t).width+24;
+    pipCtx.fillStyle="rgba(0,0,0,.6)";
+    roundRect(pipCtx,(W-capW)/2,y-30,capW,40,12);pipCtx.fill();
+    pipCtx.fillStyle="#fff";
+    pipCtx.fillText(t,W/2,y-10);
   }
   pipCtx.fillStyle="#ff2850";
   roundRect(pipCtx,14,14,58,26,6);pipCtx.fill();
   pipCtx.fillStyle="#fff";
-  pipCtx.font="800 14px -apple-system,sans-serif";pipCtx.textAlign="left";
+  pipCtx.font="800 14px -apple-system,sans-serif";pipCtx.textAlign="left";pipCtx.textBaseline="middle";
   pipCtx.fillText("LIVE",26,28);
 }
+
 function enterPiP(){
+  var v=pipVideo;
   try{
-    if(pipVideo.requestPictureInPicture){
-      pipVideo.requestPictureInPicture().then(function(){state.pipActive=true;$("rbPiP").classList.add("on");toast("📺 PiP включён");}).catch(function(e){toast("PiP: "+(e.message||"ошибка"));});
-    }else toast("PiP не поддерживается");
-  }catch(e){toast("PiP: "+e.message);}
+    v.muted=true;
+    if(v.paused){
+      var pp=v.play();
+      if(pp&&pp.catch)pp.catch(function(){});
+    }
+  }catch(e){}
+  if(document.pictureInPictureEnabled&&v.requestPictureInPicture){
+    v.requestPictureInPicture().then(function(){
+      state.pipActive=true;
+      $("rbPiP").classList.add("on");
+      toast("📺 PiP включён");
+    }).catch(function(e){
+      tryWebkitPiP(v,e);
+    });
+    return;
+  }
+  tryWebkitPiP(v,null);
+}
+function tryWebkitPiP(v,origErr){
+  if(v.webkitSetPresentationMode){
+    try{
+      v.webkitSetPresentationMode("picture-in-picture");
+      state.pipActive=true;
+      $("rbPiP").classList.add("on");
+      toast("📺 PiP включён");
+    }catch(e){
+      toast("PiP: "+(e.message||"недоступно"));
+    }
+  }else{
+    toast("PiP не поддерживается");
+  }
 }
 async function exitPiP(){
   try{
@@ -1070,6 +1040,7 @@ async function exitPiP(){
     state.pipActive=false;$("rbPiP").classList.remove("on");
   }catch(e){}
 }
+
 var mediaRecorder=null,recChunks=[],lastBlob=null,lastFilename="",micStream=null;
 async function startRecording(auto){
   auto=auto||false;
@@ -1138,7 +1109,7 @@ $("smClose").addEventListener("click",function(){$("saveModal").classList.remove
 function buildMyStreams(){
   var body=$("myStreamsBody");body.innerHTML="";
   if(myStreams.length===0){
-    body.innerHTML='<div class="empty-inbox"><span class="em">🎬</span>Пока нет записей.<br>Включи автозапись или нажми 🔴.</div>';
+    body.innerHTML='<div class="empty-inbox"><span class="em">🎬</span>Пока нет записей.</div>';
     return;
   }
   myStreams.forEach(function(s){
@@ -1258,9 +1229,7 @@ $("closeX").addEventListener("click",function(){
     state.micOn=false;
     state.currentChat=null;
     state.streaming=false;
-    commentsEl.innerHTML="";
-    heartsEl.innerHTML="";
-    recentMessages.length=0;
+    commentsEl.innerHTML="";heartsEl.innerHTML="";recentMessages.length=0;
     resetStreamTimers();
     state.viewers=30000;state.tv=30000;
     showMenu();
@@ -1281,13 +1250,8 @@ function openChatWith(nick,emoji,gradient,kind){
   var c=chats[nick];
   if(!c.kind&&kind){c.kind=kind;saveChats();}
   if(!c._firstOpened){
-    c._firstOpened=true;
-    state.totalDialogs++;
-    for(var i=0;i<5;i++){
-      var n=randomNick();
-      var av=randomAvatar();
-      addFollowerBot(n,av.emoji,av.gradient);
-    }
+    c._firstOpened=true;state.totalDialogs++;
+    for(var i=0;i<5;i++){var n=randomNick();var av=randomAvatar();addFollowerBot(n,av.emoji,av.gradient);}
     saveChats();saveStats();
   }
   c.unread=0;saveChats();
@@ -1326,8 +1290,7 @@ function sendMessage(){
   if(!text||!state.currentChat)return;
   inp.value="";
   pushMessage(state.currentChat,"me",text);
-  sfx.msg();
-  state.totalMessages++;saveStats();
+  sfx.msg();state.totalMessages++;saveStats();
   showTyping();
   var delay=ri(800,2200);
   var kind=chats[state.currentChat]?chats[state.currentChat].kind:"normal";
@@ -1359,20 +1322,15 @@ function updateInboxBadge(){
 function buildInbox(){
   var body=$("inboxBody");body.innerHTML="";
   var keys=Object.keys(chats);
-  if(keys.length===0){
-    body.innerHTML='<div class="empty-inbox"><span class="em">💬</span>Пока никого.<br>Зайди на стрим и кликни на ник.</div>';
-    return;
-  }
+  if(keys.length===0){body.innerHTML='<div class="empty-inbox"><span class="em">💬</span>Пока никого.</div>';return;}
   keys.sort(function(a,b){
     var la=chats[a].messages.slice(-1)[0]?chats[a].messages.slice(-1)[0].t:0;
     var lb=chats[b].messages.slice(-1)[0]?chats[b].messages.slice(-1)[0].t:0;
     return lb-la;
   });
   keys.forEach(function(nick){
-    var c=chats[nick];
-    var last=c.messages.slice(-1)[0];
-    var el=document.createElement("div");
-    el.className="chat-row";
+    var c=chats[nick];var last=c.messages.slice(-1)[0];
+    var el=document.createElement("div");el.className="chat-row";
     el.innerHTML='<div class="av" style="background:'+c.gradient+'">'+c.emoji+'</div><div class="body"><div class="nick">'+nick+'</div><div class="last">'+(last?(last.from==="me"?"Ты: ":"")+last.text:"Начни переписку")+'</div></div>'+(c.unread?'<div style="min-width:22px;height:22px;border-radius:11px;background:#ff2850;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;">'+c.unread+'</div>':'');
     el.addEventListener("click",function(){openChatWith(nick,c.emoji,c.gradient,c.kind);});
     body.appendChild(el);
@@ -1388,14 +1346,9 @@ function buildStats(){
 }
 function buildFollowers(){
   var body=$("followersBody");body.innerHTML="";
-  if(followersList.length===0){
-    body.innerHTML='<div class="empty-inbox"><span class="em">👥</span>Пока никто не подписался.</div>';
-    $("followersTitle").textContent="Подписчики (0)";
-    return;
-  }
+  if(followersList.length===0){body.innerHTML='<div class="empty-inbox"><span class="em">👥</span>Пока никто.</div>';$("followersTitle").textContent="Подписчики (0)";return;}
   followersList.slice().reverse().forEach(function(f){
-    var el=document.createElement("div");
-    el.className="chat-row";
+    var el=document.createElement("div");el.className="chat-row";
     el.innerHTML='<div class="av" style="background:'+f.gradient+'">'+f.emoji+'</div><div class="body"><div class="nick">'+f.nick+'</div><div class="last">подписался '+new Date(f.t).toLocaleDateString("ru-RU")+'</div></div>';
     el.addEventListener("click",function(){openChatWith(f.nick,f.emoji,f.gradient,null);});
     body.appendChild(el);
@@ -1412,10 +1365,8 @@ function buildFollowing(){
     return lb-la;
   });
   keys.forEach(function(nick){
-    var c=chats[nick];
-    var last=c.messages.slice(-1)[0];
-    var el=document.createElement("div");
-    el.className="chat-row";
+    var c=chats[nick];var last=c.messages.slice(-1)[0];
+    var el=document.createElement("div");el.className="chat-row";
     el.innerHTML='<div class="av" style="background:'+c.gradient+'">'+c.emoji+'</div><div class="body"><div class="nick">'+nick+'</div><div class="last">'+(last?(last.from==="me"?"Ты: ":"")+last.text:"Начни переписку")+'</div></div>';
     el.addEventListener("click",function(){openChatWith(nick,c.emoji,c.gradient,c.kind);});
     body.appendChild(el);
@@ -1498,8 +1449,7 @@ $("btnPlus").addEventListener("click",async function(){
   initAudio();hideMenu();
   var ok=await startCamera();
   if(!ok){showMenu();return;}
-  $("cam").classList.add("show");
-  $("ui").classList.add("show");
+  $("cam").classList.add("show");$("ui").classList.add("show");
   state.streaming=true;state.currentChat=null;
   state.totalStreams++;saveStats();
   pipStream=pipCanvas.captureStream(30);
@@ -1525,14 +1475,12 @@ $("itemEdit").addEventListener("click",openEditModal);
 $("itemAutoRec").addEventListener("click",function(){
   state.autoRec=!state.autoRec;
   $("toggleAutoRec").classList.toggle("on",state.autoRec);
-  saveStats();
-  toast(state.autoRec?"🔴 Автозапись включена":"Автозапись выключена");
+  saveStats();toast(state.autoRec?"🔴 Автозапись включена":"Автозапись выключена");
 });
 $("itemSwearing").addEventListener("click",function(){
   state.swearing=!state.swearing;
   $("toggleSwearing").classList.toggle("on",state.swearing);
-  saveStats();
-  toast(state.swearing?"🤬 Маты включены":"Маты выключены");
+  saveStats();toast(state.swearing?"🤬 Маты включены":"Маты выключены");
 });
 $("statFollowersBtn").addEventListener("click",function(){buildFollowers();openPanel("panelFollowers");});
 $("statFollowingBtn").addEventListener("click",function(){buildFollowing();openPanel("panelFollowing");});
@@ -1574,7 +1522,7 @@ $("vvSave").addEventListener("click",async function(){
 });
 $("videoViewer").addEventListener("click",function(e){if(e.target===$("videoViewer"))closeVideoViewer();});
 
-// ============ РЕДАКТОР ВИДЕО (ТАЙМЛАЙН) ============
+// РЕДАКТОР ВИДЕО (ТАЙМЛАЙН)
 var evStream=null;
 var evDuration=0;
 var evClips=[];
@@ -1673,6 +1621,9 @@ $("evCancel").addEventListener("click",function(){
   document.addEventListener("mousemove",onMove);
   document.addEventListener("mouseup",onEnd);
 })();
+$("evTrim").addEventListener("click",function(){
+  toast("✂️ Тяни стрелки на таймлайне");
+});
 $("evSplit").addEventListener("click",function(){
   if(!evClips.length)return;
   var clip=getClipAt(evPlayheadPos);
@@ -1756,12 +1707,7 @@ $("evSave").addEventListener("click",async function(){
   }
 });
 
-updateCrystalsUI();
-updateFollowersUI();
-updateFollowingUI();
-updateProfileUI();
-updateInboxBadge();
-
+updateCrystalsUI();updateFollowersUI();updateFollowingUI();updateProfileUI();updateInboxBadge();
 requestAnimationFrame(loop);
 document.body.addEventListener("touchstart",initAudio,{once:true});
 </script>
