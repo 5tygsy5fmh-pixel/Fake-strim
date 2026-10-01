@@ -135,7 +135,7 @@ body.banner-show .comments { opacity:0; transform:translateY(20px); }
 .toast { position:fixed; bottom:180px; left:50%; transform:translateX(-50%);
   background:rgba(0,0,0,.9); padding:10px 18px; border-radius:22px;
   font-size:13px; opacity:0; transition:opacity .3s;
-  pointer-events:none; white-space:nowrap; z-index:1000;
+  pointer-events:none; white-space:nowrap; z-index:5000;
   max-width:90%; text-align:center; }
 .toast.show { opacity:1; }
 
@@ -162,6 +162,49 @@ body.banner-show .comments { opacity:0; transform:translateY(20px); }
   padding:14px 28px; border-radius:26px; font-size:15px; font-weight:700;
   margin-bottom:10px; min-width:200px; cursor:pointer; }
 #saveModal .sm-btn.secondary { background:rgba(255,255,255,.15); }
+
+/* ВИДЕО ПРОСМОТРЩИК */
+#videoViewer { position:fixed; inset:0; z-index:3000; background:#000;
+  display:none; flex-direction:column; }
+#videoViewer.show { display:flex; }
+#videoViewer video { flex:1; width:100%; object-fit:contain; background:#000; }
+#vvHead { position:absolute; top:0; left:0; right:0; display:flex;
+  align-items:center; gap:12px;
+  padding:calc(14px + env(safe-area-inset-top)) 16px 14px;
+  background:linear-gradient(180deg, rgba(0,0,0,.85), transparent);
+  z-index:10; }
+#vvHead .vv-btn { width:42px; height:42px; display:flex; align-items:center;
+  justify-content:center; cursor:pointer; background:rgba(255,255,255,.15);
+  border-radius:50%;
+  backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+  transition:transform .12s; flex-shrink:0; }
+#vvHead .vv-btn:active { transform:scale(.88); }
+#vvHead .vv-btn svg { width:22px; height:22px; }
+#vvHead .vv-title { flex:1; font-size:13px; opacity:.85;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+#vvHead .vv-actions { display:flex; gap:8px; }
+
+/* РЕДАКТОР ВИДЕО */
+#editVideoModal { position:fixed; inset:0; z-index:3100;
+  background:rgba(0,0,0,.95); display:none; flex-direction:column;
+  align-items:center; justify-content:center; padding:20px; overflow-y:auto; }
+#editVideoModal.show { display:flex; }
+#editVideoModal .ev-box { background:#1a1a2e; border-radius:20px;
+  padding:20px; width:100%; max-width:400px; }
+#editVideoModal h3 { text-align:center; margin-bottom:16px; font-size:18px; }
+#editVideoModal video { width:100%; border-radius:12px; margin-bottom:14px;
+  background:#000; max-height:240px; }
+#editVideoModal label { font-size:12px; opacity:.6; display:block;
+  margin-bottom:6px; }
+#editVideoModal input[type=range] { width:100%; accent-color:#25f4ee;
+  margin-bottom:8px; }
+#editVideoModal .ev-btns { display:flex; gap:10px; margin-top:16px; }
+#editVideoModal .ev-btns button { flex:1; padding:12px; border-radius:12px;
+  border:none; font-size:14px; font-weight:700; cursor:pointer; }
+#editVideoModal .ev-save { background:#25f4ee; color:#000; }
+#editVideoModal .ev-cancel { background:rgba(255,255,255,.1); color:#fff; }
+#editVideoModal .ev-progress { font-size:12px; text-align:center;
+  margin-top:10px; opacity:.6; }
 
 #menuScreen { position:fixed; inset:0; z-index:500;
   background:linear-gradient(180deg, #0a0a14 0%, #1a0a2e 100%);
@@ -357,7 +400,8 @@ body.banner-show .comments { opacity:0; transform:translateY(20px); }
 #editModal .btns .cancel { background:rgba(255,255,255,.1); color:#fff; }
 
 .rec-item { padding:14px 16px; border-bottom:1px solid rgba(255,255,255,.06);
-  display:flex; align-items:center; gap:12px; }
+  display:flex; align-items:center; gap:12px; cursor:pointer; }
+.rec-item:active { background:rgba(255,255,255,.04); }
 .rec-item .ri-icon { width:44px; height:44px; border-radius:12px;
   background:linear-gradient(135deg,#ff2850,#ff5c8a);
   display:flex; align-items:center; justify-content:center; font-size:20px; }
@@ -708,6 +752,48 @@ body.banner-show .comments { opacity:0; transform:translateY(20px); }
   </div>
 </div>
 
+<!-- ВИДЕО ПРОСМОТРЩИК -->
+<div id="videoViewer">
+  <video id="vvVideo" controls playsinline></video>
+  <div id="vvHead">
+    <div class="vv-btn" id="vvBack">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 6 9 12 15 18"/></svg>
+    </div>
+    <div class="vv-title" id="vvTitle">Видео</div>
+    <div class="vv-actions">
+      <div class="vv-btn" id="vvEdit">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+        </svg>
+      </div>
+      <div class="vv-btn" id="vvSave">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- РЕДАКТОР ВИДЕО -->
+<div id="editVideoModal">
+  <div class="ev-box">
+    <h3>✂️ Обрезать видео</h3>
+    <video id="evVideo" controls playsinline></video>
+    <label>Начало: <span id="evStartLabel">0:00</span></label>
+    <input type="range" id="evStart" min="0" max="100" value="0">
+    <label>Конец: <span id="evEndLabel">0:00</span></label>
+    <input type="range" id="evEnd" min="0" max="100" value="100">
+    <div class="ev-progress" id="evProgress"></div>
+    <div class="ev-btns">
+      <button class="ev-cancel" id="evCancel">Отмена</button>
+      <button class="ev-save" id="evSave">Обрезать</button>
+    </div>
+  </div>
+</div>
+
 <div id="saveModal">
   <div class="sm-title">🎬 Видео готово</div>
   <div class="sm-sub" id="smSub">Нажми «Сохранить» — откроется меню iPhone</div>
@@ -807,13 +893,10 @@ function saveStats() {
   } catch (e) {}
 }
 
-// Определяем эмодзи ли символ
 function isEmoji(str) {
   if (!str) return false;
-  // эмодзи обычно длиннее 1 code unit (суррогатные пары)
   if (str.length > 1) return true;
   const code = str.codePointAt(0);
-  // Основные диапазоны эмодзи
   if (code >= 0x1F300 && code <= 0x1FAFF) return true;
   if (code >= 0x1F000 && code <= 0x1F2FF) return true;
   if (code >= 0x2600 && code <= 0x27BF) return true;
@@ -823,9 +906,7 @@ function isEmoji(str) {
   if (code >= 0x1F600 && code <= 0x1F64F) return true;
   if (code >= 0x1F680 && code <= 0x1F6FF) return true;
   if (code >= 0x1F1E6 && code <= 0x1F1FF) return true;
-  // Стрелки, технические символы с variation selector
   if (code >= 0x2190 && code <= 0x21FF) return true;
-  if (code >= 0x2B05 && code <= 0x2B07) return true;
   return false;
 }
 
@@ -834,12 +915,8 @@ function applyAvatarTo(el, char, bg, ring, textColor) {
   el.textContent = char;
   el.style.background = bg;
   el.style.boxShadow = ring;
-  // Цвет текста только если НЕ эмодзи
-  if (isEmoji(char)) {
-    el.style.color = "#fff"; // эмодзи игнорируют color, но оставим fallback
-  } else {
-    el.style.color = textColor;
-  }
+  if (isEmoji(char)) el.style.color = "#fff";
+  else el.style.color = textColor;
 }
 
 const NICK_PRE = ["dark","pro","mega","ultra","cyber","neo","pixel","retro","night","star","shadow","fire","ice","storm","lucky"];
@@ -1535,10 +1612,9 @@ function buildMyStreams() {
       <div class="ri-btn">▶ Смотреть</div>`;
     el.querySelector(".ri-btn").addEventListener("click", (e) => {
       e.stopPropagation();
-      const url = URL.createObjectURL(s.blob);
-      window.open(url, "_blank");
-      setTimeout(() => URL.revokeObjectURL(url), 60000);
+      openVideoViewer(s);
     });
+    el.addEventListener("click", () => openVideoViewer(s));
     body.appendChild(el);
   });
 }
@@ -1898,7 +1974,6 @@ function openEditModal() {
 
   updateModalPreview();
 
-  // Цвет фона
   buildColorGrid("colorGrid", AVATAR_COLORS_PRESET, state.avatarColor, (c) => {
     state._pendingAvatarColor = c;
     $("editAvatarColorPicker").value = c;
@@ -1911,7 +1986,6 @@ function openEditModal() {
     updateModalPreview();
   };
 
-  // Цвет рамки
   buildColorGrid("ringGrid", RING_PRESETS, state.avatarRing, (c) => {
     state._pendingAvatarRing = c;
     $("editRingColorPicker").value = c;
@@ -1924,7 +1998,6 @@ function openEditModal() {
     updateModalPreview();
   };
 
-  // Цвет символа
   buildColorGrid("textGrid", TEXT_PRESETS, state.avatarText, (c) => {
     state._pendingAvatarText = c;
     $("editTextColorPicker").value = c;
@@ -1937,7 +2010,6 @@ function openEditModal() {
     updateModalPreview();
   };
 
-  // Эмодзи-сетка
   const grid = $("editEmojiGrid");
   grid.innerHTML = "";
   AVATAR_EMOJIS_PICK.forEach(e => {
@@ -1954,7 +2026,6 @@ function openEditModal() {
     grid.appendChild(d);
   });
 
-  // Ручной ввод символа
   $("editAvatarChar").oninput = (e) => {
     const v = e.target.value;
     state._pendingAvatar = v || "G";
@@ -2075,6 +2146,159 @@ $("statFollowingBtn").addEventListener("click", () => { buildFollowing(); openPa
 $("statCrystalsBtn").addEventListener("click", () => { buildStats(); openPanel("panelStats"); });
 $("stFollowersCard").addEventListener("click", () => { buildFollowers(); openPanel("panelFollowers"); });
 $("stDialogsCard").addEventListener("click", () => { buildFollowing(); openPanel("panelFollowing"); });
+
+// ============ ВИДЕО ПРОСМОТРЩИК ============
+let vvCurrentStream = null;
+let vvCurrentUrl = null;
+
+function openVideoViewer(stream) {
+  vvCurrentStream = stream;
+  if (vvCurrentUrl) { URL.revokeObjectURL(vvCurrentUrl); vvCurrentUrl = null; }
+  vvCurrentUrl = URL.createObjectURL(stream.blob);
+  $("vvVideo").src = vvCurrentUrl;
+  $("vvTitle").textContent = stream.filename;
+  $("videoViewer").classList.add("show");
+}
+function closeVideoViewer() {
+  $("videoViewer").classList.remove("show");
+  const v = $("vvVideo");
+  v.pause(); v.src = "";
+}
+$("vvBack").addEventListener("click", closeVideoViewer);
+
+$("vvSave").addEventListener("click", async () => {
+  if (!vvCurrentStream) return;
+  const file = new File([vvCurrentStream.blob], vvCurrentStream.filename,
+                       { type: vvCurrentStream.blob.type });
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    try { await navigator.share({ files: [file], title: vvCurrentStream.filename });
+      toast("✅ Сохранено"); return; }
+    catch (e) { if (e.name === "AbortError") return; }
+  }
+  try {
+    const url = URL.createObjectURL(vvCurrentStream.blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = vvCurrentStream.filename;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 30000);
+    toast("💾 Файл скачан");
+  } catch (e) { toast("Не удалось сохранить"); }
+});
+
+// ============ РЕДАКТОР ВИДЕО ============
+let evStream = null, evDuration = 0;
+
+function formatTime(s) {
+  if (!s || isNaN(s)) return "0:00";
+  const m = Math.floor(s / 60), sec = Math.floor(s % 60);
+  return m + ":" + (sec < 10 ? "0" : "") + sec;
+}
+
+$("vvEdit").addEventListener("click", () => {
+  if (!vvCurrentStream) return;
+  evStream = vvCurrentStream;
+  const v = $("evVideo");
+  if (vvCurrentUrl) v.src = vvCurrentUrl;
+  $("evStart").value = 0;
+  $("evEnd").value = 100;
+  $("evStartLabel").textContent = "0:00";
+  $("evEndLabel").textContent = "0:00";
+  $("evProgress").textContent = "";
+  v.onloadedmetadata = () => {
+    evDuration = v.duration || 0;
+    $("evEndLabel").textContent = formatTime(evDuration);
+  };
+  $("editVideoModal").classList.add("show");
+});
+$("evCancel").addEventListener("click", () => {
+  $("editVideoModal").classList.remove("show");
+  $("evVideo").pause();
+});
+$("evStart").addEventListener("input", (e) => {
+  const t = (parseInt(e.target.value) / 100) * evDuration;
+  $("evStartLabel").textContent = formatTime(t);
+});
+$("evEnd").addEventListener("input", (e) => {
+  const t = (parseInt(e.target.value) / 100) * evDuration;
+  $("evEndLabel").textContent = formatTime(t);
+});
+
+$("evSave").addEventListener("click", async () => {
+  if (!evStream || !evDuration) return;
+  const startPct = parseInt($("evStart").value);
+  const endPct = parseInt($("evEnd").value);
+  if (endPct <= startPct + 1) { toast("Конец должен быть больше начала"); return; }
+  const startTime = (startPct / 100) * evDuration;
+  const endTime = (endPct / 100) * evDuration;
+
+  $("evProgress").textContent = "✂️ Обработка...";
+  const v = $("evVideo");
+  v.currentTime = startTime;
+  v.muted = false;
+
+  try {
+    const canvas = document.createElement("canvas");
+    canvas.width = v.videoWidth || 720;
+    canvas.height = v.videoHeight || 1280;
+    const ctx = canvas.getContext("2d");
+    const canvasStream = canvas.captureStream(30);
+
+    let combined;
+    try {
+      const vidStream = v.captureStream ? v.captureStream() : null;
+      const tracks = [...canvasStream.getVideoTracks()];
+      if (vidStream && vidStream.getAudioTracks().length > 0)
+        tracks.push(vidStream.getAudioTracks()[0]);
+      combined = new MediaStream(tracks);
+    } catch (e) { combined = canvasStream; }
+
+    let mime = "";
+    const tries = ["video/mp4;codecs=avc1,mp4a","video/mp4",
+                   "video/webm;codecs=vp9,opus","video/webm;codecs=vp8,opus","video/webm"];
+    for (const t of tries)
+      if (window.MediaRecorder && MediaRecorder.isTypeSupported(t)) { mime = t; break; }
+
+    const rec = new MediaRecorder(combined, mime ? { mimeType: mime } : undefined);
+    const chunks = [];
+    rec.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
+    rec.onstop = () => {
+      try {
+        const type = rec.mimeType || "video/webm";
+        const ext = type.includes("mp4") ? "mp4" : "webm";
+        const newName = evStream.filename.replace(/\.[^.]+$/, "") + "-trim." + ext;
+        const blob = new Blob(chunks, { type });
+        myStreams.unshift({ blob, filename: newName,
+          date: new Date().toISOString(), size: blob.size });
+        if (myStreams.length > 20) myStreams.pop();
+        toast("✅ Обрезано и сохранено");
+        $("editVideoModal").classList.remove("show");
+        v.pause();
+        buildMyStreams();
+      } catch (err) { toast("Ошибка: " + err.message); }
+      $("evProgress").textContent = "";
+    };
+
+    rec.start(100);
+    v.play();
+
+    const drawLoop = () => {
+      if (v.paused || v.ended || v.currentTime >= endTime) {
+        try { rec.stop(); } catch (e) {}
+        v.pause(); return;
+      }
+      ctx.drawImage(v, 0, 0, canvas.width, canvas.height);
+      requestAnimationFrame(drawLoop);
+    };
+    drawLoop();
+  } catch (e) {
+    toast("Ошибка: " + e.message);
+    $("evProgress").textContent = "";
+  }
+});
+
+$("videoViewer").addEventListener("click", (e) => {
+  if (e.target === $("videoViewer")) closeVideoViewer();
+});
 
 updateCrystalsUI();
 updateFollowersUI();
