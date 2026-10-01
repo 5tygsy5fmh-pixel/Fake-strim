@@ -184,8 +184,10 @@ body.banner-show .comments { opacity:0; transform:translateY(20px); }
   padding:20px; }
 .menu-mid .logo { width:120px; height:120px; border-radius:50%;
   background:#25a4d3; display:flex; align-items:center;
-  justify-content:center; font-size:64px; font-weight:700;
-  box-shadow:0 0 60px rgba(37,164,211,.4); overflow:hidden; }
+  justify-content:center; font-size:64px; font-weight:700; color:#fff;
+  box-shadow:0 0 60px rgba(37,164,211,.4); overflow:hidden;
+  cursor:pointer; transition:transform .15s; }
+.menu-mid .logo:active { transform:scale(.95); }
 .menu-bottom { display:flex; justify-content:space-around;
   align-items:center; padding:0 20px; }
 .menu-btn { flex:1; display:flex; flex-direction:column; align-items:center;
@@ -220,7 +222,7 @@ body.banner-show .comments { opacity:0; transform:translateY(20px); }
   cursor:pointer; }
 .chat-row:active { background:rgba(255,255,255,.04); }
 .chat-row .av { width:52px; height:52px; border-radius:50%; flex:0 0 52px;
-  display:flex; align-items:center; justify-content:center; font-size:26px; }
+  display:flex; align-items:center; justify-content:center; font-size:26px; color:#fff; }
 .chat-row .body { flex:1; min-width:0; }
 .chat-row .nick { font-size:15px; font-weight:700; margin-bottom:3px; }
 .chat-row .last { font-size:13px; opacity:.55; overflow:hidden;
@@ -230,7 +232,7 @@ body.banner-show .comments { opacity:0; transform:translateY(20px); }
 .empty-inbox .em { font-size:60px; display:block; margin-bottom:16px; }
 
 .chat-head-av { width:36px; height:36px; border-radius:50%;
-  display:flex; align-items:center; justify-content:center; font-size:20px; }
+  display:flex; align-items:center; justify-content:center; font-size:20px; color:#fff; }
 .chat-messages { flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch;
   padding:16px 12px; display:flex; flex-direction:column; gap:8px;
   scrollbar-width:none; }
@@ -270,8 +272,10 @@ body.banner-show .comments { opacity:0; transform:translateY(20px); }
 .account-body { padding:20px; }
 .account-av { width:100px; height:100px; border-radius:50%; margin:0 auto 14px;
   background:#25a4d3; display:flex; align-items:center; justify-content:center;
-  font-size:52px; font-weight:700; overflow:hidden;
-  box-shadow:0 0 0 3px rgba(255,255,255,.15); }
+  font-size:52px; font-weight:700; color:#fff; overflow:hidden;
+  box-shadow:0 0 0 3px rgba(255,255,255,.15); cursor:pointer;
+  transition:transform .15s; }
+.account-av:active { transform:scale(.95); }
 .account-name { text-align:center; font-size:22px; font-weight:800;
   margin-bottom:4px; }
 .account-handle { text-align:center; font-size:13px; opacity:.55;
@@ -296,23 +300,58 @@ body.banner-show .comments { opacity:0; transform:translateY(20px); }
 .account-item .toggle.on { background:#25f4ee; }
 .account-item .toggle.on::after { transform:translateX(20px); }
 
+/* ======= МОДАЛКА РЕДАКТИРОВАНИЯ ======= */
 #editModal { position:fixed; inset:0; z-index:2500; background:rgba(0,0,0,.9);
   display:none; flex-direction:column; align-items:center; justify-content:center;
-  padding:24px; }
+  padding:20px; overflow-y:auto; }
 #editModal.show { display:flex; }
-#editModal .box { background:#1a1a2e; border-radius:20px; padding:24px;
-  width:100%; max-width:340px; max-height:90vh; overflow-y:auto; }
+#editModal .box { background:#1a1a2e; border-radius:20px; padding:22px;
+  width:100%; max-width:360px; max-height:92vh; overflow-y:auto;
+  -webkit-overflow-scrolling:touch; }
 #editModal h3 { font-size:18px; margin-bottom:16px; text-align:center; }
 #editModal label { font-size:12px; opacity:.6; display:block;
-  margin-bottom:6px; margin-top:12px; }
+  margin-bottom:6px; margin-top:14px; }
+#editModal label:first-of-type { margin-top:0; }
 #editModal input[type=text] { width:100%; background:rgba(255,255,255,.08);
   border:none; border-radius:12px; padding:12px 14px; color:#fff;
   font-size:15px; outline:none; font-family:inherit; }
+
+/* Превью аватарки в модалке */
+#editModal .modal-av-wrap { display:flex; justify-content:center; margin-bottom:6px; }
+#editModal .modal-av { width:90px; height:90px; border-radius:50%;
+  background:#25a4d3; display:flex; align-items:center; justify-content:center;
+  font-size:46px; font-weight:700; color:#fff; cursor:pointer;
+  box-shadow:0 0 0 3px rgba(255,255,255,.15);
+  transition:transform .15s; }
+#editModal .modal-av:active { transform:scale(.92); }
+#editModal .av-hint { font-size:11px; opacity:.5; text-align:center;
+  margin-bottom:8px; line-height:1.4; }
+
+/* Поле для символа */
+#editModal .av-input { font-size:26px !important; text-align:center;
+  padding:10px !important; letter-spacing:2px; }
+
+/* Сетка цветов */
+#editModal .color-grid { display:grid; grid-template-columns:repeat(8, 1fr);
+  gap:6px; margin-top:6px; }
+#editModal .color-opt { aspect-ratio:1; border-radius:50%; cursor:pointer;
+  border:2px solid transparent; transition:transform .12s; }
+#editModal .color-opt:active { transform:scale(.85); }
+#editModal .color-opt.sel { border-color:#fff;
+  box-shadow:0 0 0 2px rgba(0,0,0,.5); }
+
+/* Системный color picker */
+#editModal .color-input { width:100%; height:44px; border-radius:12px;
+  border:none; margin-top:8px; cursor:pointer; background:transparent;
+  padding:0; }
+
+/* Эмодзи-сетка */
 #editModal .emoji-grid { display:grid; grid-template-columns:repeat(6, 1fr);
-  gap:6px; margin-top:6px; max-height:200px; overflow-y:auto; }
+  gap:6px; margin-top:6px; }
 #editModal .emoji-opt { font-size:24px; padding:6px 0; text-align:center;
   border-radius:8px; cursor:pointer; background:rgba(255,255,255,.05); }
 #editModal .emoji-opt.sel { background:#25f4ee; color:#000; }
+
 #editModal .btns { display:flex; gap:10px; margin-top:20px; }
 #editModal .btns button { flex:1; padding:12px; border-radius:12px;
   border:none; font-size:14px; font-weight:700; cursor:pointer; }
@@ -636,10 +675,25 @@ body.banner-show .comments { opacity:0; transform:translateY(20px); }
 <div id="editModal">
   <div class="box">
     <h3>Изменить профиль</h3>
+
+    <div class="modal-av-wrap">
+      <div class="modal-av" id="modalAvPreview">G</div>
+    </div>
+    <div class="av-hint">Тап по аватарке — выбор цвета<br>Или введи свой символ</div>
+
+    <label>Аватар (любой символ или эмодзи)</label>
+    <input type="text" id="editAvatarChar" maxlength="8" placeholder="🐱 или G или 😎" class="av-input">
+
+    <label>Цвет фона</label>
+    <div class="color-grid" id="colorGrid"></div>
+    <input type="color" id="editAvatarColorPicker" value="#25a4d3" class="color-input">
+
+    <label>Быстрый выбор эмодзи</label>
+    <div class="emoji-grid" id="editEmojiGrid"></div>
+
     <label>Никнейм</label>
     <input type="text" id="editNick" maxlength="20" placeholder="grand-cat">
-    <label>Аватар</label>
-    <div class="emoji-grid" id="editEmojiGrid"></div>
+
     <div class="btns">
       <button class="cancel" id="editCancel">Отмена</button>
       <button class="save" id="editSave">Сохранить</button>
@@ -662,6 +716,7 @@ const state = {
   followers: parseInt(localStorage.getItem('gc_followers') || '12400'),
   nick: localStorage.getItem('gc_nick') || 'grand-cat',
   avatar: localStorage.getItem('gc_avatar') || 'G',
+  avatarColor: localStorage.getItem('gc_avatar_color') || '#25a4d3',
   autoRec: localStorage.getItem('gc_autorec') === '1',
   swearing: localStorage.getItem('gc_swearing') === '1',
   totalStreams: parseInt(localStorage.getItem('gc_streams_count') || '0'),
@@ -677,6 +732,18 @@ const state = {
 };
 
 let myStreams = [];
+
+const AVATAR_COLORS_PRESET = [
+  "#25a4d3","#4facfe","#00f2fe","#36a2eb","#5ce1e6","#8ee8f4",
+  "#43e97b","#38f9d7","#2ecc71","#8cff8c","#a2e8b8","#4bc0c0",
+  "#fee140","#f6d365","#ffce56","#ffb84d","#ffcc70","#ff9f40",
+  "#fda085","#ff8c66","#ff6384","#ff5c8a","#ff0050","#f5576c",
+  "#fa709a","#f093fb","#c88cff","#a18cd1","#9966ff","#b388ff",
+  "#80d8ff","#c2e9fb","#ffffff","#e0e0e0","#999999","#666666",
+  "#333333","#1a1a2e","#000000","#5c3d2e"
+];
+
+const AVATAR_EMOJIS_PICK = ["G","🐱","🐶","🦊","🐼","🐯","🦁","🐸","🐵","🐰","🐻","🦄","🐲","🐙","🦋","🐢","🦉","🐺","🍕","🍔","🎮","🎯","🎸","🎧","🎤","🌈","⭐","🔥","❄️","⚡","🌸","🌙","☀️","👾","🤖","👻","💀","🎃","🎨","🎭","🎬","📺","A","B","C","D","M","S","K","X","Z"];
 
 let followersList = [];
 try { followersList = JSON.parse(localStorage.getItem('gc_followers_list') || '[]'); } catch(e) { followersList = []; }
@@ -702,6 +769,7 @@ function saveStats() {
     localStorage.setItem('gc_followers', String(state.followers));
     localStorage.setItem('gc_nick', state.nick);
     localStorage.setItem('gc_avatar', state.avatar);
+    localStorage.setItem('gc_avatar_color', state.avatarColor);
     localStorage.setItem('gc_autorec', state.autoRec ? '1' : '0');
     localStorage.setItem('gc_swearing', state.swearing ? '1' : '0');
     localStorage.setItem('gc_streams_count', String(state.totalStreams));
@@ -761,14 +829,13 @@ const EMOJIS_ALL = ["🥰","👍","🤮","👎","❤️","😂","🤣","🤯","�
 const GENERIC_CHAT = ["жиза","база","согласен","+1","💯","ну да","ты прав","😂"];
 const DONATORS = ["Whale_777","KingDonater","MegaBoss","Anonym","RichBoi","TopDon"];
 
-// Оскорбления (детектор)
 const INSULTS = [
   "лох","лошара","дурак","дура","тупой","тупая","тупо","идиот","идиотка",
   "дебил","дебилка","дебилоид","клоун","ничтожество","придурок","придурошный",
   "мудак","долбоёб","долбоеб","хуй","хуесос","пидор","пидар","гандон",
   "говно","гавно","гей","слабак","неудачник","чмо","чмошник","амёба","амеба",
   "бездарь","баран","скотина","тварь","мразь","ублюдок","козёл","козел",
-  "свинья","падла","гнида","крыса","шавка","тварь","уёбок","уебок","нахуй"
+  "свинья","падла","гнида","крыса","шавка","уёбок","уебок","нахуй"
 ];
 function isInsult(text) {
   if (!text) return false;
@@ -777,7 +844,6 @@ function isInsult(text) {
   return false;
 }
 
-// Характеры ботов — базовые фразы
 const DM_BY_KIND = {
   spam: ["67","67 67","67 forever","67!!!","шестьдесят семь 🗿","67 топ","да 67"],
   hater: ["ну такое","фу","скучно","кринж","удали это","не интересно","и это всё?","фу фу фу"],
@@ -786,8 +852,6 @@ const DM_BY_KIND = {
   asker: ["а сколько тебе лет?","откуда ты?","а какой у тебя пк?","а ты кушал?","а что делаешь?","а ты спишь?","а микро норм?"],
   normal: ["жиза 😄","ага, точно","согласен!","ахаха, да","интересно","расскажи ещё","серьёзно?","ого!","ну такое","понимаю тебя","прикольно","ок"],
 };
-
-// Универсальные ответы на разные темы
 const DM_GREETING = ["привет! 👋","о, привет!","хай","приветик","здарова","ку","привет-привет"];
 const DM_HOWRU = ["норм, а ты?","всё круто! ты как?","хорошо, спасибо 😊","отлично, сам как?","да норм, чё как сам?","живой пока)"];
 
@@ -815,76 +879,51 @@ function pickAnswer() {
 }
 function pickEmoji() { return rnd(EMOJIS_ALL); }
 
-// ============ ГЛАВНАЯ ФУНКЦИЯ ОТВЕТА БОТА ============
 function botReplyTo(userMsg, kind) {
   const t = (userMsg||"").trim();
   const tl = t.toLowerCase();
   const sw = state.swearing;
 
-  // 1. ОСКОРБЛЕНИЕ — самое важное
   if (isInsult(tl)) {
     if (kind === "simp") {
-      if (sw) return rnd([
-        "ты чё, охуел?! 😭😭","я тебя любила, а ты так... козёл!","да пошёл ты нахуй!","сам дебил, ясно?! 😡","охуеть, вот так спасибо за любовь","иди на хуй, не пиши мне больше"
-      ]);
-      return rnd([
-        "за что? 😢","ты злой 😭","я же тебе ничего плохого не сделала","обидно... 😔","почему ты так со мной?","я расстроилась 🥺","как ты можешь так..."
-      ]);
+      if (sw) return rnd(["ты чё, охуел?! 😭😭","я тебя любила, а ты так... козёл!","да пошёл ты нахуй!","сам дебил, ясно?! 😡","охуеть, вот так спасибо за любовь","иди на хуй, не пиши мне больше"]);
+      return rnd(["за что? 😢","ты злой 😭","я же тебе ничего плохого не сделала","обидно... 😔","почему ты так со мной?","я расстроилась 🥺","как ты можешь так..."]);
     }
     if (kind === "hater") {
-      if (sw) return rnd([
-        "сам такой, хуесос","иди нахуй, дебил","ты чё охуел, клоун?","закрой рот, лох","пшёл на хер, чмо","ахахах сам хуй","сам такой, скотина"
-      ]);
-      return rnd([
-        "сам такой","ты еще хуже","и что?","мне пох","ха, смешно","слился?","ахах слабак","ну и чё, дальше что?","иди лечись"
-      ]);
+      if (sw) return rnd(["сам такой, хуесос","иди нахуй, дебил","ты чё охуел, клоун?","закрой рот, лох","пшёл на хер, чмо","ахахах сам хуй","сам такой, скотина"]);
+      return rnd(["сам такой","ты еще хуже","и что?","мне пох","ха, смешно","слился?","ахах слабак","ну и чё, дальше что?","иди лечись"]);
     }
     if (kind === "spam") {
-      if (sw) return rnd([
-        "сам 67, бля","67 тебе в рот","67 67 67 иди нахуй","сам хуй 67","67 и чё, бля?","67 хуль"
-      ]);
+      if (sw) return rnd(["сам 67, бля","67 тебе в рот","67 67 67 иди нахуй","сам хуй 67","67 и чё, бля?","67 хуль"]);
       return rnd(["сам 67","67 тебе","67 не поспоришь","67 67","да 67","67 и что?"]);
     }
     if (kind === "clown") {
-      if (sw) return rnd([
-        "😂😂😂 охуел","ахахах сам такой, клоун","ору с тебя, дебил","🤡 сам такой","ахах лошара","😂😂😂 вот это высрал, бля"
-      ]);
+      if (sw) return rnd(["😂😂😂 охуел","ахахах сам такой, клоун","ору с тебя, дебил","🤡 сам такой","ахах лошара","😂😂😂 вот это высрал, бля"]);
       return rnd(["😂😂😂","ахахах сам такой","ору","🤡🤡🤡","кек","жиза","хахах смешно"]);
     }
     if (kind === "asker") {
-      if (sw) return rnd([
-        "а сам ты кто, бля?","а чего обзываешься, хуй?","а почему такой злой?","а кто тебя спрашивал вообще","а сам-то кто?"
-      ]);
-      return rnd([
-        "а сам ты кто?","а почему ты такой злой?","а зачем обзываться?","а что я сделал?","а сам ты как?"
-      ]);
+      if (sw) return rnd(["а сам ты кто, бля?","а чего обзываешься, хуй?","а почему такой злой?","а кто тебя спрашивал вообще","а сам-то кто?"]);
+      return rnd(["а сам ты кто?","а почему ты такой злой?","а зачем обзываться?","а что я сделал?","а сам ты как?"]);
     }
-    // normal
-    if (sw) return rnd([
-      "сам такой, бля","ты чё охуел?","иди нахуй","ахахах сам хуй","да пошёл ты","рот закрой","сам клоун, понял?"
-    ]);
+    if (sw) return rnd(["сам такой, бля","ты чё охуел?","иди нахуй","ахахах сам хуй","да пошёл ты","рот закрой","сам клоун, понял?"]);
     return rnd(["сам такой","ты чё","иди отсюда","ахах смешно","и что?","пфф","да ну тебя","ахах лол"]);
   }
 
-  // 2. ПРИВЕТСТВИЕ
   if (/^(привет|хай|hi|hello|ку|салют|здарова|здорово|прив)\b/.test(tl)) {
     if (sw) return rnd(["привет, бля 👋","о, привет","хай","здарова, чё надо","приветик 😊","ку, чё хотел"]);
     return rnd(DM_GREETING);
   }
 
-  // 3. СПАСИБО
   if (/спасибо|благодар|спс|пасиб/.test(tl)) {
     if (sw) return rnd(["да не за что, бля","пф, обращайся","не за что 💕","ну ты и вежливый, аж противно","та не за что, хули"]);
     return rnd(["пожалуйста! 😊","не за что 💕","обращайся!","рад помочь","ага"]);
   }
 
-  // 4. ПРОЩАНИЕ
   if (/пока|до свид|до встреч|ухожу|бай|спокойной/.test(tl)) {
     if (sw) return rnd(["давай, бля","пока, не теряйся","бай, чёрт","до связи, хули","ну и вали"]);
     return rnd(["пока! 👋","до связи","давай!","ещё увидимся","бай"]);
   }
 
-  // 5. КОМПЛИМЕНТ
   if (/классн|крут|топ|молодец|красив|умн|молоток|огонь|супер|офигенно|кайф|нравишься/.test(tl)) {
     if (kind === "hater" && sw) return rnd(["и чё, бля?","не подлизывайся","фу, лизун","сам знаю, отвали"]);
     if (kind === "hater") return rnd(["и чё","не подлизывайся","фу","да ладно","серьёзно?","ну спасибо конечно"]);
@@ -896,7 +935,6 @@ function botReplyTo(userMsg, kind) {
     return rnd(["спасибо!","ты тоже классный","приятно 🥺","взаимно!","спасибочки","приятно 😊"]);
   }
 
-  // 6. ЛЮБОВЬ
   if (/любл|люблю|нрав|обожа|скуча|целую|жаню|выходи за|встречат/.test(tl)) {
     if (kind === "hater" && sw) return rnd(["отвали, хуй","не надо этих соплей","фу бля","не пиши мне так","какой нахуй"]);
     if (kind === "hater") return rnd(["фу","не надо","иди отсюда","отвали","я не такой","серьёзно?"]);
@@ -908,7 +946,6 @@ function botReplyTo(userMsg, kind) {
     return rnd(["взаимно ❤️","и я тебя!","ты лучший 💕","😊","приятно 🥺","мило 🥰"]);
   }
 
-  // 7. КАК ДЕЛА
   if (/как дела|как ты|как жизнь|чё делаешь|что делаешь|чем занят|как сам/.test(tl)) {
     if (kind === "hater" && sw) return rnd(["норм, не твоё дело, бля","скучно, хули","ну такое","заебал спрашивать"]);
     if (kind === "hater") return rnd(["норм","скучно","не твоё дело","ну такое","нормально"]);
@@ -921,7 +958,6 @@ function botReplyTo(userMsg, kind) {
     return rnd(DM_HOWRU);
   }
 
-  // 8. ВОПРОС
   if (isQuestion(t)) {
     if (kind === "asker") {
       if (sw) return rnd(["а сам как думаешь? хуй его знает","а чего спрашиваешь, бля?","а сам ты как?","а зачем тебе это, бля?"]);
@@ -936,13 +972,11 @@ function botReplyTo(userMsg, kind) {
     return rnd(["хм, интересно","а сам как думаешь?","ну я думаю да","не уверен","можно и так","сложно сказать","ну хз"]);
   }
 
-  // 9. "ТЫ БОТ / НЕ НАСТОЯЩИЙ"
   if (/ты бот|ты не настоящ|ты ии|ты программа|ты фейк|ты робот/.test(tl)) {
     if (sw) return rnd(["сам ты бот, хуй","а ты попробуй докажи, бля","я настоящий, иди нах","че ты сказал?","не пизди, я живой"]);
     return rnd(["сам ты бот 😂","я настоящий!","да ладно","не смешно","😐","серьёзно?"]);
   }
 
-  // 10. ЧТО-ТО ПО ТЕМЕ
   const themes = detectThemes(t);
   if (themes.length > 0) {
     const th = rnd(themes);
@@ -953,16 +987,13 @@ function botReplyTo(userMsg, kind) {
     if (th.name === "приветствие") return rnd(DM_GREETING);
   }
 
-  // 11. "ОСКОРБИЛ" не словом а косвенно
   if (/ты плохой|ты скучный|ты душный|мне скучно с тобой|ты странный|ты тупой/.test(tl)) {
     if (sw) return rnd(["сам душный, бля","да пошёл ты","чё ты вякаешь","отвали, а?","не нравится — не пиши"]);
     return rnd(["ну ок","как хочешь","жаль","ясно","понятно","ну и ладно"]);
   }
 
-  // 12. ОБЩЕЕ (fallback по характеру)
   const pool = DM_BY_KIND[kind] || DM_BY_KIND.normal;
   let reply = rnd(pool);
-  // Добавляем мат для приукрашивания если включен, иногда
   if (sw && Math.random() < 0.35) {
     const spice = ["бля","хули","чё","хуй","ёпта","вот так вот","короче"];
     reply = reply + ", " + rnd(spice);
@@ -1768,43 +1799,105 @@ function buildFollowing() {
   });
 }
 
+// ============ РЕДАКТИРОВАНИЕ ПРОФИЛЯ ============
+function updateModalPreview() {
+  const av = $("modalAvPreview");
+  av.textContent = state._pendingAvatar || "G";
+  av.style.background = state._pendingAvatarColor || "#25a4d3";
+}
+
 function openEditModal() {
   $("editNick").value = state.nick;
+  $("editAvatarChar").value = state.avatar;
+  state._pendingAvatar = state.avatar;
+  state._pendingAvatarColor = state.avatarColor;
+
+  // Превью
+  updateModalPreview();
+
+  // Сетка цветов
+  const cg = $("colorGrid");
+  cg.innerHTML = "";
+  AVATAR_COLORS_PRESET.forEach(c => {
+    const d = document.createElement("div");
+    d.className = "color-opt" + (state.avatarColor === c ? " sel" : "");
+    d.style.background = c;
+    d.addEventListener("click", () => {
+      cg.querySelectorAll(".color-opt").forEach(o => o.classList.remove("sel"));
+      d.classList.add("sel");
+      state._pendingAvatarColor = c;
+      $("editAvatarColorPicker").value = c;
+      updateModalPreview();
+    });
+    cg.appendChild(d);
+  });
+  $("editAvatarColorPicker").value = state.avatarColor;
+
+  // Сетка эмодзи
   const grid = $("editEmojiGrid");
   grid.innerHTML = "";
-  const emojis = ["G","🐱","🐶","🦊","🐼","🐯","🦁","🐸","🦄","🐲","🐺","🦉","🎮","🎯","🎸","🎧","🌈","⭐","🔥","⚡","🌸","🌙","👾","🤖","💀","🎃","🎨","🎭","🎪","A","B","C","D","M","S","🎬","📺"];
-  emojis.forEach(e => {
+  AVATAR_EMOJIS_PICK.forEach(e => {
     const d = document.createElement("div");
     d.className = "emoji-opt" + (state.avatar === e ? " sel" : "");
     d.textContent = e;
     d.addEventListener("click", () => {
       grid.querySelectorAll(".emoji-opt").forEach(o => o.classList.remove("sel"));
       d.classList.add("sel");
+      $("editAvatarChar").value = e;
       state._pendingAvatar = e;
+      updateModalPreview();
     });
     grid.appendChild(d);
   });
-  state._pendingAvatar = state.avatar;
+
+  // Ручной ввод символа
+  $("editAvatarChar").oninput = (e) => {
+    const v = e.target.value;
+    state._pendingAvatar = v || "G";
+    updateModalPreview();
+    // снять выделение с эмодзи, если не совпадает
+    grid.querySelectorAll(".emoji-opt").forEach(o => o.classList.remove("sel"));
+  };
+
+  // Системный color picker
+  $("editAvatarColorPicker").oninput = (e) => {
+    state._pendingAvatarColor = e.target.value;
+    cg.querySelectorAll(".color-opt").forEach(o => o.classList.remove("sel"));
+    updateModalPreview();
+  };
+
   $("editModal").classList.add("show");
+  setTimeout(() => $("editAvatarChar").blur(), 100);
 }
+
 $("editCancel").addEventListener("click", () => $("editModal").classList.remove("show"));
 $("editSave").addEventListener("click", () => {
   const newNick = $("editNick").value.trim() || "grand-cat";
   const newAvatar = state._pendingAvatar || "G";
+  const newColor = state._pendingAvatarColor || "#25a4d3";
   state.nick = newNick;
   state.avatar = newAvatar;
+  state.avatarColor = newColor;
   saveStats();
   updateProfileUI();
   $("editModal").classList.remove("show");
   toast("✅ Профиль обновлён");
 });
 
+// Тап по превью — открывает color picker
+$("modalAvPreview").addEventListener("click", () => {
+  try { $("editAvatarColorPicker").click(); } catch (e) {}
+});
+
 function updateProfileUI() {
   $("streamNick").textContent = state.nick;
   $("streamAvatar").textContent = state.avatar;
+  $("streamAvatar").style.background = state.avatarColor;
   $("menuTitle").textContent = state.nick;
   $("menuAvatar").textContent = state.avatar;
+  $("menuAvatar").style.background = state.avatarColor;
   $("accAvatar").textContent = state.avatar;
+  $("accAvatar").style.background = state.avatarColor;
   $("accName").textContent = state.nick;
   $("accHandle").textContent = "@" + state.nick.toLowerCase().replace(/\s+/g, "_");
 }
@@ -1847,6 +1940,11 @@ $("btnPlus").addEventListener("click", async () => {
     setTimeout(() => { if (!state.isRecording) startRecording(true); }, 1500);
   }
 });
+
+// Тап по аватарке в аккаунте — открыть редактирование
+$("accAvatar").addEventListener("click", openEditModal);
+// Тап по аватарке в меню — открыть редактирование
+$("menuAvatar").addEventListener("click", openEditModal);
 
 $("itemMyStreams").addEventListener("click", () => { buildMyStreams(); openPanel("panelMyStreams"); });
 $("itemStats").addEventListener("click", () => { buildStats(); openPanel("panelStats"); });
