@@ -112,8 +112,10 @@ body.banner-show .comments{opacity:0;transform:translateY(20px);}
 .ev-act svg{width:24px;height:24px;display:block;}
 .ev-act.ev-del{background:rgba(255,50,80,.25);}
 .ev-btns{display:flex;gap:10px;}
-.ev-btns button{flex:1;padding:12px;border-radius:12px;border:none;font-size:14px;font-weight:700;cursor:pointer;}
-.ev-save{background:#25f4ee;color:#000;}
+.ev-btns button{flex:1;padding:12px;border-radius:12px;border:none;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;}
+.ev-save{background:rgba(255,255,255,.12);color:#fff;}
+.ev-save:active{background:rgba(255,255,255,.2);transform:scale(.98);}
+.ev-save svg{width:20px;height:20px;}
 .ev-cancel{background:rgba(255,255,255,.1);color:#fff;}
 .ev-progress{font-size:12px;text-align:center;margin-bottom:10px;opacity:.7;min-height:14px;}
 #menuScreen{position:fixed;inset:0;z-index:500;background:linear-gradient(180deg,#0a0a14 0%,#1a0a2e 100%);display:flex;flex-direction:column;justify-content:space-between;padding:0 0 calc(24px + env(safe-area-inset-bottom));}
@@ -396,7 +398,14 @@ body.banner-show .comments{opacity:0;transform:translateY(20px);}
     <div class="ev-progress" id="evProgress"></div>
     <div class="ev-btns">
       <button class="ev-cancel" id="evCancel">Отмена</button>
-      <button class="ev-save" id="evSave">💾 Сохранить</button>
+      <button class="ev-save" id="evSave">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3.5" y="3.5" width="17" height="17" rx="3"/>
+          <path d="M8 3.5v5h8v-5"/>
+          <rect x="8.5" y="13" width="7" height="7.5"/>
+        </svg>
+        Сохранить
+      </button>
     </div>
   </div>
 </div>
@@ -1731,18 +1740,23 @@ $("evSave").addEventListener("click",async function(){
     var chunks=[];
     rec.ondataavailable=function(e){if(e.data.size>0)chunks.push(e.data);};
     rec.onstop=function(){
+      var newStream=null;
       try{
         var type=rec.mimeType||"video/webm";
         var ext=type.indexOf("mp4")>=0?"mp4":"webm";
         var newName=evStream.filename.replace(/\.[^.]+$/,"")+"-edit."+ext;
         var blob=new Blob(chunks,{type:type});
-        myStreams.unshift({blob:blob,filename:newName,date:new Date().toISOString(),size:blob.size});
+        newStream={blob:blob,filename:newName,date:new Date().toISOString(),size:blob.size};
+        myStreams.unshift(newStream);
         if(myStreams.length>20)myStreams.pop();
-        toast("✅ Сохранено в Мои стримы");
-        $("editVideoModal").classList.remove("show");
         buildMyStreams();
+        toast("✅ Сохранено");
       }catch(err){toast("Ошибка: "+err.message);}
       $("evProgress").textContent="";
+      $("editVideoModal").classList.remove("show");
+      if(newStream){
+        setTimeout(function(){openVideoViewer(newStream);},250);
+      }
     };
     rec.start(100);
     var idx=0;
