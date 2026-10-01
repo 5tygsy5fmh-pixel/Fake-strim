@@ -96,7 +96,6 @@ body.banner-show .comments { opacity:0; transform:translateY(20px); }
 .caption.interim { opacity:.75; font-style:italic; }
 @keyframes capIn { from{opacity:0; transform:translateY(6px);} to{opacity:1;} }
 
-/* HEARTS - исправлено для ноутбука */
 .hearts { position:absolute; right:20px; bottom:180px;
   width:80px; height:60vh; overflow:visible; pointer-events:none; z-index:3; }
 .heart { position:absolute; bottom:0; left:50%; font-size:28px;
@@ -164,7 +163,6 @@ body.banner-show .comments { opacity:0; transform:translateY(20px); }
   margin-bottom:10px; min-width:200px; cursor:pointer; }
 #saveModal .sm-btn.secondary { background:rgba(255,255,255,.15); }
 
-/* ГЛАВНОЕ МЕНЮ */
 #menuScreen { position:fixed; inset:0; z-index:500;
   background:linear-gradient(180deg, #0a0a14 0%, #1a0a2e 100%);
   display:flex; flex-direction:column; justify-content:space-between;
@@ -204,7 +202,6 @@ body.banner-show .comments { opacity:0; transform:translateY(20px); }
   font-size:11px; font-weight:700; display:flex; align-items:center;
   justify-content:center; padding:0 5px; }
 
-/* ПАНЕЛИ */
 .panel { position:fixed; inset:0; z-index:600; background:#0a0a14;
   display:none; flex-direction:column; }
 .panel.show { display:flex; }
@@ -233,8 +230,7 @@ body.banner-show .comments { opacity:0; transform:translateY(20px); }
 .empty-inbox .em { font-size:60px; display:block; margin-bottom:16px; }
 
 .chat-head-av { width:36px; height:36px; border-radius:50%;
-  display:flex; align-items:center; justify-content:center;
-  font-size:20px; }
+  display:flex; align-items:center; justify-content:center; font-size:20px; }
 .chat-messages { flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch;
   padding:16px 12px; display:flex; flex-direction:column; gap:8px;
   scrollbar-width:none; }
@@ -311,13 +307,12 @@ body.banner-show .comments { opacity:0; transform:translateY(20px); }
 .account-item .toggle.on { background:#25f4ee; }
 .account-item .toggle.on::after { transform:translateX(20px); }
 
-/* Модалка редактирования */
 #editModal { position:fixed; inset:0; z-index:2500; background:rgba(0,0,0,.9);
   display:none; flex-direction:column; align-items:center; justify-content:center;
   padding:24px; }
 #editModal.show { display:flex; }
 #editModal .box { background:#1a1a2e; border-radius:20px; padding:24px;
-  width:100%; max-width:340px; }
+  width:100%; max-width:340px; max-height:90vh; overflow-y:auto; }
 #editModal h3 { font-size:18px; margin-bottom:16px; text-align:center; }
 #editModal label { font-size:12px; opacity:.6; display:block;
   margin-bottom:6px; margin-top:12px; }
@@ -325,10 +320,9 @@ body.banner-show .comments { opacity:0; transform:translateY(20px); }
   border:none; border-radius:12px; padding:12px 14px; color:#fff;
   font-size:15px; outline:none; font-family:inherit; }
 #editModal .emoji-grid { display:grid; grid-template-columns:repeat(6, 1fr);
-  gap:6px; margin-top:6px; max-height:140px; overflow-y:auto; }
+  gap:6px; margin-top:6px; max-height:200px; overflow-y:auto; }
 #editModal .emoji-opt { font-size:24px; padding:6px 0; text-align:center;
-  border-radius:8px; cursor:pointer;
-  background:rgba(255,255,255,.05); }
+  border-radius:8px; cursor:pointer; background:rgba(255,255,255,.05); }
 #editModal .emoji-opt.sel { background:#25f4ee; color:#000; }
 #editModal .btns { display:flex; gap:10px; margin-top:20px; }
 #editModal .btns button { flex:1; padding:12px; border-radius:12px;
@@ -336,7 +330,6 @@ body.banner-show .comments { opacity:0; transform:translateY(20px); }
 #editModal .btns .save { background:#25f4ee; color:#000; }
 #editModal .btns .cancel { background:rgba(255,255,255,.1); color:#fff; }
 
-/* Стримы (записи) */
 .rec-item { padding:14px 16px; border-bottom:1px solid rgba(255,255,255,.06);
   display:flex; align-items:center; gap:12px; }
 .rec-item .ri-icon { width:44px; height:44px; border-radius:12px;
@@ -350,7 +343,6 @@ body.banner-show .comments { opacity:0; transform:translateY(20px); }
   background:rgba(255,255,255,.12); font-size:12px; font-weight:600;
   cursor:pointer; }
 
-/* Статистика */
 .stat-grid { padding:20px; display:grid;
   grid-template-columns:1fr 1fr; gap:12px; }
 .stat-card { padding:16px; border-radius:16px;
@@ -361,6 +353,11 @@ body.banner-show .comments { opacity:0; transform:translateY(20px); }
 .stat-card .val.pink { color:#ff96dc; }
 .stat-card .val.cyan { color:#8ee8f4; }
 .stat-card .val.yellow { color:#ffd700; }
+
+/* Секция в настройках */
+.settings-section { padding:8px 20px 4px; font-size:12px;
+  text-transform:uppercase; letter-spacing:.8px;
+  color:rgba(255,255,255,.4); font-weight:700; }
 </style>
 </head>
 <body>
@@ -444,7 +441,6 @@ body.banner-show .comments { opacity:0; transform:translateY(20px); }
   </div>
 </div>
 
-<!-- ГЛАВНОЕ МЕНЮ -->
 <div id="menuScreen">
   <div class="menu-top">
     <h1 id="menuTitle">grand-cat</h1>
@@ -487,7 +483,6 @@ body.banner-show .comments { opacity:0; transform:translateY(20px); }
   </div>
 </div>
 
-<!-- ВХОДЯЩИЕ -->
 <div class="panel" id="panelInbox">
   <div class="panel-head">
     <div class="back" data-close="1">
@@ -500,7 +495,6 @@ body.banner-show .comments { opacity:0; transform:translateY(20px); }
   <div class="panel-body" id="inboxBody"></div>
 </div>
 
-<!-- ЧАТ -->
 <div class="panel" id="panelChat">
   <div class="panel-head">
     <div class="back" data-close="1">
@@ -522,7 +516,6 @@ body.banner-show .comments { opacity:0; transform:translateY(20px); }
   </div>
 </div>
 
-<!-- АККАУНТ -->
 <div class="panel" id="panelAccount">
   <div class="panel-head">
     <div class="back" data-close="1">
@@ -555,19 +548,42 @@ body.banner-show .comments { opacity:0; transform:translateY(20px); }
       <div class="account-item" id="itemStats">
         <div class="ic">📊</div><div class="lb">Статистика</div><div class="ar">›</div>
       </div>
-      <div class="account-item" id="itemEdit">
-        <div class="ic">✏️</div><div class="lb">Изменить ник и аватар</div><div class="ar">›</div>
+      <div class="account-item" id="itemSettings">
+        <div class="ic">⚙️</div><div class="lb">Настройки</div><div class="ar">›</div>
       </div>
-      <div class="account-item" id="itemAutoRec">
-        <div class="ic">🔴</div><div class="lb">Автозапись</div>
-        <div class="toggle" id="toggleAutoRec"></div>
-      </div>
-      <div class="account-item"><div class="ic">⚙️</div><div class="lb">Настройки</div><div class="ar">›</div></div>
     </div>
   </div>
 </div>
 
-<!-- МОИ СТРИМЫ -->
+<!-- НАСТРОЙКИ -->
+<div class="panel" id="panelSettings">
+  <div class="panel-head">
+    <div class="back" data-close="1">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round">
+        <polyline points="15 6 9 12 15 18"/>
+      </svg>
+    </div>
+    <div class="title">Настройки</div>
+  </div>
+  <div class="panel-body">
+    <div class="account-body" style="padding-top:10px;">
+      <div class="settings-section">Профиль</div>
+      <div class="account-item" id="itemEdit">
+        <div class="ic">✏️</div><div class="lb">Изменить ник и аватар</div><div class="ar">›</div>
+      </div>
+      <div class="settings-section" style="margin-top:12px;">Запись</div>
+      <div class="account-item" id="itemAutoRec">
+        <div class="ic">🔴</div><div class="lb">Автозапись при старте стрима</div>
+        <div class="toggle" id="toggleAutoRec"></div>
+      </div>
+      <div class="settings-section" style="margin-top:12px;">О приложении</div>
+      <div class="account-item">
+        <div class="ic">ℹ️</div><div class="lb">Версия 1.0</div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="panel" id="panelMyStreams">
   <div class="panel-head">
     <div class="back" data-close="1">
@@ -580,7 +596,6 @@ body.banner-show .comments { opacity:0; transform:translateY(20px); }
   <div class="panel-body" id="myStreamsBody"></div>
 </div>
 
-<!-- СТАТИСТИКА -->
 <div class="panel" id="panelStats">
   <div class="panel-head">
     <div class="back" data-close="1">
@@ -602,7 +617,6 @@ body.banner-show .comments { opacity:0; transform:translateY(20px); }
   </div>
 </div>
 
-<!-- МОДАЛКА РЕДАКТИРОВАНИЯ -->
 <div id="editModal">
   <div class="box">
     <h3>Изменить профиль</h3>
@@ -626,7 +640,6 @@ body.banner-show .comments { opacity:0; transform:translateY(20px); }
 </div>
 
 <script>
-// ============ СОСТОЯНИЕ ============
 const state = {
   viewers: 30000, tv: 30000, likes: 342000, hype: 0.3,
   crystals: parseInt(localStorage.getItem('gc_crystals') || '0'),
@@ -646,10 +659,8 @@ const state = {
   streaming: false,
 };
 
-// ============ СТРИМЫ (в памяти, blob нельзя в localStorage) ============
 let myStreams = [];
 
-// ============ ЧАТЫ ============
 let chats = {};
 try { chats = JSON.parse(localStorage.getItem('gc_chats') || '{}'); } catch (e) { chats = {}; }
 function saveChats() { try { localStorage.setItem('gc_chats', JSON.stringify(chats)); } catch (e) {} }
@@ -667,7 +678,6 @@ function saveStats() {
   } catch (e) {}
 }
 
-// ============ ГЕНЕРАТОРЫ ============
 const NICK_PRE = ["dark","pro","mega","ultra","cyber","neo","pixel","retro","night","star","shadow","fire","ice","storm","lucky"];
 const NICK_ROOT = ["cat","wolf","fox","dragon","ninja","gamer","legend","boss","king","ghost","demon","robot","troll","panda","tiger","hunter"];
 const NICK_SUF = ["01","07","13","69","77","88","99","228","777","999","xX","_pro","_yt","TV"];
@@ -699,7 +709,6 @@ function randomAvatar() {
   return { emoji, gradient: `linear-gradient(135deg, ${c1}, ${c2})` };
 }
 
-// Резиденты с personalities
 const RESIDENTS = [
   { nick:"67_kid", color:"#ff5c5c", kind:"spam", lines:["67","67 67","67???","шестьдесят семь"] },
   { nick:"skibidi_sigma", color:"#c88cff", kind:"spam", lines:["скибиди","🗿🗿🗿","сигма","гигачад"] },
@@ -719,7 +728,6 @@ const EMOJIS_ALL = ["🥰","👍","🤮","👎","❤️","😂","🤣","🤯","�
 const GENERIC_CHAT = ["жиза","база","согласен","+1","💯","ну да","ты прав","😂"];
 const DONATORS = ["Whale_777","KingDonater","MegaBoss","Anonym","RichBoi","TopDon"];
 
-// DM ответы по типу бота
 const DM_BY_KIND = {
   spam: ["67","67 67","67 forever","67!!!","шестьдесят семь 🗿","67 топ","да 67"],
   hater: ["ну такое","фу","скучно","кринж","удали это","не интересно","и это всё?","фу фу фу"],
@@ -759,17 +767,14 @@ function pickEmoji() { return rnd(EMOJIS_ALL); }
 
 function botReplyTo(userMsg, kind) {
   const t = (userMsg||"").toLowerCase();
-  // Приветствие — всегда короткое приветствие
   if (t.includes("привет")||t.includes("хай")||t.includes("здарова")||t.includes("hi")||t.includes("hello")) {
     return rnd(DM_GREETING);
   }
   if (t.includes("спасибо")||t.includes("благодар")) {
     return rnd(["пожалуйста! 😊","не за что 💕","обращайся!"]);
   }
-  // Остальное — по характеру
   const pool = DM_BY_KIND[kind] || DM_BY_KIND.normal;
   if (t.includes("как дела")||t.includes("как ты")||t.includes("как жизнь")) {
-    // Симпики и клоуны по-своему отвечают
     if (kind === "simp") return rnd(["хорошо когда ты написал 💕","всё супер! ❤️","отлично 🥰"]);
     if (kind === "clown") return rnd(["😂😂😂","ахаха всё топ","ору, хорошо"]);
     if (kind === "hater") return rnd(["норм, не то что ты","скучно","ну так"]);
@@ -777,7 +782,7 @@ function botReplyTo(userMsg, kind) {
   }
   if (t.includes("любл")||t.includes("люблю")||t.includes("нрав")) {
     if (kind === "hater") return rnd(["фу","не надо","я не такой","иди отсюда"]);
-    if (kind === "simp") return rnd(["я тебя тоже! 💕❤️","взаимно 🥰","люблю!"]); 
+    if (kind === "simp") return rnd(["я тебя тоже! 💕❤️","взаимно 🥰","люблю!"]);
     return rnd(DM_LOVE);
   }
   if (t.includes("классн")||t.includes("крут")||t.includes("топ")||t.includes("молодец")) {
@@ -785,7 +790,7 @@ function botReplyTo(userMsg, kind) {
     return rnd(DM_COMPLIMENT);
   }
   if (isQuestion(userMsg)) {
-    if (kind === "asker") return rnd(pool); // он сам спрашивает в ответ
+    if (kind === "asker") return rnd(pool);
     if (kind === "spam") return rnd(pool);
     if (kind === "clown") return rnd(pool);
     return rnd(["хм, интересно","а сам как думаешь?","ну я думаю да","не уверен","можно и так"]);
@@ -793,7 +798,6 @@ function botReplyTo(userMsg, kind) {
   return rnd(pool);
 }
 
-// ============ ЗВУК ============
 let audioCtx = null;
 function initAudio() {
   try {
@@ -836,20 +840,15 @@ function toast(text) {
 function markActivity() { state.lastActivity = Date.now(); }
 function updateCrystalsUI() {
   const s = state.crystals.toLocaleString("ru-RU");
-  ["menuCrystals","accCrystals"].forEach(id => {
-    const el = $(id); if (el) el.textContent = s;
-  });
+  ["menuCrystals","accCrystals"].forEach(id => { const el = $(id); if (el) el.textContent = s; });
 }
 function addCrystals(d) { state.crystals = Math.max(0, state.crystals + d); saveStats(); updateCrystalsUI(); }
 function updateFollowersUI() {
   const s = state.followers >= 1000 ? (state.followers/1000).toFixed(1) + "K" : String(state.followers);
-  ["menuFollowers","accFollowers"].forEach(id => {
-    const el = $(id); if (el) el.textContent = s;
-  });
+  ["menuFollowers","accFollowers"].forEach(id => { const el = $(id); if (el) el.textContent = s; });
 }
 function addFollower(d) { state.followers += d; saveStats(); updateFollowersUI(); }
 
-// ============ ПАНЕЛИ ============
 function showMenu() {
   $("menuScreen").classList.remove("hide");
   $("ui").classList.remove("show");
@@ -869,7 +868,6 @@ document.querySelectorAll(".panel-head .back").forEach(b => {
   b.addEventListener("click", () => { closeAllPanels(); updateInboxBadge(); });
 });
 
-// ============ СКРОЛЛ ЧАТА ============
 let autoScroll = true, scrollTimer = null;
 commentsEl.addEventListener("scroll", () => {
   const nb = commentsEl.scrollHeight - commentsEl.scrollTop - commentsEl.clientHeight < 30;
@@ -891,7 +889,6 @@ function smoothScrollToBottom() {
   catch (e) { commentsEl.scrollTop = commentsEl.scrollHeight; }
 }
 
-// ============ СПАВН ЧАТА ============
 function getOrCreateChat(nick, emoji, gradient, kind) {
   if (!chats[nick]) {
     chats[nick] = {
@@ -932,7 +929,6 @@ function spawnChat(text=null, nick=null, color=null, opts={}) {
     const av = randomAvatar();
     emoji = av.emoji; gradient = av.gradient;
     avHTML = `<div class="cm-av" style="background:${av.gradient}">${av.emoji}</div>`;
-    // случайная личность для обычного бота
     kind = opts.kind || rnd(["spam","hater","simp","clown","asker","normal","normal","normal"]);
   }
 
@@ -1085,7 +1081,6 @@ function updateCounters(dt) {
   if (el) el.textContent = formatViewers(state.viewers);
 }
 
-// ============ PiP ============
 const pipCanvas = document.createElement("canvas");
 pipCanvas.width = 540; pipCanvas.height = 960;
 const pipCtx = pipCanvas.getContext("2d");
@@ -1093,7 +1088,6 @@ const pipVideo = $("pipVideo");
 let pipStream = null;
 const pipHistory = [];
 let pipCaption = "";
-
 function pipAdd(nick, text, color, isReply) {
   pipHistory.push({ nick, text, color, isReply, t: Date.now() });
   while (pipHistory.length > 12) pipHistory.shift();
@@ -1170,7 +1164,6 @@ async function exitPiP() {
   } catch (e) {}
 }
 
-// ============ ЗАПИСЬ ============
 let mediaRecorder = null, recChunks = [], lastBlob = null, lastFilename = "", micStream = null;
 async function startRecording(auto=false) {
   try {
@@ -1198,7 +1191,6 @@ async function startRecording(auto=false) {
         const stamp = new Date().toISOString().replace(/[:.]/g,"-").slice(0,19);
         lastFilename = `grand-cat-${stamp}.${ext}`;
         lastBlob = new Blob(recChunks, { type });
-        // Автоматически в "Мои стримы"
         addToMyStreams(lastBlob, lastFilename);
         if (!auto) $("saveModal").classList.add("show");
       } catch (err) { toast("Ошибка: " + err.message); }
@@ -1227,7 +1219,6 @@ function addToMyStreams(blob, filename) {
   });
   if (myStreams.length > 20) myStreams.pop();
 }
-
 async function saveVideoFile() {
   if (!lastBlob) return;
   const file = new File([lastBlob], lastFilename, { type: lastBlob.type });
@@ -1246,11 +1237,7 @@ async function saveVideoFile() {
 }
 $("smSave").addEventListener("click", saveVideoFile);
 $("smToStreams").addEventListener("click", () => {
-  if (lastBlob) {
-    toast("📁 Сохранено в Мои стримы");
-    $("saveModal").classList.remove("show");
-    buildMyStreams();
-  }
+  if (lastBlob) { toast("📁 Сохранено в Мои стримы"); $("saveModal").classList.remove("show"); buildMyStreams(); }
 });
 $("smClose").addEventListener("click", () => $("saveModal").classList.remove("show"));
 
@@ -1258,10 +1245,10 @@ function buildMyStreams() {
   const body = $("myStreamsBody");
   body.innerHTML = "";
   if (myStreams.length === 0) {
-    body.innerHTML = `<div class="empty-inbox"><span class="em">🎬</span>Пока нет записей.<br>Включи автозапись в аккаунте или нажми 🔴 во время стрима.</div>`;
+    body.innerHTML = `<div class="empty-inbox"><span class="em">🎬</span>Пока нет записей.<br>Включи автозапись в настройках или нажми 🔴 во время стрима.</div>`;
     return;
   }
-  myStreams.forEach((s, idx) => {
+  myStreams.forEach(s => {
     const el = document.createElement("div");
     el.className = "rec-item";
     const mb = (s.size / 1024 / 1024).toFixed(1);
@@ -1282,7 +1269,6 @@ function buildMyStreams() {
   });
 }
 
-// ============ ЦИКЛ ============
 let lastChat=0, lastEv=0, lastNotify=0, lastResident=0, lastAutoEmoji=0;
 function resetStreamTimers() {
   const now = performance.now();
@@ -1313,7 +1299,6 @@ function loop(now) {
   requestAnimationFrame(loop);
 }
 
-// ============ КАМЕРА / МИКРОФОН ============
 async function startCamera() {
   try {
     const stream = await navigator.mediaDevices.getUserMedia({
@@ -1403,7 +1388,6 @@ $("closeX").addEventListener("click", () => {
     if (cam.srcObject) { cam.srcObject.getTracks().forEach(t => t.stop()); cam.srcObject = null; }
     if (micRunning && recognition) { try { recognition.stop(); } catch(e){} micRunning = false; }
     state.micOn = false;
-    // СБРОС сотояния стрима
     state.currentChat = null;
     state.streaming = false;
     commentsEl.innerHTML = "";
@@ -1415,7 +1399,6 @@ $("closeX").addEventListener("click", () => {
   }
 });
 
-// ============ СКРЫТИЕ SAFARI ============
 function hideSafariBar() {
   try {
     const el = document.documentElement;
@@ -1427,12 +1410,10 @@ function hideSafariBar() {
 $("tapLayer").addEventListener("click", hideSafariBar);
 $("tapLayer").addEventListener("touchstart", hideSafariBar, { passive: true });
 
-// ============ ЧАТЫ С БОТАМИ ============
 function openChatWith(nick, emoji, gradient, kind) {
   getOrCreateChat(nick, emoji, gradient, kind);
   const c = chats[nick];
   if (!c.kind && kind) { c.kind = kind; saveChats(); }
-  // Первое открытие диалога — +5 подписчиков
   if (!c._firstOpened) {
     c._firstOpened = true;
     state.totalDialogs++;
@@ -1493,8 +1474,7 @@ function sendMessage() {
 function showTyping() {
   const box = $("chatMessages");
   const el = document.createElement("div");
-  el.className = "msg typing";
-  el.id = "typingIndicator";
+  el.className = "msg typing"; el.id = "typingIndicator";
   el.innerHTML = "<span></span><span></span><span></span>";
   box.appendChild(el);
   setTimeout(() => { box.scrollTop = box.scrollHeight; }, 30);
@@ -1542,7 +1522,6 @@ function buildInbox() {
   });
 }
 
-// ============ СТАТИСТИКА ============
 function buildStats() {
   $("stStreams").textContent = state.totalStreams;
   $("stCrystals").textContent = state.crystals.toLocaleString("ru-RU");
@@ -1552,12 +1531,11 @@ function buildStats() {
   $("stDonations").textContent = state.totalDonations;
 }
 
-// ============ РЕДАКТИРОВАНИЕ ============
 function openEditModal() {
   $("editNick").value = state.nick;
   const grid = $("editEmojiGrid");
   grid.innerHTML = "";
-  const emojis = ["G","🐱","🐶","🦊","🐼","🐯","🦁","🐸","🦄","🐲","🐺","🦉","🎮","🎯","🎸","🎧","🌈","⭐","🔥","⚡","🌸","🌙","👾","🤖","💀","🎃","🎨","🎭","🎪","A","B","C","D","M","S"];
+  const emojis = ["G","🐱","🐶","🦊","🐼","🐯","🦁","🐸","🦄","🐲","🐺","🦉","🎮","🎯","🎸","🎧","🌈","⭐","🔥","⚡","🌸","🌙","👾","🤖","💀","🎃","🎨","🎭","🎪","A","B","C","D","M","S","🎬","📺"];
   emojis.forEach(e => {
     const d = document.createElement("div");
     d.className = "emoji-opt" + (state.avatar === e ? " sel" : "");
@@ -1594,11 +1572,9 @@ function updateProfileUI() {
   $("accHandle").textContent = "@" + state.nick.toLowerCase().replace(/\s+/g, "_");
 }
 
-// ============ КНОПКИ МЕНЮ ============
 $("btnInbox").addEventListener("click", () => { buildInbox(); openPanel("panelInbox"); });
 $("btnAccount").addEventListener("click", () => {
   updateCrystalsUI(); updateFollowersUI(); updateProfileUI();
-  $("toggleAutoRec").classList.toggle("on", state.autoRec);
   openPanel("panelAccount");
 });
 $("btnPlus").addEventListener("click", async () => {
@@ -1623,15 +1599,17 @@ $("btnPlus").addEventListener("click", async () => {
   resetStreamTimers();
   state.lastActivity = Date.now();
   setTimeout(() => spawnNote("grand-cat в эфире!", "Тапни на ник в чате — напишешь лично", "#8cff8c", "sub"), 600);
-  // Автозапись
   if (state.autoRec) {
     setTimeout(() => { if (!state.isRecording) startRecording(true); }, 1500);
   }
 });
 
-// Пункты аккаунта
 $("itemMyStreams").addEventListener("click", () => { buildMyStreams(); openPanel("panelMyStreams"); });
 $("itemStats").addEventListener("click", () => { buildStats(); openPanel("panelStats"); });
+$("itemSettings").addEventListener("click", () => {
+  $("toggleAutoRec").classList.toggle("on", state.autoRec);
+  openPanel("panelSettings");
+});
 $("itemEdit").addEventListener("click", openEditModal);
 $("itemAutoRec").addEventListener("click", () => {
   state.autoRec = !state.autoRec;
@@ -1640,7 +1618,6 @@ $("itemAutoRec").addEventListener("click", () => {
   toast(state.autoRec ? "🔴 Автозапись включена" : "Автозапись выключена");
 });
 
-// ============ ИНИЦИАЛИЗАЦИЯ ============
 updateCrystalsUI();
 updateFollowersUI();
 updateProfileUI();
