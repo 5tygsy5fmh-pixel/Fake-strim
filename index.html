@@ -346,6 +346,10 @@ body.banner-show .comments { opacity:0; transform:translateY(20px); }
   border-radius:8px; cursor:pointer; background:rgba(255,255,255,.05); }
 #editModal .emoji-opt.sel { background:#25f4ee; color:#000; }
 
+#editModal .hint-emoji { font-size:11px; opacity:.5; margin-top:6px;
+  line-height:1.4; padding:8px 10px; background:rgba(255,255,255,.05);
+  border-radius:8px; }
+
 #editModal .btns { display:flex; gap:10px; margin-top:20px; }
 #editModal .btns button { flex:1; padding:12px; border-radius:12px;
   border:none; font-size:14px; font-weight:700; cursor:pointer; }
@@ -673,7 +677,7 @@ body.banner-show .comments { opacity:0; transform:translateY(20px); }
     <div class="modal-av-wrap">
       <div class="modal-av" id="modalAvPreview">G</div>
     </div>
-    <div class="av-hint">Тап по аватарке — системный выбор цвета</div>
+    <div class="av-hint">Превью твоей аватарки</div>
 
     <label>Аватар (любой символ или эмодзи)</label>
     <input type="text" id="editAvatarChar" maxlength="8" placeholder="🐱 или G" class="av-input">
@@ -685,6 +689,11 @@ body.banner-show .comments { opacity:0; transform:translateY(20px); }
     <label>Цвет рамки</label>
     <div class="color-grid" id="ringGrid"></div>
     <input type="color" id="editRingColorPicker" value="#ffffff" class="color-input">
+
+    <label>Цвет символа</label>
+    <div class="color-grid" id="textGrid"></div>
+    <input type="color" id="editTextColorPicker" value="#ffffff" class="color-input">
+    <div class="hint-emoji">ℹ️ Работает только для букв и знаков (G, A, 5, ★). Эмодзи (🐱🔥) всегда остаются цветными.</div>
 
     <label>Быстрый выбор эмодзи</label>
     <div class="emoji-grid" id="editEmojiGrid"></div>
@@ -716,6 +725,7 @@ const state = {
   avatar: localStorage.getItem('gc_avatar') || 'G',
   avatarColor: localStorage.getItem('gc_avatar_color') || '#25a4d3',
   avatarRing: localStorage.getItem('gc_avatar_ring') || '#ffffff',
+  avatarText: localStorage.getItem('gc_avatar_text') || '#ffffff',
   autoRec: localStorage.getItem('gc_autorec') === '1',
   swearing: localStorage.getItem('gc_swearing') === '1',
   totalStreams: parseInt(localStorage.getItem('gc_streams_count') || '0'),
@@ -750,7 +760,16 @@ const RING_PRESETS = [
   "#9966ff","#b388ff","#80d8ff","#f5576c","#fa709a","#1a1a2e"
 ];
 
-const AVATAR_EMOJIS_PICK = ["G","🐱","🐶","🦊","🐼","🐯","🦁","🐸","🐵","🐰","🐻","🦄","🐲","🐙","🦋","🐢","🦉","🐺","🍕","🍔","🎮","🎯","🎸","🎧","🎤","🌈","⭐","🔥","❄️","⚡","🌸","🌙","☀️","👾","🤖","👻","💀","🎃","🎨","🎭","🎬","📺","A","B","C","D","M","S","K","X","Z"];
+const TEXT_PRESETS = [
+  "#ffffff","#000000","#e0e0e0","#999999","#333333",
+  "#25a4d3","#4facfe","#00f2fe","#36a2eb","#8ee8f4",
+  "#43e97b","#8cff8c","#38f9d7","#2ecc71","#4bc0c0",
+  "#fee140","#ffce56","#ffb84d","#ff9f40","#ff8c66",
+  "#ff6384","#ff0050","#f5576c","#fa709a","#f093fb",
+  "#c88cff","#9966ff","#b388ff","#80d8ff","#ffd700"
+];
+
+const AVATAR_EMOJIS_PICK = ["G","🐱","🐶","🦊","🐼","🐯","🦁","🐸","🐵","🐰","🐻","🦄","🐲","🐙","🦋","🐢","🦉","🐺","🍕","🍔","🎮","🎯","🎸","🎧","🎤","🌈","⭐","🔥","❄️","⚡","🌸","🌙","☀️","👾","🤖","👻","💀","🎃","🎨","🎭","🎬","📺","A","B","C","D","M","S","K","X","Z","★","♥","✓","✿"];
 
 let followersList = [];
 try { followersList = JSON.parse(localStorage.getItem('gc_followers_list') || '[]'); } catch(e) { followersList = []; }
@@ -778,6 +797,7 @@ function saveStats() {
     localStorage.setItem('gc_avatar', state.avatar);
     localStorage.setItem('gc_avatar_color', state.avatarColor);
     localStorage.setItem('gc_avatar_ring', state.avatarRing);
+    localStorage.setItem('gc_avatar_text', state.avatarText);
     localStorage.setItem('gc_autorec', state.autoRec ? '1' : '0');
     localStorage.setItem('gc_swearing', state.swearing ? '1' : '0');
     localStorage.setItem('gc_streams_count', String(state.totalStreams));
@@ -785,6 +805,41 @@ function saveStats() {
     localStorage.setItem('gc_donations', String(state.totalDonations));
     localStorage.setItem('gc_dialogs', String(state.totalDialogs));
   } catch (e) {}
+}
+
+// Определяем эмодзи ли символ
+function isEmoji(str) {
+  if (!str) return false;
+  // эмодзи обычно длиннее 1 code unit (суррогатные пары)
+  if (str.length > 1) return true;
+  const code = str.codePointAt(0);
+  // Основные диапазоны эмодзи
+  if (code >= 0x1F300 && code <= 0x1FAFF) return true;
+  if (code >= 0x1F000 && code <= 0x1F2FF) return true;
+  if (code >= 0x2600 && code <= 0x27BF) return true;
+  if (code >= 0x2300 && code <= 0x23FF) return true;
+  if (code >= 0x2B00 && code <= 0x2BFF) return true;
+  if (code >= 0x1F900 && code <= 0x1F9FF) return true;
+  if (code >= 0x1F600 && code <= 0x1F64F) return true;
+  if (code >= 0x1F680 && code <= 0x1F6FF) return true;
+  if (code >= 0x1F1E6 && code <= 0x1F1FF) return true;
+  // Стрелки, технические символы с variation selector
+  if (code >= 0x2190 && code <= 0x21FF) return true;
+  if (code >= 0x2B05 && code <= 0x2B07) return true;
+  return false;
+}
+
+function applyAvatarTo(el, char, bg, ring, textColor) {
+  if (!el) return;
+  el.textContent = char;
+  el.style.background = bg;
+  el.style.boxShadow = ring;
+  // Цвет текста только если НЕ эмодзи
+  if (isEmoji(char)) {
+    el.style.color = "#fff"; // эмодзи игнорируют color, но оставим fallback
+  } else {
+    el.style.color = textColor;
+  }
 }
 
 const NICK_PRE = ["dark","pro","mega","ultra","cyber","neo","pixel","retro","night","star","shadow","fire","ice","storm","lucky"];
@@ -1810,10 +1865,27 @@ function buildFollowing() {
 // ============ РЕДАКТИРОВАНИЕ ПРОФИЛЯ ============
 function updateModalPreview() {
   const av = $("modalAvPreview");
-  av.textContent = state._pendingAvatar || "G";
-  av.style.background = state._pendingAvatarColor || "#25a4d3";
+  const char = state._pendingAvatar || "G";
+  const bg = state._pendingAvatarColor || "#25a4d3";
   const ring = state._pendingAvatarRing || "#ffffff";
-  av.style.boxShadow = `0 0 0 4px ${ring}`;
+  const textColor = state._pendingAvatarText || "#ffffff";
+  applyAvatarTo(av, char, bg, `0 0 0 4px ${ring}`, textColor);
+}
+
+function buildColorGrid(containerId, presetArray, currentValue, onPick) {
+  const grid = $(containerId);
+  grid.innerHTML = "";
+  presetArray.forEach(c => {
+    const d = document.createElement("div");
+    d.className = "color-opt" + (currentValue === c ? " sel" : "");
+    d.style.background = c;
+    d.addEventListener("click", () => {
+      grid.querySelectorAll(".color-opt").forEach(o => o.classList.remove("sel"));
+      d.classList.add("sel");
+      onPick(c);
+    });
+    grid.appendChild(d);
+  });
 }
 
 function openEditModal() {
@@ -1822,56 +1894,50 @@ function openEditModal() {
   state._pendingAvatar = state.avatar;
   state._pendingAvatarColor = state.avatarColor;
   state._pendingAvatarRing = state.avatarRing;
+  state._pendingAvatarText = state.avatarText;
 
   updateModalPreview();
 
-  // Сетка цветов фона
-  const cg = $("colorGrid");
-  cg.innerHTML = "";
-  AVATAR_COLORS_PRESET.forEach(c => {
-    const d = document.createElement("div");
-    d.className = "color-opt" + (state.avatarColor === c ? " sel" : "");
-    d.style.background = c;
-    d.addEventListener("click", () => {
-      cg.querySelectorAll(".color-opt").forEach(o => o.classList.remove("sel"));
-      d.classList.add("sel");
-      state._pendingAvatarColor = c;
-      $("editAvatarColorPicker").value = c;
-      updateModalPreview();
-    });
-    cg.appendChild(d);
+  // Цвет фона
+  buildColorGrid("colorGrid", AVATAR_COLORS_PRESET, state.avatarColor, (c) => {
+    state._pendingAvatarColor = c;
+    $("editAvatarColorPicker").value = c;
+    updateModalPreview();
   });
   $("editAvatarColorPicker").value = state.avatarColor;
   $("editAvatarColorPicker").oninput = (e) => {
     state._pendingAvatarColor = e.target.value;
-    cg.querySelectorAll(".color-opt").forEach(o => o.classList.remove("sel"));
+    $("colorGrid").querySelectorAll(".color-opt").forEach(o => o.classList.remove("sel"));
     updateModalPreview();
   };
 
-  // Сетка цветов рамки
-  const rg = $("ringGrid");
-  rg.innerHTML = "";
-  RING_PRESETS.forEach(c => {
-    const d = document.createElement("div");
-    d.className = "color-opt" + (state.avatarRing === c ? " sel" : "");
-    d.style.background = c;
-    d.addEventListener("click", () => {
-      rg.querySelectorAll(".color-opt").forEach(o => o.classList.remove("sel"));
-      d.classList.add("sel");
-      state._pendingAvatarRing = c;
-      $("editRingColorPicker").value = c;
-      updateModalPreview();
-    });
-    rg.appendChild(d);
+  // Цвет рамки
+  buildColorGrid("ringGrid", RING_PRESETS, state.avatarRing, (c) => {
+    state._pendingAvatarRing = c;
+    $("editRingColorPicker").value = c;
+    updateModalPreview();
   });
   $("editRingColorPicker").value = state.avatarRing;
   $("editRingColorPicker").oninput = (e) => {
     state._pendingAvatarRing = e.target.value;
-    rg.querySelectorAll(".color-opt").forEach(o => o.classList.remove("sel"));
+    $("ringGrid").querySelectorAll(".color-opt").forEach(o => o.classList.remove("sel"));
     updateModalPreview();
   };
 
-  // Сетка эмодзи
+  // Цвет символа
+  buildColorGrid("textGrid", TEXT_PRESETS, state.avatarText, (c) => {
+    state._pendingAvatarText = c;
+    $("editTextColorPicker").value = c;
+    updateModalPreview();
+  });
+  $("editTextColorPicker").value = state.avatarText;
+  $("editTextColorPicker").oninput = (e) => {
+    state._pendingAvatarText = e.target.value;
+    $("textGrid").querySelectorAll(".color-opt").forEach(o => o.classList.remove("sel"));
+    updateModalPreview();
+  };
+
+  // Эмодзи-сетка
   const grid = $("editEmojiGrid");
   grid.innerHTML = "";
   AVATAR_EMOJIS_PICK.forEach(e => {
@@ -1906,10 +1972,12 @@ $("editSave").addEventListener("click", () => {
   const newAvatar = state._pendingAvatar || "G";
   const newColor = state._pendingAvatarColor || "#25a4d3";
   const newRing = state._pendingAvatarRing || "#ffffff";
+  const newText = state._pendingAvatarText || "#ffffff";
   state.nick = newNick;
   state.avatar = newAvatar;
   state.avatarColor = newColor;
   state.avatarRing = newRing;
+  state.avatarText = newText;
   saveStats();
   updateProfileUI();
   $("editModal").classList.remove("show");
@@ -1922,17 +1990,19 @@ $("modalAvPreview").addEventListener("click", () => {
 
 function updateProfileUI() {
   const ring = state.avatarRing || "#ffffff";
+  const textColor = state.avatarText || "#ffffff";
+
   $("streamNick").textContent = state.nick;
-  $("streamAvatar").textContent = state.avatar;
-  $("streamAvatar").style.background = state.avatarColor;
-  $("streamAvatar").style.boxShadow = `0 0 0 2px ${ring}`;
+  applyAvatarTo($("streamAvatar"), state.avatar, state.avatarColor,
+                `0 0 0 2px ${ring}`, textColor);
+
   $("menuTitle").textContent = state.nick;
-  $("menuAvatar").textContent = state.avatar;
-  $("menuAvatar").style.background = state.avatarColor;
-  $("menuAvatar").style.boxShadow = `0 0 0 4px ${ring}, 0 0 60px ${state.avatarColor}66`;
-  $("accAvatar").textContent = state.avatar;
-  $("accAvatar").style.background = state.avatarColor;
-  $("accAvatar").style.boxShadow = `0 0 0 4px ${ring}`;
+  applyAvatarTo($("menuAvatar"), state.avatar, state.avatarColor,
+                `0 0 0 4px ${ring}, 0 0 60px ${state.avatarColor}66`, textColor);
+
+  applyAvatarTo($("accAvatar"), state.avatar, state.avatarColor,
+                `0 0 0 4px ${ring}`, textColor);
+
   $("accName").textContent = state.nick;
   $("accHandle").textContent = "@" + state.nick.toLowerCase().replace(/\s+/g, "_");
 }
