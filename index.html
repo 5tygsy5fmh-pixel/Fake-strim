@@ -1848,4 +1848,41 @@ $("btnPlus").addEventListener("click", async () => {
   }
 });
 
-$("itemMyStreams").add
+$("itemMyStreams").addEventListener("click", () => { buildMyStreams(); openPanel("panelMyStreams"); });
+$("itemStats").addEventListener("click", () => { buildStats(); openPanel("panelStats"); });
+$("itemSettings").addEventListener("click", () => {
+  $("toggleAutoRec").classList.toggle("on", state.autoRec);
+  $("toggleSwearing").classList.toggle("on", state.swearing);
+  openPanel("panelSettings");
+});
+$("itemEdit").addEventListener("click", openEditModal);
+$("itemAutoRec").addEventListener("click", () => {
+  state.autoRec = !state.autoRec;
+  $("toggleAutoRec").classList.toggle("on", state.autoRec);
+  saveStats();
+  toast(state.autoRec ? "🔴 Автозапись включена" : "Автозапись выключена");
+});
+$("itemSwearing").addEventListener("click", () => {
+  state.swearing = !state.swearing;
+  $("toggleSwearing").classList.toggle("on", state.swearing);
+  saveStats();
+  toast(state.swearing ? "🤬 Маты включены" : "Маты выключены");
+});
+
+$("statFollowersBtn").addEventListener("click", () => { buildFollowers(); openPanel("panelFollowers"); });
+$("statFollowingBtn").addEventListener("click", () => { buildFollowing(); openPanel("panelFollowing"); });
+$("statCrystalsBtn").addEventListener("click", () => { buildStats(); openPanel("panelStats"); });
+$("stFollowersCard").addEventListener("click", () => { buildFollowers(); openPanel("panelFollowers"); });
+$("stDialogsCard").addEventListener("click", () => { buildFollowing(); openPanel("panelFollowing"); });
+
+updateCrystalsUI();
+updateFollowersUI();
+updateFollowingUI();
+updateProfileUI();
+updateInboxBadge();
+
+requestAnimationFrame(loop);
+document.body.addEventListener("touchstart", initAudio, { once: true });
+</script>
+</body>
+</html>
