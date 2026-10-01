@@ -558,6 +558,11 @@ body.banner-show .comments { opacity:0; transform:translateY(20px); }
       <div class="account-item" id="itemEdit">
         <div class="ic">✏️</div><div class="lb">Изменить ник и аватар</div><div class="ar">›</div>
       </div>
+      <div class="settings-section" style="margin-top:12px;">Общение</div>
+      <div class="account-item" id="itemSwearing">
+        <div class="ic">🤬</div><div class="lb">Маты (18+)</div>
+        <div class="toggle" id="toggleSwearing"></div>
+      </div>
       <div class="settings-section" style="margin-top:12px;">Запись</div>
       <div class="account-item" id="itemAutoRec">
         <div class="ic">🔴</div><div class="lb">Автозапись при старте стрима</div>
@@ -658,6 +663,7 @@ const state = {
   nick: localStorage.getItem('gc_nick') || 'grand-cat',
   avatar: localStorage.getItem('gc_avatar') || 'G',
   autoRec: localStorage.getItem('gc_autorec') === '1',
+  swearing: localStorage.getItem('gc_swearing') === '1',
   totalStreams: parseInt(localStorage.getItem('gc_streams_count') || '0'),
   totalMessages: parseInt(localStorage.getItem('gc_messages') || '0'),
   totalDonations: parseInt(localStorage.getItem('gc_donations') || '0'),
@@ -697,6 +703,7 @@ function saveStats() {
     localStorage.setItem('gc_nick', state.nick);
     localStorage.setItem('gc_avatar', state.avatar);
     localStorage.setItem('gc_autorec', state.autoRec ? '1' : '0');
+    localStorage.setItem('gc_swearing', state.swearing ? '1' : '0');
     localStorage.setItem('gc_streams_count', String(state.totalStreams));
     localStorage.setItem('gc_messages', String(state.totalMessages));
     localStorage.setItem('gc_donations', String(state.totalDonations));
@@ -754,18 +761,35 @@ const EMOJIS_ALL = ["🥰","👍","🤮","👎","❤️","😂","🤣","🤯","�
 const GENERIC_CHAT = ["жиза","база","согласен","+1","💯","ну да","ты прав","😂"];
 const DONATORS = ["Whale_777","KingDonater","MegaBoss","Anonym","RichBoi","TopDon"];
 
+// Оскорбления (детектор)
+const INSULTS = [
+  "лох","лошара","дурак","дура","тупой","тупая","тупо","идиот","идиотка",
+  "дебил","дебилка","дебилоид","клоун","ничтожество","придурок","придурошный",
+  "мудак","долбоёб","долбоеб","хуй","хуесос","пидор","пидар","гандон",
+  "говно","гавно","гей","слабак","неудачник","чмо","чмошник","амёба","амеба",
+  "бездарь","баран","скотина","тварь","мразь","ублюдок","козёл","козел",
+  "свинья","падла","гнида","крыса","шавка","тварь","уёбок","уебок","нахуй"
+];
+function isInsult(text) {
+  if (!text) return false;
+  const t = text.toLowerCase().replace(/[^а-яёa-z0-9\s]/g, "");
+  for (const w of INSULTS) if (t.includes(w)) return true;
+  return false;
+}
+
+// Характеры ботов — базовые фразы
 const DM_BY_KIND = {
   spam: ["67","67 67","67 forever","67!!!","шестьдесят семь 🗿","67 топ","да 67"],
   hater: ["ну такое","фу","скучно","кринж","удали это","не интересно","и это всё?","фу фу фу"],
-  simp: ["ты лучший 💕","люблю тебя ❤️","ты такой милый","самый красивый","женись на мне 💍","обожаю 🥰","ты мой кумир"],
+  simp: ["ты лучший 💕","люблю тебя ❤️","ты такой милый","самый красивый","женись на мне 💍","обожаю 🥰","ты мой кумир","скучала по тебе 💕"],
   clown: ["😂😂😂","ахахаха","ору не могу","🤡","кек","лол","жиза 😂","рофл"],
   asker: ["а сколько тебе лет?","откуда ты?","а какой у тебя пк?","а ты кушал?","а что делаешь?","а ты спишь?","а микро норм?"],
-  normal: ["жиза 😄","ага, точно","согласен!","ахаха, да","интересно","расскажи ещё","серьёзно?","ого!","ну такое","понимаю тебя"],
+  normal: ["жиза 😄","ага, точно","согласен!","ахаха, да","интересно","расскажи ещё","серьёзно?","ого!","ну такое","понимаю тебя","прикольно","ок"],
 };
-const DM_GREETING = ["привет! 👋","о, привет!","хай","приветик","здарова"];
-const DM_HOWRU = ["норм, а ты?","всё круто! ты как?","хорошо, спасибо 😊","отлично, сам как?"];
-const DM_COMPLIMENT = ["спасибо! 💕","ты тоже классный","милота 🥰","приятно 🥺","взаимно!"];
-const DM_LOVE = ["взаимно ❤️","ты лучший 💕","ой, я смущаюсь 🥰","и я тебя!"];
+
+// Универсальные ответы на разные темы
+const DM_GREETING = ["привет! 👋","о, привет!","хай","приветик","здарова","ку","привет-привет"];
+const DM_HOWRU = ["норм, а ты?","всё круто! ты как?","хорошо, спасибо 😊","отлично, сам как?","да норм, чё как сам?","живой пока)"];
 
 const rnd = a => a[Math.floor(Math.random()*a.length)];
 const ri  = (a,b) => Math.floor(Math.random()*(b-a+1))+a;
@@ -782,7 +806,7 @@ function isQuestion(text) {
   if (!text) return false;
   const t = text.trim().toLowerCase();
   if (t.endsWith("?")) return true;
-  const starts = ["что","кто","где","когда","почему","зачем","как","сколько","какой"];
+  const starts = ["что","кто","где","когда","почему","зачем","как","сколько","какой","куда","откуда"];
   for (const w of starts) if (t.startsWith(w)) return true;
   return false;
 }
@@ -791,37 +815,159 @@ function pickAnswer() {
 }
 function pickEmoji() { return rnd(EMOJIS_ALL); }
 
+// ============ ГЛАВНАЯ ФУНКЦИЯ ОТВЕТА БОТА ============
 function botReplyTo(userMsg, kind) {
-  const t = (userMsg||"").toLowerCase();
-  if (t.includes("привет")||t.includes("хай")||t.includes("здарова")||t.includes("hi")||t.includes("hello")) {
+  const t = (userMsg||"").trim();
+  const tl = t.toLowerCase();
+  const sw = state.swearing;
+
+  // 1. ОСКОРБЛЕНИЕ — самое важное
+  if (isInsult(tl)) {
+    if (kind === "simp") {
+      if (sw) return rnd([
+        "ты чё, охуел?! 😭😭","я тебя любила, а ты так... козёл!","да пошёл ты нахуй!","сам дебил, ясно?! 😡","охуеть, вот так спасибо за любовь","иди на хуй, не пиши мне больше"
+      ]);
+      return rnd([
+        "за что? 😢","ты злой 😭","я же тебе ничего плохого не сделала","обидно... 😔","почему ты так со мной?","я расстроилась 🥺","как ты можешь так..."
+      ]);
+    }
+    if (kind === "hater") {
+      if (sw) return rnd([
+        "сам такой, хуесос","иди нахуй, дебил","ты чё охуел, клоун?","закрой рот, лох","пшёл на хер, чмо","ахахах сам хуй","сам такой, скотина"
+      ]);
+      return rnd([
+        "сам такой","ты еще хуже","и что?","мне пох","ха, смешно","слился?","ахах слабак","ну и чё, дальше что?","иди лечись"
+      ]);
+    }
+    if (kind === "spam") {
+      if (sw) return rnd([
+        "сам 67, бля","67 тебе в рот","67 67 67 иди нахуй","сам хуй 67","67 и чё, бля?","67 хуль"
+      ]);
+      return rnd(["сам 67","67 тебе","67 не поспоришь","67 67","да 67","67 и что?"]);
+    }
+    if (kind === "clown") {
+      if (sw) return rnd([
+        "😂😂😂 охуел","ахахах сам такой, клоун","ору с тебя, дебил","🤡 сам такой","ахах лошара","😂😂😂 вот это высрал, бля"
+      ]);
+      return rnd(["😂😂😂","ахахах сам такой","ору","🤡🤡🤡","кек","жиза","хахах смешно"]);
+    }
+    if (kind === "asker") {
+      if (sw) return rnd([
+        "а сам ты кто, бля?","а чего обзываешься, хуй?","а почему такой злой?","а кто тебя спрашивал вообще","а сам-то кто?"
+      ]);
+      return rnd([
+        "а сам ты кто?","а почему ты такой злой?","а зачем обзываться?","а что я сделал?","а сам ты как?"
+      ]);
+    }
+    // normal
+    if (sw) return rnd([
+      "сам такой, бля","ты чё охуел?","иди нахуй","ахахах сам хуй","да пошёл ты","рот закрой","сам клоун, понял?"
+    ]);
+    return rnd(["сам такой","ты чё","иди отсюда","ахах смешно","и что?","пфф","да ну тебя","ахах лол"]);
+  }
+
+  // 2. ПРИВЕТСТВИЕ
+  if (/^(привет|хай|hi|hello|ку|салют|здарова|здорово|прив)\b/.test(tl)) {
+    if (sw) return rnd(["привет, бля 👋","о, привет","хай","здарова, чё надо","приветик 😊","ку, чё хотел"]);
     return rnd(DM_GREETING);
   }
-  if (t.includes("спасибо")||t.includes("благодар")) {
-    return rnd(["пожалуйста! 😊","не за что 💕","обращайся!"]);
+
+  // 3. СПАСИБО
+  if (/спасибо|благодар|спс|пасиб/.test(tl)) {
+    if (sw) return rnd(["да не за что, бля","пф, обращайся","не за что 💕","ну ты и вежливый, аж противно","та не за что, хули"]);
+    return rnd(["пожалуйста! 😊","не за что 💕","обращайся!","рад помочь","ага"]);
   }
-  const pool = DM_BY_KIND[kind] || DM_BY_KIND.normal;
-  if (t.includes("как дела")||t.includes("как ты")||t.includes("как жизнь")) {
-    if (kind === "simp") return rnd(["хорошо когда ты написал 💕","всё супер! ❤️","отлично 🥰"]);
-    if (kind === "clown") return rnd(["😂😂😂","ахаха всё топ","ору, хорошо"]);
-    if (kind === "hater") return rnd(["норм, не то что ты","скучно","ну так"]);
+
+  // 4. ПРОЩАНИЕ
+  if (/пока|до свид|до встреч|ухожу|бай|спокойной/.test(tl)) {
+    if (sw) return rnd(["давай, бля","пока, не теряйся","бай, чёрт","до связи, хули","ну и вали"]);
+    return rnd(["пока! 👋","до связи","давай!","ещё увидимся","бай"]);
+  }
+
+  // 5. КОМПЛИМЕНТ
+  if (/классн|крут|топ|молодец|красив|умн|молоток|огонь|супер|офигенно|кайф|нравишься/.test(tl)) {
+    if (kind === "hater" && sw) return rnd(["и чё, бля?","не подлизывайся","фу, лизун","сам знаю, отвали"]);
+    if (kind === "hater") return rnd(["и чё","не подлизывайся","фу","да ладно","серьёзно?","ну спасибо конечно"]);
+    if (kind === "simp") return rnd(["спасибо любимый 💕","😍😍😍 ты лучший","ты тоже классный! 🥰","аааа комплимент от тебя 🥺","я так рада 💕","😍😍😍"]);
+    if (kind === "clown" && sw) return rnd(["ахахах спасибо, бля","😂😂😂 ты тоже","жиза, спасибо","ору, спасибо хули"]);
+    if (kind === "clown") return rnd(["😂 спасибо","ты тоже","кек","жиза 😄","ахаха"]);
+    if (kind === "asker") return rnd(["а почему ты так думаешь?","а правда?","а с чего вдруг?","спасибо, а ты как?"]);
+    if (sw) return rnd(["спасибо, бля 😎","йо, спасибо","красава","респект","да ладно тебе","спс"]);
+    return rnd(["спасибо!","ты тоже классный","приятно 🥺","взаимно!","спасибочки","приятно 😊"]);
+  }
+
+  // 6. ЛЮБОВЬ
+  if (/любл|люблю|нрав|обожа|скуча|целую|жаню|выходи за|встречат/.test(tl)) {
+    if (kind === "hater" && sw) return rnd(["отвали, хуй","не надо этих соплей","фу бля","не пиши мне так","какой нахуй"]);
+    if (kind === "hater") return rnd(["фу","не надо","иди отсюда","отвали","я не такой","серьёзно?"]);
+    if (kind === "simp") return rnd(["я тебя тоже! 💕❤️","😍😍😍 обожаю!","ты мой 💕","люблю тебя больше!","ааааа 🥰🥰🥰","💕💕💕 наконец-то"]);
+    if (kind === "clown" && sw) return rnd(["ахахах бля, взаимно","😂😂😂 я тоже","люблю, хуль","ору, милота"]);
+    if (kind === "clown") return rnd(["😂😂😂","ахах взаимно","жиза","милота 🥰"]);
+    if (kind === "asker") return rnd(["а за что ты меня любишь?","а почему вдруг?","а надолго?","и я тебя 😊"]);
+    if (sw) return rnd(["и я тебя, бля","взаимно 😎","да ладно, засмущал","люблю, хуль","ну ты даёшь"]);
+    return rnd(["взаимно ❤️","и я тебя!","ты лучший 💕","😊","приятно 🥺","мило 🥰"]);
+  }
+
+  // 7. КАК ДЕЛА
+  if (/как дела|как ты|как жизнь|чё делаешь|что делаешь|чем занят|как сам/.test(tl)) {
+    if (kind === "hater" && sw) return rnd(["норм, не твоё дело, бля","скучно, хули","ну такое","заебал спрашивать"]);
+    if (kind === "hater") return rnd(["норм","скучно","не твоё дело","ну такое","нормально"]);
+    if (kind === "simp") return rnd(["хорошо когда ты написал 💕","супер! 🥰","отлично, ты как? 😊","скучала! 💕"]);
+    if (kind === "clown" && sw) return rnd(["охуенно, бля 😂","ахаха всё топ","ору, хорошо, хуль"]);
+    if (kind === "clown") return rnd(["😂 всё топ","ахаха","жиза","нормально"]);
+    if (kind === "spam") return rnd(["67","67 67 67","67 как дела?","да 67"]);
+    if (kind === "asker") return rnd(["а ты как?","а сам как думаешь?","а почему интересуешься?","норм, а ты?"]);
+    if (sw) return rnd(["норм, бля, сам как?","да как всегда, хули","ок, ты как?","живой пока, хули тут"]);
     return rnd(DM_HOWRU);
   }
-  if (t.includes("любл")||t.includes("люблю")||t.includes("нрав")) {
-    if (kind === "hater") return rnd(["фу","не надо","я не такой","иди отсюда"]);
-    if (kind === "simp") return rnd(["я тебя тоже! 💕❤️","взаимно 🥰","люблю!"]);
-    return rnd(DM_LOVE);
+
+  // 8. ВОПРОС
+  if (isQuestion(t)) {
+    if (kind === "asker") {
+      if (sw) return rnd(["а сам как думаешь? хуй его знает","а чего спрашиваешь, бля?","а сам ты как?","а зачем тебе это, бля?"]);
+      return rnd(["а сам как думаешь?","а зачем тебе?","а сам ты что думаешь?","а кто его знает","а что?"]);
+    }
+    if (kind === "hater" && sw) return rnd(["да хуй его знает","отвали с вопросами","а я ебу?","не знаю, бля"]);
+    if (kind === "hater") return rnd(["не знаю","а я откуда знаю","мне не интересно","без понятия","а чё?"]);
+    if (kind === "simp") return rnd(["ой, а зачем тебе? 💕","хм, я не знаю 🥺","а ты как думаешь?","не уверена 😅","может быть 💕"]);
+    if (kind === "clown" && sw) return rnd(["а хуй его знает 😂😂","ахаха, я хз","да хрен его знает, бля","😂😂😂 я хз бля"]);
+    if (kind === "clown") return rnd(["ахаха хз","да кто его знает","хз, кек","а я знаю? 😂"]);
+    if (sw) return rnd(["хм, хуй его знает","не уверен, бля","думаю да","скорее нет","а сам как считаешь?","ну хз, наверное"]);
+    return rnd(["хм, интересно","а сам как думаешь?","ну я думаю да","не уверен","можно и так","сложно сказать","ну хз"]);
   }
-  if (t.includes("классн")||t.includes("крут")||t.includes("топ")||t.includes("молодец")) {
-    if (kind === "hater") return rnd(["ну такое","и что","не думаю","фу"]);
-    return rnd(DM_COMPLIMENT);
+
+  // 9. "ТЫ БОТ / НЕ НАСТОЯЩИЙ"
+  if (/ты бот|ты не настоящ|ты ии|ты программа|ты фейк|ты робот/.test(tl)) {
+    if (sw) return rnd(["сам ты бот, хуй","а ты попробуй докажи, бля","я настоящий, иди нах","че ты сказал?","не пизди, я живой"]);
+    return rnd(["сам ты бот 😂","я настоящий!","да ладно","не смешно","😐","серьёзно?"]);
   }
-  if (isQuestion(userMsg)) {
-    if (kind === "asker") return rnd(pool);
-    if (kind === "spam") return rnd(pool);
-    if (kind === "clown") return rnd(pool);
-    return rnd(["хм, интересно","а сам как думаешь?","ну я думаю да","не уверен","можно и так"]);
+
+  // 10. ЧТО-ТО ПО ТЕМЕ
+  const themes = detectThemes(t);
+  if (themes.length > 0) {
+    const th = rnd(themes);
+    if (sw && Math.random() < 0.3) return rnd(["о, музыка это тема, бля","игры это святое, хули там","жрать охота пиздец","работа это зло, бля"]);
+    if (th.name === "музыка") return rnd(["что слушаешь?","топ трек 🔥","поставь ещё","качает","о, у тебя вкус","я тоже слушаю"]);
+    if (th.name === "игры") return rnd(["катка?","го в пати","я тоже играю","топ момент","мейн какой?","круто!"]);
+    if (th.name === "еда") return rnd(["дай мне 🍕","приятного!","тоже хочу","вкусно выглядит","обожаю пожрать"]);
+    if (th.name === "приветствие") return rnd(DM_GREETING);
   }
-  return rnd(pool);
+
+  // 11. "ОСКОРБИЛ" не словом а косвенно
+  if (/ты плохой|ты скучный|ты душный|мне скучно с тобой|ты странный|ты тупой/.test(tl)) {
+    if (sw) return rnd(["сам душный, бля","да пошёл ты","чё ты вякаешь","отвали, а?","не нравится — не пиши"]);
+    return rnd(["ну ок","как хочешь","жаль","ясно","понятно","ну и ладно"]);
+  }
+
+  // 12. ОБЩЕЕ (fallback по характеру)
+  const pool = DM_BY_KIND[kind] || DM_BY_KIND.normal;
+  let reply = rnd(pool);
+  // Добавляем мат для приукрашивания если включен, иногда
+  if (sw && Math.random() < 0.35) {
+    const spice = ["бля","хули","чё","хуй","ёпта","вот так вот","короче"];
+    reply = reply + ", " + rnd(spice);
+  }
+  return reply;
 }
 
 let audioCtx = null;
@@ -1500,7 +1646,7 @@ function sendMessage() {
   state.totalMessages++;
   saveStats();
   showTyping();
-  const delay = ri(1000, 2500);
+  const delay = ri(800, 2200);
   const kind = chats[state.currentChat]?.kind || "normal";
   setTimeout(() => {
     hideTyping();
@@ -1702,49 +1848,4 @@ $("btnPlus").addEventListener("click", async () => {
   }
 });
 
-$("itemMyStreams").addEventListener("click", () => { buildMyStreams(); openPanel("panelMyStreams"); });
-$("itemStats").addEventListener("click", () => { buildStats(); openPanel("panelStats"); });
-$("itemSettings").addEventListener("click", () => {
-  $("toggleAutoRec").classList.toggle("on", state.autoRec);
-  openPanel("panelSettings");
-});
-$("itemEdit").addEventListener("click", openEditModal);
-$("itemAutoRec").addEventListener("click", () => {
-  state.autoRec = !state.autoRec;
-  $("toggleAutoRec").classList.toggle("on", state.autoRec);
-  saveStats();
-  toast(state.autoRec ? "🔴 Автозапись включена" : "Автозапись выключена");
-});
-
-$("statFollowersBtn").addEventListener("click", () => {
-  buildFollowers();
-  openPanel("panelFollowers");
-});
-$("statFollowingBtn").addEventListener("click", () => {
-  buildFollowing();
-  openPanel("panelFollowing");
-});
-$("statCrystalsBtn").addEventListener("click", () => {
-  buildStats();
-  openPanel("panelStats");
-});
-$("stFollowersCard").addEventListener("click", () => {
-  buildFollowers();
-  openPanel("panelFollowers");
-});
-$("stDialogsCard").addEventListener("click", () => {
-  buildFollowing();
-  openPanel("panelFollowing");
-});
-
-updateCrystalsUI();
-updateFollowersUI();
-updateFollowingUI();
-updateProfileUI();
-updateInboxBadge();
-
-requestAnimationFrame(loop);
-document.body.addEventListener("touchstart", initAudio, { once: true });
-</script>
-</body>
-</html>
+$("itemMyStreams").add
