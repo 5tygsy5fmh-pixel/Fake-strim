@@ -282,7 +282,6 @@ body.banner-show .comments { opacity:0; transform:translateY(20px); }
 .acc-stat .l { font-size:11px; opacity:.55; margin-top:2px; }
 .account-crystal { padding:22px; border-radius:20px;
   background:linear-gradient(135deg, #1a1a3e, #2d1b4e);
-  border:1.5px solid rgba(255,255,255,.15);
   display:flex; justify-content:space-between; align-items:center;
   margin-bottom:20px; }
 .account-crystal .lbl { font-size:13px; opacity:.7; margin-bottom:4px; }
@@ -537,7 +536,7 @@ body.banner-show .comments { opacity:0; transform:translateY(20px); }
         <div class="acc-stat" id="statFollowingBtn" style="cursor:pointer">
           <div class="n" id="accFollowing">0</div><div class="l">подписки</div>
         </div>
-        <div class="acc-stat"><div class="n">340K</div><div class="l">лайки</div></div>
+        <div class="acc-stat"><div class="n" id="accCrystalsStat">0</div><div class="l">кристаллы</div></div>
       </div>
       <div class="account-crystal">
         <div>
@@ -882,7 +881,9 @@ function toast(text) {
 function markActivity() { state.lastActivity = Date.now(); }
 function updateCrystalsUI() {
   const s = state.crystals.toLocaleString("ru-RU");
-  ["menuCrystals","accCrystals"].forEach(id => { const el = $(id); if (el) el.textContent = s; });
+  ["menuCrystals","accCrystals","accCrystalsStat"].forEach(id => {
+    const el = $(id); if (el) el.textContent = s;
+  });
 }
 function addCrystals(d) { state.crystals = Math.max(0, state.crystals + d); saveStats(); updateCrystalsUI(); }
 function updateFollowersUI() {
@@ -1730,22 +1731,18 @@ $("itemAutoRec").addEventListener("click", () => {
   toast(state.autoRec ? "🔴 Автозапись включена" : "Автозапись выключена");
 });
 
-// Клик на «Подписчики» в аккаунте
 $("statFollowersBtn").addEventListener("click", () => {
   buildFollowers();
   openPanel("panelFollowers");
 });
-// Клик на «Подписки» в аккаунте (диалоги)
 $("statFollowingBtn").addEventListener("click", () => {
   buildFollowing();
   openPanel("panelFollowing");
 });
-// Клик на карточку «Подписчиков» в статистике
 $("stFollowersCard").addEventListener("click", () => {
   buildFollowers();
   openPanel("panelFollowers");
 });
-// Клик на карточку «Диалогов» в статистике
 $("stDialogsCard").addEventListener("click", () => {
   buildFollowing();
   openPanel("panelFollowing");
