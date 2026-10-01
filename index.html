@@ -280,16 +280,6 @@ body.banner-show .comments { opacity:0; transform:translateY(20px); }
 .acc-stat { text-align:center; }
 .acc-stat .n { font-size:20px; font-weight:900; }
 .acc-stat .l { font-size:11px; opacity:.55; margin-top:2px; }
-.account-crystal { padding:22px; border-radius:20px;
-  background:linear-gradient(135deg, #1a1a3e, #2d1b4e);
-  display:flex; justify-content:space-between; align-items:center;
-  margin-bottom:20px; }
-.account-crystal .lbl { font-size:13px; opacity:.7; margin-bottom:4px; }
-.account-crystal .val { font-size:34px; font-weight:900;
-  background:linear-gradient(135deg,#8ee8f4,#c88cff);
-  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
-  background-clip:text; }
-.account-crystal .icon { font-size:50px; }
 .account-item { display:flex; align-items:center; gap:14px; padding:16px 4px;
   border-bottom:1px solid rgba(255,255,255,.06); cursor:pointer; }
 .account-item .ic { width:34px; height:34px; border-radius:9px;
@@ -536,14 +526,9 @@ body.banner-show .comments { opacity:0; transform:translateY(20px); }
         <div class="acc-stat" id="statFollowingBtn" style="cursor:pointer">
           <div class="n" id="accFollowing">0</div><div class="l">подписки</div>
         </div>
-        <div class="acc-stat"><div class="n" id="accCrystalsStat">0</div><div class="l">кристаллы</div></div>
-      </div>
-      <div class="account-crystal">
-        <div>
-          <div class="lbl">Мои кристаллы</div>
-          <div class="val" id="accCrystals">0</div>
+        <div class="acc-stat" id="statCrystalsBtn" style="cursor:pointer">
+          <div class="n" id="accCrystalsStat">0</div><div class="l">кристаллы</div>
         </div>
-        <div class="icon">💎</div>
       </div>
       <div class="account-item" id="itemMyStreams">
         <div class="ic">🎬</div><div class="lb">Мои стримы</div><div class="ar">›</div>
@@ -881,7 +866,7 @@ function toast(text) {
 function markActivity() { state.lastActivity = Date.now(); }
 function updateCrystalsUI() {
   const s = state.crystals.toLocaleString("ru-RU");
-  ["menuCrystals","accCrystals","accCrystalsStat"].forEach(id => {
+  ["menuCrystals","accCrystalsStat"].forEach(id => {
     const el = $(id); if (el) el.textContent = s;
   });
 }
@@ -1738,6 +1723,10 @@ $("statFollowersBtn").addEventListener("click", () => {
 $("statFollowingBtn").addEventListener("click", () => {
   buildFollowing();
   openPanel("panelFollowing");
+});
+$("statCrystalsBtn").addEventListener("click", () => {
+  buildStats();
+  openPanel("panelStats");
 });
 $("stFollowersCard").addEventListener("click", () => {
   buildFollowers();
