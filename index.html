@@ -87,7 +87,12 @@ body.banner-show .comments{opacity:0;transform:translateY(20px);}
 #editVideoModal.show{display:flex;}
 #editVideoModal .ev-box{background:#12121e;border-radius:20px;padding:18px;width:100%;max-width:420px;}
 #editVideoModal h3{text-align:center;margin-bottom:14px;font-size:17px;}
-#editVideoModal video{width:100%;border-radius:12px;margin-bottom:14px;background:#000;max-height:180px;object-fit:contain;}
+#evVideoWrap{position:relative;margin-bottom:14px;}
+#evVideoWrap video{display:block;width:100%;border-radius:12px;background:#000;max-height:180px;object-fit:contain;cursor:pointer;}
+#evPlayOverlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;transition:opacity .2s;}
+#evPlayOverlay .pi{width:54px;height:54px;border-radius:50%;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);}
+#evPlayOverlay .pi svg{width:26px;height:26px;margin-left:3px;}
+#evPlayOverlay.hidden{opacity:0;}
 #evTimelineWrap{margin-bottom:14px;}
 #evTimeline{position:relative;height:60px;background:#1e1e30;border-radius:12px;overflow:visible;touch-action:none;user-select:none;}
 #evClips{position:absolute;inset:0;border-radius:12px;overflow:hidden;}
@@ -256,19 +261,19 @@ body.banner-show .comments{opacity:0;transform:translateY(20px);}
   <div class="toast" id="toast"></div>
   <div class="rail">
     <div class="rb red-active" id="rbRec">
-      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><circle id="recDot" cx="12" cy="12" r="4" fill="#ff2850" stroke="none" style="display:none"/></svg>
+      <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9.2" stroke="#fff" stroke-width="2"/><circle id="recDot" cx="12" cy="12" r="4.5" fill="#ff2850" style="display:none"/></svg>
     </div>
     <div class="rb" id="rbFlip">
-      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round"><path d="M3 12a9 9 0 0 1 15-6.7l2 2"/><polyline points="20 4 20 9 15 9"/><path d="M21 12a9 9 0 0 1-15 6.7l-2-2"/><polyline points="4 20 4 15 9 15"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 12a8.5 8.5 0 0 1 14.4-6.1l1.6 1.6"/><polyline points="19.5 3.5 19.5 8.5 14.5 8.5"/><path d="M20.5 12a8.5 8.5 0 0 1-14.4 6.1l-1.6-1.6"/><polyline points="4.5 20.5 4.5 15.5 9.5 15.5"/></svg>
     </div>
     <div class="rb" id="rbMic">
-      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/><line id="micSlash" x1="4" y1="4" x2="20" y2="20" stroke="#fff" stroke-width="2.2" style="display:none"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2.5" width="6" height="12" rx="3" fill="rgba(255,255,255,.15)"/><path d="M5 11a7 7 0 0 0 14 0"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="8.5" y1="22" x2="15.5" y2="22"/><line id="micSlash" x1="4" y1="4" x2="20" y2="20" stroke="#ff2850" stroke-width="2.4" stroke-linecap="round" style="display:none"/></svg>
     </div>
     <div class="rb on" id="rbEmoji">
-      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="9" cy="10" r="1" fill="#fff" stroke="none"/><circle cx="15" cy="10" r="1" fill="#fff" stroke="none"/><path d="M8.5 14.5s1.3 2 3.5 2 3.5-2 3.5-2"/><line id="emojiSlash" x1="4" y1="4" x2="20" y2="20" stroke="#fff" stroke-width="2.2" style="display:none"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9.2"/><circle cx="9" cy="10" r="1.3" fill="#fff" stroke="none"/><circle cx="15" cy="10" r="1.3" fill="#fff" stroke="none"/><path d="M8 14.5s1.6 2.2 4 2.2 4-2.2 4-2.2"/><line id="emojiSlash" x1="4" y1="4" x2="20" y2="20" stroke="#ff2850" stroke-width="2.4" stroke-linecap="round" style="display:none"/></svg>
     </div>
     <div class="rb red-active" id="rbPiP">
-      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><rect x="12" y="12" width="8" height="6" rx="1"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round"><rect x="2.5" y="4.5" width="19" height="15" rx="2.5"/><rect x="12.5" y="12" width="7.5" height="5.5" rx="1.2" fill="rgba(255,255,255,.2)"/></svg>
     </div>
   </div>
 </div>
@@ -348,7 +353,10 @@ body.banner-show .comments{opacity:0;transform:translateY(20px);}
 <div id="editVideoModal">
   <div class="ev-box">
     <h3>✂️ Редактор</h3>
-    <video id="evVideo" playsinline></video>
+    <div id="evVideoWrap">
+      <video id="evVideo" playsinline></video>
+      <div id="evPlayOverlay"><div class="pi"><svg viewBox="0 0 24 24" fill="#fff"><polygon points="7,4 7,20 20,12"/></svg></div></div>
+    </div>
     <div id="evTimelineWrap">
       <div id="evTimeline">
         <div id="evClips"></div>
@@ -370,20 +378,17 @@ body.banner-show .comments{opacity:0;transform:translateY(20px);}
         <span>Обрезать</span>
       </button>
       <button class="ev-act" id="evSplit">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="8,4 4,4 4,20 8,20"/>
-          <polyline points="16,4 20,4 20,20 16,20"/>
-          <line x1="12" y1="3" x2="12" y2="21"/>
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 4 L5 4 L5 20 L9 20"/>
+          <path d="M15 4 L19 4 L19 20 L15 20"/>
         </svg>
         <span>Разделить</span>
       </button>
       <button class="ev-act ev-del" id="evDelete">
         <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="3 6 5 6 21 6"/>
-          <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
-          <path d="M10 11v6"/>
-          <path d="M14 11v6"/>
-          <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+          <line x1="4" y1="6.5" x2="20" y2="6.5"/>
+          <line x1="12" y1="3" x2="12" y2="6.5"/>
+          <path d="M6 6.5 L6 20 L18 20 L18 6.5"/>
         </svg>
         <span>Удалить</span>
       </button>
@@ -943,7 +948,6 @@ function drawCovered(ctx,video,W,H,mirror){
 }
 function roundRect(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
 
-// PiP — КАМЕРА НА ВЕСЬ ЭКРАН
 function renderPiP(){
   var W=pipCanvas.width,H=pipCanvas.height;
   pipCtx.fillStyle="#000";pipCtx.fillRect(0,0,W,H);
@@ -1527,6 +1531,9 @@ var evStream=null;
 var evDuration=0;
 var evClips=[];
 var evPlayheadPos=0;
+var evDragging=false;
+var evRafId=null;
+
 function fmt(s){
   if(!s||isNaN(s))return"0:00";
   var m=Math.floor(s/60),x=Math.floor(s%60);
@@ -1550,9 +1557,9 @@ function renderTimeline(){
   $("evPlayhead").style.left="calc("+((evPlayheadPos/total)*100)+"% - 1.5px)";
   $("evTime").textContent=fmt(evPlayheadPos)+" / "+fmt(evDuration);
 }
-function setPlayhead(pos){
+function setPlayhead(pos,seekVideo){
   evPlayheadPos=Math.max(0,Math.min(evDuration,pos));
-  try{$("evVideo").currentTime=evPlayheadPos;}catch(e){}
+  if(seekVideo!==false){try{$("evVideo").currentTime=evPlayheadPos;}catch(e){}}
   renderTimeline();
 }
 function getClipAt(pos){
@@ -1561,10 +1568,33 @@ function getClipAt(pos){
   }
   return null;
 }
+function updateEvPlayIcon(){
+  var v=$("evVideo");var ov=$("evPlayOverlay");
+  if(!ov)return;
+  if(v.paused||v.ended){ov.classList.remove("hidden");}
+  else{ov.classList.add("hidden");}
+}
+function evRafLoop(){
+  var v=$("evVideo");
+  if(v.paused||v.ended){evRafId=null;return;}
+  if(!evDragging){
+    evPlayheadPos=Math.max(0,Math.min(evDuration,v.currentTime));
+    renderTimeline();
+  }
+  evRafId=requestAnimationFrame(evRafLoop);
+}
+function stopEvPlayback(){
+  var v=$("evVideo");
+  try{v.pause();}catch(e){}
+  if(evRafId){cancelAnimationFrame(evRafId);evRafId=null;}
+  updateEvPlayIcon();
+}
+
 $("vvEdit").addEventListener("click",function(){
   if(!vvCurrentStream)return;
   evStream=vvCurrentStream;
   var v=$("evVideo");
+  v.pause();
   if(vvCurrentUrl)v.src=vvCurrentUrl;
   $("evProgress").textContent="";
   v.onloadedmetadata=function(){
@@ -1572,13 +1602,34 @@ $("vvEdit").addEventListener("click",function(){
     evClips=[{start:0,end:evDuration}];
     evPlayheadPos=0;
     renderTimeline();
+    updateEvPlayIcon();
   };
+  v.onplay=function(){updateEvPlayIcon();if(!evRafId)evRafId=requestAnimationFrame(evRafLoop);};
+  v.onpause=function(){updateEvPlayIcon();};
+  v.onended=function(){updateEvPlayIcon();};
+  v.ontimeupdate=function(){if(v.paused&&!evDragging){evPlayheadPos=v.currentTime;renderTimeline();}};
   $("editVideoModal").classList.add("show");
 });
-$("evCancel").addEventListener("click",function(){
-  $("editVideoModal").classList.remove("show");
-  $("evVideo").pause();
+$("evVideo").addEventListener("click",function(){
+  var v=this;
+  if(v.paused){
+    var clip=getClipAt(evPlayheadPos);
+    if(clip){
+      if(evPlayheadPos>=clip.end-0.05)evPlayheadPos=clip.start;
+      try{v.currentTime=evPlayheadPos;}catch(e){}
+    }
+    v.play().then(function(){updateEvPlayIcon();if(!evRafId)evRafId=requestAnimationFrame(evRafLoop);}).catch(function(){});
+  }else{
+    v.pause();
+    updateEvPlayIcon();
+    if(evRafId){cancelAnimationFrame(evRafId);evRafId=null;}
+  }
 });
+$("evCancel").addEventListener("click",function(){
+  stopEvPlayback();
+  $("editVideoModal").classList.remove("show");
+});
+
 (function setupTimelineDrag(){
   var tl=$("evTimeline");
   var dragging=null;
@@ -1593,6 +1644,9 @@ $("evCancel").addEventListener("click",function(){
     if(t.closest&&t.closest("#evLeftHandle"))dragging="left";
     else if(t.closest&&t.closest("#evRightHandle"))dragging="right";
     else dragging="playhead";
+    evDragging=true;
+    try{$("evVideo").pause();}catch(err){}
+    if(evRafId){cancelAnimationFrame(evRafId);evRafId=null;}
     onMove(e);
   }
   function onMove(e){
@@ -1610,10 +1664,14 @@ $("evCancel").addEventListener("click",function(){
       evClips[evClips.length-1].end=Math.min(evDuration,Math.max(leftLimit,t));
       renderTimeline();
     }else if(dragging==="playhead"){
-      setPlayhead(t);
+      setPlayhead(t,true);
     }
   }
-  function onEnd(){dragging=null;}
+  function onEnd(){
+    dragging=null;
+    evDragging=false;
+    updateEvPlayIcon();
+  }
   tl.addEventListener("touchstart",onStart,{passive:false});
   tl.addEventListener("touchmove",onMove,{passive:false});
   tl.addEventListener("touchend",onEnd);
@@ -1621,9 +1679,8 @@ $("evCancel").addEventListener("click",function(){
   document.addEventListener("mousemove",onMove);
   document.addEventListener("mouseup",onEnd);
 })();
-$("evTrim").addEventListener("click",function(){
-  toast("✂️ Тяни стрелки на таймлайне");
-});
+
+$("evTrim").addEventListener("click",function(){toast("✂️ Тяни стрелки на таймлайне");});
 $("evSplit").addEventListener("click",function(){
   if(!evClips.length)return;
   var clip=getClipAt(evPlayheadPos);
@@ -1647,8 +1704,10 @@ $("evDelete").addEventListener("click",function(){
   renderTimeline();
   toast("🗑 Удалено");
 });
+
 $("evSave").addEventListener("click",async function(){
   if(!evStream||!evDuration||!evClips.length)return;
+  stopEvPlayback();
   $("evProgress").textContent="✂️ Обработка...";
   var v=$("evVideo");
   v.pause();v.muted=false;
