@@ -346,7 +346,8 @@ body.banner-show .comments { opacity:0; transform:translateY(20px); }
 .stat-grid { padding:20px; display:grid;
   grid-template-columns:1fr 1fr; gap:12px; }
 .stat-card { padding:16px; border-radius:16px;
-  background:rgba(255,255,255,.06); }
+  background:rgba(255,255,255,.06); transition:background .15s; }
+.stat-card[style*="cursor:pointer"]:active { background:rgba(255,255,255,.12); }
 .stat-card .lbl { font-size:12px; opacity:.6; margin-bottom:6px; }
 .stat-card .val { font-size:24px; font-weight:900; }
 .stat-card .val.green { color:#8cff8c; }
@@ -354,7 +355,6 @@ body.banner-show .comments { opacity:0; transform:translateY(20px); }
 .stat-card .val.cyan { color:#8ee8f4; }
 .stat-card .val.yellow { color:#ffd700; }
 
-/* Секция в настройках */
 .settings-section { padding:8px 20px 4px; font-size:12px;
   text-transform:uppercase; letter-spacing:.8px;
   color:rgba(255,255,255,.4); font-weight:700; }
@@ -531,8 +531,12 @@ body.banner-show .comments { opacity:0; transform:translateY(20px); }
       <div class="account-name" id="accName">grand-cat</div>
       <div class="account-handle" id="accHandle">@grand_cat</div>
       <div class="account-stats">
-        <div class="acc-stat"><div class="n" id="accFollowers">0</div><div class="l">подписчики</div></div>
-        <div class="acc-stat"><div class="n">248</div><div class="l">подписки</div></div>
+        <div class="acc-stat" id="statFollowersBtn" style="cursor:pointer">
+          <div class="n" id="accFollowers">0</div><div class="l">подписчики</div>
+        </div>
+        <div class="acc-stat" id="statFollowingBtn" style="cursor:pointer">
+          <div class="n" id="accFollowing">0</div><div class="l">подписки</div>
+        </div>
         <div class="acc-stat"><div class="n">340K</div><div class="l">лайки</div></div>
       </div>
       <div class="account-crystal">
@@ -555,7 +559,6 @@ body.banner-show .comments { opacity:0; transform:translateY(20px); }
   </div>
 </div>
 
-<!-- НАСТРОЙКИ -->
 <div class="panel" id="panelSettings">
   <div class="panel-head">
     <div class="back" data-close="1">
@@ -609,12 +612,36 @@ body.banner-show .comments { opacity:0; transform:translateY(20px); }
     <div class="stat-grid">
       <div class="stat-card"><div class="lbl">Всего стримов</div><div class="val cyan" id="stStreams">0</div></div>
       <div class="stat-card"><div class="lbl">Кристаллов собрано</div><div class="val pink" id="stCrystals">0</div></div>
-      <div class="stat-card"><div class="lbl">Подписчиков</div><div class="val green" id="stFollowers">0</div></div>
+      <div class="stat-card" id="stFollowersCard" style="cursor:pointer"><div class="lbl">Подписчиков</div><div class="val green" id="stFollowers">0</div></div>
       <div class="stat-card"><div class="lbl">Сообщений ботов</div><div class="val yellow" id="stMessages">0</div></div>
-      <div class="stat-card"><div class="lbl">Диалогов</div><div class="val cyan" id="stDialogs">0</div></div>
+      <div class="stat-card" id="stDialogsCard" style="cursor:pointer"><div class="lbl">Диалогов</div><div class="val cyan" id="stDialogs">0</div></div>
       <div class="stat-card"><div class="lbl">Донатов</div><div class="val pink" id="stDonations">0</div></div>
     </div>
   </div>
+</div>
+
+<div class="panel" id="panelFollowers">
+  <div class="panel-head">
+    <div class="back" data-close="1">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round">
+        <polyline points="15 6 9 12 15 18"/>
+      </svg>
+    </div>
+    <div class="title" id="followersTitle">Подписчики</div>
+  </div>
+  <div class="panel-body" id="followersBody"></div>
+</div>
+
+<div class="panel" id="panelFollowing">
+  <div class="panel-head">
+    <div class="back" data-close="1">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round">
+        <polyline points="15 6 9 12 15 18"/>
+      </svg>
+    </div>
+    <div class="title">Подписки (диалоги)</div>
+  </div>
+  <div class="panel-body" id="followingBody"></div>
 </div>
 
 <div id="editModal">
@@ -660,6 +687,21 @@ const state = {
 };
 
 let myStreams = [];
+
+let followersList = [];
+try { followersList = JSON.parse(localStorage.getItem('gc_followers_list') || '[]'); } catch(e) { followersList = []; }
+function saveFollowersList() {
+  try { localStorage.setItem('gc_followers_list', JSON.stringify(followersList)); } catch(e) {}
+}
+function addFollowerBot(nick, emoji, gradient) {
+  if (followersList.find(f => f.nick === nick)) return;
+  followersList.push({ nick, emoji, gradient, t: Date.now() });
+  if (followersList.length > 200) followersList.shift();
+  saveFollowersList();
+  state.followers = followersList.length;
+  saveStats();
+  updateFollowersUI();
+}
 
 let chats = {};
 try { chats = JSON.parse(localStorage.getItem('gc_chats') || '{}'); } catch (e) { chats = {}; }
@@ -844,10 +886,15 @@ function updateCrystalsUI() {
 }
 function addCrystals(d) { state.crystals = Math.max(0, state.crystals + d); saveStats(); updateCrystalsUI(); }
 function updateFollowersUI() {
-  const s = state.followers >= 1000 ? (state.followers/1000).toFixed(1) + "K" : String(state.followers);
+  const n = followersList.length;
+  const s = n >= 1000 ? (n/1000).toFixed(1) + "K" : String(n);
   ["menuFollowers","accFollowers"].forEach(id => { const el = $(id); if (el) el.textContent = s; });
 }
-function addFollower(d) { state.followers += d; saveStats(); updateFollowersUI(); }
+function updateFollowingUI() {
+  const n = Object.keys(chats).length;
+  const el = $("accFollowing");
+  if (el) el.textContent = n.toLocaleString("ru-RU");
+}
 
 function showMenu() {
   $("menuScreen").classList.remove("hide");
@@ -1058,8 +1105,9 @@ function donationEvent() {
 function subscriptionEvent() {
   markActivity();
   const nick = randomNick();
+  const av = randomAvatar();
   spawnNote(`${nick} подписался!`, "новый подписчик ✅", "#8cff8c", "sub");
-  addFollower(1);
+  addFollowerBot(nick, av.emoji, av.gradient);
   state.hype = Math.min(1, state.hype + 0.2);
   sfx.subscribe(); boom("❤️", 8);
   state.lastEvent = Date.now();
@@ -1417,7 +1465,11 @@ function openChatWith(nick, emoji, gradient, kind) {
   if (!c._firstOpened) {
     c._firstOpened = true;
     state.totalDialogs++;
-    addFollower(5);
+    for (let i = 0; i < 5; i++) {
+      const n = randomNick();
+      const av = randomAvatar();
+      addFollowerBot(n, av.emoji, av.gradient);
+    }
     saveChats(); saveStats();
   }
   c.unread = 0;
@@ -1531,6 +1583,59 @@ function buildStats() {
   $("stDonations").textContent = state.totalDonations;
 }
 
+function buildFollowers() {
+  const body = $("followersBody");
+  body.innerHTML = "";
+  if (followersList.length === 0) {
+    body.innerHTML = `<div class="empty-inbox"><span class="em">👥</span>Пока никто не подписался.<br>Начни стрим или начни диалог — придут подписчики.</div>`;
+    $("followersTitle").textContent = "Подписчики (0)";
+    return;
+  }
+  const sorted = [...followersList].reverse();
+  sorted.forEach(f => {
+    const el = document.createElement("div");
+    el.className = "chat-row";
+    el.innerHTML = `
+      <div class="av" style="background:${f.gradient}">${f.emoji}</div>
+      <div class="body">
+        <div class="nick">${f.nick}</div>
+        <div class="last">подписался ${new Date(f.t).toLocaleDateString("ru-RU")}</div>
+      </div>`;
+    el.addEventListener("click", () => openChatWith(f.nick, f.emoji, f.gradient, null));
+    body.appendChild(el);
+  });
+  $("followersTitle").textContent = `Подписчики (${followersList.length})`;
+}
+
+function buildFollowing() {
+  const body = $("followingBody");
+  body.innerHTML = "";
+  const keys = Object.keys(chats);
+  if (keys.length === 0) {
+    body.innerHTML = `<div class="empty-inbox"><span class="em">💬</span>Пока нет диалогов.<br>Зайди на стрим и напиши кому-нибудь.</div>`;
+    return;
+  }
+  keys.sort((a, b) => {
+    const la = chats[a].messages.slice(-1)[0]?.t || 0;
+    const lb = chats[b].messages.slice(-1)[0]?.t || 0;
+    return lb - la;
+  });
+  keys.forEach(nick => {
+    const c = chats[nick];
+    const last = c.messages.slice(-1)[0];
+    const el = document.createElement("div");
+    el.className = "chat-row";
+    el.innerHTML = `
+      <div class="av" style="background:${c.gradient}">${c.emoji}</div>
+      <div class="body">
+        <div class="nick">${nick}</div>
+        <div class="last">${last ? (last.from === "me" ? "Ты: " : "") + last.text : "Начни переписку"}</div>
+      </div>`;
+    el.addEventListener("click", () => openChatWith(nick, c.emoji, c.gradient, c.kind));
+    body.appendChild(el);
+  });
+}
+
 function openEditModal() {
   $("editNick").value = state.nick;
   const grid = $("editEmojiGrid");
@@ -1574,7 +1679,7 @@ function updateProfileUI() {
 
 $("btnInbox").addEventListener("click", () => { buildInbox(); openPanel("panelInbox"); });
 $("btnAccount").addEventListener("click", () => {
-  updateCrystalsUI(); updateFollowersUI(); updateProfileUI();
+  updateCrystalsUI(); updateFollowersUI(); updateFollowingUI(); updateProfileUI();
   openPanel("panelAccount");
 });
 $("btnPlus").addEventListener("click", async () => {
@@ -1598,6 +1703,13 @@ $("btnPlus").addEventListener("click", async () => {
   } catch (e) {}
   resetStreamTimers();
   state.lastActivity = Date.now();
+  setTimeout(() => {
+    for (let i = 0; i < 3; i++) {
+      const n = randomNick();
+      const av = randomAvatar();
+      addFollowerBot(n, av.emoji, av.gradient);
+    }
+  }, 2000);
   setTimeout(() => spawnNote("grand-cat в эфире!", "Тапни на ник в чате — напишешь лично", "#8cff8c", "sub"), 600);
   if (state.autoRec) {
     setTimeout(() => { if (!state.isRecording) startRecording(true); }, 1500);
@@ -1618,8 +1730,30 @@ $("itemAutoRec").addEventListener("click", () => {
   toast(state.autoRec ? "🔴 Автозапись включена" : "Автозапись выключена");
 });
 
+// Клик на «Подписчики» в аккаунте
+$("statFollowersBtn").addEventListener("click", () => {
+  buildFollowers();
+  openPanel("panelFollowers");
+});
+// Клик на «Подписки» в аккаунте (диалоги)
+$("statFollowingBtn").addEventListener("click", () => {
+  buildFollowing();
+  openPanel("panelFollowing");
+});
+// Клик на карточку «Подписчиков» в статистике
+$("stFollowersCard").addEventListener("click", () => {
+  buildFollowers();
+  openPanel("panelFollowers");
+});
+// Клик на карточку «Диалогов» в статистике
+$("stDialogsCard").addEventListener("click", () => {
+  buildFollowing();
+  openPanel("panelFollowing");
+});
+
 updateCrystalsUI();
 updateFollowersUI();
+updateFollowingUI();
 updateProfileUI();
 updateInboxBadge();
 
