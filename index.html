@@ -300,7 +300,6 @@ body.banner-show .comments { opacity:0; transform:translateY(20px); }
 .account-item .toggle.on { background:#25f4ee; }
 .account-item .toggle.on::after { transform:translateX(20px); }
 
-/* ======= МОДАЛКА РЕДАКТИРОВАНИЯ ======= */
 #editModal { position:fixed; inset:0; z-index:2500; background:rgba(0,0,0,.9);
   display:none; flex-direction:column; align-items:center; justify-content:center;
   padding:20px; overflow-y:auto; }
@@ -316,22 +315,19 @@ body.banner-show .comments { opacity:0; transform:translateY(20px); }
   border:none; border-radius:12px; padding:12px 14px; color:#fff;
   font-size:15px; outline:none; font-family:inherit; }
 
-/* Превью аватарки в модалке */
 #editModal .modal-av-wrap { display:flex; justify-content:center; margin-bottom:6px; }
 #editModal .modal-av { width:90px; height:90px; border-radius:50%;
   background:#25a4d3; display:flex; align-items:center; justify-content:center;
   font-size:46px; font-weight:700; color:#fff; cursor:pointer;
-  box-shadow:0 0 0 3px rgba(255,255,255,.15);
+  box-shadow:0 0 0 4px #fff;
   transition:transform .15s; }
 #editModal .modal-av:active { transform:scale(.92); }
 #editModal .av-hint { font-size:11px; opacity:.5; text-align:center;
   margin-bottom:8px; line-height:1.4; }
 
-/* Поле для символа */
 #editModal .av-input { font-size:26px !important; text-align:center;
   padding:10px !important; letter-spacing:2px; }
 
-/* Сетка цветов */
 #editModal .color-grid { display:grid; grid-template-columns:repeat(8, 1fr);
   gap:6px; margin-top:6px; }
 #editModal .color-opt { aspect-ratio:1; border-radius:50%; cursor:pointer;
@@ -340,12 +336,10 @@ body.banner-show .comments { opacity:0; transform:translateY(20px); }
 #editModal .color-opt.sel { border-color:#fff;
   box-shadow:0 0 0 2px rgba(0,0,0,.5); }
 
-/* Системный color picker */
 #editModal .color-input { width:100%; height:44px; border-radius:12px;
   border:none; margin-top:8px; cursor:pointer; background:transparent;
   padding:0; }
 
-/* Эмодзи-сетка */
 #editModal .emoji-grid { display:grid; grid-template-columns:repeat(6, 1fr);
   gap:6px; margin-top:6px; }
 #editModal .emoji-opt { font-size:24px; padding:6px 0; text-align:center;
@@ -679,14 +673,18 @@ body.banner-show .comments { opacity:0; transform:translateY(20px); }
     <div class="modal-av-wrap">
       <div class="modal-av" id="modalAvPreview">G</div>
     </div>
-    <div class="av-hint">Тап по аватарке — выбор цвета<br>Или введи свой символ</div>
+    <div class="av-hint">Тап по аватарке — системный выбор цвета</div>
 
     <label>Аватар (любой символ или эмодзи)</label>
-    <input type="text" id="editAvatarChar" maxlength="8" placeholder="🐱 или G или 😎" class="av-input">
+    <input type="text" id="editAvatarChar" maxlength="8" placeholder="🐱 или G" class="av-input">
 
     <label>Цвет фона</label>
     <div class="color-grid" id="colorGrid"></div>
     <input type="color" id="editAvatarColorPicker" value="#25a4d3" class="color-input">
+
+    <label>Цвет рамки</label>
+    <div class="color-grid" id="ringGrid"></div>
+    <input type="color" id="editRingColorPicker" value="#ffffff" class="color-input">
 
     <label>Быстрый выбор эмодзи</label>
     <div class="emoji-grid" id="editEmojiGrid"></div>
@@ -717,6 +715,7 @@ const state = {
   nick: localStorage.getItem('gc_nick') || 'grand-cat',
   avatar: localStorage.getItem('gc_avatar') || 'G',
   avatarColor: localStorage.getItem('gc_avatar_color') || '#25a4d3',
+  avatarRing: localStorage.getItem('gc_avatar_ring') || '#ffffff',
   autoRec: localStorage.getItem('gc_autorec') === '1',
   swearing: localStorage.getItem('gc_swearing') === '1',
   totalStreams: parseInt(localStorage.getItem('gc_streams_count') || '0'),
@@ -741,6 +740,14 @@ const AVATAR_COLORS_PRESET = [
   "#fa709a","#f093fb","#c88cff","#a18cd1","#9966ff","#b388ff",
   "#80d8ff","#c2e9fb","#ffffff","#e0e0e0","#999999","#666666",
   "#333333","#1a1a2e","#000000","#5c3d2e"
+];
+
+const RING_PRESETS = [
+  "#ffffff","#e0e0e0","#999999","#666666","#333333","#000000",
+  "#25a4d3","#4facfe","#00f2fe","#36a2eb","#5ce1e6","#8ee8f4",
+  "#43e97b","#8cff8c","#4bc0c0","#fee140","#ffce56","#ffb84d",
+  "#ff9f40","#ff8c66","#ff6384","#ff0050","#f093fb","#c88cff",
+  "#9966ff","#b388ff","#80d8ff","#f5576c","#fa709a","#1a1a2e"
 ];
 
 const AVATAR_EMOJIS_PICK = ["G","🐱","🐶","🦊","🐼","🐯","🦁","🐸","🐵","🐰","🐻","🦄","🐲","🐙","🦋","🐢","🦉","🐺","🍕","🍔","🎮","🎯","🎸","🎧","🎤","🌈","⭐","🔥","❄️","⚡","🌸","🌙","☀️","👾","🤖","👻","💀","🎃","🎨","🎭","🎬","📺","A","B","C","D","M","S","K","X","Z"];
@@ -770,6 +777,7 @@ function saveStats() {
     localStorage.setItem('gc_nick', state.nick);
     localStorage.setItem('gc_avatar', state.avatar);
     localStorage.setItem('gc_avatar_color', state.avatarColor);
+    localStorage.setItem('gc_avatar_ring', state.avatarRing);
     localStorage.setItem('gc_autorec', state.autoRec ? '1' : '0');
     localStorage.setItem('gc_swearing', state.swearing ? '1' : '0');
     localStorage.setItem('gc_streams_count', String(state.totalStreams));
@@ -1804,6 +1812,8 @@ function updateModalPreview() {
   const av = $("modalAvPreview");
   av.textContent = state._pendingAvatar || "G";
   av.style.background = state._pendingAvatarColor || "#25a4d3";
+  const ring = state._pendingAvatarRing || "#ffffff";
+  av.style.boxShadow = `0 0 0 4px ${ring}`;
 }
 
 function openEditModal() {
@@ -1811,11 +1821,11 @@ function openEditModal() {
   $("editAvatarChar").value = state.avatar;
   state._pendingAvatar = state.avatar;
   state._pendingAvatarColor = state.avatarColor;
+  state._pendingAvatarRing = state.avatarRing;
 
-  // Превью
   updateModalPreview();
 
-  // Сетка цветов
+  // Сетка цветов фона
   const cg = $("colorGrid");
   cg.innerHTML = "";
   AVATAR_COLORS_PRESET.forEach(c => {
@@ -1832,6 +1842,34 @@ function openEditModal() {
     cg.appendChild(d);
   });
   $("editAvatarColorPicker").value = state.avatarColor;
+  $("editAvatarColorPicker").oninput = (e) => {
+    state._pendingAvatarColor = e.target.value;
+    cg.querySelectorAll(".color-opt").forEach(o => o.classList.remove("sel"));
+    updateModalPreview();
+  };
+
+  // Сетка цветов рамки
+  const rg = $("ringGrid");
+  rg.innerHTML = "";
+  RING_PRESETS.forEach(c => {
+    const d = document.createElement("div");
+    d.className = "color-opt" + (state.avatarRing === c ? " sel" : "");
+    d.style.background = c;
+    d.addEventListener("click", () => {
+      rg.querySelectorAll(".color-opt").forEach(o => o.classList.remove("sel"));
+      d.classList.add("sel");
+      state._pendingAvatarRing = c;
+      $("editRingColorPicker").value = c;
+      updateModalPreview();
+    });
+    rg.appendChild(d);
+  });
+  $("editRingColorPicker").value = state.avatarRing;
+  $("editRingColorPicker").oninput = (e) => {
+    state._pendingAvatarRing = e.target.value;
+    rg.querySelectorAll(".color-opt").forEach(o => o.classList.remove("sel"));
+    updateModalPreview();
+  };
 
   // Сетка эмодзи
   const grid = $("editEmojiGrid");
@@ -1855,15 +1893,7 @@ function openEditModal() {
     const v = e.target.value;
     state._pendingAvatar = v || "G";
     updateModalPreview();
-    // снять выделение с эмодзи, если не совпадает
     grid.querySelectorAll(".emoji-opt").forEach(o => o.classList.remove("sel"));
-  };
-
-  // Системный color picker
-  $("editAvatarColorPicker").oninput = (e) => {
-    state._pendingAvatarColor = e.target.value;
-    cg.querySelectorAll(".color-opt").forEach(o => o.classList.remove("sel"));
-    updateModalPreview();
   };
 
   $("editModal").classList.add("show");
@@ -1875,29 +1905,34 @@ $("editSave").addEventListener("click", () => {
   const newNick = $("editNick").value.trim() || "grand-cat";
   const newAvatar = state._pendingAvatar || "G";
   const newColor = state._pendingAvatarColor || "#25a4d3";
+  const newRing = state._pendingAvatarRing || "#ffffff";
   state.nick = newNick;
   state.avatar = newAvatar;
   state.avatarColor = newColor;
+  state.avatarRing = newRing;
   saveStats();
   updateProfileUI();
   $("editModal").classList.remove("show");
   toast("✅ Профиль обновлён");
 });
 
-// Тап по превью — открывает color picker
 $("modalAvPreview").addEventListener("click", () => {
   try { $("editAvatarColorPicker").click(); } catch (e) {}
 });
 
 function updateProfileUI() {
+  const ring = state.avatarRing || "#ffffff";
   $("streamNick").textContent = state.nick;
   $("streamAvatar").textContent = state.avatar;
   $("streamAvatar").style.background = state.avatarColor;
+  $("streamAvatar").style.boxShadow = `0 0 0 2px ${ring}`;
   $("menuTitle").textContent = state.nick;
   $("menuAvatar").textContent = state.avatar;
   $("menuAvatar").style.background = state.avatarColor;
+  $("menuAvatar").style.boxShadow = `0 0 0 4px ${ring}, 0 0 60px ${state.avatarColor}66`;
   $("accAvatar").textContent = state.avatar;
   $("accAvatar").style.background = state.avatarColor;
+  $("accAvatar").style.boxShadow = `0 0 0 4px ${ring}`;
   $("accName").textContent = state.nick;
   $("accHandle").textContent = "@" + state.nick.toLowerCase().replace(/\s+/g, "_");
 }
@@ -1941,9 +1976,7 @@ $("btnPlus").addEventListener("click", async () => {
   }
 });
 
-// Тап по аватарке в аккаунте — открыть редактирование
 $("accAvatar").addEventListener("click", openEditModal);
-// Тап по аватарке в меню — открыть редактирование
 $("menuAvatar").addEventListener("click", openEditModal);
 
 $("itemMyStreams").addEventListener("click", () => { buildMyStreams(); openPanel("panelMyStreams"); });
