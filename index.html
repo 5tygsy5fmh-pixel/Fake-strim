@@ -1719,12 +1719,32 @@ $("evSave").addEventListener("click",async function(){
   stopEvPlayback();
   $("evProgress").textContent="✂️ Обработка...";
   var v=$("evVideo");
-  v.pause();v.muted=false;
+  v.pause();
+  v.muted=false;
+  var clips=evClips.slice().sort(function(a,b){return a.start-b.start;});
   try{
     var canvas=document.createElement("canvas");
     canvas.width=v.videoWidth||720;
     canvas.height=v.videoHeight||1280;
     var ctx=canvas.getContext("2d");
+
+    function seekTo(t){
+      return new Promise(function(resolve){
+        var done=false;
+        function onSeeked(){
+          if(done)return;done=true;
+          v.removeEventListener("seeked",onSeeked);
+          resolve();
+        }
+        v.addEventListener("seeked",onSeeked);
+        try{v.currentTime=t;}catch(e){if(!done){done=true;resolve();}}
+        setTimeout(function(){if(!done){done=true;v.removeEventListener("seeked",onSeeked);resolve();}},3000);
+      });
+    }
+
+    await seekTo(clips[0].start);
+    try{ctx.drawImage(v,0,0,canvas.width,canvas.height);}catch(e){}
+
     var canvasStream=canvas.captureStream(30);
     var combined=canvasStream;
     try{
@@ -1733,13 +1753,19 @@ $("evSave").addEventListener("click",async function(){
         combined=new MediaStream(canvasStream.getVideoTracks().concat([vs.getAudioTracks()[0]]));
       }
     }catch(e){}
+
     var mime="";
     var tries=["video/mp4;codecs=avc1,mp4a","video/mp4","video/webm;codecs=vp9,opus","video/webm;codecs=vp8,opus","video/webm"];
     for(var i=0;i<tries.length;i++)if(window.MediaRecorder&&MediaRecorder.isTypeSupported(tries[i])){mime=tries[i];break;}
+
     var rec=new MediaRecorder(combined,mime?{mimeType:mime}:undefined);
     var chunks=[];
     rec.ondataavailable=function(e){if(e.data.size>0)chunks.push(e.data);};
+
+    var finalized=false;
     rec.onstop=function(){
+      if(finalized)return;
+      finalized=true;
       var newStream=null;
       try{
         var type=rec.mimeType||"video/webm";
@@ -1758,22 +1784,55 @@ $("evSave").addEventListener("click",async function(){
         setTimeout(function(){openVideoViewer(newStream);},250);
       }
     };
+
     rec.start(100);
+
     var idx=0;
-    var playNext=function(){
-      if(idx>=evClips.length){setTimeout(function(){try{rec.stop();}catch(e){}v.pause();},300);return;}
-      var clip=evClips[idx];
-      v.currentTime=clip.start;
-      v.play().then(function(){
-        var drawLoop=function(){
-          if(v.paused||v.ended||v.currentTime>=clip.end){idx++;playNext();return;}
-          ctx.drawImage(v,0,0,canvas.width,canvas.height);
-          requestAnimationFrame(drawLoop);
+    var currentClip=clips[0];
+    var finished=false;
+    var seeking=false;
+
+    var drawLoop=function(){
+      if(finished)return;
+      var ct=v.currentTime;
+
+      if(v.ended||ct>=currentClip.end-0.02){
+        idx++;
+        if(idx>=clips.length){
+          finished=true;
+          setTimeout(function(){
+            try{rec.stop();}catch(e){}
+            try{v.pause();}catch(e){}
+          },400);
+          return;
+        }
+        currentClip=clips[idx];
+        seeking=true;
+        var onSeeked=function(){
+          v.removeEventListener("seeked",onSeeked);
+          seeking=false;
         };
-        drawLoop();
-      }).catch(function(){idx++;playNext();});
+        v.addEventListener("seeked",onSeeked);
+        try{v.currentTime=currentClip.start;}catch(e){seeking=false;}
+        requestAnimationFrame(drawLoop);
+        return;
+      }
+
+      if(!seeking&&ct>=currentClip.start-0.05&&ct<currentClip.end){
+        try{ctx.drawImage(v,0,0,canvas.width,canvas.height);}catch(e){}
+      }
+      requestAnimationFrame(drawLoop);
     };
-    playNext();
+
+    try{
+      await v.play();
+    }catch(e){
+      toast("Ошибка воспроизведения: "+e.message);
+      try{rec.stop();}catch(err){}
+      return;
+    }
+    requestAnimationFrame(drawLoop);
+
   }catch(e){
     toast("Ошибка: "+e.message);
     $("evProgress").textContent="";
