@@ -97,7 +97,17 @@ body.banner-show .comments{opacity:0;transform:translateY(20px);}
 #evTimeline{position:relative;height:60px;background:#1e1e30;border-radius:12px;overflow:visible;touch-action:none;user-select:none;}
 #evClips{position:absolute;inset:0;border-radius:12px;overflow:hidden;}
 .ev-clip{height:100%;position:absolute;box-sizing:border-box;background:linear-gradient(135deg,#2e4a8f,#4a6ec4);border-right:2px solid #12121e;}
-.ev-clip.selected{background:linear-gradient(135deg,#8f4a2e,#c47a4a);}
+.ev-clip.selected{
+  background:linear-gradient(135deg,#ff7a1a,#ffb347);
+  box-shadow:0 0 16px rgba(255,140,30,.95),inset 0 0 12px rgba(255,255,255,.45);
+  border-right-color:#ffb347;
+  z-index:2;
+  animation:clipGlow 1.2s ease-in-out infinite;
+}
+@keyframes clipGlow{
+  0%,100%{box-shadow:0 0 16px rgba(255,140,30,.95),inset 0 0 12px rgba(255,255,255,.45);}
+  50%{box-shadow:0 0 24px rgba(255,160,40,1),inset 0 0 16px rgba(255,255,255,.6);}
+}
 .ev-handle{position:absolute;top:-4px;bottom:-4px;width:22px;background:rgba(255,255,255,.95);border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:grab;z-index:5;box-shadow:0 2px 8px rgba(0,0,0,.6);}
 .ev-handle svg{width:16px;height:16px;}
 #evLeftHandle{left:-4px;}
@@ -1539,21 +1549,26 @@ function fmt(s){
   var m=Math.floor(s/60),x=Math.floor(s%60);
   return m+":"+(x<10?"0":"")+x;
 }
+
+// Возвращает клип, который находится под курсором (белая палка).
+// Границы трактуются как [start, end) — на стыке выбирается правый клип.
+// Именно этот клип подсвечивается оранжевым и удаляется по кнопке.
 function getClipAt(pos){
   for(var i=0;i<evClips.length;i++){
     var c=evClips[i];
     var isLast=(i===evClips.length-1);
-    // [start, end) — на стыке побеждает клип, который начинается в этой точке
     if(pos>=c.start && (pos<c.end || (isLast && pos<=c.end)))return c;
   }
   return null;
 }
+
 function renderTimeline(){
   var c=$("evClips");c.innerHTML="";
   var total=evDuration||1;
   var leftBound=evClips.length?evClips[0].start:0;
   var rightBound=evClips.length?evClips[evClips.length-1].end:0;
-  var selClip=getClipAt(evPlayheadPos); // только ОДИН клип выделен
+  // Ровно один клип под белым курсором подсвечивается оранжевым
+  var selClip=getClipAt(evPlayheadPos);
   evClips.forEach(function(clip){
     var el=document.createElement("div");
     el.className="ev-clip";
@@ -1587,7 +1602,7 @@ function evRafLoop(){
     var target=null;
     var stop=false;
     if(!clip){
-      // попали в удалённый кусок — прыгаем к началу следующего живого
+      // курсор в удалённом куске — прыгаем к началу следующего живого
       for(var i=0;i<evClips.length;i++){
         if(evClips[i].start>ct+0.01){target=evClips[i].start;break;}
       }
@@ -1648,7 +1663,14 @@ $("vvEdit").addEventListener("click",function(){
   v.onplay=function(){updateEvPlayIcon();if(!evRafId)evRafId=requestAnimationFrame(evRafLoop);};
   v.onpause=function(){updateEvPlayIcon();};
   v.onended=function(){updateEvPlayIcon();};
-  v.ontimeupdate=function(){if(v.paused&&!evDragging){evPlayheadPos=v.currentTime;renderTimeline();}};
+  // Синхронизируем позицию курсора ТОЛЬКО во время воспроизведения,
+  // чтобы после перетаскивания палка не отпрыгивала назад из-за seek-snapping.
+  v.ontimeupdate=function(){
+    if(!v.paused && !evDragging){
+      evPlayheadPos=v.currentTime;
+      renderTimeline();
+    }
+  };
   $("editVideoModal").classList.add("show");
 });
 $("evVideo").addEventListener("click",function(){
@@ -1705,6 +1727,7 @@ $("evCancel").addEventListener("click",function(){
       evClips[evClips.length-1].end=Math.min(evDuration,Math.max(leftLimit,t));
       renderTimeline();
     }else if(dragging==="playhead"){
+      // перемещаем белую палку + мгновенно пересвечиваем клип под ней
       setPlayhead(t,true);
     }
   }
@@ -1716,34 +1739,50 @@ $("evCancel").addEventListener("click",function(){
   tl.addEventListener("touchstart",onStart,{passive:false});
   tl.addEventListener("touchmove",onMove,{passive:false});
   tl.addEventListener("touchend",onEnd);
+  tl.addEventListener("touchcancel",onEnd);
   tl.addEventListener("mousedown",onStart);
   document.addEventListener("mousemove",onMove);
   document.addEventListener("mouseup",onEnd);
 })();
 
+// РАЗДЕЛИТЬ — режем ровно там, где стоит белая палка
 $("evSplit").addEventListener("click",function(){
   if(!evClips.length)return;
+  // если видео играет — пауза, чтобы позиция была корректной
+  var v=$("evVideo");
+  if(!v.paused){try{v.pause();}catch(e){}}
   var clip=getClipAt(evPlayheadPos);
   if(!clip){toast("Курсор не на клипе");return;}
-  var margin=0.15;
+  var margin=0.1;
   if(evPlayheadPos-clip.start<margin||clip.end-evPlayheadPos<margin){toast("Слишком близко к краю");return;}
   var idx=evClips.indexOf(clip);
-  evClips.splice(idx,1,{start:clip.start,end:evPlayheadPos},{start:evPlayheadPos,end:clip.end});
+  var splitAt=evPlayheadPos;
+  evClips.splice(idx,1,
+    {start:clip.start,end:splitAt},
+    {start:splitAt,end:clip.end}
+  );
   renderTimeline();
-  toast("Разделено");
+  toast("✂️ Разделено на "+fmt(splitAt));
 });
+
+// УДАЛИТЬ — удаляем ТОЛЬКО тот клип, который подсвечен оранжевым под белой палкой
 $("evDelete").addEventListener("click",function(){
   if(evClips.length<=1){toast("Нельзя удалить единственный отрезок");return;}
+  var v=$("evVideo");
+  if(!v.paused){try{v.pause();}catch(e){}}
   var clip=getClipAt(evPlayheadPos);
   if(!clip){toast("Курсор не на клипе");return;}
   var idx=evClips.indexOf(clip);
-  // удаляем ТОЛЬКО этот клип
+  if(idx<0){toast("Не найдено");return;}
+  var removedLen=clip.end-clip.start;
+  // Удаляем только этот клип
   evClips.splice(idx,1);
+  // Ставим палку в начало следующего живого клипа (или в конец предыдущего)
   if(idx>=evClips.length)evPlayheadPos=evClips[evClips.length-1].end;
   else evPlayheadPos=evClips[idx].start;
-  try{$("evVideo").currentTime=evPlayheadPos;}catch(e){}
+  try{v.currentTime=evPlayheadPos;}catch(e){}
   renderTimeline();
-  toast("Удалено");
+  toast("🗑 Удалено "+fmt(removedLen)+" сек");
 });
 
 $("evSave").addEventListener("click",async function(){
@@ -1763,7 +1802,6 @@ $("evSave").addEventListener("click",async function(){
     canvas.height=v.videoHeight||1280;
     var ctx=canvas.getContext("2d");
 
-    // Быстрый seek: минимальные паузы, ранний выход если уже на месте
     function seekTo(t){
       return new Promise(function(resolve){
         if(Math.abs(v.currentTime-t)<0.05){setTimeout(resolve,30);return;}
