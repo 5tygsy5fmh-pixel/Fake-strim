@@ -107,7 +107,7 @@ body.banner-show .comments{opacity:0;transform:translateY(20px);}
 #evPlayhead::before{content:"";position:absolute;top:-6px;left:-5px;width:13px;height:13px;background:#fff;border-radius:50%;box-shadow:0 0 6px rgba(0,0,0,.5);}
 #evTime{text-align:center;font-size:12px;opacity:.7;margin-top:8px;}
 .ev-actions{display:flex;gap:8px;margin-bottom:14px;}
-.ev-act{flex:1;padding:11px 4px;border-radius:12px;border:none;background:rgba(255,255,255,.1);color:#fff;font-size:10px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;line-height:1;}
+.ev-act{flex:1;padding:11px 4px;border-radius:12px;border:none;background:rgba(255,255,255,.1);color:#fff;font-size:11px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;line-height:1;}
 .ev-act:active{background:rgba(255,255,255,.2);transform:scale(.96);}
 .ev-act svg{width:24px;height:24px;display:block;}
 .ev-act.ev-del{background:rgba(255,50,80,.25);}
@@ -354,7 +354,7 @@ body.banner-show .comments{opacity:0;transform:translateY(20px);}
 
 <div id="editVideoModal">
   <div class="ev-box">
-    <h3>✂️ Редактор</h3>
+    <h3>Редактор</h3>
     <div id="evVideoWrap">
       <video id="evVideo" playsinline></video>
       <div id="evPlayOverlay"><div class="pi"><svg viewBox="0 0 24 24" fill="#fff"><polygon points="7,4 7,20 20,12"/></svg></div></div>
@@ -369,16 +369,6 @@ body.banner-show .comments{opacity:0;transform:translateY(20px);}
       <div id="evTime">0:00 / 0:00</div>
     </div>
     <div class="ev-actions">
-      <button class="ev-act" id="evTrim">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="6" cy="6" r="3"/>
-          <circle cx="6" cy="18" r="3"/>
-          <line x1="20" y1="4" x2="8.12" y2="15.88"/>
-          <line x1="14.47" y1="14.48" x2="20" y2="20"/>
-          <line x1="8.12" y1="8.12" x2="12" y2="12"/>
-        </svg>
-        <span>Обрезать</span>
-      </button>
       <button class="ev-act" id="evSplit">
         <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
           <path d="M9 4 L5 4 L5 20 L9 20"/>
@@ -1535,7 +1525,7 @@ $("vvSave").addEventListener("click",async function(){
 });
 $("videoViewer").addEventListener("click",function(e){if(e.target===$("videoViewer"))closeVideoViewer();});
 
-// РЕДАКТОР ВИДЕО (ТАЙМЛАЙН)
+// РЕДАКТОР ВИДЕО
 var evStream=null;
 var evDuration=0;
 var evClips=[];
@@ -1689,7 +1679,6 @@ $("evCancel").addEventListener("click",function(){
   document.addEventListener("mouseup",onEnd);
 })();
 
-$("evTrim").addEventListener("click",function(){toast("✂️ Тяни стрелки на таймлайне");});
 $("evSplit").addEventListener("click",function(){
   if(!evClips.length)return;
   var clip=getClipAt(evPlayheadPos);
@@ -1699,7 +1688,7 @@ $("evSplit").addEventListener("click",function(){
   var idx=evClips.indexOf(clip);
   evClips.splice(idx,1,{start:clip.start,end:evPlayheadPos},{start:evPlayheadPos,end:clip.end});
   renderTimeline();
-  toast("✂️ Разделено");
+  toast("Разделено");
 });
 $("evDelete").addEventListener("click",function(){
   if(evClips.length<=1){toast("Нельзя удалить единственный отрезок");return;}
@@ -1711,13 +1700,13 @@ $("evDelete").addEventListener("click",function(){
   else evPlayheadPos=evClips[idx].start;
   try{$("evVideo").currentTime=evPlayheadPos;}catch(e){}
   renderTimeline();
-  toast("🗑 Удалено");
+  toast("Удалено");
 });
 
 $("evSave").addEventListener("click",async function(){
   if(!evStream||!evDuration||!evClips.length)return;
   stopEvPlayback();
-  $("evProgress").textContent="✂️ Обработка...";
+  $("evProgress").textContent="Сохранение...";
   var v=$("evVideo");
   v.pause();
   v.muted=false;
@@ -1730,15 +1719,18 @@ $("evSave").addEventListener("click",async function(){
 
     function seekTo(t){
       return new Promise(function(resolve){
+        if(Math.abs(v.currentTime - t) < 0.03){ setTimeout(resolve, 80); return; }
         var done=false;
+        var to=setTimeout(function(){ if(!done){done=true; v.removeEventListener("seeked",onSeeked); resolve();} },5000);
         function onSeeked(){
-          if(done)return;done=true;
+          if(done)return;
+          done=true;
+          clearTimeout(to);
           v.removeEventListener("seeked",onSeeked);
-          resolve();
+          setTimeout(resolve, 100);
         }
         v.addEventListener("seeked",onSeeked);
-        try{v.currentTime=t;}catch(e){if(!done){done=true;resolve();}}
-        setTimeout(function(){if(!done){done=true;v.removeEventListener("seeked",onSeeked);resolve();}},3000);
+        try{v.currentTime=t;}catch(e){ clearTimeout(to); if(!done){done=true;resolve();} }
       });
     }
 
@@ -1750,17 +1742,19 @@ $("evSave").addEventListener("click",async function(){
     try{
       var vs=v.captureStream?v.captureStream():null;
       if(vs&&vs.getAudioTracks().length){
-        combined=new MediaStream(canvasStream.getVideoTracks().concat([vs.getAudioTracks()[0]]));
+        combined=new MediaStream();
+        canvasStream.getVideoTracks().forEach(function(t){combined.addTrack(t);});
+        vs.getAudioTracks().forEach(function(t){combined.addTrack(t);});
       }
     }catch(e){}
 
     var mime="";
-    var tries=["video/mp4;codecs=avc1,mp4a","video/mp4","video/webm;codecs=vp9,opus","video/webm;codecs=vp8,opus","video/webm"];
+    var tries=["video/mp4;codecs=avc1.42E01E,mp4a.40.2","video/mp4;codecs=avc1,mp4a","video/mp4","video/webm;codecs=vp9,opus","video/webm;codecs=vp8,opus","video/webm"];
     for(var i=0;i<tries.length;i++)if(window.MediaRecorder&&MediaRecorder.isTypeSupported(tries[i])){mime=tries[i];break;}
 
-    var rec=new MediaRecorder(combined,mime?{mimeType:mime}:undefined);
+    var rec=new MediaRecorder(combined,mime?{mimeType:mime,videoBitsPerSecond:4000000}:undefined);
     var chunks=[];
-    rec.ondataavailable=function(e){if(e.data.size>0)chunks.push(e.data);};
+    rec.ondataavailable=function(e){if(e.data&&e.data.size>0)chunks.push(e.data);};
 
     var finalized=false;
     rec.onstop=function(){
@@ -1776,7 +1770,7 @@ $("evSave").addEventListener("click",async function(){
         myStreams.unshift(newStream);
         if(myStreams.length>20)myStreams.pop();
         buildMyStreams();
-        toast("✅ Сохранено");
+        toast("Сохранено");
       }catch(err){toast("Ошибка: "+err.message);}
       $("evProgress").textContent="";
       $("editVideoModal").classList.remove("show");
@@ -1785,53 +1779,46 @@ $("evSave").addEventListener("click",async function(){
       }
     };
 
-    rec.start(100);
+    rec.start(200);
 
-    var idx=0;
-    var currentClip=clips[0];
     var finished=false;
-    var seeking=false;
-
     var drawLoop=function(){
       if(finished)return;
-      var ct=v.currentTime;
-
-      if(v.ended||ct>=currentClip.end-0.02){
-        idx++;
-        if(idx>=clips.length){
-          finished=true;
-          setTimeout(function(){
-            try{rec.stop();}catch(e){}
-            try{v.pause();}catch(e){}
-          },400);
-          return;
-        }
-        currentClip=clips[idx];
-        seeking=true;
-        var onSeeked=function(){
-          v.removeEventListener("seeked",onSeeked);
-          seeking=false;
-        };
-        v.addEventListener("seeked",onSeeked);
-        try{v.currentTime=currentClip.start;}catch(e){seeking=false;}
-        requestAnimationFrame(drawLoop);
-        return;
-      }
-
-      if(!seeking&&ct>=currentClip.start-0.05&&ct<currentClip.end){
-        try{ctx.drawImage(v,0,0,canvas.width,canvas.height);}catch(e){}
-      }
+      try{ctx.drawImage(v,0,0,canvas.width,canvas.height);}catch(e){}
       requestAnimationFrame(drawLoop);
     };
-
-    try{
-      await v.play();
-    }catch(e){
-      toast("Ошибка воспроизведения: "+e.message);
-      try{rec.stop();}catch(err){}
-      return;
-    }
     requestAnimationFrame(drawLoop);
+
+    var playIndex=0;
+    var playClip=function(){
+      if(playIndex>=clips.length){
+        finished=true;
+        setTimeout(function(){
+          try{v.pause();}catch(e){}
+          try{rec.stop();}catch(e){}
+        },350);
+        return;
+      }
+      var clip=clips[playIndex];
+      seekTo(clip.start).then(function(){
+        return v.play();
+      }).then(function(){
+        var watch=function(){
+          if(v.ended||v.currentTime>=clip.end-0.03){
+            playIndex++;
+            try{v.pause();}catch(e){}
+            setTimeout(playClip,60);
+            return;
+          }
+          requestAnimationFrame(watch);
+        };
+        watch();
+      }).catch(function(){
+        playIndex++;
+        setTimeout(playClip,60);
+      });
+    };
+    playClip();
 
   }catch(e){
     toast("Ошибка: "+e.message);
