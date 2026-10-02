@@ -1532,23 +1532,34 @@ var evClips=[];
 var evPlayheadPos=0;
 var evDragging=false;
 var evRafId=null;
+var evSeekJump=false;
 
 function fmt(s){
   if(!s||isNaN(s))return"0:00";
   var m=Math.floor(s/60),x=Math.floor(s%60);
   return m+":"+(x<10?"0":"")+x;
 }
+function getClipAt(pos){
+  for(var i=0;i<evClips.length;i++){
+    var c=evClips[i];
+    var isLast=(i===evClips.length-1);
+    // [start, end) — на стыке побеждает клип, который начинается в этой точке
+    if(pos>=c.start && (pos<c.end || (isLast && pos<=c.end)))return c;
+  }
+  return null;
+}
 function renderTimeline(){
   var c=$("evClips");c.innerHTML="";
   var total=evDuration||1;
   var leftBound=evClips.length?evClips[0].start:0;
   var rightBound=evClips.length?evClips[evClips.length-1].end:0;
+  var selClip=getClipAt(evPlayheadPos); // только ОДИН клип выделен
   evClips.forEach(function(clip){
     var el=document.createElement("div");
     el.className="ev-clip";
     el.style.left=((clip.start/total)*100)+"%";
     el.style.width=(((clip.end-clip.start)/total)*100)+"%";
-    if(evPlayheadPos>=clip.start&&evPlayheadPos<=clip.end)el.classList.add("selected");
+    if(clip===selClip)el.classList.add("selected");
     c.appendChild(el);
   });
   $("evLeftHandle").style.left="calc("+((leftBound/total)*100)+"% - 4px)";
@@ -1561,12 +1572,6 @@ function setPlayhead(pos,seekVideo){
   if(seekVideo!==false){try{$("evVideo").currentTime=evPlayheadPos;}catch(e){}}
   renderTimeline();
 }
-function getClipAt(pos){
-  for(var i=0;i<evClips.length;i++){
-    if(pos>=evClips[i].start&&pos<=evClips[i].end)return evClips[i];
-  }
-  return null;
-}
 function updateEvPlayIcon(){
   var v=$("evVideo");var ov=$("evPlayOverlay");
   if(!ov)return;
@@ -1576,7 +1581,43 @@ function updateEvPlayIcon(){
 function evRafLoop(){
   var v=$("evVideo");
   if(v.paused||v.ended){evRafId=null;return;}
-  if(!evDragging){
+  if(!evDragging && !evSeekJump){
+    var ct=v.currentTime;
+    var clip=getClipAt(ct);
+    var target=null;
+    var stop=false;
+    if(!clip){
+      // попали в удалённый кусок — прыгаем к началу следующего живого
+      for(var i=0;i<evClips.length;i++){
+        if(evClips[i].start>ct+0.01){target=evClips[i].start;break;}
+      }
+      if(target===null)stop=true;
+    } else if(ct>=clip.end-0.03){
+      // дошли до конца клипа — прыгаем к следующему
+      var idx=evClips.indexOf(clip);
+      if(idx>=0 && idx<evClips.length-1)target=evClips[idx+1].start;
+      else stop=true;
+    }
+    if(stop){
+      try{v.pause();}catch(e){}
+      updateEvPlayIcon();
+      evRafId=null;
+      return;
+    }
+    if(target!==null){
+      evSeekJump=true;
+      var onSeeked=function(){
+        v.removeEventListener("seeked",onSeeked);
+        evSeekJump=false;
+      };
+      v.addEventListener("seeked",onSeeked);
+      setTimeout(function(){evSeekJump=false;},1500);
+      try{v.currentTime=target;}catch(e){evSeekJump=false;}
+      evPlayheadPos=target;
+      renderTimeline();
+      evRafId=requestAnimationFrame(evRafLoop);
+      return;
+    }
     evPlayheadPos=Math.max(0,Math.min(evDuration,v.currentTime));
     renderTimeline();
   }
@@ -1586,6 +1627,7 @@ function stopEvPlayback(){
   var v=$("evVideo");
   try{v.pause();}catch(e){}
   if(evRafId){cancelAnimationFrame(evRafId);evRafId=null;}
+  evSeekJump=false;
   updateEvPlayIcon();
 }
 
@@ -1695,6 +1737,7 @@ $("evDelete").addEventListener("click",function(){
   var clip=getClipAt(evPlayheadPos);
   if(!clip){toast("Курсор не на клипе");return;}
   var idx=evClips.indexOf(clip);
+  // удаляем ТОЛЬКО этот клип
   evClips.splice(idx,1);
   if(idx>=evClips.length)evPlayheadPos=evClips[evClips.length-1].end;
   else evPlayheadPos=evClips[idx].start;
@@ -1706,31 +1749,34 @@ $("evDelete").addEventListener("click",function(){
 $("evSave").addEventListener("click",async function(){
   if(!evStream||!evDuration||!evClips.length)return;
   stopEvPlayback();
-  $("evProgress").textContent="Сохранение...";
+  var prog=$("evProgress");
+  prog.textContent="Подготовка...";
   var v=$("evVideo");
   v.pause();
   v.muted=false;
   var clips=evClips.slice().sort(function(a,b){return a.start-b.start;});
+  var totalOut=clips.reduce(function(s,c){return s+(c.end-c.start);},0);
+
   try{
     var canvas=document.createElement("canvas");
     canvas.width=v.videoWidth||720;
     canvas.height=v.videoHeight||1280;
     var ctx=canvas.getContext("2d");
 
+    // Быстрый seek: минимальные паузы, ранний выход если уже на месте
     function seekTo(t){
       return new Promise(function(resolve){
-        if(Math.abs(v.currentTime - t) < 0.03){ setTimeout(resolve, 80); return; }
+        if(Math.abs(v.currentTime-t)<0.05){setTimeout(resolve,30);return;}
         var done=false;
-        var to=setTimeout(function(){ if(!done){done=true; v.removeEventListener("seeked",onSeeked); resolve();} },5000);
+        var to=setTimeout(function(){if(!done){done=true;v.removeEventListener("seeked",onSeeked);resolve();}},2500);
         function onSeeked(){
           if(done)return;
-          done=true;
-          clearTimeout(to);
+          done=true;clearTimeout(to);
           v.removeEventListener("seeked",onSeeked);
-          setTimeout(resolve, 100);
+          setTimeout(resolve,20);
         }
         v.addEventListener("seeked",onSeeked);
-        try{v.currentTime=t;}catch(e){ clearTimeout(to); if(!done){done=true;resolve();} }
+        try{v.currentTime=t;}catch(e){clearTimeout(to);if(!done){done=true;resolve();}}
       });
     }
 
@@ -1770,16 +1816,14 @@ $("evSave").addEventListener("click",async function(){
         myStreams.unshift(newStream);
         if(myStreams.length>20)myStreams.pop();
         buildMyStreams();
-        toast("Сохранено");
+        toast("✅ Сохранено");
       }catch(err){toast("Ошибка: "+err.message);}
-      $("evProgress").textContent="";
+      prog.textContent="";
       $("editVideoModal").classList.remove("show");
-      if(newStream){
-        setTimeout(function(){openVideoViewer(newStream);},250);
-      }
+      if(newStream)setTimeout(function(){openVideoViewer(newStream);},200);
     };
 
-    rec.start(200);
+    rec.start(150);
 
     var finished=false;
     var drawLoop=function(){
@@ -1789,6 +1833,7 @@ $("evSave").addEventListener("click",async function(){
     };
     requestAnimationFrame(drawLoop);
 
+    var doneOut=0;
     var playIndex=0;
     var playClip=function(){
       if(playIndex>=clips.length){
@@ -1796,33 +1841,36 @@ $("evSave").addEventListener("click",async function(){
         setTimeout(function(){
           try{v.pause();}catch(e){}
           try{rec.stop();}catch(e){}
-        },350);
+        },180);
         return;
       }
       var clip=clips[playIndex];
-      seekTo(clip.start).then(function(){
-        return v.play();
-      }).then(function(){
+      seekTo(clip.start).then(function(){return v.play();}).then(function(){
         var watch=function(){
-          if(v.ended||v.currentTime>=clip.end-0.03){
+          var ct=v.currentTime;
+          var inClip=Math.max(0,ct-clip.start);
+          var pct=Math.min(100,Math.round(((doneOut+inClip)/totalOut)*100));
+          prog.textContent="Сохранение... "+pct+"%";
+          if(v.ended||ct>=clip.end-0.03){
+            doneOut+=clip.end-clip.start;
             playIndex++;
             try{v.pause();}catch(e){}
-            setTimeout(playClip,60);
+            setTimeout(playClip,25);
             return;
           }
           requestAnimationFrame(watch);
         };
         watch();
       }).catch(function(){
+        doneOut+=clip.end-clip.start;
         playIndex++;
-        setTimeout(playClip,60);
+        setTimeout(playClip,25);
       });
     };
     playClip();
-
   }catch(e){
     toast("Ошибка: "+e.message);
-    $("evProgress").textContent="";
+    prog.textContent="";
   }
 });
 
