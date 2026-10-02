@@ -150,20 +150,34 @@ body.banner-show .comments{opacity:0;transform:translateY(20px);}
 .menu-btn .badge{position:absolute;top:4px;right:calc(50% - 22px);min-width:18px;height:18px;background:#ff2850;border-radius:9px;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 5px;}
 .panel{position:fixed;inset:0;z-index:600;background:#0a0a14;display:none;flex-direction:column;}
 .panel.show{display:flex;}
-.panel-head{display:flex;align-items:center;gap:12px;padding:calc(14px + env(safe-area-inset-top)) 16px 14px;background:rgba(0,0,0,.6);border-bottom:1px solid rgba(255,255,255,.08);flex-shrink:0;}
-.panel-head .back{width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.panel-head{display:flex;align-items:center;gap:10px;padding:calc(14px + env(safe-area-inset-top)) 16px 14px;background:rgba(0,0,0,.6);border-bottom:1px solid rgba(255,255,255,.08);flex-shrink:0;}
+.panel-head .back{width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;}
 .panel-head .back svg{width:24px;height:24px;}
-.panel-head .title{font-size:18px;font-weight:700;flex:1;}
+.panel-head .title{font-size:18px;font-weight:700;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .panel-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.co-stream-btn{
+  display:flex;align-items:center;gap:5px;
+  background:linear-gradient(135deg,#ff0050,#ff5c8a);
+  color:#fff;border:none;font-size:11px;font-weight:800;
+  padding:7px 11px;border-radius:15px;cursor:pointer;
+  flex-shrink:0;letter-spacing:.2px;
+  box-shadow:0 4px 14px rgba(255,0,80,.4);
+  transition:transform .12s;
+}
+.co-stream-btn:active{transform:scale(.94);}
+.co-stream-btn svg{width:14px;height:14px;}
 .chat-row{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.06);cursor:pointer;}
 .chat-row:active{background:rgba(255,255,255,.04);}
-.chat-row .av{width:52px;height:52px;border-radius:50%;flex:0 0 52px;display:flex;align-items:center;justify-content:center;font-size:26px;color:#fff;}
+.chat-row .av{width:52px;height:52px;border-radius:50%;flex:0 0 52px;display:flex;align-items:center;justify-content:center;font-size:26px;color:#fff;position:relative;overflow:hidden;}
+.chat-row .av canvas{width:100%;height:100%;display:block;}
 .chat-row .body{flex:1;min-width:0;}
-.chat-row .nick{font-size:15px;font-weight:700;margin-bottom:3px;}
+.chat-row .nick{font-size:15px;font-weight:700;margin-bottom:3px;display:flex;align-items:center;gap:5px;}
+.chat-row .nick .g-ico{font-size:10px;background:rgba(255,255,255,.15);padding:2px 5px;border-radius:6px;font-weight:700;letter-spacing:.3px;}
 .chat-row .last{font-size:13px;opacity:.55;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .empty-inbox{text-align:center;padding:80px 30px;opacity:.55;font-size:14px;line-height:1.6;}
 .empty-inbox .em{font-size:60px;display:block;margin-bottom:16px;}
-.chat-head-av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff;}
+.chat-head-av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff;overflow:hidden;flex-shrink:0;}
+.chat-head-av canvas{width:100%;height:100%;display:block;}
 .chat-messages{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 12px;display:flex;flex-direction:column;gap:8px;scrollbar-width:none;}
 .chat-messages::-webkit-scrollbar{display:none;}
 .msg{max-width:75%;padding:10px 14px;border-radius:18px;font-size:14px;line-height:1.35;word-wrap:break-word;animation:msgin .25s ease-out;}
@@ -240,6 +254,73 @@ body.banner-show .comments{opacity:0;transform:translateY(20px);}
 .stat-card .val.cyan{color:#8ee8f4;}
 .stat-card .val.yellow{color:#ffd700;}
 .settings-section{padding:8px 20px 4px;font-size:12px;text-transform:uppercase;letter-spacing:.8px;color:rgba(255,255,255,.4);font-weight:700;}
+
+/* ─── СОВМЕСТНЫЙ СТРИМ: модель бота на кадре ─── */
+#coBotCanvas{
+  position:absolute;
+  right:0;
+  bottom:0;
+  display:none;
+  pointer-events:none;
+  z-index:5;
+  filter:drop-shadow(0 8px 18px rgba(0,0,0,.45));
+  transition:opacity .35s;
+}
+#coBotCanvas.show{display:block;}
+#coBotTag{
+  position:absolute;
+  right:8px;
+  display:none;
+  background:linear-gradient(135deg,rgba(255,0,80,.9),rgba(255,92,138,.9));
+  padding:5px 10px;
+  border-radius:14px;
+  font-size:11px;
+  font-weight:800;
+  color:#fff;
+  z-index:6;
+  backdrop-filter:blur(6px);
+  -webkit-backdrop-filter:blur(6px);
+  box-shadow:0 4px 14px rgba(255,0,80,.4);
+  pointer-events:none;
+  max-width:140px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+#coBotTag.show{display:block;}
+#coBotControls{
+  position:absolute;
+  right:8px;
+  display:none;
+  flex-direction:column;
+  gap:6px;
+  z-index:7;
+  pointer-events:auto;
+}
+#coBotControls.show{display:flex;}
+#coBotControls .pose-btn{
+  width:44px;height:44px;
+  border-radius:50%;
+  border:2px solid rgba(255,255,255,.35);
+  background:rgba(0,0,0,.6);
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+  color:#fff;
+  font-size:20px;
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:transform .12s,background .15s,border-color .15s;
+}
+#coBotControls .pose-btn:active{transform:scale(.88);}
+#coBotControls .pose-btn.active{
+  background:linear-gradient(135deg,#ff0050,#ff5c8a);
+  border-color:#fff;
+  box-shadow:0 4px 16px rgba(255,0,80,.55);
+}
+#coBotControls .close-co{
+  background:rgba(255,50,80,.35);
+  border-color:rgba(255,80,100,.7);
+}
 </style>
 </head>
 <body>
@@ -271,6 +352,17 @@ body.banner-show .comments{opacity:0;transform:translateY(20px);}
   <div class="hearts" id="hearts"></div>
   <div class="caption" id="caption"></div>
   <div class="toast" id="toast"></div>
+
+  <!-- Модель бота на кадре -->
+  <canvas id="coBotCanvas"></canvas>
+  <div id="coBotTag"></div>
+  <div id="coBotControls">
+    <button class="pose-btn" data-pose="stand" title="Я стою">🧍</button>
+    <button class="pose-btn" data-pose="sit" title="Я сижу">🪑</button>
+    <button class="pose-btn" data-pose="lap" title="На коленях">👥</button>
+    <button class="pose-btn close-co" id="coBotClose" title="Убрать">✕</button>
+  </div>
+
   <div class="rail">
     <div class="rb red-active" id="rbRec">
       <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9.2" stroke="#fff" stroke-width="2"/><circle id="recDot" cx="12" cy="12" r="4.5" fill="#ff2850" style="display:none"/></svg>
@@ -317,9 +409,51 @@ body.banner-show .comments{opacity:0;transform:translateY(20px);}
 </div>
 
 <div class="panel" id="panelInbox"><div class="panel-head"><div class="back" data-close="1"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><polyline points="15 6 9 12 15 18"/></svg></div><div class="title">Сообщения</div></div><div class="panel-body" id="inboxBody"></div></div>
-<div class="panel" id="panelChat"><div class="panel-head"><div class="back" data-close="1"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><polyline points="15 6 9 12 15 18"/></svg></div><div class="chat-head-av" id="chatHeadAv">🐱</div><div class="title" id="chatHeadName">nick</div></div><div class="chat-messages" id="chatMessages"></div><div class="chat-input-row"><input id="chatInput" type="text" placeholder="Сообщение..." autocomplete="off"><button id="chatSend"><svg viewBox="0 0 24 24" fill="#fff"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg></button></div></div>
+
+<div class="panel" id="panelChat">
+  <div class="panel-head">
+    <div class="back" data-close="1"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><polyline points="15 6 9 12 15 18"/></svg></div>
+    <div class="chat-head-av" id="chatHeadAv">🐱</div>
+    <div class="title" id="chatHeadName">nick</div>
+    <button class="co-stream-btn" id="chatCoStreamBtn" title="Провести совместный стрим">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+      <span>В эфир</span>
+    </button>
+  </div>
+  <div class="chat-messages" id="chatMessages"></div>
+  <div class="chat-input-row"><input id="chatInput" type="text" placeholder="Сообщение..." autocomplete="off"><button id="chatSend"><svg viewBox="0 0 24 24" fill="#fff"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg></button></div>
+</div>
+
 <div class="panel" id="panelAccount"><div class="panel-head"><div class="back" data-close="1"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><polyline points="15 6 9 12 15 18"/></svg></div><div class="title">Аккаунт</div></div><div class="panel-body"><div class="account-body"><div class="account-av" id="accAvatar">G</div><div class="account-name" id="accName">grand-cat</div><div class="account-handle" id="accHandle">@grand_cat</div><div class="account-stats"><div class="acc-stat" id="statFollowersBtn" style="cursor:pointer"><div class="n" id="accFollowers">0</div><div class="l">подписчики</div></div><div class="acc-stat" id="statFollowingBtn" style="cursor:pointer"><div class="n" id="accFollowing">0</div><div class="l">подписки</div></div><div class="acc-stat" id="statCrystalsBtn" style="cursor:pointer"><div class="n" id="accCrystalsStat">0</div><div class="l">кристаллы</div></div></div><div class="account-item" id="itemMyStreams"><div class="ic">🎬</div><div class="lb">Мои стримы</div><div class="ar">›</div></div><div class="account-item" id="itemStats"><div class="ic">📊</div><div class="lb">Статистика</div><div class="ar">›</div></div><div class="account-item" id="itemSettings"><div class="ic">⚙️</div><div class="lb">Настройки</div><div class="ar">›</div></div></div></div></div>
-<div class="panel" id="panelSettings"><div class="panel-head"><div class="back" data-close="1"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><polyline points="15 6 9 12 15 18"/></svg></div><div class="title">Настройки</div></div><div class="panel-body"><div class="account-body" style="padding-top:10px;"><div class="settings-section">Профиль</div><div class="account-item" id="itemEdit"><div class="ic">✏️</div><div class="lb">Изменить ник и аватар</div><div class="ar">›</div></div><div class="settings-section" style="margin-top:12px;">Общение</div><div class="account-item" id="itemSwearing"><div class="ic">🤬</div><div class="lb">Маты (18+)</div><div class="toggle" id="toggleSwearing"></div></div><div class="settings-section" style="margin-top:12px;">Запись</div><div class="account-item" id="itemAutoRec"><div class="ic">🔴</div><div class="lb">Автозапись при старте стрима</div><div class="toggle" id="toggleAutoRec"></div></div><div class="settings-section" style="margin-top:12px;">О приложении</div><div class="account-item"><div class="ic">ℹ️</div><div class="lb">Версия 1.0</div></div></div></div></div>
+
+<div class="panel" id="panelSettings">
+  <div class="panel-head"><div class="back" data-close="1"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><polyline points="15 6 9 12 15 18"/></svg></div><div class="title">Настройки</div></div>
+  <div class="panel-body"><div class="account-body" style="padding-top:10px;">
+    <div class="settings-section">Профиль</div>
+    <div class="account-item" id="itemEdit"><div class="ic">✏️</div><div class="lb">Изменить ник и аватар</div><div class="ar">›</div></div>
+
+    <div class="settings-section" style="margin-top:12px;">Общение</div>
+    <div class="account-item" id="itemSwearing"><div class="ic">🤬</div><div class="lb">Маты (18+)</div><div class="toggle" id="toggleSwearing"></div></div>
+
+    <div class="settings-section" style="margin-top:12px;">Запись</div>
+    <div class="account-item" id="itemAutoRec"><div class="ic">🔴</div><div class="lb">Автозапись при старте стрима</div><div class="toggle" id="toggleAutoRec"></div></div>
+
+    <div class="settings-section" style="margin-top:12px;">Совместный стрим</div>
+    <div class="account-item" id="itemAutoPose">
+      <div class="ic">🤖</div>
+      <div class="lb">Авто-поза бота (стоит/сидит/колени)</div>
+      <div class="toggle" id="toggleAutoPose"></div>
+    </div>
+    <div class="account-item" id="itemPoseStatus" style="cursor:default;opacity:.7;">
+      <div class="ic">📡</div>
+      <div class="lb" id="poseStatusText" style="font-size:13px;">Распознавание: выкл</div>
+    </div>
+
+    <div class="settings-section" style="margin-top:12px;">О приложении</div>
+    <div class="account-item"><div class="ic">ℹ️</div><div class="lb">Версия 1.0</div></div>
+  </div></div>
+</div>
+
 <div class="panel" id="panelMyStreams"><div class="panel-head"><div class="back" data-close="1"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><polyline points="15 6 9 12 15 18"/></svg></div><div class="title">Мои стримы</div></div><div class="panel-body" id="myStreamsBody"></div></div>
 <div class="panel" id="panelStats"><div class="panel-head"><div class="back" data-close="1"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><polyline points="15 6 9 12 15 18"/></svg></div><div class="title">Статистика</div></div><div class="panel-body"><div class="stat-grid"><div class="stat-card"><div class="lbl">Всего стримов</div><div class="val cyan" id="stStreams">0</div></div><div class="stat-card"><div class="lbl">Кристаллов собрано</div><div class="val pink" id="stCrystals">0</div></div><div class="stat-card" id="stFollowersCard" style="cursor:pointer"><div class="lbl">Подписчиков</div><div class="val green" id="stFollowers">0</div></div><div class="stat-card"><div class="lbl">Сообщений ботов</div><div class="val yellow" id="stMessages">0</div></div><div class="stat-card" id="stDialogsCard" style="cursor:pointer"><div class="lbl">Диалогов</div><div class="val cyan" id="stDialogs">0</div></div><div class="stat-card"><div class="lbl">Донатов</div><div class="val pink" id="stDonations">0</div></div></div></div></div>
 <div class="panel" id="panelFollowers"><div class="panel-head"><div class="back" data-close="1"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><polyline points="15 6 9 12 15 18"/></svg></div><div class="title" id="followersTitle">Подписчики</div></div><div class="panel-body" id="followersBody"></div></div>
@@ -428,6 +562,7 @@ avatarColor:localStorage.getItem('gc_avatar_color')||'#25a4d3',
 avatarRing:localStorage.getItem('gc_avatar_ring')||'#ffffff',
 avatarText:localStorage.getItem('gc_avatar_text')||'#ffffff',
 autoRec:localStorage.getItem('gc_autorec')==='1',
+autoPose:localStorage.getItem('gc_autopose')==='1',
 swearing:localStorage.getItem('gc_swearing')==='1',
 totalStreams:parseInt(localStorage.getItem('gc_streams_count')||'0'),
 totalMessages:parseInt(localStorage.getItem('gc_messages')||'0'),
@@ -435,7 +570,8 @@ totalDonations:parseInt(localStorage.getItem('gc_donations')||'0'),
 totalDialogs:parseInt(localStorage.getItem('gc_dialogs')||'0'),
 muted:false,micOn:false,micMuted:false,emojisOn:true,facing:"user",
 pipActive:false,isRecording:false,lastEvent:Date.now(),lastActivity:Date.now(),
-currentChat:null,streaming:false};
+currentChat:null,streaming:false,
+coBot:null,coPose:'stand'};
 
 var myStreams=[];
 var AVATAR_COLORS_PRESET=["#25a4d3","#4facfe","#00f2fe","#36a2eb","#5ce1e6","#8ee8f4","#43e97b","#38f9d7","#2ecc71","#8cff8c","#a2e8b8","#4bc0c0","#fee140","#f6d365","#ffce56","#ffb84d","#ffcc70","#ff9f40","#fda085","#ff8c66","#ff6384","#ff5c8a","#ff0050","#f5576c","#fa709a","#f093fb","#c88cff","#a18cd1","#9966ff","#b388ff","#80d8ff","#c2e9fb","#ffffff","#e0e0e0","#999999","#666666","#333333","#1a1a2e","#000000","#5c3d2e"];
@@ -464,6 +600,7 @@ function saveStats(){
     localStorage.setItem('gc_avatar_ring',state.avatarRing);
     localStorage.setItem('gc_avatar_text',state.avatarText);
     localStorage.setItem('gc_autorec',state.autoRec?'1':'0');
+    localStorage.setItem('gc_autopose',state.autoPose?'1':'0');
     localStorage.setItem('gc_swearing',state.swearing?'1':'0');
     localStorage.setItem('gc_streams_count',String(state.totalStreams));
     localStorage.setItem('gc_messages',String(state.totalMessages));
@@ -515,14 +652,461 @@ var AVATAR_COLORS=["#ff6384","#36a2eb","#ffce56","#4bc0c0","#9966ff","#ff9f40","
 function randomAvatar(){
   var emoji=rnd(AVATAR_EMOJIS);
   var gr=rnd(AVATAR_GRADIENTS);
-  return{emoji:emoji,gradient:"linear-gradient(135deg, "+gr[0]+", "+gr[1]+")"};
+  var gender=(Math.random()<0.5)?'male':'female';
+  return{emoji:emoji,gradient:"linear-gradient(135deg, "+gr[0]+", "+gr[1]+")",gender:gender};
 }
+
+/* ─── ГЕНЕРАЦИЯ МОДЕЛИ БОТА ─── */
+var SKIN_TONES=['#f7c8a8','#f0be98','#e8b090','#d4a078','#c08a68','#a07050','#8a6040'];
+var HAIR_FEMALE=['#1a1a1a','#2a1a0a','#3a1a2a','#5a2a1a','#6a3a1a','#8a5a2a','#c0a060','#e0c080','#a02a2a','#2a5a3a','#4a3a6a','#d04080'];
+var HAIR_MALE=['#1a1a1a','#2a2a2a','#3a1a0a','#2a1a0a','#4a3a2a','#6a5a4a','#5a2a1a','#a06030'];
+var SHIRT_COLORS=['#ff6384','#36a2eb','#ffce56','#4bc0c0','#9966ff','#ff9f40','#2ecc71','#e74c3c','#a855f7','#06b6d4','#f43f5e','#84cc16','#fb923c','#14b8a6','#8b5cf6','#ec4899','#3b82f6','#f59e0b'];
+var PANTS_COLORS=['#2a2a3a','#1a1a2e','#3a2a4a','#4a3a2a','#5a5a6a','#2a3a5a','#3a2a2a','#4a4a5a'];
+var SHOES_COLORS=['#1a1a1a','#2a2a3a','#4a2a1a','#5a5a6a','#e0e0e0'];
+
+function generateBotAppearance(gender){
+  gender=gender||(Math.random()<0.5?'male':'female');
+  return{
+    gender:gender,
+    skin:rnd(SKIN_TONES),
+    hairColor:rnd(gender==='female'?HAIR_FEMALE:HAIR_MALE),
+    shirtColor:rnd(SHIRT_COLORS),
+    pantsColor:rnd(PANTS_COLORS),
+    shoeColor:rnd(SHOES_COLORS)
+  };
+}
+function ensureBotAppearance(c){
+  if(!c)return;
+  if(!c.gender)c.gender=Math.random()<0.5?'male':'female';
+  if(!c.skin){var a=generateBotAppearance(c.gender);c.skin=a.skin;c.hairColor=a.hairColor;c.shirtColor=a.shirtColor;c.pantsColor=a.pantsColor;c.shoeColor=a.shoeColor;}
+}
+function genderIcon(g){return g==='male'?'♂':'♀';}
+
+/* ─── ОТРИСОВКА МОДЕЛИ БОТА НА CANVAS ─── */
+function drawCharacter(canvas,bot,pose){
+  var ctx=canvas.getContext('2d');
+  var W=canvas.width,H=canvas.height;
+  ctx.clearRect(0,0,W,H);
+  var female=bot.gender!=='male';
+  var skin=bot.skin||'#f0c0a0';
+  var hair=bot.hairColor||(female?'#3a1a2a':'#1a1a1a');
+  var shirt=bot.shirtColor||'#ff6384';
+  var pants=bot.pantsColor||'#2a2a3a';
+  var shoe=bot.shoeColor||'#1a1a1a';
+
+  function drawHead(cx,cy,r){
+    ctx.fillStyle=skin;
+    ctx.fillRect(cx-r*0.26,cy+r*0.72,r*0.52,r*0.6);
+    ctx.beginPath();
+    ctx.arc(cx,cy,r,0,Math.PI*2);
+    ctx.fillStyle=skin;
+    ctx.fill();
+    ctx.fillStyle=hair;
+    ctx.beginPath();
+    ctx.arc(cx,cy-r*0.08,r*1.02,Math.PI*1.05,Math.PI*1.95);
+    ctx.lineTo(cx+r*0.9,cy+r*0.15);
+    ctx.lineTo(cx-r*0.9,cy+r*0.15);
+    ctx.closePath();
+    ctx.fill();
+    if(female){
+      ctx.beginPath();
+      ctx.ellipse(cx-r*0.98,cy+r*0.35,r*0.34,r*0.95,0,0,Math.PI*2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.ellipse(cx+r*0.98,cy+r*0.35,r*0.34,r*0.95,0,0,Math.PI*2);
+      ctx.fill();
+    }else{
+      ctx.beginPath();
+      ctx.arc(cx,cy-r*0.05,r*1.02,Math.PI*1.15,Math.PI*1.85);
+      ctx.fill();
+    }
+    ctx.fillStyle='#1a1a1a';
+    ctx.beginPath();ctx.ellipse(cx-r*0.32,cy+r*0.05,r*0.08,r*0.12,0,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.ellipse(cx+r*0.32,cy+r*0.05,r*0.08,r*0.12,0,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='rgba(255,255,255,.85)';
+    ctx.beginPath();ctx.arc(cx-r*0.30,cy+r*0.02,r*0.03,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.arc(cx+r*0.34,cy+r*0.02,r*0.03,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle='#b04040';
+    ctx.lineWidth=Math.max(2,r*0.06);
+    ctx.lineCap='round';
+    ctx.beginPath();
+    ctx.arc(cx,cy+r*0.28,r*0.24,0.25,Math.PI-0.25);
+    ctx.stroke();
+    ctx.fillStyle='rgba(255,150,150,.35)';
+    ctx.beginPath();ctx.ellipse(cx-r*0.5,cy+r*0.2,r*0.14,r*0.08,0,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.ellipse(cx+r*0.5,cy+r*0.2,r*0.14,r*0.08,0,0,Math.PI*2);ctx.fill();
+  }
+
+  var cx=W/2;
+
+  if(pose==='stand'){
+    var r=W*0.18;
+    var headY=r+6;
+    ctx.fillStyle=pants;
+    ctx.beginPath();ctx.roundRect(cx-r*0.9,headY+r*3.8,r*0.7,H-headY-r*4.1,r*0.18);ctx.fill();
+    ctx.beginPath();ctx.roundRect(cx+r*0.2,headY+r*3.8,r*0.7,H-headY-r*4.1,r*0.18);ctx.fill();
+    ctx.fillStyle=shoe;
+    ctx.beginPath();ctx.ellipse(cx-r*0.55,H-8,r*0.55,r*0.16,0,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.ellipse(cx+r*0.55,H-8,r*0.55,r*0.16,0,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle=shirt;
+    ctx.beginPath();ctx.roundRect(cx-r*1.15,headY+r*1.55,r*2.3,r*2.35,r*0.35);ctx.fill();
+    ctx.fillStyle='rgba(0,0,0,.18)';
+    ctx.beginPath();ctx.moveTo(cx-r*0.4,headY+r*1.55);ctx.lineTo(cx,headY+r*1.95);ctx.lineTo(cx+r*0.4,headY+r*1.55);ctx.closePath();ctx.fill();
+    ctx.fillStyle=shirt;
+    ctx.beginPath();ctx.roundRect(cx-r*1.55,headY+r*1.7,r*0.42,r*2.15,r*0.2);ctx.fill();
+    ctx.beginPath();ctx.roundRect(cx+r*1.13,headY+r*1.7,r*0.42,r*2.15,r*0.2);ctx.fill();
+    ctx.fillStyle=skin;
+    ctx.beginPath();ctx.arc(cx-r*1.34,headY+r*3.85,r*0.24,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.arc(cx+r*1.34,headY+r*3.85,r*0.24,0,Math.PI*2);ctx.fill();
+    drawHead(cx,headY,r);
+  } else if(pose==='sit'){
+    var r=W*0.19;
+    var headY=r+6;
+    ctx.fillStyle=pants;
+    ctx.beginPath();ctx.roundRect(cx-r*1.2,H-r*1.8,r*1.1,r*0.6,r*0.22);ctx.fill();
+    ctx.beginPath();ctx.roundRect(cx+r*0.1,H-r*1.8,r*1.1,r*0.6,r*0.22);ctx.fill();
+    ctx.beginPath();ctx.roundRect(cx-r*1.2,H-r*1.35,r*0.55,H*0.14,r*0.15);ctx.fill();
+    ctx.beginPath();ctx.roundRect(cx+r*0.65,H-r*1.35,r*0.55,H*0.14,r*0.15);ctx.fill();
+    ctx.fillStyle=shoe;
+    ctx.beginPath();ctx.ellipse(cx-r*0.9,H-6,r*0.42,r*0.14,0,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.ellipse(cx+r*0.9,H-6,r*0.42,r*0.14,0,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle=shirt;
+    ctx.beginPath();ctx.roundRect(cx-r*1.15,headY+r*1.55,r*2.3,r*2.05,r*0.35);ctx.fill();
+    ctx.fillStyle='rgba(0,0,0,.18)';
+    ctx.beginPath();ctx.moveTo(cx-r*0.4,headY+r*1.55);ctx.lineTo(cx,headY+r*1.95);ctx.lineTo(cx+r*0.4,headY+r*1.55);ctx.closePath();ctx.fill();
+    ctx.fillStyle=shirt;
+    ctx.beginPath();ctx.roundRect(cx-r*1.55,headY+r*1.7,r*0.42,r*1.75,r*0.2);ctx.fill();
+    ctx.beginPath();ctx.roundRect(cx+r*1.13,headY+r*1.7,r*0.42,r*1.75,r*0.2);ctx.fill();
+    ctx.fillStyle=skin;
+    ctx.beginPath();ctx.arc(cx-r*1.34,headY+r*3.45,r*0.24,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.arc(cx+r*1.34,headY+r*3.45,r*0.24,0,Math.PI*2);ctx.fill();
+    drawHead(cx,headY,r);
+  } else {
+    var r=W*0.22;
+    var headY=r+5;
+    ctx.fillStyle=pants;
+    ctx.beginPath();ctx.roundRect(cx-r*1.45,H-r*1.55,r*0.8,H*0.25,r*0.32);ctx.fill();
+    ctx.beginPath();ctx.roundRect(cx+r*0.65,H-r*1.55,r*0.8,H*0.25,r*0.32);ctx.fill();
+    ctx.fillStyle=shirt;
+    ctx.beginPath();ctx.roundRect(cx-r*1.1,headY+r*1.55,r*2.2,r*2.05,r*0.35);ctx.fill();
+    ctx.fillStyle='rgba(0,0,0,.18)';
+    ctx.beginPath();ctx.moveTo(cx-r*0.4,headY+r*1.55);ctx.lineTo(cx,headY+r*1.95);ctx.lineTo(cx+r*0.4,headY+r*1.55);ctx.closePath();ctx.fill();
+    ctx.fillStyle=shirt;
+    ctx.beginPath();ctx.roundRect(cx-r*1.3,headY+r*2.6,r*2.6,r*0.55,r*0.27);ctx.fill();
+    ctx.fillStyle=skin;
+    ctx.beginPath();ctx.arc(cx-r*0.55,headY+r*2.87,r*0.22,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.arc(cx+r*0.55,headY+r*2.87,r*0.22,0,Math.PI*2);ctx.fill();
+    drawHead(cx,headY,r);
+  }
+}
+
+function drawMiniAvatar(canvas,bot){
+  var ctx=canvas.getContext('2d');
+  var W=canvas.width,H=canvas.height;
+  ctx.clearRect(0,0,W,H);
+  var female=bot.gender!=='male';
+  var skin=bot.skin||'#f0c0a0';
+  var hair=bot.hairColor||(female?'#3a1a2a':'#1a1a1a');
+  ctx.fillStyle=bot.shirtColor||bot.color||'#ff6384';
+  ctx.fillRect(0,0,W,H);
+  var grd=ctx.createLinearGradient(0,0,W,H);
+  grd.addColorStop(0,'rgba(255,255,255,.25)');
+  grd.addColorStop(1,'rgba(0,0,0,.25)');
+  ctx.fillStyle=grd;
+  ctx.fillRect(0,0,W,H);
+  var cx=W/2, cy=H*0.55, r=H*0.32;
+  if(female){
+    ctx.fillStyle=hair;
+    ctx.beginPath();
+    ctx.ellipse(cx,cy+r*0.2,r*1.15,r*0.95,0,0,Math.PI*2);
+    ctx.fill();
+  }
+  ctx.beginPath();
+  ctx.arc(cx,cy,r,0,Math.PI*2);
+  ctx.fillStyle=skin;
+  ctx.fill();
+  ctx.fillStyle=hair;
+  ctx.beginPath();
+  ctx.arc(cx,cy-r*0.05,r*1.02,Math.PI*1.05,Math.PI*1.95);
+  ctx.lineTo(cx+r*0.9,cy+r*0.1);
+  ctx.lineTo(cx-r*0.9,cy+r*0.1);
+  ctx.closePath();
+  ctx.fill();
+  if(female){
+    ctx.beginPath();
+    ctx.ellipse(cx-r*0.95,cy+r*0.3,r*0.32,r*0.95,0,0,Math.PI*2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(cx+r*0.95,cy+r*0.3,r*0.32,r*0.95,0,0,Math.PI*2);
+    ctx.fill();
+  }
+  ctx.fillStyle='#1a1a1a';
+  ctx.beginPath();ctx.ellipse(cx-r*0.32,cy+r*0.05,r*0.09,r*0.13,0,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.ellipse(cx+r*0.32,cy+r*0.05,r*0.09,r*0.13,0,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle='#b04040';
+  ctx.lineWidth=Math.max(1.5,r*0.07);
+  ctx.lineCap='round';
+  ctx.beginPath();
+  ctx.arc(cx,cy+r*0.28,r*0.24,0.3,Math.PI-0.3);
+  ctx.stroke();
+}
+
+/* ─── РЕНДЕР СОВМЕСТНОГО СТРИМА ─── */
+function renderCoBot(){
+  if(!state.coBot)return;
+  var canvas=$("coBotCanvas");
+  var W,H;
+  if(state.coPose==='stand'){W=400;H=Math.min(900,window.innerHeight*0.72);}
+  else if(state.coPose==='sit'){W=420;H=Math.min(560,window.innerHeight*0.5);}
+  else{W=340;H=Math.min(400,window.innerHeight*0.38);}
+  canvas.width=W;canvas.height=H;
+  canvas.style.width=Math.round(window.innerWidth*(state.coPose==='lap'?0.30:state.coPose==='sit'?0.40:0.38))+"px";
+  canvas.style.height="auto";
+  if(state.coPose==='lap'){
+    canvas.style.right="14px";
+    canvas.style.bottom="calc(150px + env(safe-area-inset-bottom))";
+  } else {
+    canvas.style.right="2px";
+    canvas.style.bottom="0";
+  }
+  drawCharacter(canvas,state.coBot,state.coPose);
+  var tag=$("coBotTag");
+  var canvasRect=canvas.getBoundingClientRect();
+  tag.textContent="🎬 "+state.coBot.nick;
+  tag.style.bottom=(window.innerHeight-canvasRect.top+6)+"px";
+  tag.style.right="8px";
+  $("coBotControls").style.bottom=(window.innerHeight-canvasRect.top+42)+"px";
+}
+function startCoStreamWith(bot){
+  if(!state.streaming){
+    toast("Сначала запустите стрим");
+    return;
+  }
+  state.coBot=bot;
+  state.coPose='stand';
+  if(state.autoPose){
+    poseHistory=[];poseLastPose='stand';
+    if(!poseRunning){poseRunning=true;poseFrameLoop();}
+  }
+  renderCoBot();
+  $("coBotCanvas").classList.add("show");
+  $("coBotTag").classList.add("show");
+  $("coBotControls").classList.add("show");
+  document.querySelectorAll("#coBotControls .pose-btn[data-pose]").forEach(function(b){
+    b.classList.toggle("active",b.dataset.pose==='stand');
+  });
+  closeAllPanels();
+  var greet=['Всем привет, я с '+state.nick+'!','Привет, ребята! 👋','Приветик! 💕','Хай, чат!','Мы в эфире! 🔥','О, я в кадре!'];
+  spawnNote(bot.nick+" в эфире!",'Совместный стрим','#8cff8c','sub');
+  setTimeout(function(){spawnChat(rnd(greet),bot.nick,bot.shirtColor||'#ff6384',{kind:bot.kind||'normal'});},900);
+  state.hype=Math.min(1,state.hype+0.4);
+  sfx.subscribe();boom('❤️',10);
+}
+function stopCoStream(){
+  if(!state.coBot)return;
+  var who=state.coBot.nick;
+  state.coBot=null;
+  poseHistory=[];
+  $("coBotCanvas").classList.remove("show");
+  $("coBotTag").classList.remove("show");
+  $("coBotControls").classList.remove("show");
+  toast("👋 "+who+" покинул эфир");
+}
+function setCoPose(pose){
+  state.coPose=pose;
+  document.querySelectorAll("#coBotControls .pose-btn[data-pose]").forEach(function(b){
+    b.classList.toggle("active",b.dataset.pose===pose);
+  });
+  renderCoBot();
+  var labels={stand:'🧍 Модель встала рядом',sit:'🪑 Модель села',lap:'👥 Модель села к тебе на колени'};
+  toast(labels[pose]||'');
+}
+$("coBotClose").addEventListener("click",stopCoStream);
+document.querySelectorAll("#coBotControls .pose-btn[data-pose]").forEach(function(b){
+  b.addEventListener("click",function(){setCoPose(b.dataset.pose);});
+});
+window.addEventListener("resize",function(){if(state.coBot)renderCoBot();});
+window.addEventListener("orientationchange",function(){setTimeout(function(){if(state.coBot)renderCoBot();},250);});
+
+/* ─────────── АВТО-ПОЗА (MediaPipe Pose) ─────────── */
+var poseDetector=null;
+var poseLibLoading=false;
+var poseLibReady=false;
+var poseRunning=false;
+var poseDetectBusy=false;
+var poseHistory=[];
+var poseLastPose='stand';
+var poseLastChange=0;
+var POSE_CDN_BASE='https://cdn.jsdelivr.net/npm/@mediapipe/pose@0.5.1675469404';
+
+function loadScriptOnce(src){
+  return new Promise(function(resolve,reject){
+    if(document.querySelector('script[data-src="'+src+'"]')){resolve();return;}
+    var s=document.createElement('script');
+    s.src=src;s.async=true;s.crossOrigin='anonymous';
+    s.setAttribute('data-src',src);
+    s.onload=function(){resolve();};
+    s.onerror=function(){reject(new Error('Не удалось загрузить '+src));};
+    document.head.appendChild(s);
+  });
+}
+
+async function ensurePoseLib(){
+  if(poseLibReady)return true;
+  if(poseLibLoading)return false;
+  poseLibLoading=true;
+  try{
+    await loadScriptOnce(POSE_CDN_BASE+'/pose.js');
+    if(!window.Pose)throw new Error('Pose не загрузился');
+    poseDetector=new Pose({
+      locateFile:function(f){return POSE_CDN_BASE+'/'+f;}
+    });
+    poseDetector.setOptions({
+      modelComplexity:0,
+      smoothLandmarks:true,
+      enableSegmentation:false,
+      minDetectionConfidence:0.5,
+      minTrackingConfidence:0.5
+    });
+    poseDetector.onResults(onPoseResults);
+    poseLibReady=true;
+    return true;
+  }catch(e){
+    console.warn('MediaPipe:',e);
+    updatePoseStatus('Не загрузилось: '+e.message);
+    return false;
+  }finally{
+    poseLibLoading=false;
+  }
+}
+
+function updatePoseStatus(txt){
+  var el=$("poseStatusText");
+  if(el)el.textContent='Распознавание: '+txt;
+}
+
+function classifyPose(lm){
+  if(!lm||lm.length<29)return null;
+  function vis(i){return lm[i]&&(lm[i].visibility===undefined?1:lm[i].visibility);}
+  function avg(a,b){return (a+b)/2;}
+
+  var ls=lm[11],rs=lm[12],lh=lm[23],rh=lm[24];
+  var lk=lm[25],rk=lm[26],la=lm[27],ra=lm[28];
+
+  if(vis(11)<0.3||vis(12)<0.3||vis(23)<0.3||vis(24)<0.3)return null;
+
+  var shoulderY=avg(ls.y,rs.y);
+  var hipY=avg(lh.y,rh.y);
+  var shoulderX=avg(ls.x,rs.x);
+  var hipX=avg(lh.x,rh.x);
+
+  var shoulderWidth=Math.abs(ls.x-rs.x);
+  var torsoHeight=hipY-shoulderY;
+  var torsoShift=Math.abs(hipX-shoulderX);
+  var torsoTilt=torsoHeight>0?torsoShift/torsoHeight:0;
+
+  var anklesVisible=vis(27)>0.3&&vis(28)>0.3;
+  var kneesVisible=vis(25)>0.3&&vis(26)>0.3;
+
+  if(shoulderWidth>0.42 && torsoTilt>0.35 && !anklesVisible){
+    return 'lap';
+  }
+
+  if(anklesVisible){
+    var hipToAnkle=avg(la.y,ra.y)-hipY;
+    if(hipToAnkle>0.35 && torsoTilt<0.35){
+      return 'stand';
+    }
+    if(hipToAnkle<0.35 || torsoTilt>0.35){
+      return 'sit';
+    }
+    return 'stand';
+  }
+
+  if(kneesVisible){
+    var kneeY=avg(lk.y,rk.y);
+    if(kneeY>0.82)return 'sit';
+  }
+
+  if(hipY>0.78 || shoulderWidth>0.38)return 'sit';
+
+  return null;
+}
+
+function onPoseResults(results){
+  poseDetectBusy=false;
+  if(!state.autoPose||!state.coBot)return;
+  if(!results||!results.poseLandmarks)return;
+
+  var pose=classifyPose(results.poseLandmarks);
+  if(!pose)return;
+
+  poseHistory.push(pose);
+  if(poseHistory.length>8)poseHistory.shift();
+
+  var counts={stand:0,sit:0,lap:0};
+  for(var i=0;i<poseHistory.length;i++)counts[poseHistory[i]]++;
+  var best='stand',bestN=0;
+  ['stand','sit','lap'].forEach(function(k){if(counts[k]>bestN){bestN=counts[k];best=k;}});
+  var agree=bestN/poseHistory.length;
+
+  var now=performance.now();
+  if(best!==poseLastPose && agree>=0.55 && now-poseLastChange>1200){
+    poseLastPose=best;
+    poseLastChange=now;
+    setCoPose(best);
+    updatePoseStatus('🤖 '+({stand:'стоишь',sit:'сидишь',lap:'на коленях'}[best]));
+  }else{
+    updatePoseStatus('🤖 '+(agree>=0.55?({stand:'стоишь',sit:'сидишь',lap:'на коленях'}[best]):'анализирую…'));
+  }
+}
+
+async function poseFrameLoop(){
+  if(!state.autoPose||!state.coBot||!state.streaming){poseRunning=false;return;}
+  var cam=$("cam");
+  if(poseDetector && cam && cam.readyState>=2 && !poseDetectBusy){
+    poseDetectBusy=true;
+    try{await poseDetector.send({image:cam});}catch(e){poseDetectBusy=false;}
+  }
+  setTimeout(poseFrameLoop,140);
+}
+
+async function startAutoPose(){
+  if(state.autoPose)return;
+  updatePoseStatus('загрузка…');
+  var ok=await ensurePoseLib();
+  if(!ok){
+    state.autoPose=false;
+    $("toggleAutoPose").classList.remove('on');
+    saveStats();
+    toast('⚠️ Не удалось загрузить распознавание');
+    return;
+  }
+  state.autoPose=true;
+  $("toggleAutoPose").classList.add('on');
+  saveStats();
+  poseHistory=[];
+  poseLastPose='stand';
+  updatePoseStatus('готово');
+  toast('🤖 Авто-поза включена');
+  if(state.coBot && !poseRunning){poseRunning=true;poseFrameLoop();}
+}
+function stopAutoPose(){
+  state.autoPose=false;
+  $("toggleAutoPose").classList.remove('on');
+  saveStats();
+  poseHistory=[];
+  updatePoseStatus('выкл');
+  toast('Авто-поза выключена');
+}
+
+/* ─── Резиденты ─── */
 var RESIDENTS=[
-  {nick:"67_kid",color:"#ff5c5c",kind:"spam",lines:["67","67 67","67???","шестьдесят семь"]},
-  {nick:"skibidi_sigma",color:"#c88cff",kind:"spam",lines:["скибиди","🗿🗿🗿","сигма","гигачад"]},
-  {nick:"hater2000",color:"#ff3c3c",kind:"hater",lines:["ну такое","фу","скучно","кринж"]},
-  {nick:"Lera_Simp",color:"#ff96dc",kind:"simp",lines:["ты лучший 💕","люблю тебя","милый"]},
-  {nick:"vibe_clown",color:"#ffce56",kind:"clown",lines:["😂😂😂","ору","ахахах","жиза"]}
+  {nick:"67_kid",color:"#ff5c5c",kind:"spam",gender:"male",lines:["67","67 67","67???","шестьдесят семь"]},
+  {nick:"skibidi_sigma",color:"#c88cff",kind:"spam",gender:"male",lines:["скибиди","🗿🗿🗿","сигма","гигачад"]},
+  {nick:"hater2000",color:"#ff3c3c",kind:"hater",gender:"male",lines:["ну такое","фу","скучно","кринж"]},
+  {nick:"Lera_Simp",color:"#ff96dc",kind:"simp",gender:"female",lines:["ты лучший 💕","люблю тебя","милый"]},
+  {nick:"vibe_clown",color:"#ffce56",kind:"clown",gender:"male",lines:["😂😂😂","ору","ахахах","жиза"]}
 ];
 var THEMES=[
   {name:"музыка",keys:["музык","трек","песн","бит","рэп","петь","слушаю"],replies:["что за трек?","топ 🔥","поставь ещё","качает"]},
@@ -738,6 +1322,7 @@ function showMenu(){
   $("ui").classList.remove("show");
   $("cam").classList.remove("show");
   state.streaming=false;
+  if(state.coBot)stopCoStream();
   closeAllPanels();
 }
 function hideMenu(){$("menuScreen").classList.add("hide");}
@@ -771,16 +1356,19 @@ function smoothScrollToBottom(){
   try{commentsEl.scrollTo({top:commentsEl.scrollHeight,behavior:"smooth"});}
   catch(e){commentsEl.scrollTop=commentsEl.scrollHeight;}
 }
-function getOrCreateChat(nick,emoji,gradient,kind){
+function getOrCreateChat(nick,emoji,gradient,kind,gender){
   if(!chats[nick]){
-    chats[nick]={emoji:emoji||nick[0].toUpperCase(),gradient:gradient||"#ff6384",messages:[],unread:0,kind:kind||null};
+    chats[nick]={emoji:emoji||nick[0].toUpperCase(),gradient:gradient||"#ff6384",messages:[],unread:0,kind:kind||null,gender:gender||(Math.random()<0.5?'male':'female')};
+    ensureBotAppearance(chats[nick]);
     saveChats();
   }
+  ensureBotAppearance(chats[nick]);
   return chats[nick];
 }
 function spawnChat(text,nick,color,opts){
   opts=opts||{};
   var isResident=!!opts.isResident;
+  var gender=opts.gender||null;
   if(!nick&&!isResident)nick=randomNick();
   if(!nick)nick=rnd(RESIDENTS).nick;
   if(!color&&!isResident)color=rnd(AVATAR_COLORS);
@@ -800,14 +1388,14 @@ function spawnChat(text,nick,color,opts){
     gradient=color;emoji=nick[0].toUpperCase();kind=opts.kind||null;
   }else{
     var av=randomAvatar();
-    emoji=av.emoji;gradient=av.gradient;
+    emoji=av.emoji;gradient=av.gradient;gender=av.gender;
     avHTML='<div class="cm-av" style="background:'+av.gradient+'">'+av.emoji+'</div>';
     kind=opts.kind||rnd(["spam","hater","simp","clown","asker","normal","normal","normal"]);
   }
   var el=document.createElement("div");
   el.className="cm"+(opts.reply?" reply":"");
   el.innerHTML=avHTML+'<div class="cm-body"><div class="cm-nick" style="color:'+color+'">'+nick+'</div><div class="cm-text">'+text+'</div></div>';
-  var openHandler=function(e){e.stopPropagation();openChatWith(nick,emoji,gradient,kind);};
+  var openHandler=function(e){e.stopPropagation();openChatWith(nick,emoji,gradient,kind,gender);};
   el.querySelector(".cm-av").addEventListener("click",openHandler);
   el.querySelector(".cm-nick").addEventListener("click",openHandler);
   commentsEl.appendChild(el);
@@ -862,7 +1450,7 @@ function pickReplyFor(prev){
   if(prev.kind==="clown")return rnd(REPLY_TO_CLOWN);
   return rnd(GENERIC_CHAT);
 }
-function residentSpam(r){spawnChat(rnd(r.lines),r.nick,r.color,{isResident:true,kind:r.kind});}
+function residentSpam(r){spawnChat(rnd(r.lines),r.nick,r.color,{isResident:true,kind:r.kind,gender:r.gender});}
 function showCaption(text,isInterim){
   captionEl.textContent=text;captionEl.style.display="block";
   captionEl.classList.toggle("interim",!!isInterim);
@@ -932,6 +1520,7 @@ function updateCounters(dt){
   var idle=(Date.now()-state.lastActivity)/1000;
   if(idle<12)state.tv+=28*dt;
   else{state.tv-=15*dt;if(state.tv<300)state.tv=300;}
+  if(state.coBot)state.tv+=10*dt;
   state.viewers+=(state.tv-state.viewers)*Math.min(1,dt*1.5);
   var el=$("viewers");if(el)el.textContent=formatViewers(state.viewers);
 }
@@ -961,6 +1550,17 @@ function renderPiP(){
   var W=pipCanvas.width,H=pipCanvas.height;
   pipCtx.fillStyle="#000";pipCtx.fillRect(0,0,W,H);
   drawCovered(pipCtx,$("cam"),W,H,state.facing==="user");
+
+  if(state.coBot){
+    var coCanvas=$("coBotCanvas");
+    if(coCanvas.width){
+      var coW=W*0.5;
+      var coH=coW*(coCanvas.height/coCanvas.width);
+      pipCtx.globalAlpha=0.98;
+      pipCtx.drawImage(coCanvas,W-coW, H-coH-40, coW, coH);
+      pipCtx.globalAlpha=1;
+    }
+  }
 
   var now=Date.now();
   var items=pipHistory.filter(function(m){return now-m.t<15000;}).slice(-6);
@@ -1153,6 +1753,10 @@ function loop(now){
       var ai=700+Math.random()*900;
       if(now-lastAutoEmoji>ai){boom(pickEmoji(),ri(1,3));lastAutoEmoji=now;}
     }
+    if(state.coBot&&Math.random()<0.03){
+      var botLines=['Классный чат сегодня!','Ого, сколько зрителей!','Ребят, подписывайтесь! 💕','Я тут с '+state.nick+'!','Всем привет!','Кто смотрит нас?'];
+      spawnChat(rnd(botLines),state.coBot.nick,state.coBot.shirtColor||'#ff6384',{kind:state.coBot.kind||'normal'});
+    }
     updateCounters(dt);
     renderPiP();
     if(state.pipActive&&pipVideo.paused)pipVideo.play().catch(function(){});
@@ -1236,6 +1840,8 @@ $("rbPiP").addEventListener("click",function(e){pulse(e.currentTarget);if(state.
 $("closeX").addEventListener("click",function(){
   if(confirm("Завершить стрим?")){
     if(state.isRecording)stopRecording();
+    if(state.coBot)stopCoStream();
+    poseHistory=[];
     var cam=$("cam");
     if(cam.srcObject){cam.srcObject.getTracks().forEach(function(t){t.stop();});cam.srcObject=null;}
     if(micRunning&&recognition){try{recognition.stop();}catch(e){}micRunning=false;}
@@ -1258,8 +1864,20 @@ function hideSafariBar(){
 }
 $("tapLayer").addEventListener("click",hideSafariBar);
 $("tapLayer").addEventListener("touchstart",hideSafariBar,{passive:true});
-function openChatWith(nick,emoji,gradient,kind){
-  getOrCreateChat(nick,emoji,gradient,kind);
+
+function renderChatHeadAvatar(nick){
+  var box=$("chatHeadAv");
+  box.innerHTML="";
+  var c=chats[nick];
+  if(!c)return;
+  ensureBotAppearance(c);
+  var cv=document.createElement("canvas");
+  cv.width=72;cv.height=72;
+  box.appendChild(cv);
+  drawMiniAvatar(cv,c);
+}
+function openChatWith(nick,emoji,gradient,kind,gender){
+  getOrCreateChat(nick,emoji,gradient,kind,gender);
   var c=chats[nick];
   if(!c.kind&&kind){c.kind=kind;saveChats();}
   if(!c._firstOpened){
@@ -1271,8 +1889,7 @@ function openChatWith(nick,emoji,gradient,kind){
   state.currentChat=nick;
   document.querySelectorAll(".panel").forEach(function(p){p.classList.remove("show");});
   $("panelChat").classList.add("show");
-  $("chatHeadAv").textContent=c.emoji;
-  $("chatHeadAv").style.background=c.gradient;
+  renderChatHeadAvatar(nick);
   $("chatHeadName").textContent=nick;
   renderChatMessages();
   updateInboxBadge();
@@ -1325,6 +1942,41 @@ function showTyping(){
 function hideTyping(){var el=$("typingIndicator");if(el)el.remove();}
 $("chatSend").addEventListener("click",sendMessage);
 $("chatInput").addEventListener("keydown",function(e){if(e.key==="Enter")sendMessage();});
+
+$("chatCoStreamBtn").addEventListener("click",async function(){
+  if(!state.currentChat)return;
+  var bot=chats[state.currentChat];
+  if(!bot)return;
+  ensureBotAppearance(bot);
+  var botInfo={
+    nick:state.currentChat,
+    gender:bot.gender,
+    skin:bot.skin,hairColor:bot.hairColor,
+    shirtColor:bot.shirtColor,pantsColor:bot.pantsColor,shoeColor:bot.shoeColor,
+    color:bot.gradient,kind:bot.kind,emoji:bot.emoji,gradient:bot.gradient
+  };
+  if(!state.streaming){
+    closeAllPanels();
+    initAudio();
+    hideMenu();
+    var ok=await startCamera();
+    if(!ok){showMenu();return;}
+    $("cam").classList.add("show");$("ui").classList.add("show");
+    state.streaming=true;state.currentChat=null;
+    state.totalStreams++;saveStats();
+    pipStream=pipCanvas.captureStream(30);
+    pipVideo.srcObject=pipStream;
+    pipVideo.muted=true;
+    try{await pipVideo.play();}catch(e){}
+    try{await navigator.mediaDevices.getUserMedia({audio:true});startMicAuto();}catch(e){}
+    resetStreamTimers();state.lastActivity=Date.now();
+    setTimeout(function(){for(var i=0;i<3;i++){var n=randomNick();var av=randomAvatar();addFollowerBot(n,av.emoji,av.gradient);}},2000);
+    setTimeout(function(){spawnNote("grand-cat в эфире!","Тапни на ник — напишешь лично","#8cff8c","sub");},600);
+    if(state.autoRec)setTimeout(function(){if(!state.isRecording)startRecording(true);},1500);
+  }
+  setTimeout(function(){startCoStreamWith(botInfo);},state.streaming?0:1500);
+});
+
 function updateInboxBadge(){
   var unread=Object.values(chats).reduce(function(s,c){return s+(c.unread||0);},0);
   var b=$("inboxBadge");
@@ -1342,10 +1994,14 @@ function buildInbox(){
     return lb-la;
   });
   keys.forEach(function(nick){
-    var c=chats[nick];var last=c.messages.slice(-1)[0];
+    var c=chats[nick];ensureBotAppearance(c);var last=c.messages.slice(-1)[0];
     var el=document.createElement("div");el.className="chat-row";
-    el.innerHTML='<div class="av" style="background:'+c.gradient+'">'+c.emoji+'</div><div class="body"><div class="nick">'+nick+'</div><div class="last">'+(last?(last.from==="me"?"Ты: ":"")+last.text:"Начни переписку")+'</div></div>'+(c.unread?'<div style="min-width:22px;height:22px;border-radius:11px;background:#ff2850;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;">'+c.unread+'</div>':'');
-    el.addEventListener("click",function(){openChatWith(nick,c.emoji,c.gradient,c.kind);});
+    var gIcon=genderIcon(c.gender);
+    el.innerHTML='<div class="av"></div><div class="body"><div class="nick">'+nick+'<span class="g-ico">'+gIcon+'</span></div><div class="last">'+(last?(last.from==="me"?"Ты: ":"")+last.text:"Начни переписку")+'</div></div>'+(c.unread?'<div style="min-width:22px;height:22px;border-radius:11px;background:#ff2850;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;">'+c.unread+'</div>':'');
+    var avBox=el.querySelector(".av");
+    var cv=document.createElement("canvas");cv.width=64;cv.height=64;
+    avBox.appendChild(cv);drawMiniAvatar(cv,c);
+    el.addEventListener("click",function(){openChatWith(nick,c.emoji,c.gradient,c.kind,c.gender);});
     body.appendChild(el);
   });
 }
@@ -1363,7 +2019,7 @@ function buildFollowers(){
   followersList.slice().reverse().forEach(function(f){
     var el=document.createElement("div");el.className="chat-row";
     el.innerHTML='<div class="av" style="background:'+f.gradient+'">'+f.emoji+'</div><div class="body"><div class="nick">'+f.nick+'</div><div class="last">подписался '+new Date(f.t).toLocaleDateString("ru-RU")+'</div></div>';
-    el.addEventListener("click",function(){openChatWith(f.nick,f.emoji,f.gradient,null);});
+    el.addEventListener("click",function(){openChatWith(f.nick,f.emoji,f.gradient,null,null);});
     body.appendChild(el);
   });
   $("followersTitle").textContent="Подписчики ("+followersList.length+")";
@@ -1378,10 +2034,13 @@ function buildFollowing(){
     return lb-la;
   });
   keys.forEach(function(nick){
-    var c=chats[nick];var last=c.messages.slice(-1)[0];
+    var c=chats[nick];ensureBotAppearance(c);var last=c.messages.slice(-1)[0];
     var el=document.createElement("div");el.className="chat-row";
-    el.innerHTML='<div class="av" style="background:'+c.gradient+'">'+c.emoji+'</div><div class="body"><div class="nick">'+nick+'</div><div class="last">'+(last?(last.from==="me"?"Ты: ":"")+last.text:"Начни переписку")+'</div></div>';
-    el.addEventListener("click",function(){openChatWith(nick,c.emoji,c.gradient,c.kind);});
+    el.innerHTML='<div class="av"></div><div class="body"><div class="nick">'+nick+'<span class="g-ico">'+genderIcon(c.gender)+'</span></div><div class="last">'+(last?(last.from==="me"?"Ты: ":"")+last.text:"Начни переписку")+'</div></div>';
+    var avBox=el.querySelector(".av");
+    var cv=document.createElement("canvas");cv.width=64;cv.height=64;
+    avBox.appendChild(cv);drawMiniAvatar(cv,c);
+    el.addEventListener("click",function(){openChatWith(nick,c.emoji,c.gradient,c.kind,c.gender);});
     body.appendChild(el);
   });
 }
@@ -1482,6 +2141,8 @@ $("itemStats").addEventListener("click",function(){buildStats();openPanel("panel
 $("itemSettings").addEventListener("click",function(){
   $("toggleAutoRec").classList.toggle("on",state.autoRec);
   $("toggleSwearing").classList.toggle("on",state.swearing);
+  $("toggleAutoPose").classList.toggle("on",state.autoPose);
+  updatePoseStatus(state.autoPose?'готово':'выкл');
   openPanel("panelSettings");
 });
 $("itemEdit").addEventListener("click",openEditModal);
@@ -1494,6 +2155,10 @@ $("itemSwearing").addEventListener("click",function(){
   state.swearing=!state.swearing;
   $("toggleSwearing").classList.toggle("on",state.swearing);
   saveStats();toast(state.swearing?"🤬 Маты включены":"Маты выключены");
+});
+$("itemAutoPose").addEventListener("click",function(){
+  if(state.autoPose)stopAutoPose();
+  else startAutoPose();
 });
 $("statFollowersBtn").addEventListener("click",function(){buildFollowers();openPanel("panelFollowers");});
 $("statFollowingBtn").addEventListener("click",function(){buildFollowing();openPanel("panelFollowing");});
@@ -1549,10 +2214,6 @@ function fmt(s){
   var m=Math.floor(s/60),x=Math.floor(s%60);
   return m+":"+(x<10?"0":"")+x;
 }
-
-// Возвращает клип, который находится под курсором (белая палка).
-// Границы трактуются как [start, end) — на стыке выбирается правый клип.
-// Именно этот клип подсвечивается оранжевым и удаляется по кнопке.
 function getClipAt(pos){
   for(var i=0;i<evClips.length;i++){
     var c=evClips[i];
@@ -1561,13 +2222,11 @@ function getClipAt(pos){
   }
   return null;
 }
-
 function renderTimeline(){
   var c=$("evClips");c.innerHTML="";
   var total=evDuration||1;
   var leftBound=evClips.length?evClips[0].start:0;
   var rightBound=evClips.length?evClips[evClips.length-1].end:0;
-  // Ровно один клип под белым курсором подсвечивается оранжевым
   var selClip=getClipAt(evPlayheadPos);
   evClips.forEach(function(clip){
     var el=document.createElement("div");
@@ -1602,13 +2261,11 @@ function evRafLoop(){
     var target=null;
     var stop=false;
     if(!clip){
-      // курсор в удалённом куске — прыгаем к началу следующего живого
       for(var i=0;i<evClips.length;i++){
         if(evClips[i].start>ct+0.01){target=evClips[i].start;break;}
       }
       if(target===null)stop=true;
     } else if(ct>=clip.end-0.03){
-      // дошли до конца клипа — прыгаем к следующему
       var idx=evClips.indexOf(clip);
       if(idx>=0 && idx<evClips.length-1)target=evClips[idx+1].start;
       else stop=true;
@@ -1663,8 +2320,6 @@ $("vvEdit").addEventListener("click",function(){
   v.onplay=function(){updateEvPlayIcon();if(!evRafId)evRafId=requestAnimationFrame(evRafLoop);};
   v.onpause=function(){updateEvPlayIcon();};
   v.onended=function(){updateEvPlayIcon();};
-  // Синхронизируем позицию курсора ТОЛЬКО во время воспроизведения,
-  // чтобы после перетаскивания палка не отпрыгивала назад из-за seek-snapping.
   v.ontimeupdate=function(){
     if(!v.paused && !evDragging){
       evPlayheadPos=v.currentTime;
@@ -1727,7 +2382,6 @@ $("evCancel").addEventListener("click",function(){
       evClips[evClips.length-1].end=Math.min(evDuration,Math.max(leftLimit,t));
       renderTimeline();
     }else if(dragging==="playhead"){
-      // перемещаем белую палку + мгновенно пересвечиваем клип под ней
       setPlayhead(t,true);
     }
   }
@@ -1745,10 +2399,8 @@ $("evCancel").addEventListener("click",function(){
   document.addEventListener("mouseup",onEnd);
 })();
 
-// РАЗДЕЛИТЬ — режем ровно там, где стоит белая палка
 $("evSplit").addEventListener("click",function(){
   if(!evClips.length)return;
-  // если видео играет — пауза, чтобы позиция была корректной
   var v=$("evVideo");
   if(!v.paused){try{v.pause();}catch(e){}}
   var clip=getClipAt(evPlayheadPos);
@@ -1765,7 +2417,6 @@ $("evSplit").addEventListener("click",function(){
   toast("✂️ Разделено на "+fmt(splitAt));
 });
 
-// УДАЛИТЬ — удаляем ТОЛЬКО тот клип, который подсвечен оранжевым под белой палкой
 $("evDelete").addEventListener("click",function(){
   if(evClips.length<=1){toast("Нельзя удалить единственный отрезок");return;}
   var v=$("evVideo");
@@ -1775,9 +2426,7 @@ $("evDelete").addEventListener("click",function(){
   var idx=evClips.indexOf(clip);
   if(idx<0){toast("Не найдено");return;}
   var removedLen=clip.end-clip.start;
-  // Удаляем только этот клип
   evClips.splice(idx,1);
-  // Ставим палку в начало следующего живого клипа (или в конец предыдущего)
   if(idx>=evClips.length)evPlayheadPos=evClips[evClips.length-1].end;
   else evPlayheadPos=evClips[idx].start;
   try{v.currentTime=evPlayheadPos;}catch(e){}
