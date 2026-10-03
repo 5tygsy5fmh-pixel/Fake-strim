@@ -219,7 +219,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:-ap
 #vvTrimOverlay{position:absolute;inset:0;pointer-events:none}
 #vvTrimOverlay .mask{position:absolute;top:0;bottom:0;background:rgba(0,0,0,.65)}
 #vvTrimOverlay .sel{position:absolute;top:0;bottom:0;border-top:3px solid #fff;border-bottom:3px solid #fff;box-shadow:0 0 12px rgba(255,255,255,.35);border-radius:4px;pointer-events:none}
-/* Ручки внутри .sel — двигаются вместе с ним */
 #vvTrimOverlay .h{position:absolute;top:0;bottom:0;width:22px;background:#fff;border-radius:5px;display:flex;align-items:center;justify-content:center;pointer-events:auto;cursor:ew-resize;box-shadow:0 2px 8px rgba(0,0,0,.6);z-index:2}
 #vvTrimOverlay .h svg{width:14px;height:14px;pointer-events:none}
 #vvTrimOverlay .h.l{left:-11px}
@@ -248,7 +247,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:-ap
 .vv-speed-slider{width:100%;height:6px;-webkit-appearance:none;appearance:none;background:rgba(255,255,255,.15);border-radius:3px;outline:none;margin:12px 0 20px}
 .vv-speed-slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:24px;height:24px;border-radius:50%;background:#fff;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.5)}
 .vv-speed-slider::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:#fff;cursor:pointer;border:none}
-/* Прогресс */
 #vvProgress{display:none;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.92);padding:18px 28px;border-radius:16px;font-size:14px;font-weight:700;color:#fff;z-index:99;text-align:center;min-width:180px}
 #vvProgress.show{display:block}
 #vvProgress .pct{font-size:32px;font-weight:900;color:#2f7fff;margin-top:6px}
@@ -859,12 +857,18 @@ function fmtT2(s){if(!s||isNaN(s))return'0:00.0';var m=Math.floor(s/60),x=s%60;r
 
 var FILTERS=[{name:'Normal',css:'none'},{name:'Chrome',css:'contrast(1.2) saturate(1.3) brightness(1.05)'},{name:'Fade',css:'contrast(.9) saturate(.7) brightness(1.1)'},{name:'Instant',css:'contrast(1.1) saturate(1.4) hue-rotate(-10deg)'},{name:'Mono',css:'grayscale(1) contrast(1.1)'},{name:'Noir',css:'grayscale(1) contrast(1.5) brightness(.9)'},{name:'Process',css:'contrast(1.3) saturate(1.2) hue-rotate(15deg)'},{name:'Tonal',css:'sepia(.4) contrast(1.1)'},{name:'Transfer',css:'contrast(1.4) saturate(.9)'},{name:'Tone',css:'sepia(.2) brightness(1.05)'},{name:'Linear',css:'contrast(1.15) brightness(1.05)'}];
 
+/* Открывает просмотрщик с новым видео. Полностью сбрасывает состояние. */
 function openVideoViewer(s){
   vvStream=s;
   if(vvUrl){try{URL.revokeObjectURL(vvUrl);}catch(e){}}
   vvUrl=URL.createObjectURL(s.blob);
   var v=$('vvVideo');
-  v.src=vvUrl;v.playbackRate=1;v.style.transform='';v.style.filter='none';
+  v.pause();
+  v.src=vvUrl;
+  v.playbackRate=1;
+  v.style.transform='';
+  v.style.filter='none';
+  try{v.load();}catch(e){}
   var frame=$('vvFrame');
   frame.style.background='#000';frame.style.width='';frame.style.height='';
   vvOpts={ratio:'none',bgColor:'#000000',filter:'none',filterName:'Normal',rotate:0,flipH:false,flipV:false,speed:1};
@@ -872,10 +876,12 @@ function openVideoViewer(s){
   document.querySelectorAll('.vv-rot-btn').forEach(function(o){o.classList.remove('on');});
   var sl=$('vvSpeedSlider');if(sl)sl.value=1;
   var lb=$('vvSpeedLabel');if(lb)lb.textContent='1.0x';
-  try{v.currentTime=0;}catch(e){}
   $('vvTitle').textContent=s.filename;
   $('vvSheet').classList.remove('show');
   $('videoViewer').classList.add('show');
+  try{v.currentTime=0;}catch(e){}
+  // Автозапуск нового видео
+  setTimeout(function(){try{v.play().catch(function(){});}catch(e){}},120);
 }
 function closeVideoViewer(){$('videoViewer').classList.remove('show');$('vvSheet').classList.remove('show');try{$('vvVideo').pause();}catch(e){}}
 
@@ -1023,7 +1029,7 @@ $('vvSheetOk').addEventListener('click',function(){
   else { $('vvSheet').classList.remove('show'); toast('Настройки применены'); }
 });
 
-/* ===== Экспорт с прогрессом 0-100% ===== */
+/* ===== Экспорт с прогрессом и автоматическим возвратом в просмотрщик ===== */
 async function exportEdit(){
   if(!vvStream||!vvTrimDur)return;
   var prog=$('vvProgress'),pctEl=$('vvPct');
@@ -1069,15 +1075,9 @@ async function exportEdit(){
     await v.play();
     await new Promise(function(r){
       var w=function(){
-        if(v.currentTime>=end-0.03||v.ended){
-          v.pause();
-          setPct(100);
-          r();
-          return;
-        }
-        var cur = v.currentTime - start;
-        var dur = (end - start) || 1;
-        var p = Math.max(0, Math.min(99, (cur/dur)*100));
+        if(v.currentTime>=end-0.03||v.ended){v.pause();setPct(100);r();return;}
+        var cur=v.currentTime-start;var dur=(end-start)||1;
+        var p=Math.max(0,Math.min(99,(cur/dur)*100));
         setPct(p);
         requestAnimationFrame(w);
       };
@@ -1092,14 +1092,31 @@ async function exportEdit(){
     myStreams.unshift(newS);
     if(myStreams.length>20){var rm=myStreams.pop();if(rm&&rm.filename)deleteVideoFromIDB(rm.filename).catch(function(){});}
     saveVideoToIDB(newS).catch(function(){});
+
+    // Скрыть прогресс, закрыть панель инструментов
     prog.classList.remove('show');
     $('vvSheet').classList.remove('show');
+    $('vvSheetBody').scrollTop=0;
+
+    // Полный сброс настроек редактора
     vvOpts={ratio:'none',bgColor:'#000000',filter:'none',filterName:'Normal',rotate:0,flipH:false,flipV:false,speed:1};
     document.querySelectorAll('.vv-ratio').forEach(function(o){o.classList.toggle('sel',o.getAttribute('data-ratio')==='none');});
     document.querySelectorAll('.vv-filter').forEach(function(o){o.classList.remove('sel');});
-    $('vvSpeedSlider').value=1;$('vvSpeedLabel').textContent='1.0x';
-    openVideoViewer(newS);toast('✅ Сохранено');
-  }catch(e){prog.classList.remove('show');toast('Ошибка: '+e.message);}
+    document.querySelectorAll('.vv-rot-btn').forEach(function(o){o.classList.remove('on');});
+    var sl=$('vvSpeedSlider');if(sl)sl.value=1;
+    var lb=$('vvSpeedLabel');if(lb)lb.textContent='1.0x';
+
+    // Принудительно закрыть и заново открыть просмотрщик с новым видео
+    $('videoViewer').classList.remove('show');
+    $('vvVideo').pause();
+    setTimeout(function(){
+      openVideoViewer(newS);
+      toast('✅ Изменения сохранены');
+    },150);
+  }catch(e){
+    prog.classList.remove('show');
+    toast('Ошибка: '+e.message);
+  }
 }
 
 $('vvBack').addEventListener('click',function(){$('vvSheet').classList.remove('show');});
