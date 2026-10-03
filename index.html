@@ -29,7 +29,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:-ap
 .comments{position:absolute;left:12px;right:80px;bottom:170px;max-height:50%;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;gap:7px;padding-top:26px;padding-bottom:6px;z-index:3;pointer-events:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;mask-image:linear-gradient(180deg,transparent,#000 14%);-webkit-mask-image:linear-gradient(180deg,transparent,#000 14%)}
 .comments::-webkit-scrollbar{display:none}
 .cm{display:flex;align-items:flex-start;gap:8px;background:rgba(0,0,0,.42);backdrop-filter:blur(6px);padding:7px 12px 7px 8px;border-radius:20px;flex:0 0 auto;transition:margin .25s}
-/* Сообщение бота — сдвинуто вправо */
 .cm.cm-bot{margin-left:44px;background:rgba(255,0,80,.28);border:1px solid rgba(255,255,255,.18)}
 .cm-av{flex:0 0 26px;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer}
 .cm-nick{font-size:11px;opacity:.85;margin-bottom:1px;cursor:pointer;font-weight:600}
@@ -383,7 +382,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:-ap
   <div id="vvTools">
     <div class="vv-tool" data-tool="trim"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="8.5" y1="8.5" x2="20" y2="20"/><line x1="8.5" y1="15.5" x2="20" y2="4"/></svg><span>TRIM</span></div>
     <div class="vv-tool" data-tool="canvas"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M3 9h18"/></svg><span>CANVAS</span></div>
-    <div class="vv-tool" data-tool="color"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 3v18"/></svg><span>COLOR</span></div>
     <div class="vv-tool" data-tool="filter"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="9" cy="14" r="5"/><circle cx="15" cy="10" r="5"/></svg><span>FILTER</span></div>
     <div class="vv-tool" data-tool="rotate"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><polyline points="21 3 21 9 15 9"/></svg><span>ROTATE</span></div>
     <div class="vv-tool" data-tool="speed"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 12l4-3"/><path d="M12 12l-2 4"/></svg><span>SPEED</span></div>
@@ -424,11 +422,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:-ap
         </div>
       </div>
 
-      <div class="vv-panel" data-panel="color">
-        <h4>Background Color</h4>
-        <div class="vv-colors" id="vvColorGrid"></div>
-      </div>
-
       <div class="vv-panel" data-panel="filter">
         <h4>Select Filter</h4>
         <div class="vv-filters" id="vvFilterList"></div>
@@ -437,21 +430,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:-ap
       <div class="vv-panel" data-panel="rotate">
         <h4>Rotate</h4>
         <div class="vv-rotate-row">
-          <div class="vv-rot-btn" data-rot="left">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><polyline points="3 3 3 9 9 9"/></svg>
-            <span>Rotate L</span>
-          </div>
-          <div class="vv-rot-btn" data-rot="right">
+          <div class="vv-rot-btn" id="vvRotateBtn">
             <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><polyline points="21 3 21 9 15 9"/></svg>
-            <span>Rotate R</span>
-          </div>
-          <div class="vv-rot-btn" data-rot="fliph">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><line x1="12" y1="3" x2="12" y2="21"/><path d="M4 7 L9 7 L9 17 L4 17 Z"/><path d="M20 7 L15 7 L15 17 L20 17 Z" fill="rgba(255,255,255,.25)"/></svg>
-            <span>Flip H</span>
-          </div>
-          <div class="vv-rot-btn" data-rot="flipv">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><line x1="3" y1="12" x2="21" y2="12"/><path d="M7 4 L7 9 L17 9 L17 4 Z"/><path d="M7 20 L7 15 L17 15 L17 20 Z" fill="rgba(255,255,255,.25)"/></svg>
-            <span>Flip V</span>
+            <span>Повернуть</span>
           </div>
         </div>
       </div>
@@ -459,7 +440,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:-ap
       <div class="vv-panel" data-panel="speed">
         <h4>Speed</h4>
         <div class="vv-speed-val"><span id="vvSpeedLabel">1.0x</span></div>
-        <input type="range" min="0.5" max="2" step="0.05" value="1" class="vv-speed-slider" id="vvSpeedSlider">
+        <input type="range" min="1" max="4" step="0.1" value="1" class="vv-speed-slider" id="vvSpeedSlider">
         <div class="vv-speed-modes">
           <button class="on" id="vvSoundNatural">Natural Sound</button>
           <button id="vvSoundPitch">Pitch Effect</button>
@@ -481,7 +462,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:-ap
 <script>
 window.onerror=function(m,s,l,c){var el=document.getElementById('fatal');if(el){el.style.display='block';el.textContent='ОШИБКА: '+m+'\nСтрока '+l+':'+c;}};
 
-/* =============== IndexedDB для видео =============== */
+/* =============== IndexedDB =============== */
 var IDB=null;
 function openIDB(){return new Promise(function(resolve,reject){if(IDB){resolve(IDB);return;}try{var req=indexedDB.open('grandcat_db',1);req.onupgradeneeded=function(e){var db=e.target.result;if(!db.objectStoreNames.contains('videos')){db.createObjectStore('videos',{keyPath:'filename'});}};req.onsuccess=function(e){IDB=e.target.result;resolve(IDB);};req.onerror=function(e){reject(e.target.error);};}catch(e){reject(e);}});}
 function saveVideoToIDB(s){return openIDB().then(function(db){return new Promise(function(resolve,reject){var tx=db.transaction('videos','readwrite');tx.objectStore('videos').put({filename:s.filename,blob:s.blob,date:s.date,size:s.size});tx.oncomplete=function(){resolve();};tx.onerror=function(e){reject(e.target.error);};});});}
@@ -596,31 +577,12 @@ function applyBotAv(){
   S.botPos.y=clamp(S.botPos.y,40,window.innerHeight-size*0.7);
   el.style.left=S.botPos.x+'px';el.style.top=S.botPos.y+'px';
 }
-/* Перетаскивание бота */
 (function(){
   var el=$('botAvatar');var drag=false,sx=0,sy=0,sl=0,st=0;
-  function dn(e){
-    if(!S.coBot)return;
-    drag=true;
-    var p=e.touches?e.touches[0]:e;
-    sx=p.clientX;sy=p.clientY;sl=S.botPos?S.botPos.x:0;st=S.botPos?S.botPos.y:0;
-    e.preventDefault();e.stopPropagation();
-  }
-  function mv(e){
-    if(!drag)return;
-    var p=e.touches?e.touches[0]:e;
-    S.botPos.x=sl+(p.clientX-sx);
-    S.botPos.y=st+(p.clientY-sy);
-    applyBotAv();
-    e.preventDefault();e.stopPropagation();
-  }
+  function dn(e){if(!S.coBot)return;drag=true;var p=e.touches?e.touches[0]:e;sx=p.clientX;sy=p.clientY;sl=S.botPos?S.botPos.x:0;st=S.botPos?S.botPos.y:0;e.preventDefault();e.stopPropagation();}
+  function mv(e){if(!drag)return;var p=e.touches?e.touches[0]:e;S.botPos.x=sl+(p.clientX-sx);S.botPos.y=st+(p.clientY-sy);applyBotAv();e.preventDefault();e.stopPropagation();}
   function up(){if(!drag)return;drag=false;if(S.coBot&&S.currentChat&&chats[S.currentChat]){chats[S.currentChat].posX=S.botPos.x;chats[S.currentChat].posY=S.botPos.y;saveChats();}}
-  el.addEventListener('touchstart',dn,{passive:false});
-  el.addEventListener('touchmove',mv,{passive:false});
-  el.addEventListener('touchend',up);el.addEventListener('touchcancel',up);
-  el.addEventListener('mousedown',dn);
-  document.addEventListener('mousemove',mv);
-  document.addEventListener('mouseup',up);
+  el.addEventListener('touchstart',dn,{passive:false});el.addEventListener('touchmove',mv,{passive:false});el.addEventListener('touchend',up);el.addEventListener('touchcancel',up);el.addEventListener('mousedown',dn);document.addEventListener('mousemove',mv);document.addEventListener('mouseup',up);
 })();
 
 var cE=$('comments'),nE=$('notes'),bE=$('banner'),hE=$('hearts'),capE=$('caption'),tE=$('toast');
@@ -636,7 +598,8 @@ document.querySelectorAll('[data-back]').forEach(function(b){b.addEventListener(
 
 function getChat(nick,emoji,gradient,kind,gender){if(!chats[nick]){var a=genBotApp(gender);chats[nick]={emoji:emoji||a.emoji,gradient:gradient||a.gradient,messages:[],unread:0,kind:kind||null,gender:gender||a.gender};saveChats();}ensureApp(chats[nick]);return chats[nick];}
 function renderChatHead(nick){var box=$('chatHeadAv');box.innerHTML='';var c=chats[nick];if(!c)return;ensureApp(c);var d=document.createElement('div');d.style.cssText='width:100%;height:100%;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff;background:'+(c.gradient||'#ff6384');d.textContent=c.emoji||'🐱';box.appendChild(d);}
-/* spawnChat — с поддержкой isBot */
+
+/* Обновленная логика spawnChat */
 function spawnChat(text,nick,color,opts){
   opts=opts||{};
   var isRes=!!opts.isResident,isBot=!!opts.isBot,gender=opts.gender||null;
@@ -669,7 +632,7 @@ function spawnChat(text,nick,color,opts){
   setTimeout(function(){if(el.parentNode)el.remove();},60000);
   cE.scrollTop=cE.scrollHeight;
   if(!isRes){S.totalMessages++;saveStats();}
-  /* Если это НЕ бот и есть coBot — бот иногда отвечает с isBot:true */
+  /* Бот отвечает только если это не бот, и вероятность 0.3 (чтобы не спамить) */
   if(S.coBot&&!isBot&&nick!==S.coBot.nick&&!isRes&&Math.random()<0.3){
     var r=botReply(text,'normal');
     setTimeout(function(){spawnChat(r,S.coBot.nick,S.coBot.gradient||'#ff6384',{kind:'normal',isBot:true});speak(S.coBot,r);},ri(800,2000));
@@ -681,13 +644,28 @@ function boom(emoji,count){count=count||16;for(var i=0;i<count;i++){var el=docum
 function resSpam(r){spawnChat(rnd(r.lines),r.nick,r.color,{isResident:true,kind:r.kind,gender:r.gender});}
 function showCap(text,interim){capE.textContent=text;capE.style.display='block';capE.classList.toggle('interim',!!interim);clearTimeout(capE._t);if(!interim)capE._t=setTimeout(function(){capE.style.display='none';},2500);}
 
+/* Обновленная логика ответа бота */
 function onUserSpoke(text){
   if(!text||text.trim().length<2)return;
   var th=detectThemes(text);
   if(th.length>0){var t1=rnd(th);currentTopic={name:t1.name,replies:t1.replies,expires:Date.now()+25000};}
   var q=isQuestion(text),n=q?ri(3,5):ri(2,4);
-  if(S.coBot){var bc=chats[S.coBot.nick],kind=bc?bc.kind:'normal',r=botReply(text,kind);
-    setTimeout(function(){spawnChat(r,S.coBot.nick,S.coBot.gradient||'#ff6384',{kind:kind,isBot:true});speak(S.coBot,r);},ri(600,1400));}
+  
+  if(S.coBot){
+    var bc=chats[S.coBot.nick],kind=bc?bc.kind:'normal';
+    // Бот отвечает только на вопросы или если его упомянули
+    var shouldReply = q || /бот|котик|кот|котенок|grand-cat/i.test(text) || Math.random() < 0.3;
+    if(shouldReply){
+      var r=botReply(text,kind);
+      // Если бот хочет много написать, собираем в одно сообщение
+      if(r.length > 50 || Math.random() < 0.5) {
+        var extra = rnd([' 😊',' 🔥',' 💯',' 👀',' 😂',' 💕']);
+        r += extra;
+      }
+      setTimeout(function(){spawnChat(r,S.coBot.nick,S.coBot.gradient||'#ff6384',{kind:kind,isBot:true});speak(S.coBot,r);},ri(600,1400));
+    }
+  }
+  
   for(var i=0;i<n;i++)(function(idx){setTimeout(function(){
     if(q&&Math.random()<0.7)spawnChat(rnd(['хороший вопрос!','думаю да','думаю нет','хм, не уверен']));
     else if(currentTopic&&Date.now()<currentTopic.expires&&Math.random()<0.75)spawnChat(rnd(currentTopic.replies));
@@ -708,17 +686,70 @@ function subEvent(){var nick=randNick(),av=randAv();spawnNote(nick+' подпи�
 function fmtV(v){if(v>=1000000){var m=v/1000000;return(m>=10?Math.floor(m):m.toFixed(1))+' млн';}if(v>=1000)return(v/1000).toFixed(1)+'K';return String(Math.floor(v));}
 function updCnt(dt){S.hype=Math.max(0,S.hype-dt*0.18);var idle=(Date.now()-S.lastActivity)/1000;if(idle<12)S.tv+=28*dt;else{S.tv-=15*dt;if(S.tv<300)S.tv=300;}if(S.coBot)S.tv+=10*dt;S.viewers+=(S.tv-S.viewers)*Math.min(1,dt*1.5);var e=$('viewers');if(e)e.textContent=fmtV(S.viewers);}
 
+/* Отрисовка PiP с комментариями */
 var pipCan=document.createElement('canvas');pipCan.width=540;pipCan.height=960;var pipCx=pipCan.getContext('2d');
 var pipVideo=$('pipVideo');
 function drawCov(ctx,v,W,H,mir){if(!v||v.readyState<2||!v.videoWidth)return;var vw=v.videoWidth,vh=v.videoHeight,sc=Math.max(W/vw,H/vh),dw=vw*sc,dh=vh*sc,dx=(W-dw)/2,dy=(H-dh)/2;if(mir){ctx.save();ctx.translate(W,0);ctx.scale(-1,1);ctx.drawImage(v,W-dx-dw,dy,dw,dh);ctx.restore();}else ctx.drawImage(v,dx,dy,dw,dh);}
-function renderPiP(){var W=pipCan.width,H=pipCan.height;pipCx.fillStyle='#000';pipCx.fillRect(0,0,W,H);drawCov(pipCx,$('cam'),W,H,S.facing==='user');
-  if(S.coBot&&S.botPos){var av=$('botAvatar'),rct=av.getBoundingClientRect(),scX=W/window.innerWidth,scY=H/window.innerHeight,ax=rct.left*scX,ay=rct.top*scY,aw=rct.width*scX,ah=rct.height*scY;
+
+function renderPiP(){
+  var W=pipCan.width,H=pipCan.height;
+  pipCx.fillStyle='#000';pipCx.fillRect(0,0,W,H);
+  drawCov(pipCx,$('cam'),W,H,S.facing==='user');
+  
+  // Рисуем бота
+  if(S.coBot&&S.botPos){
+    var av=$('botAvatar'),rct=av.getBoundingClientRect(),scX=W/window.innerWidth,scY=H/window.innerHeight;
+    var ax=rct.left*scX,ay=rct.top*scY,aw=rct.width*scX,ah=rct.height*scY;
     pipCx.save();pipCx.beginPath();pipCx.arc(ax+aw/2,ay+ah/2,aw/2,0,Math.PI*2);pipCx.clip();
     var c=chats[S.coBot.nick];pipCx.fillStyle=(c&&c.gradient)||'#ff6384';pipCx.fillRect(ax,ay,aw,ah);
     pipCx.font=Math.round(aw*0.55)+'px sans-serif';pipCx.textAlign='center';pipCx.textBaseline='middle';pipCx.fillStyle='#fff';pipCx.fillText((c&&c.emoji)||'🐱',ax+aw/2,ay+ah/2);
-    pipCx.restore();pipCx.strokeStyle='rgba(255,255,255,.7)';pipCx.lineWidth=4;pipCx.beginPath();pipCx.arc(ax+aw/2,ay+ah/2,aw/2,0,Math.PI*2);pipCx.stroke();}
+    pipCx.restore();pipCx.strokeStyle='rgba(255,255,255,.7)';pipCx.lineWidth=4;pipCx.beginPath();pipCx.arc(ax+aw/2,ay+ah/2,aw/2,0,Math.PI*2);pipCx.stroke();
+  }
+  
+  // Рисуем комментарии (последние 3)
+  var comments = cE.querySelectorAll('.cm');
+  var startY = H - 180;
+  var drawn = 0;
+  for(var i=comments.length-1; i>=0 && drawn<3; i--){
+    var cm = comments[i];
+    var nickEl = cm.querySelector('.cm-nick');
+    var textEl = cm.querySelector('.cm-text');
+    if(!nickEl || !textEl) continue;
+    
+    var nick = nickEl.textContent;
+    var text = textEl.textContent;
+    var isBot = cm.classList.contains('cm-bot');
+    
+    var fontSize = 16;
+    pipCx.font = fontSize + 'px -apple-system,sans-serif';
+    var textWidth = pipCx.measureText(nick + ': ' + text).width;
+    var boxW = Math.min(W - 40, textWidth + 30);
+    var boxH = 36;
+    
+    var boxX = isBot ? W - boxW - 20 : 20;
+    var boxY = startY - drawn * (boxH + 10) - boxH;
+    
+    pipCx.fillStyle = isBot ? 'rgba(255,0,80,0.4)' : 'rgba(0,0,0,0.5)';
+    pipCx.beginPath();
+    pipCx.roundRect(boxX, boxY, boxW, boxH, 10);
+    pipCx.fill();
+    
+    pipCx.fillStyle = isBot ? '#ff96dc' : '#8ee8f4';
+    pipCx.font = 'bold 13px -apple-system,sans-serif';
+    pipCx.textAlign = 'left';
+    pipCx.textBaseline = 'middle';
+    pipCx.fillText(nick, boxX + 10, boxY + 10);
+    
+    pipCx.fillStyle = '#fff';
+    pipCx.font = '13px -apple-system,sans-serif';
+    pipCx.fillText(text.substring(0, 25) + (text.length > 25 ? '...' : ''), boxX + 10, boxY + 26);
+    
+    drawn++;
+  }
+  
   pipCx.fillStyle='#ff2850';pipCx.fillRect(14,14,58,26);
-  pipCx.fillStyle='#fff';pipCx.font='800 14px -apple-system,sans-serif';pipCx.textAlign='left';pipCx.textBaseline='middle';pipCx.fillText('LIVE',26,28);}
+  pipCx.fillStyle='#fff';pipCx.font='800 14px -apple-system,sans-serif';pipCx.textAlign='left';pipCx.textBaseline='middle';pipCx.fillText('LIVE',26,28);
+}
 
 var mediaRec=null,recChunks=[],lastBlob=null,lastName='',micStream=null;
 function startRec(auto){try{var vs=pipCan.captureStream(30);
@@ -768,15 +799,7 @@ function startMic(){var SR=window.SpeechRecognition||window.webkitSpeechRecognit
     recog.onend=function(){if(S.micOn&&!S.micMuted){micRun=false;setTimeout(function(){if(S.micOn&&!S.micMuted)startMic();},300);}else micRun=false;};
     recog.start();micRun=true;S.micOn=true;$('micSlash').style.display='none';}catch(e){console.warn(e);}}
 function toggleMic(){if(!S.micMuted){S.micMuted=true;$('micSlash').style.display='block';toast('🔇 Микрофон выключен');capE.style.display='none';}else{S.micMuted=false;$('micSlash').style.display='none';toast('🎤 Микрофон включён');if(!micRun)startMic();}}
-/* toggleEmoji — теперь безопасный */
-function toggleEmoji(){
-  S.emojisOn=!S.emojisOn;
-  var slash=$('emojiSlash');
-  if(slash) slash.style.display = S.emojisOn ? 'none' : 'block';
-  var rb=$('rbEmoji');
-  if(rb) rb.classList.toggle('on', S.emojisOn);
-  toast(S.emojisOn ? '😀 Смайлики включены' : '🚫 Смайлики выключены');
-}
+function toggleEmoji(){S.emojisOn=!S.emojisOn;var slash=$('emojiSlash');if(slash)slash.style.display=S.emojisOn?'none':'block';var rb=$('rbEmoji');if(rb)rb.classList.toggle('on',S.emojisOn);toast(S.emojisOn?'😀 Смайлики включены':'🚫 Смайлики выключены');}
 function pulse(el){el.classList.add('pulse');setTimeout(function(){el.classList.remove('pulse');},380);}
 
 function startStream(onStart){initAudio();unlockVoice();hideMenu();
@@ -870,8 +893,8 @@ $('wdSave').addEventListener('click',function(){if(!wdNick||!wdP)return;var c=ch
 /* ================= РЕДАКТОР ВИДЕО ================= */
 var vvStream=null,vvUrl=null;
 var vvTrimStart=0,vvTrimEnd=0,vvTrimDur=0,vvDragging=null;
-var TOOLS=['trim','canvas','color','filter','rotate','speed'];
-var TOOL_TITLES={trim:'Trim',canvas:'Canvas',color:'Background Color',filter:'Select Filter',rotate:'Rotate',speed:'Speed'};
+var TOOLS=['trim','canvas','filter','rotate','speed'];
+var TOOL_TITLES={trim:'Trim',canvas:'Canvas',filter:'Select Filter',rotate:'Rotate',speed:'Speed'};
 var vvActiveTool='trim';
 var vvOpts={ratio:'none',bgColor:'#000000',filter:'none',filterName:'Normal',rotate:0,flipH:false,flipV:false,speed:1.0,pitchEffect:false};
 
@@ -964,6 +987,7 @@ function updateTrimUI(){var total=vvTrimDur||1;var lp=(vvTrimStart/total)*100,rp
 
 document.querySelectorAll('.vv-ratio').forEach(function(el){el.addEventListener('click',function(){document.querySelectorAll('.vv-ratio').forEach(function(o){o.classList.remove('sel');});el.classList.add('sel');vvOpts.ratio=el.getAttribute('data-ratio');applyPreview();});});
 
+/* Убрана кнопка COLOR */
 (function(){
   var g=$('vvColorGrid');if(!g)return;
   BG_COLORS.forEach(function(c){
@@ -992,19 +1016,14 @@ function fillFilterPreviews(){
   });
 }
 
-document.querySelectorAll('.vv-rot-btn').forEach(function(el){
-  el.addEventListener('click',function(){
-    var r=el.getAttribute('data-rot');
-    if(r==='left'){vvOpts.rotate=(vvOpts.rotate+270)%360;}
-    else if(r==='right'){vvOpts.rotate=(vvOpts.rotate+90)%360;}
-    else if(r==='fliph'){vvOpts.flipH=!vvOpts.flipH;}
-    else if(r==='flipv'){vvOpts.flipV=!vvOpts.flipV;}
-    document.querySelectorAll('.vv-rot-btn').forEach(function(o){var or=o.getAttribute('data-rot');if(or==='fliph')o.classList.toggle('on',vvOpts.flipH);else if(or==='flipv')o.classList.toggle('on',vvOpts.flipV);});
-    applyPreview();
-  });
+/* Обновленная логика ROTATE */
+document.getElementById('vvRotateBtn').addEventListener('click', function() {
+  vvOpts.rotate = (vvOpts.rotate + 90) % 360;
+  applyPreview();
+  toast('Поворот: ' + vvOpts.rotate + '°');
 });
 
-$('vvSpeedSlider').addEventListener('input',function(e){vvOpts.speed=parseFloat(e.target.value);$('vvSpeedLabel').textContent=vvOpts.speed.toFixed(2).replace(/\.?0+$/,'')+'x';var v=$('vvVideo');if(v)v.playbackRate=vvOpts.speed;});
+$('vvSpeedSlider').addEventListener('input',function(e){vvOpts.speed=parseFloat(e.target.value);$('vvSpeedLabel').textContent=vvOpts.speed.toFixed(1)+'x';var v=$('vvVideo');if(v)v.playbackRate=vvOpts.speed;});
 $('vvSoundNatural').addEventListener('click',function(){vvOpts.pitchEffect=false;$('vvSoundNatural').classList.add('on');$('vvSoundPitch').classList.remove('on');});
 $('vvSoundPitch').addEventListener('click',function(){vvOpts.pitchEffect=true;$('vvSoundPitch').classList.add('on');$('vvSoundNatural').classList.remove('on');});
 
@@ -1033,7 +1052,10 @@ document.querySelectorAll('#vvTools .vv-tool').forEach(function(el){
   el.addEventListener('click',function(){var tool=el.getAttribute('data-tool');var v=$('vvVideo');try{v.pause();}catch(e){}openSheet(tool);});
 });
 
-$('vvSheetOk').addEventListener('click',function(){if(vvActiveTool==='trim'){exportEdit();}else{$('vvSheet').classList.remove('show');}});
+$('vvSheetOk').addEventListener('click',function(){
+  if(vvActiveTool==='trim'){exportEdit();}
+  else { $('vvSheet').classList.remove('show'); toast('Настройки применены'); }
+});
 
 async function exportEdit(){
   if(!vvStream||!vvTrimDur)return;
@@ -1041,9 +1063,6 @@ async function exportEdit(){
   try{
     var v=$('vvVideo');v.pause();
     var start=vvTrimStart,end=vvTrimEnd;
-    var fullRange=(start<0.05&&end>vvTrimDur-0.05);
-    var noChanges=fullRange&&vvOpts.ratio==='none'&&vvOpts.bgColor==='#000000'&&vvOpts.filter==='none'&&vvOpts.rotate===0&&!vvOpts.flipH&&!vvOpts.flipV&&vvOpts.speed===1;
-    if(noChanges){prog.remove();toast('Изменений нет');$('vvSheet').classList.remove('show');return;}
     var cv=document.createElement('canvas');
     var baseW=v.videoWidth||720,baseH=v.videoHeight||1280;
     var ratioW=baseW,ratioH=baseH;
@@ -1092,7 +1111,7 @@ async function exportEdit(){
     document.querySelectorAll('.vv-color').forEach(function(o){o.classList.toggle('sel',o.style.backgroundColor==='rgb(0, 0, 0)');});
     document.querySelectorAll('.vv-filter').forEach(function(o){o.classList.remove('sel');});
     document.querySelectorAll('.vv-rot-btn').forEach(function(o){o.classList.remove('on');});
-    $('vvSpeedSlider').value=1;$('vvSpeedLabel').textContent='1x';
+    $('vvSpeedSlider').value=1;$('vvSpeedLabel').textContent='1.0x';
     openVideoViewer(newS);toast('✅ Сохранено');
   }catch(e){prog.remove();toast('Ошибка: '+e.message);}
 }
