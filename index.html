@@ -198,8 +198,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:-ap
 #vvTools .vv-tool:active{transform:scale(.9)}
 #vvTools .vv-tool svg{width:28px;height:28px;flex-shrink:0}
 #vvTools .vv-tool span{font-size:10px;font-weight:700;letter-spacing:.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
-
-/* ===== ИСПРАВЛЕНО: панели в обычном потоке, без absolute ===== */
 #vvSheet{position:absolute;left:0;right:0;bottom:70px;background:#1a1a1e;border-radius:20px;z-index:11;display:none;flex-direction:column;max-height:70vh;animation:vvUp .25s ease-out;overflow:hidden;box-shadow:0 8px 30px rgba(0,0,0,.8)}
 #vvSheet.show{display:flex}
 @keyframes vvUp{from{transform:translateY(100%)}to{transform:none}}
@@ -208,10 +206,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:-ap
 #vvSheetHead .t-ok{width:38px;height:38px;border-radius:50%;background:#2f7fff;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
 #vvSheetHead .t-ok:active{transform:scale(.92)}
 #vvSheetHead .t-ok svg{width:20px;height:20px}
-/* Тело панели — растягивается по содержимому, ограничено 70vh */
 #vvSheetBody{overflow-y:auto;overflow-x:hidden;touch-action:pan-y;max-height:calc(70vh - 60px);-webkit-overflow-scrolling:touch;scrollbar-width:none}
 #vvSheetBody::-webkit-scrollbar{display:none}
-/* Панели теперь в обычном потоке — контент видно! */
 .vv-panel{display:none;padding:14px 16px 16px}
 .vv-panel.active{display:block}
 .vv-panel h4{font-size:13px;font-weight:700;opacity:.7;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px}
@@ -222,27 +218,23 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:-ap
 #vvTrimCanvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 #vvTrimOverlay{position:absolute;inset:0;pointer-events:none}
 #vvTrimOverlay .mask{position:absolute;top:0;bottom:0;background:rgba(0,0,0,.65)}
-#vvTrimOverlay .sel{position:absolute;top:0;bottom:0;border-top:3px solid #fff;border-bottom:3px solid #fff;box-shadow:0 0 12px rgba(255,255,255,.35);border-radius:4px}
+#vvTrimOverlay .sel{position:absolute;top:0;bottom:0;border-top:3px solid #fff;border-bottom:3px solid #fff;box-shadow:0 0 12px rgba(255,255,255,.35);border-radius:4px;pointer-events:none}
+/* Ручки внутри .sel — двигаются вместе с ним */
 #vvTrimOverlay .h{position:absolute;top:0;bottom:0;width:22px;background:#fff;border-radius:5px;display:flex;align-items:center;justify-content:center;pointer-events:auto;cursor:ew-resize;box-shadow:0 2px 8px rgba(0,0,0,.6);z-index:2}
 #vvTrimOverlay .h svg{width:14px;height:14px;pointer-events:none}
-#vvTrimOverlay .h.l{left:-2px}
-#vvTrimOverlay .h.r{right:-2px}
+#vvTrimOverlay .h.l{left:-11px}
+#vvTrimOverlay .h.r{right:-11px}
 #vvTrimTime{text-align:center;font-size:14px;font-weight:600;margin-top:10px;opacity:.9}
 #vvTrimTotal{text-align:right;font-size:12px;opacity:.6;margin-bottom:8px}
 .vv-ratios{display:flex;gap:8px;justify-content:space-between;margin-top:12px}
 .vv-ratio{flex:1;padding:12px 4px;background:rgba(255,255,255,.08);border-radius:10px;text-align:center;cursor:pointer;font-size:12px;font-weight:700;border:2px solid transparent;transition:transform .12s}
 .vv-ratio:active{transform:scale(.94)}
 .vv-ratio.sel{background:linear-gradient(135deg,#4a6ec4,#6f92e0);border-color:#fff}
-.vv-colors{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;padding:4px 0}
-.vv-color{aspect-ratio:1;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:transform .12s}
-.vv-color:active{transform:scale(.9)}
-.vv-color.sel{border-color:#fff;box-shadow:0 0 0 2px rgba(0,0,0,.5),0 0 0 4px rgba(255,255,255,.15)}
 .vv-filters{display:flex;gap:10px;overflow-x:auto;padding-bottom:8px;margin:0 -16px;padding-left:16px;padding-right:16px;scrollbar-width:none}
 .vv-filters::-webkit-scrollbar{display:none}
 .vv-filter{flex:0 0 auto;width:80px;cursor:pointer;text-align:center}
 .vv-filter .fbox{width:80px;height:110px;border-radius:8px;background:#000;overflow:hidden;border:2px solid transparent;margin-bottom:6px;display:flex;align-items:center;justify-content:center;position:relative}
-.vv-filter .fbox video{width:100%;height:100%;object-fit:cover;pointer-events:none}
-.vv-filter .fbox::after{content:"";position:absolute;inset:0;background:inherit;pointer-events:none}
+.vv-filter .fbox canvas{width:100%;height:100%;object-fit:cover}
 .vv-filter.sel .fbox{border-color:#fff}
 .vv-filter span{font-size:11px;font-weight:600;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .vv-rotate-row{display:flex;gap:10px;justify-content:space-around;margin-top:14px}
@@ -256,9 +248,10 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:-ap
 .vv-speed-slider{width:100%;height:6px;-webkit-appearance:none;appearance:none;background:rgba(255,255,255,.15);border-radius:3px;outline:none;margin:12px 0 20px}
 .vv-speed-slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:24px;height:24px;border-radius:50%;background:#fff;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.5)}
 .vv-speed-slider::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:#fff;cursor:pointer;border:none}
-.vv-speed-modes{display:flex;background:rgba(255,255,255,.08);border-radius:14px;padding:4px;margin-top:8px}
-.vv-speed-modes button{flex:1;padding:10px;border:none;background:transparent;color:#fff;font-size:12px;font-weight:700;cursor:pointer;border-radius:10px;font-family:inherit}
-.vv-speed-modes button.on{background:#fff;color:#000}
+/* Прогресс */
+#vvProgress{display:none;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.92);padding:18px 28px;border-radius:16px;font-size:14px;font-weight:700;color:#fff;z-index:99;text-align:center;min-width:180px}
+#vvProgress.show{display:block}
+#vvProgress .pct{font-size:32px;font-weight:900;color:#2f7fff;margin-top:6px}
 </style>
 </head>
 <body>
@@ -376,6 +369,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:-ap
 <div id="videoViewer">
   <div id="vvStage">
     <div id="vvFrame"><video id="vvVideo" playsinline controls></video></div>
+    <div id="vvProgress"><div>Сохранение...</div><div class="pct" id="vvPct">0%</div></div>
   </div>
   <div id="vvHead">
     <div class="vv-btn" id="vvBack"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><polyline points="15 6 9 12 15 18"/></svg></div>
@@ -405,9 +399,10 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:-ap
             <div id="vvTrimOverlay">
               <div class="mask" id="vvMaskL"></div>
               <div class="mask" id="vvMaskR"></div>
-              <div class="sel" id="vvSel"></div>
-              <div class="h l" id="vvHandleL"><svg viewBox="0 0 24 24" fill="#333"><polygon points="15,6 9,12 15,18"/></svg></div>
-              <div class="h r" id="vvHandleR"><svg viewBox="0 0 24 24" fill="#333"><polygon points="9,6 15,12 9,18"/></svg></div>
+              <div class="sel" id="vvSel">
+                <div class="h l" id="vvHandleL"><svg viewBox="0 0 24 24" fill="#333"><polygon points="15,6 9,12 15,18"/></svg></div>
+                <div class="h r" id="vvHandleR"><svg viewBox="0 0 24 24" fill="#333"><polygon points="9,6 15,12 9,18"/></svg></div>
+              </div>
             </div>
           </div>
           <div id="vvTrimTime">0:00.0 - 0:00.0</div>
@@ -445,10 +440,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:-ap
         <h4>Speed</h4>
         <div class="vv-speed-val"><span id="vvSpeedLabel">1.0x</span></div>
         <input type="range" min="1" max="4" step="0.1" value="1" class="vv-speed-slider" id="vvSpeedSlider">
-        <div class="vv-speed-modes">
-          <button class="on" id="vvSoundNatural">Natural Sound</button>
-          <button id="vvSoundPitch">Pitch Effect</button>
-        </div>
       </div>
     </div>
   </div>
@@ -861,13 +852,12 @@ var vvTrimStart=0,vvTrimEnd=0,vvTrimDur=0,vvDragging=null;
 var TOOLS=['trim','canvas','filter','rotate','speed'];
 var TOOL_TITLES={trim:'Trim',canvas:'Canvas',filter:'Select Filter',rotate:'Rotate',speed:'Speed'};
 var vvActiveTool='trim';
-var vvOpts={ratio:'none',bgColor:'#000000',filter:'none',filterName:'Normal',rotate:0,flipH:false,flipV:false,speed:1.0,pitchEffect:false};
+var vvOpts={ratio:'none',bgColor:'#000000',filter:'none',filterName:'Normal',rotate:0,flipH:false,flipV:false,speed:1.0};
 
 function fmtT(s){if(!s||isNaN(s))return'0:00';var m=Math.floor(s/60),x=Math.floor(s%60);return m+':'+(x<10?'0':'')+x;}
 function fmtT2(s){if(!s||isNaN(s))return'0:00.0';var m=Math.floor(s/60),x=s%60;return m+':'+(x<10?'0':'')+x.toFixed(1);}
 
 var FILTERS=[{name:'Normal',css:'none'},{name:'Chrome',css:'contrast(1.2) saturate(1.3) brightness(1.05)'},{name:'Fade',css:'contrast(.9) saturate(.7) brightness(1.1)'},{name:'Instant',css:'contrast(1.1) saturate(1.4) hue-rotate(-10deg)'},{name:'Mono',css:'grayscale(1) contrast(1.1)'},{name:'Noir',css:'grayscale(1) contrast(1.5) brightness(.9)'},{name:'Process',css:'contrast(1.3) saturate(1.2) hue-rotate(15deg)'},{name:'Tonal',css:'sepia(.4) contrast(1.1)'},{name:'Transfer',css:'contrast(1.4) saturate(.9)'},{name:'Tone',css:'sepia(.2) brightness(1.05)'},{name:'Linear',css:'contrast(1.15) brightness(1.05)'}];
-var BG_COLORS=['#000000','#1a1a1a','#333333','#666666','#999999','#cccccc','#ffffff','#e0e0e0','#1a2e5a','#2f7fff','#4a90e2','#80d8ff','#c2e9fb','#6ee7b7','#10b981','#166534','#f0d8a0','#ffce56','#ffb84d','#fb923c','#c2410c','#7c2d12','#f5576c','#ff0050','#fa709a','#ff96dc','#f093fb','#c88cff','#9966ff','#5a3a8a','#2a1a4a','#1a0a2e'];
 
 function openVideoViewer(s){
   vvStream=s;
@@ -877,7 +867,7 @@ function openVideoViewer(s){
   v.src=vvUrl;v.playbackRate=1;v.style.transform='';v.style.filter='none';
   var frame=$('vvFrame');
   frame.style.background='#000';frame.style.width='';frame.style.height='';
-  vvOpts={ratio:'none',bgColor:'#000000',filter:'none',filterName:'Normal',rotate:0,flipH:false,flipV:false,speed:1,pitchEffect:false};
+  vvOpts={ratio:'none',bgColor:'#000000',filter:'none',filterName:'Normal',rotate:0,flipH:false,flipV:false,speed:1};
   document.querySelectorAll('.vv-ratio').forEach(function(o){o.classList.toggle('sel',o.getAttribute('data-ratio')==='none');});
   document.querySelectorAll('.vv-rot-btn').forEach(function(o){o.classList.remove('on');});
   var sl=$('vvSpeedSlider');if(sl)sl.value=1;
@@ -939,27 +929,42 @@ function drawThumbs(){
   tmpV.addEventListener('seeked',function(){try{var scale=Math.max(tw/tmpV.videoWidth,cv.height/tmpV.videoHeight);var dw=tmpV.videoWidth*scale,dh=tmpV.videoHeight*scale;var dx=idx*tw+(tw-dw)/2,dy=(cv.height-dh)/2;ctx.save();ctx.beginPath();ctx.rect(idx*tw,0,tw,cv.height);ctx.clip();ctx.drawImage(tmpV,dx,dy,dw,dh);ctx.restore();}catch(e){}idx++;if(idx<count)step();});
   step();
 }
-function updateTrimUI(){var total=vvTrimDur||1;var lp=(vvTrimStart/total)*100,rp=(vvTrimEnd/total)*100;$('vvMaskL').style.left='0';$('vvMaskL').style.width=lp+'%';$('vvMaskR').style.left=rp+'%';$('vvMaskR').style.width=(100-rp)+'%';$('vvSel').style.left=lp+'%';$('vvSel').style.width=(rp-lp)+'%';$('vvTrimTime').textContent=fmtT2(vvTrimStart)+' - '+fmtT2(vvTrimEnd);}
+function updateTrimUI(){
+  var total=vvTrimDur||1;
+  var lp=(vvTrimStart/total)*100,rp=(vvTrimEnd/total)*100;
+  $('vvMaskL').style.left='0';$('vvMaskL').style.width=lp+'%';
+  $('vvMaskR').style.left=rp+'%';$('vvMaskR').style.width=(100-rp)+'%';
+  $('vvSel').style.left=lp+'%';$('vvSel').style.width=(rp-lp)+'%';
+  $('vvTrimTime').textContent=fmtT2(vvTrimStart)+' - '+fmtT2(vvTrimEnd);
+}
 (function(){
   var track=$('vvTrimTrack');
   function pctFromEvent(e){var r=track.getBoundingClientRect();var x=(e.touches?e.touches[0].clientX:e.clientX)-r.left;return Math.max(0,Math.min(1,x/r.width));}
-  function down(e){var t=e.target;if(t.closest&&t.closest('#vvHandleL'))vvDragging='L';else if(t.closest&&t.closest('#vvHandleR'))vvDragging='R';else vvDragging=null;if(vvDragging){try{$('vvVideo').pause();}catch(err){}if(e.cancelable)e.preventDefault();e.stopPropagation();}}
-  function move(e){if(!vvDragging)return;if(e.cancelable)e.preventDefault();e.stopPropagation();var p=pctFromEvent(e);var t=p*vvTrimDur;if(vvDragging==='L')vvTrimStart=Math.max(0,Math.min(vvTrimEnd-0.15,t));else vvTrimEnd=Math.min(vvTrimDur,Math.max(vvTrimStart+0.15,t));updateTrimUI();}
+  function down(e){
+    var t=e.target;
+    if(t.closest&&t.closest('#vvHandleL'))vvDragging='L';
+    else if(t.closest&&t.closest('#vvHandleR'))vvDragging='R';
+    else vvDragging=null;
+    if(vvDragging){try{$('vvVideo').pause();}catch(err){}if(e.cancelable)e.preventDefault();e.stopPropagation();}
+  }
+  function move(e){
+    if(!vvDragging)return;
+    if(e.cancelable)e.preventDefault();e.stopPropagation();
+    var p=pctFromEvent(e);var t=p*vvTrimDur;
+    if(vvDragging==='L')vvTrimStart=Math.max(0,Math.min(vvTrimEnd-0.15,t));
+    else vvTrimEnd=Math.min(vvTrimDur,Math.max(vvTrimStart+0.15,t));
+    updateTrimUI();
+  }
   function up(){vvDragging=null;}
-  track.addEventListener('touchstart',down,{passive:false});track.addEventListener('touchmove',move,{passive:false});track.addEventListener('touchend',up);track.addEventListener('touchcancel',up);track.addEventListener('mousedown',down);
-  document.addEventListener('mousemove',move);document.addEventListener('mouseup',up);
+  track.addEventListener('touchstart',down,{passive:false});
+  track.addEventListener('touchmove',move,{passive:false});
+  track.addEventListener('touchend',up);track.addEventListener('touchcancel',up);
+  track.addEventListener('mousedown',down);
+  document.addEventListener('mousemove',move);
+  document.addEventListener('mouseup',up);
 })();
 
 document.querySelectorAll('.vv-ratio').forEach(function(el){el.addEventListener('click',function(){document.querySelectorAll('.vv-ratio').forEach(function(o){o.classList.remove('sel');});el.classList.add('sel');vvOpts.ratio=el.getAttribute('data-ratio');applyPreview();});});
-
-(function(){
-  var g=$('vvColorGrid');if(!g)return;
-  BG_COLORS.forEach(function(c){
-    var d=document.createElement('div');d.className='vv-color'+(c==='#000000'?' sel':'');d.style.background=c;
-    d.onclick=function(){g.querySelectorAll('.vv-color').forEach(function(o){o.classList.remove('sel');});d.classList.add('sel');vvOpts.bgColor=c;var frame=$('vvFrame');if(frame)frame.style.background=c;};
-    g.appendChild(d);
-  });
-})();
 
 function fillFilterPreviews(){
   var list=$('vvFilterList');if(list.dataset.filled==='1')return;list.dataset.filled='1';
@@ -987,8 +992,6 @@ document.getElementById('vvRotateBtn').addEventListener('click', function() {
 });
 
 $('vvSpeedSlider').addEventListener('input',function(e){vvOpts.speed=parseFloat(e.target.value);$('vvSpeedLabel').textContent=vvOpts.speed.toFixed(1)+'x';var v=$('vvVideo');if(v)v.playbackRate=vvOpts.speed;});
-$('vvSoundNatural').addEventListener('click',function(){vvOpts.pitchEffect=false;$('vvSoundNatural').classList.add('on');$('vvSoundPitch').classList.remove('on');});
-$('vvSoundPitch').addEventListener('click',function(){vvOpts.pitchEffect=true;$('vvSoundPitch').classList.add('on');$('vvSoundNatural').classList.remove('on');});
 
 function applyPreview(){
   var v=$('vvVideo');var frame=$('vvFrame');if(!v||!frame)return;
@@ -1020,9 +1023,13 @@ $('vvSheetOk').addEventListener('click',function(){
   else { $('vvSheet').classList.remove('show'); toast('Настройки применены'); }
 });
 
+/* ===== Экспорт с прогрессом 0-100% ===== */
 async function exportEdit(){
   if(!vvStream||!vvTrimDur)return;
-  var prog=document.createElement('div');prog.style.cssText='position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:9999;background:rgba(0,0,0,.92);padding:18px 26px;border-radius:16px;font-size:14px;font-weight:700;color:#fff;pointer-events:none';prog.textContent='Обработка...';document.body.appendChild(prog);
+  var prog=$('vvProgress'),pctEl=$('vvPct');
+  prog.classList.add('show');
+  pctEl.textContent='0%';
+  var setPct=function(p){pctEl.textContent=Math.round(p)+'%';};
   try{
     var v=$('vvVideo');v.pause();
     var start=vvTrimStart,end=vvTrimEnd;
@@ -1058,9 +1065,26 @@ async function exportEdit(){
     requestAnimationFrame(draw);
     var seek=function(t){return new Promise(function(r){if(Math.abs(v.currentTime-t)<0.05){setTimeout(r,30);return;}var dn=false;var to=setTimeout(function(){if(!dn){dn=true;v.removeEventListener('seeked',oh);r();}},2500);function oh(){if(dn)return;dn=true;clearTimeout(to);v.removeEventListener('seeked',oh);setTimeout(r,20);}v.addEventListener('seeked',oh);try{v.currentTime=t;}catch(e){clearTimeout(to);if(!dn){dn=true;r();}}});};
     await seek(start);
-    v.playbackRate=vvOpts.speed;await v.play();
-    await new Promise(function(r){var w=function(){if(v.currentTime>=end-0.03||v.ended){v.pause();r();return;}requestAnimationFrame(w);};w();});
-    stopped=true;done=true;try{rec.stop();}catch(e){}await finished;
+    v.playbackRate=vvOpts.speed;
+    await v.play();
+    await new Promise(function(r){
+      var w=function(){
+        if(v.currentTime>=end-0.03||v.ended){
+          v.pause();
+          setPct(100);
+          r();
+          return;
+        }
+        var cur = v.currentTime - start;
+        var dur = (end - start) || 1;
+        var p = Math.max(0, Math.min(99, (cur/dur)*100));
+        setPct(p);
+        requestAnimationFrame(w);
+      };
+      w();
+    });
+    stopped=true;done=true;try{rec.stop();}catch(e){}
+    await finished;
     var type=rec.mimeType||'video/webm';var ext=type.indexOf('mp4')>=0?'mp4':'webm';
     var name=vvStream.filename.replace(/\.[^.]+$/,'')+'-edit.'+ext;
     var blob=new Blob(chunks,{type:type});
@@ -1068,13 +1092,14 @@ async function exportEdit(){
     myStreams.unshift(newS);
     if(myStreams.length>20){var rm=myStreams.pop();if(rm&&rm.filename)deleteVideoFromIDB(rm.filename).catch(function(){});}
     saveVideoToIDB(newS).catch(function(){});
-    prog.remove();$('vvSheet').classList.remove('show');
-    vvOpts={ratio:'none',bgColor:'#000000',filter:'none',filterName:'Normal',rotate:0,flipH:false,flipV:false,speed:1,pitchEffect:false};
+    prog.classList.remove('show');
+    $('vvSheet').classList.remove('show');
+    vvOpts={ratio:'none',bgColor:'#000000',filter:'none',filterName:'Normal',rotate:0,flipH:false,flipV:false,speed:1};
     document.querySelectorAll('.vv-ratio').forEach(function(o){o.classList.toggle('sel',o.getAttribute('data-ratio')==='none');});
     document.querySelectorAll('.vv-filter').forEach(function(o){o.classList.remove('sel');});
     $('vvSpeedSlider').value=1;$('vvSpeedLabel').textContent='1.0x';
     openVideoViewer(newS);toast('✅ Сохранено');
-  }catch(e){prog.remove();toast('Ошибка: '+e.message);}
+  }catch(e){prog.classList.remove('show');toast('Ошибка: '+e.message);}
 }
 
 $('vvBack').addEventListener('click',function(){$('vvSheet').classList.remove('show');});
