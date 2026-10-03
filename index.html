@@ -184,8 +184,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:-ap
 #videoViewer{position:fixed;inset:0;z-index:3000;background:#000;display:none;flex-direction:column}
 #videoViewer.show{display:flex}
 #vvStage{flex:1;position:relative;display:flex;align-items:center;justify-content:center;background:#000;overflow:hidden;min-height:0}
-#vvFrame{position:relative;max-width:100%;max-height:100%;background:#000;transition:width .15s,height .15s}
-#vvVideo{display:block;width:100%;height:100%;object-fit:contain;background:#000;transition:transform .25s,filter .15s}
+#vvFrame{position:relative;max-width:100%;max-height:100%;background:#000;transition:width .15s,height .15s;display:flex;align-items:center;justify-content:center}
+#vvVideo{display:block;max-width:100%;max-height:100%;width:100%;height:100%;object-fit:contain;background:#000;transition:transform .25s,filter .15s}
 #vvHead{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;gap:10px;padding:calc(14px + env(safe-area-inset-top)) 14px 14px;background:linear-gradient(180deg,rgba(0,0,0,.85),transparent);z-index:10;pointer-events:auto}
 #vvHead .vv-btn{width:42px;height:42px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:rgba(255,255,255,.15);border-radius:50%;backdrop-filter:blur(10px);transition:transform .12s;flex-shrink:0}
 #vvHead .vv-btn:active{transform:scale(.88)}
@@ -855,9 +855,13 @@ function openVideoViewer(s){
   v.playbackRate=1;
   v.style.transform='';
   v.style.filter='none';
-  $('vvFrame').style.background='#000';
-  $('vvFrame').style.width='';
-  $('vvFrame').style.height='';
+  var frame=$('vvFrame');
+  frame.style.background='#000';
+  frame.style.width='';
+  frame.style.height='';
+  // Сбрасываем настройки редактора
+  vvOpts.ratio='none';vvOpts.bgColor='#000000';vvOpts.filter='none';vvOpts.filterName='Normal';
+  vvOpts.rotate=0;vvOpts.flipH=false;vvOpts.flipV=false;vvOpts.speed=1;vvOpts.pitchEffect=false;
   try{v.currentTime=0;}catch(e){}
   $('vvTitle').textContent=s.filename;
   $('vvSheet').classList.remove('show');
@@ -875,6 +879,8 @@ function openSheet(tool){
   $('vvSheetTitle').textContent=TOOL_TITLES[tool]||'Edit';
   document.querySelectorAll('.vv-panel').forEach(function(p){p.classList.toggle('active',p.getAttribute('data-panel')===tool);});
   $('vvSheet').classList.add('show');
+  // Применяем текущие настройки
+  applyPreview();
   if(tool==='trim')setTimeout(initTrim,120);
   if(tool==='filter')setTimeout(fillFilterPreviews,100);
 }
@@ -886,7 +892,6 @@ function openSheet(tool){
   body.addEventListener('touchstart',function(e){
     if(e.touches.length!==1)return;
     var t=e.target;
-    /* Игнорируем свайп на ползунках trim и в горизонтальных скроллах */
     if(t.closest&&(t.closest('#vvTrimTrack')||t.closest('.vv-hscroll')||t.closest('.vv-filters'))){swiping=false;return;}
     sx=e.touches[0].clientX;sy=e.touches[0].clientY;swiping=true;lockDir=null;
   },{passive:true});
@@ -985,19 +990,26 @@ document.querySelectorAll('.vv-ratio').forEach(function(el){
   });
 });
 
-/* COLOR */
+/* COLOR — теперь реально меняет фон рамки */
 (function(){
   var g=$('vvColorGrid');
+  if(!g) return;
   BG_COLORS.forEach(function(c){
     var d=document.createElement('div');
     d.className='vv-color'+(c==='#000000'?' sel':'');
     d.style.background=c;
-    d.onclick=function(){g.querySelectorAll('.vv-color').forEach(function(o){o.classList.remove('sel');});d.classList.add('sel');vvOpts.bgColor=c;applyPreview();};
+    d.onclick=function(){
+      g.querySelectorAll('.vv-color').forEach(function(o){o.classList.remove('sel');});
+      d.classList.add('sel');
+      vvOpts.bgColor=c;
+      var frame=$('vvFrame');
+      if(frame) frame.style.background=c;
+    };
     g.appendChild(d);
   });
 })();
 
-/* FILTER */
+/* FILTER — теперь реально применяет фильтр */
 function fillFilterPreviews(){
   var list=$('vvFilterList');
   if(list.dataset.filled==='1')return;
@@ -1017,11 +1029,12 @@ function fillFilterPreviews(){
     el.onclick=function(){
       list.querySelectorAll('.vv-filter').forEach(function(o){o.classList.remove('sel');});
       el.classList.add('sel');
-      vvOpts.filter=f.css;vvOpts.filterName=f.name;
-      applyPreview();
+      vvOpts.filter=f.css;
+      vvOpts.filterName=f.name;
+      var video=$('vvVideo');
+      if(video) video.style.filter=f.css==='none'?'none':f.css;
     };
     list.appendChild(el);
-    /* Попробуем заполнить превьюшку кадром */
     try{
       var tmp=document.createElement('video');
       tmp.src=vvUrl;tmp.muted=true;tmp.preload='auto';
@@ -1044,7 +1057,7 @@ function fillFilterPreviews(){
   });
 }
 
-/* ROTATE */
+/* ROTATE — теперь реально поворачивает видео */
 document.querySelectorAll('.vv-rot-btn').forEach(function(el){
   el.addEventListener('click',function(){
     var r=el.getAttribute('data-rot');
@@ -1061,15 +1074,12 @@ document.querySelectorAll('.vv-rot-btn').forEach(function(el){
   });
 });
 
-/* SPEED */
+/* SPEED — теперь реально меняет скорость видео */
 $('vvSpeedSlider').addEventListener('input',function(e){
   vvOpts.speed=parseFloat(e.target.value);
   $('vvSpeedLabel').textContent=vvOpts.speed.toFixed(2).replace(/\.?0+$/,'')+'x';
   var v=$('vvVideo');
-  v.playbackRate=vvOpts.speed;
-  if(vvOpts.pitchEffect){
-    /* Без реального pitch-шифта, меняем только rate */
-  }
+  if(v) v.playbackRate=vvOpts.speed;
 });
 $('vvSoundNatural').addEventListener('click',function(){
   vvOpts.pitchEffect=false;
@@ -1080,21 +1090,22 @@ $('vvSoundPitch').addEventListener('click',function(){
   $('vvSoundPitch').classList.add('on');$('vvSoundNatural').classList.remove('on');
 });
 
-/* Применить превью */
+/* Применить превью (цвет, фильтр, поворот) */
 function applyPreview(){
   var v=$('vvVideo');
   var frame=$('vvFrame');
-  /* Transform */
+  if(!v||!frame)return;
+  // Transform
   var tr=[];
   if(vvOpts.rotate)tr.push('rotate('+vvOpts.rotate+'deg)');
   var sx=vvOpts.flipH?-1:1,sy=vvOpts.flipV?-1:1;
   if(sx!==1||sy!==1)tr.push('scale('+sx+','+sy+')');
   v.style.transform=tr.join(' ');
-  /* Filter */
+  // Filter
   v.style.filter=vvOpts.filter==='none'?'none':vvOpts.filter;
-  /* Background */
+  // Background
   frame.style.background=vvOpts.bgColor;
-  /* Ratio */
+  // Ratio
   if(vvOpts.ratio==='none'){
     frame.style.width='';frame.style.height='';
   }else{
@@ -1137,12 +1148,12 @@ document.querySelectorAll('#vvTools .vv-tool').forEach(function(el){
   });
 });
 
-/* OK — применить изменения через перекодирование */
-$('vvSheetOk').addEventListener('click',async function(){
+/* OK — применить изменения */
+$('vvSheetOk').addEventListener('click', function(){
   if(vvActiveTool==='trim'){
-    await exportEdit();
+    exportEdit();
   } else {
-    /* Для остальных просто закрываем панель, изменения уже применены в превью */
+    // Для остальных инструментов изменения уже применены в реальном времени
     $('vvSheet').classList.remove('show');
   }
 });
@@ -1169,7 +1180,6 @@ async function exportEdit(){
     if(vvOpts.ratio!=='none'){
       var parts=vvOpts.ratio.split(':');
       var ar=parseFloat(parts[0])/parseFloat(parts[1]);
-      /* Вписываем видео в пропорцию */
       if(baseW/baseH>ar){ratioW=baseW;ratioH=baseW/ar;}
       else{ratioH=baseH;ratioW=baseH*ar;}
     }
@@ -1202,7 +1212,6 @@ async function exportEdit(){
           drawW=ratioH;drawH=ratioW;
         }
         ctx.filter=vvOpts.filter==='none'?'none':vvOpts.filter;
-        /* contain */
         var sc=Math.min(drawW/vw,drawH/vh);
         var dw=vw*sc,dh=vh*sc;
         ctx.drawImage(v,-dw/2,-dh/2,dw,dh);
@@ -1238,7 +1247,6 @@ async function exportEdit(){
     myStreams.unshift(newS);if(myStreams.length>20)myStreams.pop();
     prog.remove();
     $('vvSheet').classList.remove('show');
-    /* Сбрасываем опции */
     vvOpts={ratio:'none',bgColor:'#000000',filter:'none',filterName:'Normal',rotate:0,flipH:false,flipV:false,speed:1,pitchEffect:false};
     document.querySelectorAll('.vv-ratio').forEach(function(o){o.classList.toggle('sel',o.getAttribute('data-ratio')==='none');});
     document.querySelectorAll('.vv-color').forEach(function(o){o.classList.toggle('sel',o.style.backgroundColor==='rgb(0, 0, 0)');});
