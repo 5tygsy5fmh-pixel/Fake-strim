@@ -179,6 +179,41 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:-ap
 #botAvatar .av-face{width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:inherit;border-radius:50%}
 #botAvatar .av-name{position:absolute;bottom:-28px;left:50%;transform:translateX(-50%);white-space:nowrap;background:linear-gradient(135deg,rgba(255,0,80,.9),rgba(255,92,138,.9));padding:4px 10px;border-radius:12px;font-size:11px;font-weight:800;pointer-events:none}
 #fatal{position:fixed;inset:0;background:#200;color:#fff;padding:20px;font:14px monospace;z-index:99999;display:none;white-space:pre-wrap;overflow:auto}
+
+/* ============ ВИДЕОПРОСМОТРЩИК + РЕДАКТОР ============ */
+#videoViewer{position:fixed;inset:0;z-index:3000;background:#000;display:none;flex-direction:column}
+#videoViewer.show{display:flex}
+#vvVideo{flex:1;width:100%;object-fit:contain;background:#000;min-height:0}
+#vvHead{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;gap:10px;padding:calc(14px + env(safe-area-inset-top)) 14px 14px;background:linear-gradient(180deg,rgba(0,0,0,.85),transparent);z-index:10;pointer-events:auto}
+#vvHead .vv-btn{width:42px;height:42px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:rgba(255,255,255,.15);border-radius:50%;backdrop-filter:blur(10px);transition:transform .12s;flex-shrink:0}
+#vvHead .vv-btn:active{transform:scale(.88)}
+#vvHead .vv-btn svg{width:22px;height:22px}
+#vvHead .vv-title{flex:1;font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center}
+#vvTools{position:absolute;bottom:0;left:0;right:0;display:flex;justify-content:space-around;align-items:flex-end;padding:14px 6px calc(20px + env(safe-area-inset-bottom));background:linear-gradient(0deg,rgba(0,0,0,.95) 60%,transparent);z-index:10;pointer-events:auto}
+#vvTools .vv-tool{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;padding:6px 2px;flex:1;transition:transform .12s;min-width:0}
+#vvTools .vv-tool:active{transform:scale(.9)}
+#vvTools .vv-tool svg{width:28px;height:28px;flex-shrink:0}
+#vvTools .vv-tool span{font-size:10px;font-weight:700;letter-spacing:.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+#vvTrimPanel{position:absolute;left:0;right:0;bottom:0;background:#1a1a1e;padding:16px 16px calc(24px + env(safe-area-inset-bottom));z-index:11;display:none;pointer-events:auto;border-top-left-radius:20px;border-top-right-radius:20px;animation:vvUp .25s ease-out}
+@keyframes vvUp{from{transform:translateY(100%)}to{transform:none}}
+#vvTrimPanel.show{display:block}
+#vvTrimHead{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+#vvTrimHead .t-title{font-size:16px;font-weight:700}
+#vvTrimHead .t-ok{width:38px;height:38px;border-radius:50%;background:#2f7fff;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+#vvTrimHead .t-ok:active{transform:scale(.92)}
+#vvTrimHead .t-ok svg{width:20px;height:20px}
+#vvTrimTotal{text-align:right;font-size:12px;opacity:.6;margin-bottom:10px}
+#vvTrimTrack{position:relative;height:64px;background:#000;border-radius:8px;overflow:hidden;margin-bottom:10px;touch-action:none;user-select:none}
+#vvTrimCanvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+#vvTrimOverlay{position:absolute;inset:0;pointer-events:none}
+#vvTrimOverlay .mask{position:absolute;top:0;bottom:0;background:rgba(0,0,0,.65)}
+#vvTrimOverlay .sel{position:absolute;top:0;bottom:0;border-top:3px solid #fff;border-bottom:3px solid #fff;box-shadow:0 0 12px rgba(255,255,255,.35);border-radius:4px;background:transparent}
+#vvTrimOverlay .h{position:absolute;top:0;bottom:0;width:22px;background:#fff;border-radius:5px;display:flex;align-items:center;justify-content:center;pointer-events:auto;cursor:ew-resize;box-shadow:0 2px 8px rgba(0,0,0,.6);z-index:2}
+#vvTrimOverlay .h:active{transform:scale(1.06)}
+#vvTrimOverlay .h svg{width:14px;height:14px;pointer-events:none}
+#vvTrimOverlay .h.l{left:-2px}
+#vvTrimOverlay .h.r{right:-2px}
+#vvTrimTime{text-align:center;font-size:14px;opacity:.9;font-weight:600;letter-spacing:.5px;margin-top:4px}
 </style>
 </head>
 <body>
@@ -294,6 +329,42 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:-ap
   <div class="wd-gender-row"><div class="wd-gender-opt" data-gender="female">♀ Женский</div><div class="wd-gender-opt" data-gender="male">♂ Мужской</div></div>
   <div class="wd-btns"><button class="wd-cancel" id="wdCancel">Отмена</button><button class="wd-save" id="wdSave">Сохранить</button></div>
 </div></div>
+
+<div id="videoViewer">
+  <video id="vvVideo" playsinline controls></video>
+  <div id="vvHead">
+    <div class="vv-btn" id="vvBack"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><polyline points="15 6 9 12 15 18"/></svg></div>
+    <div class="vv-title" id="vvTitle">Видео</div>
+    <div class="vv-btn" id="vvEdit"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
+    <div class="vv-btn" id="vvSave"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg></div>
+  </div>
+  <div id="vvTools">
+    <div class="vv-tool" data-tool="trim"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="8.5" y1="8.5" x2="20" y2="20"/><line x1="8.5" y1="15.5" x2="20" y2="4"/></svg><span>TRIM</span></div>
+    <div class="vv-tool" data-tool="canvas"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M3 9h18"/></svg><span>CANVAS</span></div>
+    <div class="vv-tool" data-tool="color"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 3v18"/></svg><span>COLOR</span></div>
+    <div class="vv-tool" data-tool="filter"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="9" cy="14" r="5"/><circle cx="15" cy="10" r="5"/></svg><span>FILTER</span></div>
+    <div class="vv-tool" data-tool="rotate"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><polyline points="21 3 21 9 15 9"/></svg><span>ROTATE</span></div>
+    <div class="vv-tool" data-tool="speed"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 12l4-3"/><path d="M12 12l-2 4"/></svg><span>SPEED</span></div>
+  </div>
+  <div id="vvTrimPanel">
+    <div id="vvTrimHead">
+      <div class="t-title">Обрезка</div>
+      <button class="t-ok" id="vvTrimOk"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 13 10 18 20 6"/></svg></button>
+    </div>
+    <div id="vvTrimTotal">Всего: <span id="vvTrimTotalTime">0:00</span></div>
+    <div id="vvTrimTrack">
+      <canvas id="vvTrimCanvas"></canvas>
+      <div id="vvTrimOverlay">
+        <div class="mask" id="vvMaskL"></div>
+        <div class="mask" id="vvMaskR"></div>
+        <div class="sel" id="vvSel"></div>
+        <div class="h l" id="vvHandleL"><svg viewBox="0 0 24 24" fill="#333"><polygon points="15,6 9,12 15,18"/></svg></div>
+        <div class="h r" id="vvHandleR"><svg viewBox="0 0 24 24" fill="#333"><polygon points="9,6 15,12 9,18"/></svg></div>
+      </div>
+    </div>
+    <div id="vvTrimTime">0:00.0 - 0:00.0</div>
+  </div>
+</div>
 
 <div id="saveModal">
   <div class="sm-title">🎬 Видео готово</div>
@@ -589,7 +660,7 @@ function buildFollowing(){var body=$('followingBody');body.innerHTML='';var keys
 function buildMyStreams(){var body=$('myStreamsBody');body.innerHTML='';if(!myStreams.length){body.innerHTML='<div class="empty-inbox"><span class="em">🎬</span>Пока нет записей.</div>';return;}
   for(var i=0;i<myStreams.length;i++)(function(s){var el=document.createElement('div');el.className='rec-item';var mb=(s.size/1024/1024).toFixed(1);
     el.innerHTML='<div class="ri-icon">🎬</div><div class="ri-body"><div class="ri-name">'+s.filename+'</div><div class="ri-meta">'+new Date(s.date).toLocaleString('ru-RU')+' • '+mb+' МБ</div></div><div class="ri-btn">▶</div>';
-    el.onclick=function(){var u=URL.createObjectURL(s.blob);var w=window.open('');if(w)w.document.write('<video src="'+u+'" controls autoplay style="width:100%;height:100vh;background:#000"></video>');else toast('Браузер блокирует');};body.appendChild(el);})(myStreams[i]);}
+    el.onclick=function(){openVideoViewer(s);};body.appendChild(el);})(myStreams[i]);}
 
 function updProfUI(){var ring=S.avatarRing||'#ffffff',tc=S.avatarText||'#ffffff';$('streamNick').textContent=S.nick;applyAv($('streamAvatar'),S.avatar,S.avatarColor,'0 0 0 2px '+ring,tc);$('menuTitle').textContent=S.nick;applyAv($('menuAvatar'),S.avatar,S.avatarColor,'0 0 0 4px '+ring,tc);applyAv($('accAvatar'),S.avatar,S.avatarColor,'0 0 0 4px '+ring,tc);$('accName').textContent=S.nick;$('accHandle').textContent='@'+S.nick.toLowerCase().replace(/\s+/g,'_');}
 function buildMGrid(id,preset,cur,onPick){var g=$(id);g.innerHTML='';for(var i=0;i<preset.length;i++)(function(c){var d=document.createElement('div');d.className='color-opt'+(cur===c?' sel':'');d.style.background=c;d.onclick=function(){g.querySelectorAll('.color-opt').forEach(function(o){o.classList.remove('sel');});d.classList.add('sel');onPick(c);};g.appendChild(d);})(preset[i]);}
@@ -620,6 +691,224 @@ $('wdSave').addEventListener('click',function(){if(!wdNick||!wdP)return;var c=ch
   if(S.coBot&&S.coBot.nick===wdNick){S.coBot.emoji=c.emoji;S.coBot.gradient=c.gradient;S.coBot.gender=c.gender;applyBotAv();}
   if(S.currentChat===wdNick)renderChatHead(wdNick);toast('✅ Сохранено');wdP=null;wdNick=null;$('wardrobeModal').classList.remove('show');});
 
+/* ================== ВИДЕОПРОСМОТРЩИК + РЕДАКТОР ================== */
+var vvStream=null,vvUrl=null,vvTrimStart=0,vvTrimEnd=0,vvTrimDur=0,vvDragging=null;
+
+function fmtT(s){if(!s||isNaN(s))return'0:00';var m=Math.floor(s/60),x=Math.floor(s%60);return m+':'+(x<10?'0':'')+x;}
+function fmtT2(s){if(!s||isNaN(s))return'0:00.0';var m=Math.floor(s/60),x=s%60;return m+':'+(x<10?'0':'')+x.toFixed(1);}
+
+function openVideoViewer(s){
+  vvStream=s;
+  if(vvUrl){try{URL.revokeObjectURL(vvUrl);}catch(e){}}
+  vvUrl=URL.createObjectURL(s.blob);
+  var v=$('vvVideo');
+  v.src=vvUrl;
+  try{v.currentTime=0;}catch(e){}
+  $('vvTitle').textContent=s.filename;
+  $('vvTrimPanel').classList.remove('show');
+  $('videoViewer').classList.add('show');
+}
+function closeVideoViewer(){
+  $('videoViewer').classList.remove('show');
+  $('vvTrimPanel').classList.remove('show');
+  try{$('vvVideo').pause();}catch(e){}
+}
+
+$('vvBack').addEventListener('click',closeVideoViewer);
+
+$('vvSave').addEventListener('click',async function(){
+  if(!vvStream)return;
+  var f;try{f=new File([vvStream.blob],vvStream.filename,{type:vvStream.blob.type});}catch(e){f=null;}
+  if(f&&navigator.canShare&&navigator.canShare({files:[f]})){
+    try{await navigator.share({files:[f],title:vvStream.filename});toast('✅ Сохранено');return;}catch(e){if(e.name==='AbortError')return;}
+  }
+  try{
+    var u=URL.createObjectURL(vvStream.blob),a=document.createElement('a');
+    a.href=u;a.download=vvStream.filename;document.body.appendChild(a);a.click();document.body.removeChild(a);
+    setTimeout(function(){try{URL.revokeObjectURL(u);}catch(e){}},30000);
+    toast('💾 Файл скачан');
+  }catch(e){toast('Не удалось');}
+});
+
+$('vvEdit').addEventListener('click',function(){
+  var v=$('vvVideo');try{v.pause();}catch(e){}
+  $('vvTrimPanel').classList.add('show');
+  setTimeout(initTrim,120);
+});
+
+document.querySelectorAll('#vvTools .vv-tool').forEach(function(el){
+  el.addEventListener('click',function(){
+    var tool=el.getAttribute('data-tool');
+    if(tool==='trim'){
+      var v=$('vvVideo');try{v.pause();}catch(e){}
+      $('vvTrimPanel').classList.add('show');
+      setTimeout(initTrim,120);
+    } else {
+      toast(tool.toUpperCase()+' — в разработке');
+    }
+  });
+});
+
+function initTrim(){
+  var v=$('vvVideo');
+  function go(){
+    if(!v.duration||isNaN(v.duration)){setTimeout(go,200);return;}
+    vvTrimDur=v.duration;
+    vvTrimStart=0;
+    vvTrimEnd=v.duration;
+    $('vvTrimTotalTime').textContent=fmtT(vvTrimDur);
+    drawThumbs();
+    updateTrimUI();
+  }
+  go();
+}
+function drawThumbs(){
+  var cv=$('vvTrimCanvas');
+  if(!cv)return;
+  var w=cv.clientWidth,h=cv.clientHeight;
+  if(!w||!h)return;
+  cv.width=w*2;cv.height=h*2;
+  var ctx=cv.getContext('2d');
+  ctx.fillStyle='#111';ctx.fillRect(0,0,cv.width,cv.height);
+  var count=Math.max(4,Math.floor(w/55));
+  var tw=cv.width/count;
+  var tmpV=document.createElement('video');
+  tmpV.src=vvUrl;tmpV.muted=true;tmpV.preload='auto';
+  var idx=0;
+  function step(){
+    if(idx>=count)return;
+    try{tmpV.currentTime=((idx+0.5)/count)*vvTrimDur;}catch(e){}
+  }
+  tmpV.addEventListener('seeked',function(){
+    try{
+      var scale=Math.max(tw/tmpV.videoWidth,cv.height/tmpV.videoHeight);
+      var dw=tmpV.videoWidth*scale,dh=tmpV.videoHeight*scale;
+      var dx=idx*tw+(tw-dw)/2,dy=(cv.height-dh)/2;
+      ctx.save();
+      ctx.beginPath();ctx.rect(idx*tw,0,tw,cv.height);ctx.clip();
+      ctx.drawImage(tmpV,dx,dy,dw,dh);
+      ctx.restore();
+    }catch(e){}
+    idx++;
+    if(idx<count)step();
+  });
+  step();
+}
+function updateTrimUI(){
+  var total=vvTrimDur||1;
+  var lp=(vvTrimStart/total)*100;
+  var rp=(vvTrimEnd/total)*100;
+  $('vvMaskL').style.left='0';
+  $('vvMaskL').style.width=lp+'%';
+  $('vvMaskR').style.left=rp+'%';
+  $('vvMaskR').style.width=(100-rp)+'%';
+  $('vvSel').style.left=lp+'%';
+  $('vvSel').style.width=(rp-lp)+'%';
+  $('vvTrimTime').textContent=fmtT2(vvTrimStart)+' - '+fmtT2(vvTrimEnd);
+}
+
+(function(){
+  var track=$('vvTrimTrack');
+  function pctFromEvent(e){
+    var r=track.getBoundingClientRect();
+    var x=(e.touches?e.touches[0].clientX:e.clientX)-r.left;
+    return Math.max(0,Math.min(1,x/r.width));
+  }
+  function down(e){
+    var t=e.target;
+    if(t.closest&&t.closest('#vvHandleL'))vvDragging='L';
+    else if(t.closest&&t.closest('#vvHandleR'))vvDragging='R';
+    else vvDragging=null;
+    if(vvDragging){
+      try{$('vvVideo').pause();}catch(err){}
+      if(e.cancelable)e.preventDefault();
+      e.stopPropagation();
+    }
+  }
+  function move(e){
+    if(!vvDragging)return;
+    if(e.cancelable)e.preventDefault();
+    e.stopPropagation();
+    var p=pctFromEvent(e);
+    var t=p*vvTrimDur;
+    if(vvDragging==='L'){
+      vvTrimStart=Math.max(0,Math.min(vvTrimEnd-0.15,t));
+    }else{
+      vvTrimEnd=Math.min(vvTrimDur,Math.max(vvTrimStart+0.15,t));
+    }
+    updateTrimUI();
+  }
+  function up(){vvDragging=null;}
+  track.addEventListener('touchstart',down,{passive:false});
+  track.addEventListener('touchmove',move,{passive:false});
+  track.addEventListener('touchend',up);
+  track.addEventListener('touchcancel',up);
+  track.addEventListener('mousedown',down);
+  document.addEventListener('mousemove',move);
+  document.addEventListener('mouseup',up);
+})();
+
+$('vvTrimOk').addEventListener('click',async function(){
+  if(!vvStream||!vvTrimDur)return;
+  var prog=document.createElement('div');
+  prog.style.cssText='position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:9999;background:rgba(0,0,0,.9);padding:18px 26px;border-radius:16px;font-size:14px;font-weight:700;color:#fff';
+  prog.textContent='Обработка...';
+  document.body.appendChild(prog);
+  try{
+    var v=$('vvVideo');
+    v.pause();
+    var start=vvTrimStart,end=vvTrimEnd;
+    if(start<0.05&&end>vvTrimDur-0.05){
+      prog.remove();toast('Границы не изменены');return;
+    }
+    var cv=document.createElement('canvas');
+    cv.width=v.videoWidth||720;cv.height=v.videoHeight||1280;
+    var ctx=cv.getContext('2d');
+    var stream=cv.captureStream(30);
+    var mime='';
+    var tries=['video/mp4;codecs=avc1,mp4a','video/mp4','video/webm;codecs=vp9,opus','video/webm'];
+    for(var i=0;i<tries.length;i++)if(window.MediaRecorder&&MediaRecorder.isTypeSupported(tries[i])){mime=tries[i];break;}
+    var rec=new MediaRecorder(stream,mime?{mimeType:mime,videoBitsPerSecond:4000000}:undefined);
+    var chunks=[];
+    rec.ondataavailable=function(e){if(e.data&&e.data.size>0)chunks.push(e.data);};
+    var done=false;
+    var finished=new Promise(function(res){rec.onstop=function(){if(done)return;done=true;res();};});
+    rec.start(150);
+    var draw=function(){
+      if(!done){try{ctx.drawImage(v,0,0,cv.width,cv.height);}catch(e){}requestAnimationFrame(draw);}
+    };
+    var seek=function(t){return new Promise(function(r){if(Math.abs(v.currentTime-t)<0.05){setTimeout(r,40);return;}
+      var dn=false;var to=setTimeout(function(){if(!dn){dn=true;v.removeEventListener('seeked',oh);r();}},2500);
+      function oh(){if(dn)return;dn=true;clearTimeout(to);v.removeEventListener('seeked',oh);setTimeout(r,30);}
+      v.addEventListener('seeked',oh);try{v.currentTime=t;}catch(e){clearTimeout(to);if(!dn){dn=true;r();}}
+    });};
+    await seek(start);
+    requestAnimationFrame(draw);
+    await v.play();
+    await new Promise(function(r){
+      var w=function(){
+        if(v.currentTime>=end-0.03||v.ended){v.pause();r();return;}
+        requestAnimationFrame(w);
+      };w();
+    });
+    done=true;
+    try{rec.stop();}catch(e){}
+    await finished;
+    var type=rec.mimeType||'video/webm';
+    var ext=type.indexOf('mp4')>=0?'mp4':'webm';
+    var name=vvStream.filename.replace(/\.[^.]+$/,'')+'-trim.'+ext;
+    var blob=new Blob(chunks,{type:type});
+    var newS={blob:blob,filename:name,date:new Date().toISOString(),size:blob.size};
+    myStreams.unshift(newS);
+    if(myStreams.length>20)myStreams.pop();
+    prog.remove();
+    $('vvTrimPanel').classList.remove('show');
+    openVideoViewer(newS);
+    toast('✅ Обрезано: '+fmtT2(end-start));
+  }catch(e){prog.remove();toast('Ошибка: '+e.message);}
+});
+
+/* ================== BINDINGS ================== */
 $('rbRec').addEventListener('click',function(e){pulse(e.currentTarget);if(S.isRecording)stopRec();else startRec();});
 $('rbFlip').addEventListener('click',function(e){pulse(e.currentTarget);flipCam();});
 $('rbMic').addEventListener('click',function(e){pulse(e.currentTarget);toggleMic();});
