@@ -182,7 +182,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:-ap
 #botAvatar .av-name{position:absolute;bottom:-28px;left:50%;transform:translateX(-50%);white-space:nowrap;background:linear-gradient(135deg,rgba(255,0,80,.9),rgba(255,92,138,.9));padding:4px 10px;border-radius:12px;font-size:11px;font-weight:800;pointer-events:none}
 #fatal{position:fixed;inset:0;background:#200;color:#fff;padding:20px;font:14px monospace;z-index:99999;display:none;white-space:pre-wrap;overflow:auto}
 
-/* ================= ВИДЕОПРОСМОТРЩИК + РЕДАКТОР ================= */
 #videoViewer{position:fixed;inset:0;z-index:3000;background:#000;display:none;flex-direction:column}
 #videoViewer.show{display:flex}
 #vvStage{flex:1;position:relative;display:flex;align-items:center;justify-content:center;background:#000;overflow:hidden;min-height:0}
@@ -502,19 +501,129 @@ var GREET=['привет! 👋','о, привет!','хай','приветик',
 var HOWRU=['норм, а ты?','всё круто! ты как?','хорошо, спасибо 😊','отлично, сам как?','да норм','живой пока)'];
 function detectThemes(t){t=(t||'').toLowerCase();var out=[],TH=[{name:'музыка',keys:['музык','трек','песн','бит','рэп'],replies:['что за трек?','топ 🔥','поставь ещё']},{name:'игры',keys:['игр','дот','кс','фортнайт'],replies:['катка?','го в пати','я тоже играю']},{name:'еда',keys:['ед','куш','пицц','голод'],replies:['дай мне 🍕','приятного!']}];for(var i=0;i<TH.length;i++)for(var j=0;j<TH[i].keys.length;j++)if(t.indexOf(TH[i].keys[j])>=0){out.push(TH[i]);break;}return out;}
 function isQuestion(t){if(!t)return false;var x=t.trim().toLowerCase();if(x.slice(-1)==='?')return true;var st=['что','кто','где','когда','почему','зачем','как','сколько'];for(var i=0;i<st.length;i++)if(x.indexOf(st[i])===0)return true;return false;}
-function botReply(t,kind){t=(t||'').trim();var tl=t.toLowerCase();
-  if(isInsult(tl)){if(kind==='simp')return rnd(['за что? 😢','ты злой 😭','обидно... 😔']);if(kind==='hater')return rnd(['сам такой','ты еще хуже','и что?','мне пох']);if(kind==='spam')return rnd(['сам 67','67 тебе']);if(kind==='clown')return rnd(['😂😂😂','ахахах сам такой']);return rnd(['сам такой','ты чё','иди отсюда','пфф']);}
-  if(/^(привет|хай|hi|hello|ку|здарова)\b/.test(tl))return rnd(GREET);
-  if(/спасибо|спс|пасиб/.test(tl))return rnd(['пожалуйста! 😊','не за что 💕','обращайся!']);
-  if(/пока|бай|до свид/.test(tl))return rnd(['пока! 👋','до связи','давай!']);
-  if(/классн|крут|топ|молодец|красив|супер|нравишься/.test(tl)){if(kind==='simp')return rnd(['спасибо 💕','😍😍😍','ты тоже классный!']);return rnd(['спасибо!','ты тоже','приятно 🥺']);}
-  if(/любл|люблю|обожа|скуча/.test(tl)){if(kind==='simp')return rnd(['я тебя тоже! 💕','😍😍😍 обожаю!','ты мой 💕']);return rnd(['взаимно ❤️','и я тебя!','😊']);}
-  if(/как дела|как ты|чё делаешь/.test(tl))return rnd(HOWRU);
-  if(isQuestion(t))return rnd(['хм, интересно','а сам как думаешь?','ну я думаю да','не уверен']);
-  if(/ты бот|ты ии/.test(tl))return rnd(['сам ты бот 😂','я настоящий!','да ладно']);
-  var themes=detectThemes(t);
-  if(themes.length>0){var th=rnd(themes);return rnd(th.replies);}
-  return rnd(DM[kind]||DM.normal);
+
+/* ============ SWEARING (добавляем маты когда включено) ============ */
+var SWEARS_MILD=['блин','капец','ёлки','чёрт','фигня'];
+var SWEARS_HARD=['блядь','хуй','пиздец','нахуй','ёбаный','сука','нихуя','пиздецки','залупа','мразь'];
+function addSwear(text,force){
+  if(!S.swearing)return text;
+  if(!force&&Math.random()>0.45)return text;
+  var s=rnd(SWEARS_HARD);
+  var patterns=[
+    s+', '+text,
+    text+' '+s,
+    s+'! '+text,
+    'ну '+s+', '+text
+  ];
+  return rnd(patterns);
+}
+
+/* ============ BOT REPLY ============ */
+function botReply(t,kind){
+  var trimmed=(t||'').trim();
+  var tl=trimmed.toLowerCase();
+  var isHate=isInsult(tl);
+  var themes=detectThemes(trimmed);
+  var q=isQuestion(trimmed);
+
+  // 1. ОСКОРБЛЕНИЯ — жёсткий живой ответ
+  if(isHate){
+    var hateAnswers;
+    if(S.swearing){
+      hateAnswers=[
+        'да пошёл ты нахуй, дебил',
+        'иди нахуй, мразь',
+        'сам ты лох, хуйло',
+        'завали хлебало, уёбок',
+        'ты вообще кто такой, пиздюк?',
+        'сам такой, иди нахуй отсюда',
+        'ты че хуйню несёшь, долбоёб?',
+        'закрой рот, пёс'
+      ];
+    } else {
+      hateAnswers=[
+        'иди отсюда',
+        'сам такой',
+        'закрой рот',
+        'ты вообще кто?',
+        'мне пох на тебя',
+        'слышь, потише',
+        'ты че несёшь?',
+        'фу, злой какой'
+      ];
+    }
+    return rnd(hateAnswers);
+  }
+
+  // 2. ПРИВЕТСТВИЯ
+  if(/^(привет|хай|hi|hello|ку|здарова)\b/.test(tl)) return rnd(GREET);
+
+  // 3. СПАСИБО
+  if(/спасибо|спс|пасиб/.test(tl)){
+    var ans=rnd(['пожалуйста! 😊','не за что 💕','обращайся!','да без проблем']);
+    return S.swearing?addSwear(ans):ans;
+  }
+
+  // 4. ПОКА
+  if(/пока|бай|до свид/.test(tl)) return rnd(['пока! 👋','до связи','давай!','ну давай']);
+
+  // 5. КОМПЛИМЕНТЫ
+  if(/классн|крут|топ|молодец|красив|супер|нравишься/.test(tl)){
+    if(kind==='simp')return rnd(['спасибо 💕','😍😍😍','ты тоже классный!']);
+    var ans=rnd(['спасибо!','ты тоже','приятно 🥺','ну спасибо']);
+    return S.swearing?addSwear(ans):ans;
+  }
+
+  // 6. ЛЮБОВЬ
+  if(/любл|люблю|обожа|скуча/.test(tl)){
+    if(kind==='simp')return rnd(['я тебя тоже! 💕','😍😍😍 обожаю!','ты мой 💕']);
+    return rnd(['взаимно ❤️','и я тебя!','😊']);
+  }
+
+  // 7. КАК ДЕЛА
+  if(/как дела|как ты|чё делаешь/.test(tl)) return rnd(HOWRU);
+
+  // 8. ВОПРОСЫ
+  if(q){
+    var qa=rnd([
+      'хм, интересно','а сам как думаешь?','ну я думаю да','не уверен',
+      'а ты как считаешь?','да хз если честно','ну такое, если честно'
+    ]);
+    return S.swearing?addSwear(qa):qa;
+  }
+
+  // 9. ПРО БОТА
+  if(/ты бот|ты ии/.test(tl)){
+    var ans=rnd(['сам ты бот 😂','я настоящий!','да ладно','ну да, я бот. и что?']);
+    return S.swearing?addSwear(ans):ans;
+  }
+
+  // 10. ТЕМЫ
+  if(themes.length>0){
+    var ans=rnd(rnd(themes).replies);
+    return S.swearing?addSwear(ans):ans;
+  }
+
+  // 11. ОБЫЧНЫЙ ОТВЕТ (живой, разнообразный)
+  var generic;
+  if(kind==='simp'){
+    generic=rnd(['ты лучший 💕','мой любимый 💖','ты очень клёвый','обнимаю 🥰']);
+  } else if(kind==='hater'){
+    generic=rnd(['ну такое','фу','кринж','да ладно тебе','серьёзно?']);
+  } else if(kind==='clown'){
+    generic=rnd(['😂😂😂','ору','ахахах','кек','клоун']);
+  } else if(kind==='spam'){
+    generic=rnd(['67','67 67','да 67']);
+  } else {
+    // Живые ответы, чтобы не было шаблонности
+    generic=rnd([
+      'жиза 😄','ага','согласен!','ахаха','интересно','серьёзно?','ого!',
+      'прикольно','ок','ну такое','хм','да ладно','вот это поворот',
+      'уважаю','респект','красава','ну ты даёшь'
+    ]);
+  }
+  if(S.swearing) generic=addSwear(generic);
+  return generic;
 }
 
 var AC=null;
@@ -623,9 +732,18 @@ function spawnChat(text,nick,color,opts){
   setTimeout(function(){if(el.parentNode)el.remove();},60000);
   cE.scrollTop=cE.scrollHeight;
   if(!isRes){S.totalMessages++;saveStats();}
-  if(S.coBot&&!isBot&&nick!==S.coBot.nick&&!isRes&&Math.random()<0.3){
-    var r=botReply(text,'normal');
-    setTimeout(function(){spawnChat(r,S.coBot.nick,S.coBot.gradient||'#ff6384',{kind:'normal',isBot:true});speak(S.coBot,r);},ri(800,2000));
+  // Бот отвечает почти на всё с высокой вероятностью
+  if(S.coBot&&!isBot&&nick!==S.coBot.nick&&!isRes){
+    // Отвечает на вопросы, упоминания и хейт всегда, на остальное ~70%
+    var replyChance=0.7;
+    if(isQuestion(text))replyChance=1.0;
+    if(isInsult(text))replyChance=1.0;
+    if(/бот|котик|кот|котенок|grand-cat/i.test(text))replyChance=1.0;
+    if(kind==='hater')replyChance=1.0;
+    if(Math.random()<replyChance){
+      var r=botReply(text,kind||'normal');
+      setTimeout(function(){spawnChat(r,S.coBot.nick,S.coBot.gradient||'#ff6384',{kind:'normal',isBot:true});speak(S.coBot,r);},ri(700,1800));
+    }
   }
 }
 function spawnNote(text,sub,color,cls){sub=sub||'';color=color||'#ffd700';cls=cls||'';var el=document.createElement('div');el.className='note '+cls;el.style.borderLeftColor=color;el.innerHTML='<b style="color:'+color+'">'+text+'</b>'+(sub?'<small>'+sub+'</small>':'');nE.appendChild(el);setTimeout(function(){if(el.parentNode)el.remove();},5000);}
@@ -641,11 +759,11 @@ function onUserSpoke(text){
   var q=isQuestion(text),n=q?ri(3,5):ri(2,4);
   if(S.coBot){
     var bc=chats[S.coBot.nick],kind=bc?bc.kind:'normal';
-    var shouldReply = q || /бот|котик|кот|котенок|grand-cat/i.test(text) || Math.random() < 0.3;
+    // Бот отвечает почти всегда
+    var shouldReply=q||isInsult(text)||/бот|котик|кот|котенок|grand-cat/i.test(text)||Math.random()<0.75;
     if(shouldReply){
       var r=botReply(text,kind);
-      if(r.length > 50 || Math.random() < 0.5){var extra = rnd([' 😊',' 🔥',' 💯',' 👀',' 😂',' 💕']); r += extra;}
-      setTimeout(function(){spawnChat(r,S.coBot.nick,S.coBot.gradient||'#ff6384',{kind:kind,isBot:true});speak(S.coBot,r);},ri(600,1400));
+      setTimeout(function(){spawnChat(r,S.coBot.nick,S.coBot.gradient||'#ff6384',{kind:kind,isBot:true});speak(S.coBot,r);},ri(500,1200));
     }
   }
   for(var i=0;i<n;i++)(function(idx){setTimeout(function(){
@@ -662,6 +780,7 @@ function donEvent(){
   S.crystals+=a*10;S.totalDonations++;saveStats();updCrysUI();
   S.hype=Math.min(1,S.hype+0.5);if(a>=1000)sfxDonBig();else sfxDonSm();boom('💎',10+Math.min(20,Math.floor(a/200)));
   if(S.coBot){var th=rnd(['Ого, спасибо за донат!','Вау, спасибо большое!','Круто! Спасибо за поддержку!','Ничего себе, спасибо огромное!']);
+    if(S.swearing)th=addSwear(th);
     setTimeout(function(){spawnChat(th,S.coBot.nick,S.coBot.gradient||'#ff6384',{kind:'normal',isBot:true});speak(S.coBot,th);},1200);}
 }
 function subEvent(){var nick=randNick(),av=randAv();spawnNote(nick+' подписался!','новый подписчик ✅','#8cff8c','sub');if(!followersList.find(function(f){return f.nick===nick;})){followersList.push({nick:nick,emoji:av.emoji,gradient:av.gradient,t:Date.now()});if(followersList.length>200)followersList.shift();saveFollowers();S.followers=followersList.length;saveStats();updFolUI();}S.hype=Math.min(1,S.hype+0.2);sfxSub();boom('❤️',8);}
@@ -738,6 +857,7 @@ function loop(now){var dt=(now-lastTick)/1000;lastTick=now;
     if(now-lastNotify>45000+Math.random()*20000){subEvent();lastNotify=now;}
     if(S.emojisOn){var ai=700+Math.random()*900;if(now-lastAutoEmoji>ai){boom(rnd(EMOJIS_ALL),ri(1,3));lastAutoEmoji=now;}}
     if(S.coBot&&Math.random()<0.015){var bl=rnd(['Классный чат сегодня!','Ого, сколько зрителей!','Ребят, подписывайтесь! 💕','Я тут с '+S.nick+'!','Кто смотрит нас?','Спасибо что смотрите!']);
+      if(S.swearing)bl=addSwear(bl);
       spawnChat(bl,S.coBot.nick,S.coBot.gradient||'#ff6384',{kind:'normal',isBot:true});speak(S.coBot,bl);}
     updCnt(dt);renderPiP();}
   requestAnimationFrame(loop);}
@@ -773,6 +893,7 @@ function startCo(bot){
   if(c&&typeof c.posX==='number'&&typeof c.posY==='number')S.botPos={x:c.posX,y:c.posY};else S.botPos=null;
   applyBotAv();$('botAvatar').classList.add('show');$('rbKick').style.display='flex';closeAll();
   var g=rnd(['Всем привет, я с '+S.nick+'!','Привет, ребята! 👋','Приветик! 💕','Хай, чат!','Мы в эфире! 🔥','О, я в кадре!']);
+  if(S.swearing)g=addSwear(g);
   spawnNote(bot.nick+' в эфире!','Можно перетаскивать бота пальцем','#8cff8c','sub');
   unlockVoice();
   setTimeout(function(){spawnChat(g,bot.nick,bot.gradient||'#ff6384',{kind:bot.kind||'normal',isBot:true});speak(bot,g);},700);
@@ -857,13 +978,12 @@ function fmtT2(s){if(!s||isNaN(s))return'0:00.0';var m=Math.floor(s/60),x=s%60;r
 
 var FILTERS=[{name:'Normal',css:'none'},{name:'Chrome',css:'contrast(1.2) saturate(1.3) brightness(1.05)'},{name:'Fade',css:'contrast(.9) saturate(.7) brightness(1.1)'},{name:'Instant',css:'contrast(1.1) saturate(1.4) hue-rotate(-10deg)'},{name:'Mono',css:'grayscale(1) contrast(1.1)'},{name:'Noir',css:'grayscale(1) contrast(1.5) brightness(.9)'},{name:'Process',css:'contrast(1.3) saturate(1.2) hue-rotate(15deg)'},{name:'Tonal',css:'sepia(.4) contrast(1.1)'},{name:'Transfer',css:'contrast(1.4) saturate(.9)'},{name:'Tone',css:'sepia(.2) brightness(1.05)'},{name:'Linear',css:'contrast(1.15) brightness(1.05)'}];
 
-/* Открывает просмотрщик с новым видео. Полностью сбрасывает состояние. */
 function openVideoViewer(s){
   vvStream=s;
   if(vvUrl){try{URL.revokeObjectURL(vvUrl);}catch(e){}}
   vvUrl=URL.createObjectURL(s.blob);
   var v=$('vvVideo');
-  v.pause();
+  try{v.pause();}catch(e){}
   v.src=vvUrl;
   v.playbackRate=1;
   v.style.transform='';
@@ -880,7 +1000,6 @@ function openVideoViewer(s){
   $('vvSheet').classList.remove('show');
   $('videoViewer').classList.add('show');
   try{v.currentTime=0;}catch(e){}
-  // Автозапуск нового видео
   setTimeout(function(){try{v.play().catch(function(){});}catch(e){}},120);
 }
 function closeVideoViewer(){$('videoViewer').classList.remove('show');$('vvSheet').classList.remove('show');try{$('vvVideo').pause();}catch(e){}}
@@ -1029,7 +1148,7 @@ $('vvSheetOk').addEventListener('click',function(){
   else { $('vvSheet').classList.remove('show'); toast('Настройки применены'); }
 });
 
-/* ===== Экспорт с прогрессом и автоматическим возвратом в просмотрщик ===== */
+/* ===== Экспорт с прогрессом. ИСПРАВЛЕН БАГ С done=true ===== */
 async function exportEdit(){
   if(!vvStream||!vvTrimDur)return;
   var prog=$('vvProgress'),pctEl=$('vvPct');
@@ -1050,7 +1169,8 @@ async function exportEdit(){
     for(var i=0;i<tries.length;i++)if(window.MediaRecorder&&MediaRecorder.isTypeSupported(tries[i])){mime=tries[i];break;}
     var rec=new MediaRecorder(stream,mime?{mimeType:mime,videoBitsPerSecond:4000000}:undefined);
     var chunks=[];rec.ondataavailable=function(e){if(e.data&&e.data.size>0)chunks.push(e.data);};
-    var done=false;var finished=new Promise(function(res){rec.onstop=function(){if(done)return;done=true;res();};});
+    var resolveStop;var finished=new Promise(function(res){resolveStop=res;});
+    rec.onstop=function(){resolveStop();};
     rec.start(150);
     var stopped=false;
     var draw=function(){
@@ -1072,7 +1192,7 @@ async function exportEdit(){
     var seek=function(t){return new Promise(function(r){if(Math.abs(v.currentTime-t)<0.05){setTimeout(r,30);return;}var dn=false;var to=setTimeout(function(){if(!dn){dn=true;v.removeEventListener('seeked',oh);r();}},2500);function oh(){if(dn)return;dn=true;clearTimeout(to);v.removeEventListener('seeked',oh);setTimeout(r,20);}v.addEventListener('seeked',oh);try{v.currentTime=t;}catch(e){clearTimeout(to);if(!dn){dn=true;r();}}});};
     await seek(start);
     v.playbackRate=vvOpts.speed;
-    await v.play();
+    try{await v.play();}catch(e){console.warn('play err',e);}
     await new Promise(function(r){
       var w=function(){
         if(v.currentTime>=end-0.03||v.ended){v.pause();setPct(100);r();return;}
@@ -1083,7 +1203,8 @@ async function exportEdit(){
       };
       w();
     });
-    stopped=true;done=true;try{rec.stop();}catch(e){}
+    stopped=true;
+    try{rec.stop();}catch(e){}
     await finished;
     var type=rec.mimeType||'video/webm';var ext=type.indexOf('mp4')>=0?'mp4':'webm';
     var name=vvStream.filename.replace(/\.[^.]+$/,'')+'-edit.'+ext;
@@ -1092,23 +1213,17 @@ async function exportEdit(){
     myStreams.unshift(newS);
     if(myStreams.length>20){var rm=myStreams.pop();if(rm&&rm.filename)deleteVideoFromIDB(rm.filename).catch(function(){});}
     saveVideoToIDB(newS).catch(function(){});
-
-    // Скрыть прогресс, закрыть панель инструментов
     prog.classList.remove('show');
     $('vvSheet').classList.remove('show');
     $('vvSheetBody').scrollTop=0;
-
-    // Полный сброс настроек редактора
     vvOpts={ratio:'none',bgColor:'#000000',filter:'none',filterName:'Normal',rotate:0,flipH:false,flipV:false,speed:1};
     document.querySelectorAll('.vv-ratio').forEach(function(o){o.classList.toggle('sel',o.getAttribute('data-ratio')==='none');});
     document.querySelectorAll('.vv-filter').forEach(function(o){o.classList.remove('sel');});
     document.querySelectorAll('.vv-rot-btn').forEach(function(o){o.classList.remove('on');});
     var sl=$('vvSpeedSlider');if(sl)sl.value=1;
     var lb=$('vvSpeedLabel');if(lb)lb.textContent='1.0x';
-
-    // Принудительно закрыть и заново открыть просмотрщик с новым видео
     $('videoViewer').classList.remove('show');
-    $('vvVideo').pause();
+    try{$('vvVideo').pause();}catch(e){}
     setTimeout(function(){
       openVideoViewer(newS);
       toast('✅ Изменения сохранены');
