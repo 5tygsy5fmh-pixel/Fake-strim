@@ -171,7 +171,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:-ap
 .stat-card .val.cyan{color:#8ee8f4}
 .stat-card .val.yellow{color:#ffd700}
 .settings-section{padding:8px 20px 4px;font-size:12px;text-transform:uppercase;letter-spacing:.8px;color:rgba(255,255,255,.4);font-weight:700}
-#botAvatar{position:absolute;display:none;z-index:5;cursor:grab;touch-action:none;user-select:none}
+
+/* ===== АВАТАРКА БОТА — БЕЗ КНОПОК ===== */
+#botAvatar{position:absolute;display:none;z-index:5;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
 #botAvatar.show{display:block}
 #botAvatar .av-ring{position:relative;border-radius:50%;box-shadow:0 8px 30px rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff}
 #botAvatar .av-ring::before{content:"";position:absolute;inset:-3px;border-radius:50%;background:conic-gradient(from 0deg,#ff0050,#ff5c8a,#8b5cf6,#25f4ee,#ff0050);z-index:-1;animation:spinRing 4s linear infinite}
@@ -179,7 +181,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:-ap
 #botAvatar.speaking .av-ring::before{animation:spinRing 1.5s linear infinite,glowPulse .6s ease-in-out infinite alternate}
 @keyframes glowPulse{to{filter:brightness(1.4)}}
 #botAvatar .av-face{width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:inherit;border-radius:50%}
-#botAvatar .av-wave{position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);display:flex;gap:3px;align-items:flex-end;height:18px;opacity:0;transition:opacity .2s}
+#botAvatar .av-wave{position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);display:flex;gap:3px;align-items:flex-end;height:18px;opacity:0;transition:opacity .2s}
 #botAvatar.speaking .av-wave{opacity:1}
 #botAvatar .av-wave span{width:3px;background:#fff;border-radius:2px;height:6px;animation:waveBar .5s ease-in-out infinite alternate}
 #botAvatar .av-wave span:nth-child(2){animation-delay:.1s}
@@ -187,10 +189,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:-ap
 #botAvatar .av-wave span:nth-child(4){animation-delay:.15s}
 #botAvatar .av-wave span:nth-child(5){animation-delay:.05s}
 @keyframes waveBar{to{height:16px}}
-#botAvatar .av-name{position:absolute;bottom:-26px;left:50%;transform:translateX(-50%);white-space:nowrap;background:linear-gradient(135deg,rgba(255,0,80,.9),rgba(255,92,138,.9));padding:4px 10px;border-radius:12px;font-size:11px;font-weight:800;pointer-events:none}
-#botAvatar .av-close{position:absolute;top:-8px;right:-8px;width:28px;height:28px;border-radius:50%;background:rgba(255,50,80,.95);border:2px solid #fff;display:flex;align-items:center;justify-content:center;font-size:14px;color:#fff;font-weight:800;cursor:pointer;z-index:10}
-#botAvatar .av-edit{position:absolute;top:-8px;left:-8px;width:28px;height:28px;border-radius:50%;background:rgba(139,92,246,.95);border:2px solid #fff;display:flex;align-items:center;justify-content:center;font-size:14px;color:#fff;font-weight:800;cursor:pointer;z-index:10}
-#botAvatar .av-move-hint{position:absolute;top:-38px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.75);padding:4px 10px;border-radius:10px;font-size:10px;opacity:0;transition:opacity .3s;pointer-events:none}
+#botAvatar .av-name{position:absolute;bottom:-28px;left:50%;transform:translateX(-50%);white-space:nowrap;background:linear-gradient(135deg,rgba(255,0,80,.9),rgba(255,92,138,.9));padding:4px 10px;border-radius:12px;font-size:11px;font-weight:800;pointer-events:none}
+#botAvatar .av-move-hint{position:absolute;top:-38px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.75);padding:4px 10px;border-radius:10px;font-size:10px;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap}
 #botAvatar:active .av-move-hint{opacity:1}
 #fatal{position:fixed;inset:0;background:#200;color:#fff;padding:20px;font:14px monospace;z-index:99999;display:none;white-space:pre-wrap;overflow:auto}
 </style>
@@ -215,18 +215,39 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:-ap
   <div class="hearts" id="hearts"></div>
   <div class="caption" id="caption"></div>
   <div class="toast" id="toast"></div>
+
+  <!-- Аватарка бота БЕЗ кнопок -->
   <div id="botAvatar">
-    <div class="av-edit" id="botAvEdit">✏️</div>
-    <div class="av-close" id="botAvClose">✕</div>
     <div class="av-move-hint">👆 Перетащи меня</div>
     <div class="av-ring"><div class="av-face" id="botAvFace">🐱</div><div class="av-wave"><span></span><span></span><span></span><span></span><span></span></div></div>
     <div class="av-name" id="botAvName">nick</div>
   </div>
+
   <div class="rail">
     <div class="rb" id="rbRec"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9.2" stroke="#fff" stroke-width="2"/><circle id="recDot" cx="12" cy="12" r="4.5" fill="#ff2850" style="display:none"/></svg></div>
     <div class="rb" id="rbFlip"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M3.5 12a8.5 8.5 0 0 1 14.4-6.1l1.6 1.6"/><polyline points="19.5 3.5 19.5 8.5 14.5 8.5"/><path d="M20.5 12a8.5 8.5 0 0 1-14.4 6.1l-1.6-1.6"/><polyline points="4.5 20.5 4.5 15.5 9.5 15.5"/></svg></div>
     <div class="rb" id="rbMic"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="9" y="2.5" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="8.5" y1="22" x2="15.5" y2="22"/><line id="micSlash" x1="4" y1="4" x2="20" y2="20" stroke="#ff2850" stroke-width="2.4" style="display:none"/></svg></div>
-    <div class="rb on" id="rbEmoji"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="9.2"/><circle cx="9" cy="10" r="1.3" fill="#fff"/><circle cx="15" cy="10" r="1.3" fill="#fff"/><path d="M8 14.5s1.6 2.2 4 2.2 4-2.2 4-2.2"/><line id="emojiSlash" x1="4" y1="4" x2="20" y2="20" stroke="#ff2850" stroke-width="2.4" style="display:none"/></svg></div>
+
+    <!-- НОВАЯ ИКОНКА СМАЙЛА — маленькие точки + улыбка + блёстки -->
+    <div class="rb on" id="rbEmoji">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="13" r="8"/>
+        <circle cx="8.3" cy="11.5" r="0.9" fill="#fff" stroke="none"/>
+        <circle cx="13.7" cy="11.5" r="0.9" fill="#fff" stroke="none"/>
+        <path d="M7.5 15 Q11 17.5 14.5 15"/>
+        <path d="M19.5 4.5 L20 5.7 L21.2 6.2 L20 6.7 L19.5 7.9 L19 6.7 L17.8 6.2 L19 5.7 Z" fill="#fff" stroke="none"/>
+        <path d="M21.5 8.5 L21.8 9.2 L22.5 9.5 L21.8 9.8 L21.5 10.5 L21.2 9.8 L20.5 9.5 L21.2 9.2 Z" fill="#fff" stroke="none"/>
+      </svg>
+    </div>
+
+    <!-- Кнопка "убрать бота" — появляется только во время эфира с ботом -->
+    <div class="rb" id="rbKick" style="display:none">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#ff5050" stroke-width="2.2" stroke-linecap="round">
+        <circle cx="12" cy="12" r="9"/>
+        <line x1="8" y1="8" x2="16" y2="16"/>
+        <line x1="16" y1="8" x2="8" y2="16"/>
+      </svg>
+    </div>
   </div>
 </div>
 
@@ -343,7 +364,7 @@ var BOT_EMOJIS=['🐱','🐶','🦊','🐼','🐯','🦁','🐸','🐵','🐰','
 var GRADS=[['#ff6384','#ff9a5c'],['#36a2eb','#5ce1e6'],['#ffce56','#ffb84d'],['#4bc0c0','#6ee7b7'],['#9966ff','#c88cff'],['#ff9f40','#ffcc70'],['#2ecc71','#a2e8b8'],['#e74c3c','#ff8c66'],['#f093fb','#f5576c'],['#4facfe','#00f2fe'],['#43e97b','#38f9d7'],['#fa709a','#fee140']];
 function randAv(){var g=rnd(GRADS);return{emoji:rnd(BOT_EMOJIS),gradient:'linear-gradient(135deg,'+g[0]+','+g[1]+')',gender:Math.random()<0.5?'male':'female'};}
 function genBotApp(g){g=g||(Math.random()<0.5?'male':'female');var gr=rnd(GRADS);return{gender:g,emoji:rnd(BOT_EMOJIS),gradient:'linear-gradient(135deg,'+gr[0]+','+gr[1]+')'};}
-function ensureApp(c){if(!c)return;if(!c.gender)c.gender=Math.random()<0.5?'male':'female';if(!c.emoji||!c.gradient){var a=genBotApp(c.gender);c.emoji=c.emoji||a.emoji;c.gradient=c.gradient||a.gradient;}}
+function ensureApp(c){if(!c)return;if(!c.gender)c.gender=Math.random()<0.5?'male':'female';if(!c.emoji||!c.gradient){var a=genBotApp(c.gender);if(!c.emoji)c.emoji=a.emoji;if(!c.gradient)c.gradient=a.gradient;}}
 function gIcon(g){if(g==='male')return'<span class="g-ico male">♂</span>';return'<span class="g-ico female">♀</span>';}
 function isEmoji(s){if(!s)return false;if(s.length>1)return true;var c=s.codePointAt(0);return c>=0x1F000&&c<=0x1FAFF||c>=0x2600&&c<=0x27BF;}
 function applyAv(el,ch,bg,ring,tc){if(!el)return;el.textContent=ch;el.style.background=bg;el.style.boxShadow=ring;el.style.color=isEmoji(ch)?'#fff':tc;}
@@ -385,32 +406,34 @@ function sfxDonBig(){[523,659,784,1047,1319].forEach(function(f,i){tone(f,0.2,0.
 function sfxDonSm(){tone(660,0.15,0.2);tone(880,0.2,0.2,'sine',0.1);}
 function sfxSub(){tone(660,0.15,0.2);tone(880,0.15,0.2,'sine',0.1);tone(1320,0.25,0.22,'sine',0.2);}
 
-/* ================= ГОЛОС ================= */
+/* ===================== ГОЛОС ===================== */
 var vc=[];
-var voiceUnlocked=false;
-function refreshV(){if(window.speechSynthesis)vc=window.speechSynthesis.getVoices()||[];}
+function refreshV(){try{if(window.speechSynthesis)vc=window.speechSynthesis.getVoices()||[];}catch(e){}}
 if(window.speechSynthesis){
   refreshV();
   window.speechSynthesis.onvoiceschanged=refreshV;
-  setTimeout(refreshV,500);
-  setTimeout(refreshV,2000);
+  setTimeout(refreshV,200);
+  setTimeout(refreshV,1000);
+  setTimeout(refreshV,3000);
 }
+var voiceUnlocked=false;
 function unlockVoice(){
   if(voiceUnlocked||!window.speechSynthesis)return;
   voiceUnlocked=true;
   try{
-    var u=new SpeechSynthesisUtterance(' ');
-    u.volume=0;u.rate=10;u.pitch=0.01;
+    var u=new SpeechSynthesisUtterance('a');
+    u.volume=0.01;u.rate=2;u.pitch=1;
     window.speechSynthesis.speak(u);
+    setTimeout(function(){try{window.speechSynthesis.cancel();}catch(e){}},150);
     setTimeout(refreshV,300);
   }catch(e){}
 }
 function hash(n){var h=0,nn=n||'bot';for(var i=0;i<nn.length;i++)h=(h*31+nn.charCodeAt(i))|0;return Math.abs(h);}
 function vParams(bot){
   var h=hash(bot.nick);
-  var bp=bot.gender==='male'?0.7:1.4;
-  var pitch=clamp(bp+((h%40)-20)/100,0.5,1.85);
-  var rate=clamp(0.92+((h>>6)%26)/100,0.85,1.22);
+  var basePitch=bot.gender==='male'?0.85:1.25;
+  var pitch=clamp(basePitch+((h%20)-10)/100,0.7,1.4);
+  var rate=clamp(0.92+((h>>6)%14)/100,0.85,1.05);
   return{pitch:pitch,rate:rate};
 }
 function pickV(bot){
@@ -419,29 +442,21 @@ function pickV(bot){
   var ru=vc.filter(function(v){return v.lang&&v.lang.toLowerCase().indexOf('ru')===0;});
   var pool=ru.length?ru:vc;
   if(!pool.length)return null;
-  var fh=['milena','alena','irina','marina','anna','katya','elena','olga','svetlana','tatiana','darina','kseniya','алёна','милена'];
-  var mh=['dmitri','yuri','pavel','maxim','aleksei','ivan','artem','andrei','nikolai','sergey','boris'];
-  var hints=bot.gender==='male'?mh:fh;
-  var m=[];
-  for(var i=0;i<pool.length;i++){
-    var nl=(pool[i].name||'').toLowerCase();
-    for(var j=0;j<hints.length;j++)if(nl.indexOf(hints[j])>=0){m.push(pool[i]);break;}
-  }
-  return m.length?m[h%m.length]:pool[h%pool.length];
+  return pool[h%pool.length];
 }
 function speak(bot,text){
   if(!S.voiceOn)return;
   if(!window.speechSynthesis)return;
   if(!text)return;
-  text=String(text).replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2300}-\u{23FF}]/gu,'').replace(/\s+/g,' ').trim();
-  if(!text)return;
+  var clean=String(text).replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2300}-\u{23FF}\u{2B00}-\u{2BFF}]/gu,'').replace(/\s+/g,' ').trim();
+  if(!clean)return;
   try{
     try{window.speechSynthesis.cancel();}catch(e){}
-    var u=new SpeechSynthesisUtterance(text);
+    var u=new SpeechSynthesisUtterance(clean);
     var v=pickV(bot);
-    if(v)u.voice=v;
+    if(v){u.voice=v;u.lang=v.lang||'ru-RU';}
+    else u.lang='ru-RU';
     var p=vParams(bot);
-    u.lang=(v&&v.lang)||'ru-RU';
     u.pitch=p.pitch;
     u.rate=p.rate;
     u.volume=1;
@@ -449,22 +464,27 @@ function speak(bot,text){
     u.onend=function(){setSpeak(false);};
     u.onerror=function(){setSpeak(false);};
     window.speechSynthesis.speak(u);
-    setSpeak(true);
-    setTimeout(function(){
-      if(window.speechSynthesis&&!window.speechSynthesis.speaking)setSpeak(false);
-    },1000+text.length*80);
   }catch(e){console.warn('speak',e);}
 }
 function stopSpeak(){try{if(window.speechSynthesis)window.speechSynthesis.cancel();setSpeak(false);}catch(e){}}
 function setSpeak(on){var el=$('botAvatar');if(!el)return;if(on)el.classList.add('speaking');else el.classList.remove('speaking');}
 
-/* ================= АВАТАРКА ================= */
+/* ===================== АВАТАРКА БОТА ===================== */
 function applyBotAv(){
   if(!S.coBot)return;
   var el=$('botAvatar'),face=$('botAvFace'),name=$('botAvName');
-  face.textContent=S.coBot.emoji||'🐱';
-  face.style.background=S.coBot.gradient||'linear-gradient(135deg,#ff6384,#ff9a5c)';
-  name.textContent=S.coBot.nick;
+  // emoji и gradient берём напрямую из chats — фиксированные
+  var c=chats[S.coBot.nick];
+  if(c){
+    ensureApp(c);
+    face.textContent=c.emoji;
+    face.style.background=c.gradient;
+    name.textContent=c.nick;
+  } else {
+    face.textContent=S.coBot.emoji||'🐱';
+    face.style.background=S.coBot.gradient||'linear-gradient(135deg,#ff6384,#ff9a5c)';
+    name.textContent=S.coBot.nick;
+  }
   var size=Math.min(window.innerWidth*0.35,140);
   var ring=el.querySelector('.av-ring');
   ring.style.width=size+'px';
@@ -479,10 +499,9 @@ function applyBotAv(){
 
 (function(){
   var el=$('botAvatar');
-  var drag=false,sx=0,sy=0,sl=0,st=0,moved=false;
+  var drag=false,sx=0,sy=0,sl=0,st=0;
   function dn(e){
-    if(e.target.id==='botAvClose'||e.target.id==='botAvEdit')return;
-    drag=true;moved=false;
+    drag=true;
     var p=e.touches?e.touches[0]:e;
     sx=p.clientX;sy=p.clientY;
     sl=S.botPos?S.botPos.x:0;
@@ -492,10 +511,8 @@ function applyBotAv(){
   function mv(e){
     if(!drag)return;
     var p=e.touches?e.touches[0]:e;
-    var dx=p.clientX-sx,dy=p.clientY-sy;
-    if(Math.abs(dx)+Math.abs(dy)>5)moved=true;
-    S.botPos.x=sl+dx;
-    S.botPos.y=st+dy;
+    S.botPos.x=sl+(p.clientX-sx);
+    S.botPos.y=st+(p.clientY-sy);
     applyBotAv();
     e.preventDefault();e.stopPropagation();
   }
@@ -515,13 +532,9 @@ function applyBotAv(){
   el.addEventListener('mousedown',dn);
   document.addEventListener('mousemove',mv);
   document.addEventListener('mouseup',up);
-  $('botAvClose').addEventListener('click',function(e){e.stopPropagation();e.preventDefault();stopCo();});
-  $('botAvClose').addEventListener('touchstart',function(e){e.stopPropagation();},{passive:true});
-  $('botAvEdit').addEventListener('click',function(e){e.stopPropagation();e.preventDefault();if(S.coBot)openWardrobe(S.coBot.nick);});
-  $('botAvEdit').addEventListener('touchstart',function(e){e.stopPropagation();},{passive:true});
 })();
 
-/* ================= UI ================= */
+/* ===================== UI ===================== */
 var cE=$('comments'),nE=$('notes'),bE=$('banner'),hE=$('hearts'),capE=$('caption'),tE=$('toast');
 function toast(t){tE.textContent=t;tE.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(function(){tE.classList.remove('show');},2200);}
 function updCrysUI(){var s=S.crystals.toLocaleString('ru-RU');['menuCrystals','accCrystalsStat'].forEach(function(id){var e=$(id);if(e)e.textContent=s;});}
@@ -613,8 +626,9 @@ function drawCov(ctx,v,W,H,mir){if(!v||v.readyState<2||!v.videoWidth)return;var 
 function renderPiP(){var W=pipCan.width,H=pipCan.height;pipCx.fillStyle='#000';pipCx.fillRect(0,0,W,H);drawCov(pipCx,$('cam'),W,H,S.facing==='user');
   if(S.coBot&&S.botPos){var av=$('botAvatar'),rct=av.getBoundingClientRect(),scX=W/window.innerWidth,scY=H/window.innerHeight,ax=rct.left*scX,ay=rct.top*scY,aw=rct.width*scX,ah=rct.height*scY;
     pipCx.save();pipCx.beginPath();pipCx.arc(ax+aw/2,ay+ah/2,aw/2,0,Math.PI*2);pipCx.clip();
-    pipCx.fillStyle=S.coBot.gradient||'#ff6384';pipCx.fillRect(ax,ay,aw,ah);
-    pipCx.font=Math.round(aw*0.55)+'px sans-serif';pipCx.textAlign='center';pipCx.textBaseline='middle';pipCx.fillStyle='#fff';pipCx.fillText(S.coBot.emoji||'🐱',ax+aw/2,ay+ah/2);
+    var c=chats[S.coBot.nick];
+    pipCx.fillStyle=(c&&c.gradient)||'#ff6384';pipCx.fillRect(ax,ay,aw,ah);
+    pipCx.font=Math.round(aw*0.55)+'px sans-serif';pipCx.textAlign='center';pipCx.textBaseline='middle';pipCx.fillStyle='#fff';pipCx.fillText((c&&c.emoji)||'🐱',ax+aw/2,ay+ah/2);
     pipCx.restore();
     pipCx.strokeStyle='rgba(255,255,255,.7)';pipCx.lineWidth=4;pipCx.beginPath();pipCx.arc(ax+aw/2,ay+ah/2,aw/2,0,Math.PI*2);pipCx.stroke();
   }
@@ -736,9 +750,11 @@ function startCo(bot){
   if(c&&typeof c.posX==='number'&&typeof c.posY==='number')S.botPos={x:c.posX,y:c.posY};else S.botPos=null;
   applyBotAv();
   $('botAvatar').classList.add('show');
+  $('rbKick').style.display='flex';
   closeAll();
   var g=rnd(['Всем привет, я с '+S.nick+'!','Привет, ребята! 👋','Приветик! 💕','Хай, чат!','Мы в эфире! 🔥','О, я в кадре!']);
   spawnNote(bot.nick+' в эфире!','Бот говорит голосом 🎙','#8cff8c','sub');
+  unlockVoice();
   setTimeout(function(){
     spawnChat(g,bot.nick,bot.gradient||'#ff6384',{kind:bot.kind||'normal'});
     speak(bot,g);
@@ -746,7 +762,15 @@ function startCo(bot){
   S.hype=Math.min(1,S.hype+0.4);
   sfxSub();boom('❤️',10);
 }
-function stopCo(){if(!S.coBot)return;var w=S.coBot.nick;S.coBot=null;S.botPos=null;$('botAvatar').classList.remove('show','speaking');stopSpeak();toast('👋 '+w+' покинул эфир');}
+function stopCo(){
+  if(!S.coBot)return;
+  var w=S.coBot.nick;
+  S.coBot=null;S.botPos=null;
+  $('botAvatar').classList.remove('show','speaking');
+  $('rbKick').style.display='none';
+  stopSpeak();
+  toast('👋 '+w+' покинул эфир');
+}
 
 function openChatWith(nick,emoji,gradient,kind,gender){
   getChat(nick,emoji,gradient,kind,gender);
@@ -878,10 +902,13 @@ $('wdSave').addEventListener('click',function(){
   $('wardrobeModal').classList.remove('show');
 });
 
+/* ===================== BINDINGS ===================== */
 $('rbRec').addEventListener('click',function(e){pulse(e.currentTarget);if(S.isRecording)stopRec();else startRec();});
 $('rbFlip').addEventListener('click',function(e){pulse(e.currentTarget);flipCam();});
 $('rbMic').addEventListener('click',function(e){pulse(e.currentTarget);toggleMic();});
 $('rbEmoji').addEventListener('click',function(e){pulse(e.currentTarget);toggleEmoji();});
+$('rbKick').addEventListener('click',function(e){pulse(e.currentTarget);stopCo();});
+
 $('closeX').addEventListener('click',function(){
   if(confirm('Завершить стрим?')){
     if(S.isRecording)stopRec();
