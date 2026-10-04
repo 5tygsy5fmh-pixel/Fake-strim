@@ -569,6 +569,8 @@ window.addEventListener('unhandledrejection', function(e) {
   var el = document.getElementById('fatal');
   if (el) { el.style.display = 'block'; el.textContent = 'PROMISE ERROR: ' + (e.reason && e.reason.message ? e.reason.message : e.reason); }
 });
+</script>
+<script>
 "use strict";
 
 var IDB=null;
@@ -864,6 +866,7 @@ function showTyping(){var b=$('chatMessages'),el=document.createElement('div');e
 function hideTyping(){var el=$('typingIndicator');if(el)el.remove();}
 
 function updBadge(){var u=0,ks=Object.keys(chats);for(var i=0;i<ks.length;i++)u+=(chats[ks[i]].unread||0);var b=$('inboxBadge');if(!b)return;if(u>0){b.textContent=u>99?'99+':String(u);b.style.display='flex';}else b.style.display='none';}
+</script>
 function buildInbox(){
   var body=$('inboxBody');if(!body)return;body.innerHTML='';
   var list=[];
@@ -1572,6 +1575,6 @@ try{
   var f=$('fatal');
   if(f){f.style.display='block';f.textContent='Ошибка init: '+e.message+'\n'+e.stack;}
 }
-alert('JS работает!');</script>
+</script>
 </body>
 </html>
