@@ -378,7 +378,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:-ap
     <div class="back" data-back><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><polyline points="15 6 9 12 15 18"/></svg></div>
     <div class="chat-head-av" id="channelHeadAv" style="cursor:pointer"></div>
     <div class="title" id="channelHeadName" style="cursor:pointer">Канал</div>
-    <div class="roomGift" id="channelGiftBtn">🎁</div>
+    <div class="roomGift" id="channelGiftBtn"><svg viewBox="0 0 24 24" fill="#fff" style="width:22px;height:22px"><path d="M20 7h-2.5c.3-.5.5-1 .5-1.5 0-1.4-1.1-2.5-2.5-2.5-1 0-2 .6-2.7 1.5L12 5.5l-.8-1C10.5 3.6 9.5 3 8.5 3 7.1 3 6 4.1 6 5.5c0 .5.2 1 .5 1.5H4c-1.1 0-2 .9-2 2v2c0 .6.4 1 1 1h18c.6 0 1-.4 1-1V9c0-1.1-.9-2-2-2zM4 13v7c0 1.1.9 2 2 2h5v-9H4zm9 9h5c1.1 0 2-.9 2-2v-7h-7v9z"/></svg></div>
+    <div class="roomGift" id="channelDeleteBtn"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M5 6l1 14a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-14"/><line x1="9" y1="11" x2="9" y2="17"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="15" y1="11" x2="15" y2="17"/></svg></div>
   </div>
   <div class="chat-messages" id="channelMessages"></div>
   <div class="chat-input-row"><input id="channelInput" type="text" placeholder="Сообщение в канал..."><button id="channelSend"><svg viewBox="0 0 24 24" fill="#fff"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg></button></div>
@@ -389,6 +390,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:-ap
     <div class="back" data-back><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><polyline points="15 6 9 12 15 18"/></svg></div>
     <div class="chat-head-av" id="chatRoomHeadAv" style="cursor:pointer"></div>
     <div class="title" id="chatRoomHeadName" style="cursor:pointer">Чат</div>
+    <div class="roomGift" id="chatRoomDeleteBtn"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M5 6l1 14a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-14"/><line x1="9" y1="11" x2="9" y2="17"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="15" y1="11" x2="15" y2="17"/></svg></div>
   </div>
   <div class="chat-messages" id="chatRoomMessages"></div>
   <div class="chat-input-row"><input id="chatRoomInput" type="text" placeholder="Сообщение..."><button id="chatRoomSend"><svg viewBox="0 0 24 24" fill="#fff"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg></button></div>
@@ -512,6 +514,16 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:-ap
   <div class="roomBtns" style="flex-direction:column">
     <button class="roomSave" id="sanctionUndoBtn" style="background:#25f4ee;color:#000">Отменить</button>
     <button class="roomCancel" data-close="sanctionModal">Закрыть</button>
+  </div>
+</div></div>
+
+<div id="deleteRoomModal" class="roomModal"><div class="roomBox" style="max-width:340px;text-align:center">
+  <div style="font-size:52px;margin-bottom:8px">🗑</div>
+  <h3>Удалить?</h3>
+  <p style="font-size:13px;opacity:.7;margin-bottom:16px" id="deleteRoomText">Это действие нельзя отменить</p>
+  <div class="roomBtns">
+    <button class="roomCancel" data-close="deleteRoomModal">Отмена</button>
+    <button class="roomSave" id="deleteRoomConfirm" style="background:#ff5050;color:#fff">Удалить</button>
   </div>
 </div></div>
 
@@ -886,7 +898,7 @@ function showTyping(){var b=$('chatMessages'),el=document.createElement('div');e
 function hideTyping(){var el=$('typingIndicator');if(el)el.remove();}
 
 function updBadge(){var u=0,ks=Object.keys(chats);for(var i=0;i<ks.length;i++)u+=(chats[ks[i]].unread||0);var b=$('inboxBadge');if(!b)return;if(u>0){b.textContent=u>99?'99+':String(u);b.style.display='flex';}else b.style.display='none';}
-  function buildInbox(){
+function buildInbox(){
   var body=$('inboxBody');if(!body)return;body.innerHTML='';
   var list=[];
   Object.keys(channels).forEach(function(id){list.push({type:'channel',id:id,data:channels[id],ts:channels[id].lastT||0});});
@@ -992,9 +1004,9 @@ function openCreateChannel(){
   buildRoomEmojiGrid('chEmojiGrid','📢');buildRoomColorGrid('chColorGrid','#25a4d3');
   var cp=$('chColorPicker');cp.value='#25a4d3';cp.style.background='#25a4d3';
   cp.oninput=function(e){prev.style.background=e.target.value;cp.style.background=e.target.value;};
-  $('chChar').oninput=function(e){var v=e.target.value||'📢';prev.textContent=v;prev.style.color=isEmoji(v)?'#fff':'#fff';};
+  $('chChar').oninput=function(e){var v=e.target.value||'📢';prev.textContent=v;};
   document.querySelectorAll('#chEmojiGrid .emoji-opt').forEach(function(o){o.addEventListener('click',function(){prev.textContent=o.dataset.chosen;$('chChar').value=o.dataset.chosen;});});
-  document.querySelectorAll('#chColorGrid .color-opt').forEach(function(o){o.addEventListener('click',function(){prev.style.background=o.dataset.chosen;$('chColorPicker').value=o.dataset.chosen;$('chColorPicker').style.background=o.dataset.chosen;});});
+  document.querySelectorAll('#chColorGrid .color-opt').forEach(function(o){o.addEventListener('click',function(){prev.style.background=o.dataset.chosen;var p=$('chColorPicker');p.value=o.dataset.chosen;p.style.background=o.dataset.chosen;});});
   $('createChannelModal').classList.add('show');
 }
 function createChannel(){
@@ -1366,6 +1378,26 @@ function saveEditRoom(){
   buildInbox();
 }
 
+var deleteTarget=null;
+function openDeleteConfirm(type,id){
+  deleteTarget={type:type,id:id};
+  var name='';
+  if(type==='channel'){var ch=channels[id];if(!ch)return;name=ch.name;}
+  else{var cr=chatrooms[id];if(!cr)return;name=cr.name;}
+  $('deleteRoomText').textContent='Удалить «'+name+'»? Это действие нельзя отменить.';
+  $('deleteRoomModal').classList.add('show');
+}
+function confirmDeleteRoom(){
+  if(!deleteTarget)return;
+  if(deleteTarget.type==='channel'){delete channels[deleteTarget.id];saveChannels();}
+  else{delete chatrooms[deleteTarget.id];saveChatrooms();}
+  deleteTarget=null;
+  $('deleteRoomModal').classList.remove('show');
+  closeAll();
+  toast('🗑 Удалено');
+  buildInbox();
+}
+
 var msgTargetNick=null;
 function openMsgActions(nick){
   if(!currentChatRoomId)return;
@@ -1651,6 +1683,7 @@ bind('chCreateSave','click',createChannel);
 bind('channelSend','click',sendChannelMessage);
 bind('channelInput','keydown',function(e){if(e.key==='Enter')sendChannelMessage();});
 bind('channelGiftBtn','click',openGiveaway);
+bind('channelDeleteBtn','click',function(){if(currentChannelId)openDeleteConfirm('channel',currentChannelId);});
 bind('channelHeadName','click',function(){openChatMenu('channel');});
 bind('channelHeadAv','click',function(){openChatMenu('channel');});
 bind('gwStart','click',startGiveaway);
@@ -1663,6 +1696,8 @@ bind('chatRoomSend','click',sendChatRoomMessage);
 bind('chatRoomInput','keydown',function(e){if(e.key==='Enter')sendChatRoomMessage();});
 bind('chatRoomHeadName','click',function(){openChatMenu('chatroom');});
 bind('chatRoomHeadAv','click',function(){openChatMenu('chatroom');});
+bind('chatRoomDeleteBtn','click',function(){if(currentChatRoomId)openDeleteConfirm('chatroom',currentChatRoomId);});
+bind('deleteRoomConfirm','click',confirmDeleteRoom);
 bind('msgKickBtn','click',doKick);
 bind('msgBanBtn','click',doBan);
 bind('msgMutBtn','click',doMut);
