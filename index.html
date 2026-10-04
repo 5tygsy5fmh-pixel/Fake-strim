@@ -763,7 +763,6 @@ function subEvent(){
     followersList.push({nick:nick,emoji:av.emoji,gradient:av.gradient,t:Date.now()});
     if(followersList.length>200)followersList.shift();
     saveFollowers();S.followers=followersList.length;saveStats();updFolUI();
-    // В КАНАЛЫ — только с вероятностью 65%
     Object.keys(channels).forEach(function(id){
       var ch=channels[id];
       if(ch&&ch.members){
@@ -775,7 +774,6 @@ function subEvent(){
         }
       }
     });
-    // В ПУБЛИЧНЫЕ ЧАТЫ — только с вероятностью 50%
     Object.keys(chatrooms).forEach(function(id){
       var cr=chatrooms[id];
       if(cr&&cr.members&&!cr.isPrivate){
@@ -1222,7 +1220,7 @@ function renderChatMenu(){
       var isBanned=obj.banned&&obj.banned[m.nick];
       var isMuted=obj.muted&&obj.muted[m.nick]>Date.now();
       var role=isAdmin?'⭐ Админ':(isBanned?'🚫 Забанен':(isMuted?'🤐 Мут':'участник'));
-      html4+='<div class="roomInfoMember" onclick="openMemberChat(\''+m.nick+'\')"><div class="mAv" style="background:'+m.gradient+'">'+m.emoji+'</div><div class="mBody"><div class="mName">'+m.nick+'</div><div class="mRole">'+role+'</div></div><div class="mArrow">›</div></div>';
+      htmlshow4+='<div class="');roomInfoMember" onclick="renderopenMemberChat(\''+m.nickChat+'\')"><div class="mAv" style="background:'+m.gradient+'">'+m.emoji+'</div><div class="mBody"><div class="mName">'+m.nick+'</div><div class="mRole">'+role+'</div></div><div class="mArrow">›</div></div>';
     });
     box.innerHTML=html4;
   }
@@ -1280,7 +1278,7 @@ function doBan(){
   cr.members=cr.members.filter(function(m){return m.nick!==msgTargetNick;});
   cr.admins=cr.admins.filter(function(n){return n!==msgTargetNick;});
   cr.messages.push({from:'system',text:'🚫 '+msgTargetNick+' забанен '+S.nick,t:Date.now()});
-  saveChatrooms();$('msgActionModal').classList.remove('show');renderChatRoomMessages();
+  saveChatrooms();$('msgActionModal').classList.remove('RoomMessages();
   showSanction('🚫',msgTargetNick+' забанен','ban',msgTargetNick);
 }
 function doMut(){if(!msgTargetNick)return;$('msgActionModal').classList.remove('show');$('muteTimeModal').classList.add('show');}
@@ -1374,19 +1372,36 @@ function confirmPick(){
   $('pickMembersList').querySelectorAll('.memberRow.sel').forEach(function(r){selected.push(r.dataset.nick);});
   if(pickType==='admin'){
     var cr=chatrooms[currentChatRoomId];
-    selected.forEach(function(nick){if(cr.admins.indexOf(nick)<0)cr.admins.push(nick);});
-    cr.messages.push({from:'system',text:'⭐ Новые админы: '+selected.join(', '),t:Date.now()});
-    saveChatrooms();if(currentChatRoomId===cr.id)renderChatRoomMessages();toast('⭐ Назначено: '+selected.length);
+    selected.forEach(function(nick){
+      if(cr.admins.indexOf(nick)<0)cr.admins.push(nick);
+      cr.messages.push({from:'system',text:'⭐ '+nick+' назначен админом '+S.nick,t:Date.now()});
+    });
+    cr.lastT=Date.now();
+    saveChatrooms();
+    if(currentChatRoomId===cr.id)renderChatRoomMessages();
+    toast('⭐ Назначено: '+selected.length);
     $('pickMembersModal').classList.remove('show');
     openChatMenu('chatroom');openMenuSub('admins');
     return;
   }else if(pickType==='member'){
-    selected.forEach(function(nick){var c=chats[nick];if(!c){ensureChatEntry(nick);c=chats[nick];}if(!c)return;obj.members.push({nick:nick,emoji:c.emoji,gradient:c.gradient,t:Date.now()});});
-    obj.messages.push({from:'system',text:'👤 Добавлены: '+selected.join(', '),t:Date.now()});
-    if(menuType==='channel')saveChannels();else saveChatrooms();
+    selected.forEach(function(nick){
+      var c=chats[nick];if(!c){ensureChatEntry(nick);c=chats[nick];}if(!c)return;
+      if(obj.members.find(function(m){return m.nick===nick;}))return;
+      obj.members.push({nick:nick,emoji:c.emoji,gradient:c.gradient,t:Date.now()});
+      obj.messages.push({from:'system',text:'👤 '+nick+' добавлен в '+(menuType==='channel'?'канал':'чат')+' '+S.nick,t:Date.now()});
+    });
+    obj.lastT=Date.now();
+    if(menuType==='channel'){
+      saveChannels();
+      if(currentChannelId===obj.id)renderChannelMessages();
+    }else{
+      saveChatrooms();
+      if(currentChatRoomId===obj.id)renderChatRoomMessages();
+    }
     toast('👤 Добавлено: '+selected.length);
   }
   $('pickMembersModal').classList.remove('show');
+  if(menuType&&$('chatMenuModal').classList.contains('show')){renderChatMenu();}
 }
 
 var vvStream=null,vvUrl=null;
@@ -1453,16 +1468,10 @@ async function exportEdit(){
       try{v.currentTime=t;}catch(e){clearTimeout(to);if(!dn){dn=true;r();}}
     });};
 
-    // 1) Сначала перематываем — видео на паузе
     await seek(start);
-
-    // 2) Устанавливаем скорость
     v.playbackRate=vvOpts.speed;
-
-    // 3) Запускаем воспроизведение
     try{await v.play();}catch(e){}
 
-    // 4) Ждём первый реальный кадр — только теперь включаем рекордер
     await new Promise(function(r){
       if(typeof v.requestVideoFrameCallback==='function'){
         var done=false;
@@ -1474,7 +1483,6 @@ async function exportEdit(){
     });
     rec.start(100);
 
-    // 5) Пишем до конца диапазона
     await new Promise(function(r){
       var w=function(){
         if(v.currentTime>=end-0.02||v.ended){v.pause();setPct(100);r();return;}
