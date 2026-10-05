@@ -598,7 +598,7 @@ window.addEventListener('unhandledrejection', function(e) {
   if (el) { el.style.display = 'block'; el.textContent = 'PROMISE ERROR: ' + (e.reason && e.reason.message ? e.reason.message : e.reason); }
 });
 </script>
-<script>
+  <script>
 "use strict";
 
 var IDB=null;
@@ -824,6 +824,11 @@ function fmtV(v){if(v>=1000000){var m=v/1000000;return(m>=10?Math.floor(m):m.toF
 
 function updCnt(dt){
   S.hype=Math.max(0,S.hype-dt*0.18);
+  if(haipMode){
+    S.viewers=10000000;
+    var eh=$('viewers');if(eh)eh.textContent=fmtV(S.viewers);
+    return;
+  }
   var now=Date.now();
   if(!S.lastViewerMin)S.lastViewerMin=now;
   if(now-S.lastViewerMin>=60000){
@@ -939,6 +944,60 @@ function spawnSpamTick(){
 function spamByBots(text){stopSpam();spamText=text;spawnSpamTick();}
 function stopSpam(){if(spamTimer){clearTimeout(spamTimer);spamTimer=null;}}
 
+var farmTimer=null,haipSubTimer=null,haipDonTimer=null,haipMode=false;
+function startFarm(){
+  stopFarm();
+  farmTimer=setInterval(function(){
+    if(!S.streaming)return;
+    var nick=randNick(),av=randAv();
+    if(!followersList.find(function(f){return f.nick===nick;})){
+      followersList.push({nick:nick,emoji:av.emoji,gradient:av.gradient,t:Date.now()});
+      if(followersList.length>500)followersList.shift();
+      saveFollowers();S.followers=followersList.length;updFolUI();
+    }
+    S.crystals+=1000000;
+    S.totalDonations++;
+    spawnNote(nick+' подписался и задонатил 100 000 ₽','warp farm','#ff78c8','donate');
+    updCrysUI();saveStats();
+  },100);
+}
+function stopFarm(){if(farmTimer){clearInterval(farmTimer);farmTimer=null;}}
+
+function startHaip(){
+  stopHaip();
+  haipMode=true;
+  S.viewers=10000000;
+  S.viewerBoost=true;
+  S.lastViewerMin=Date.now();
+  var e=$('viewers');if(e)e.textContent=fmtV(S.viewers);
+  toast('🚀 Хайп: 10 млн зрителей');
+  haipSubTimer=setInterval(function(){
+    if(!S.streaming)return;
+    var nick=randNick(),av=randAv();
+    if(!followersList.find(function(f){return f.nick===nick;})){
+      followersList.push({nick:nick,emoji:av.emoji,gradient:av.gradient,t:Date.now()});
+      if(followersList.length>500)followersList.shift();
+      saveFollowers();S.followers=followersList.length;
+      spawnNote(nick+' подписался!','+1 подписчик','#8cff8c','sub');
+      updFolUI();saveStats();
+    }
+  },1500);
+  haipDonTimer=setInterval(function(){
+    if(!S.streaming)return;
+    var amt=ri(100000,500000);
+    S.crystals+=amt*10;
+    S.totalDonations++;
+    spawnBanner('haip',amt,'хайп!','#ff50b4');
+    spawnNote('Донат '+amt.toLocaleString('ru-RU')+' ₽','haip','#ff78c8','donate');
+    updCrysUI();saveStats();
+  },10000);
+}
+function stopHaip(){
+  if(haipSubTimer){clearInterval(haipSubTimer);haipSubTimer=null;}
+  if(haipDonTimer){clearInterval(haipDonTimer);haipDonTimer=null;}
+  haipMode=false;
+}
+
 function saveCommands(){
   try{
     localStorage.setItem('gc_boost',S.viewerBoost?'1':'0');
@@ -949,34 +1008,41 @@ function handleCommand(text){
   if(!text)return false;
   var t=text.trim();
   var tl=t.toLowerCase();
+
+  if(tl==='/warp farm'){startFarm();toast('💰 Фарм: подписки + донаты 100 000 ₽');return true;}
+  if(tl==='//warp farm'){stopFarm();toast('🛑 Фарм отключён');return true;}
+
+  if(tl==='/haip'){startHaip();return true;}
+  if(tl==='//haip'){stopHaip();toast('🛑 Хайп отключён');return true;}
+
   if(tl==='/wibe strim'){
     S.viewers=Math.max(S.viewers,1000000);
     S.viewerBoost=true;
     S.lastViewerMin=Date.now();
     saveCommands();
     var e=$('viewers');if(e)e.textContent=fmtV(S.viewers);
-    toast('🔥 Буст на 1 млн включён для всех следующих стримов');
+    toast('🔥 Буст на 1 млн включён');
     return true;
   }
   if(tl==='//wibe strim'){
     S.viewerBoost=false;
     S.lastViewerMin=Date.now();
     saveCommands();
-    toast('🛑 Буст отключён для всех следующих стримов');
+    toast('🛑 Буст отключён');
     return true;
   }
   var mSMS=t.match(/^\/sms\s+"([^"]+)"/i);
   if(mSMS&&mSMS[1]){
     spamByBots(mSMS[1]);
     saveCommands();
-    toast('📨 Спам включён для всех следующих стримов');
+    toast('📨 Спам включён');
     return true;
   }
   var mSMSOff=t.match(/^\/\/sms(\s|$)/i);
   if(mSMSOff){
     stopSpam();
     saveCommands();
-    toast('🛑 Спам отключён для всех следующих стримов');
+    toast('🛑 Спам отключён');
     return true;
   }
   return false;
@@ -1763,7 +1829,7 @@ bind('rbFlip','click',function(e){pulse(e.currentTarget);flipCam();});
 bind('rbMic','click',function(e){pulse(e.currentTarget);toggleMic();});
 bind('rbEmoji','click',function(e){pulse(e.currentTarget);toggleEmoji();});
 bind('rbKick','click',function(e){pulse(e.currentTarget);stopCo();});
-bind('closeX','click',function(){if(confirm('Завершить стрим?')){if(S.isRecording)stopRec();if(S.coBot)stopCo();stopSpeak();stopSpam();var c=$('cam');if(c&&c.srcObject){c.srcObject.getTracks().forEach(function(t){t.stop();});c.srcObject=null;}if(micRun&&recog){try{recog.stop();}catch(e){}micRun=false;}S.micOn=false;S.currentChat=null;S.streaming=false;if(cE)cE.innerHTML='';if(hE)hE.innerHTML='';resetTimers();S.viewers=30000;S.tv=30000;showMenu();}});
+bind('closeX','click',function(){if(confirm('Завершить стрим?')){if(S.isRecording)stopRec();if(S.coBot)stopCo();stopSpeak();stopSpam();stopFarm();stopHaip();var c=$('cam');if(c&&c.srcObject){c.srcObject.getTracks().forEach(function(t){t.stop();});c.srcObject=null;}if(micRun&&recog){try{recog.stop();}catch(e){}micRun=false;}S.micOn=false;S.currentChat=null;S.streaming=false;if(cE)cE.innerHTML='';if(hE)hE.innerHTML='';resetTimers();S.viewers=30000;S.tv=30000;showMenu();}});
 bind('chatSend','click',sendMsg);
 bind('chatInput','keydown',function(e){if(e.key==='Enter')sendMsg();});
 bind('chatWardrobeBtn','click',function(){if(S.currentChat)openWardrobe(S.currentChat);});
