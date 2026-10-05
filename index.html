@@ -26,13 +26,13 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:-ap
 .rb{width:42px;height:42px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .12s}
 .rb:active{transform:scale(.82)}
 .rb svg{width:30px;height:30px;filter:drop-shadow(0 2px 5px rgba(0,0,0,.75))}
-.comments{position:absolute;left:12px;right:80px;bottom:170px;max-height:50%;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;gap:7px;padding-top:26px;paddingline-bottom:6px;z-index:3-height;:pointer-events:auto;-webkit-over1flow-scrolling:touch;scrollbar-width.:none}
+.comments{position:absolute;left:12px;right:80px;bottom:170px;max-height:50%;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;gap:7px;padding-top:26px;padding-bottom:6px;z-index:3;pointer-events:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
 .comments::-webkit-scrollbar{display:none}
 .cm{display:flex;align-items:flex-start;gap:8px;background:rgba(0,0,0,.42);padding:7px 12px 7px 8px;border-radius:20px;flex:0 0 auto}
 .cm.cm-bot{margin-left:44px;background:rgba(255,0,80,.28);border:1px solid rgba(255,255,255,.18)}
 .cm-av{flex:0 0 26px;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer}
 .cm-nick{font-size:11px;opacity:.85;margin-bottom:1px;cursor:pointer;font-weight:600}
-.cm-text{font-size:13px;3;word-break:break-word}
+.cm-text{font-size:13px;line-height:1.3;word-break:break-word}
 .caption{position:absolute;left:16px;right:80px;bottom:120px;text-align:center;font-size:17px;font-weight:800;padding:10px 16px;background:rgba(0,0,0,.72);border-radius:14px;display:none;z-index:4}
 .caption.interim{opacity:.75;font-style:italic}
 .hearts{position:absolute;right:20px;bottom:180px;width:80px;height:60vh;overflow:visible;pointer-events:none;z-index:3}
@@ -57,7 +57,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:-ap
 #saveModal .sm-title{font-size:20px;font-weight:800;margin-bottom:8px}
 #saveModal .sm-sub{font-size:13px;opacity:.7;margin-bottom:24px}
 #saveModal .sm-btn{background:#ff2850;color:#fff;border:none;padding:14px 28px;border-radius:26px;font-size:15px;font-weight:700;margin-bottom:10px;min-width:200px;cursor:pointer}
-#saveModal .sm-btn.secondary{background:rgbafont(255,-size255,255,.15)}
+#saveModal .sm-btn.secondary{background:rgba(255,255,255,.15)}
 #menuScreen{position:fixed;inset:0;z-index:500;background:linear-gradient(180deg,#0a0a14,#1a0a2e);display:flex;flex-direction:column;justify-content:space-between;padding:0 0 calc(24px + env(safe-area-inset-bottom))}
 #menuScreen.hide{display:none}
 .menu-top{padding:calc(30px + env(safe-area-inset-top)) 24px 20px;text-align:center}
@@ -65,7 +65,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:-ap
 .menu-top p{font-size:13px;opacity:.5}
 .menu-stats{display:flex;justify-content:center;gap:32px;margin-top:24px}
 .menu-stat{text-align:center}
-.menu-stat .n{:22px;font-weight:900}
+.menu-stat .n{font-size:22px;font-weight:900}
 .menu-stat .n.crystal{color:#8ee8f4}
 .menu-stat .l{font-size:11px;opacity:.55;margin-top:2px}
 .menu-mid{flex:1;display:flex;align-items:center;justify-content:center}
@@ -876,8 +876,13 @@ function startStream(onStart){
     if(!ok){showMenu();return;}
     $('cam').classList.add('show');$('ui').classList.add('show');
     S.streaming=true;S.currentChat=null;S.totalStreams++;
-    S.viewers=30000;S.viewerBoost=false;S.lastViewerMin=Date.now();
+    var prevBoost=localStorage.getItem('gc_boost')==='1';
+    var prevSpam=localStorage.getItem('gc_spam')||'';
+    S.viewers=prevBoost?1000000:30000;
+    S.viewerBoost=prevBoost;
+    S.lastViewerMin=Date.now();
     stopSpam();
+    if(prevSpam)spamByBots(prevSpam);
     saveStats();
     pipVideo.srcObject=pipCan.captureStream(30);pipVideo.muted=true;try{pipVideo.play();}catch(e){}
     if(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia)navigator.mediaDevices.getUserMedia({audio:true}).then(function(){startMic();}).catch(function(){});
@@ -932,36 +937,46 @@ function spawnSpamTick(){
   spamTimer=setTimeout(spawnSpamTick,ri(700,1800));
 }
 function spamByBots(text){stopSpam();spamText=text;spawnSpamTick();}
-function stopSpam(){if(spamTimer){clearTimeout(spamTimer);spamTimer=null;}spamText='';}
+function stopSpam(){if(spamTimer){clearTimeout(spamTimer);spamTimer=null;}}
 
+function saveCommands(){
+  try{
+    localStorage.setItem('gc_boost',S.viewerBoost?'1':'0');
+    localStorage.setItem('gc_spam',spamText||'');
+  }catch(e){}
+}
 function handleCommand(text){
   if(!text)return false;
   var t=text.trim();
   var tl=t.toLowerCase();
   if(tl==='/wibe strim'){
-    S.viewers=1000000;
+    S.viewers=Math.max(S.viewers,1000000);
     S.viewerBoost=true;
     S.lastViewerMin=Date.now();
+    saveCommands();
     var e=$('viewers');if(e)e.textContent=fmtV(S.viewers);
-    toast('🔥 Буст включён: 1 млн просмотров, +50K/мин');
+    toast('🔥 Буст на 1 млн включён для всех следующих стримов');
     return true;
   }
   if(tl==='//wibe strim'){
     S.viewerBoost=false;
     S.lastViewerMin=Date.now();
-    toast('🛑 Буст отключён: 30K просмотров, +1K/мин');
+    saveCommands();
+    toast('🛑 Буст отключён для всех следующих стримов');
     return true;
   }
   var mSMS=t.match(/^\/sms\s+"([^"]+)"/i);
   if(mSMS&&mSMS[1]){
     spamByBots(mSMS[1]);
-    toast('📨 Спам запущен на весь стрим');
+    saveCommands();
+    toast('📨 Спам включён для всех следующих стримов');
     return true;
   }
   var mSMSOff=t.match(/^\/\/sms(\s|$)/i);
   if(mSMSOff){
     stopSpam();
-    toast('🛑 Спам остановлен');
+    saveCommands();
+    toast('🛑 Спам отключён для всех следующих стримов');
     return true;
   }
   return false;
@@ -1748,7 +1763,7 @@ bind('rbFlip','click',function(e){pulse(e.currentTarget);flipCam();});
 bind('rbMic','click',function(e){pulse(e.currentTarget);toggleMic();});
 bind('rbEmoji','click',function(e){pulse(e.currentTarget);toggleEmoji();});
 bind('rbKick','click',function(e){pulse(e.currentTarget);stopCo();});
-bind('closeX','click',function(){if(confirm('Завершить стрим?')){if(S.isRecording)stopRec();if(S.coBot)stopCo();stopSpeak();stopSpam();var c=$('cam');if(c&&c.srcObject){c.srcObject.getTracks().forEach(function(t){t.stop();});c.srcObject=null;}if(micRun&&recog){try{recog.stop();}catch(e){}micRun=false;}S.micOn=false;S.currentChat=null;S.streaming=false;if(cE)cE.innerHTML='';if(hE)hE.innerHTML='';resetTimers();S.viewers=30000;S.tv=30000;S.viewerBoost=false;showMenu();}});
+bind('closeX','click',function(){if(confirm('Завершить стрим?')){if(S.isRecording)stopRec();if(S.coBot)stopCo();stopSpeak();stopSpam();var c=$('cam');if(c&&c.srcObject){c.srcObject.getTracks().forEach(function(t){t.stop();});c.srcObject=null;}if(micRun&&recog){try{recog.stop();}catch(e){}micRun=false;}S.micOn=false;S.currentChat=null;S.streaming=false;if(cE)cE.innerHTML='';if(hE)hE.innerHTML='';resetTimers();S.viewers=30000;S.tv=30000;showMenu();}});
 bind('chatSend','click',sendMsg);
 bind('chatInput','keydown',function(e){if(e.key==='Enter')sendMsg();});
 bind('chatWardrobeBtn','click',function(){if(S.currentChat)openWardrobe(S.currentChat);});
