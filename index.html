@@ -610,6 +610,7 @@ function deleteVideoFromIDB(filename){return openIDB().then(function(db){return 
 var S={crystals:parseInt(localStorage.getItem('gc_crystals')||'0'),followers:parseInt(localStorage.getItem('gc_followers')||'12400'),nick:localStorage.getItem('gc_nick')||'grand-cat',avatar:localStorage.getItem('gc_avatar')||'G',avatarColor:localStorage.getItem('gc_avatar_color')||'#25a4d3',avatarRing:localStorage.getItem('gc_avatar_ring')||'#ffffff',avatarText:localStorage.getItem('gc_avatar_text')||'#ffffff',voiceOn:localStorage.getItem('gc_voiceon')!=='0',swearing:localStorage.getItem('gc_swearing')==='1',autoRec:localStorage.getItem('gc_autorec')==='1',emojisOn:localStorage.getItem('gc_emojison')!=='0',totalStreams:parseInt(localStorage.getItem('gc_streams_count')||'0'),totalMessages:parseInt(localStorage.getItem('gc_messages')||'0'),totalDonations:parseInt(localStorage.getItem('gc_donations')||'0'),totalDialogs:parseInt(localStorage.getItem('gc_dialogs')||'0'),viewers:30000,tv:30000,viewerBoost:false,lastViewerMin:0,hype:0.3,micOn:false,micMuted:false,facing:'user',isRecording:false,lastActivity:Date.now(),currentChat:null,streaming:false,coBot:null,botPos:null};
 var myStreams=[],followersList=[],chats={},currentTopic=null,lastTick=performance.now(),lastChat=0,lastEv=0,lastNotify=0,lastResident=0,lastAutoEmoji=0;
 var donCustomText=localStorage.getItem('gc_dontext')||'';
+var botSimOn=true;
 try{followersList=JSON.parse(localStorage.getItem('gc_followers_list')||'[]');}catch(e){}
 try{chats=JSON.parse(localStorage.getItem('gc_chats')||'{}');}catch(e){}
 
@@ -654,6 +655,7 @@ var RES=[{nick:'67_kid',color:'#ff5c5c',kind:'spam',gender:'male',lines:['67','6
 var EMOJIS_ALL=['🥰','👍','🤮','👎','❤️','😂','🤣','🤯','🗿'];
 var CHAT_GEN=['жиза','база','согласен','+1','💯','ну да','ты прав','😂'];
 var DONATORS=['Whale_777','KingDonater','MegaBoss','Anonym','RichBoi','TopDon'];
+var DON_REASONS=['за контент','продолжай','ты лучший','респект','го дальше','красава','жиза','уважуха','топ стрим','за хайп'];
 var INSULTS=['лох','дурак','тупой','идиот','дебил','клоун','придурок','мудак','хуй','хуесос','пидор','гандон','говно','гавно','слабак','чмо','амёба','баран','скотина','тварь','мразь','козёл','свинья','падла','гнида','крыса','нахуй'];
 function isInsult(t){if(!t)return false;var x=t.toLowerCase().replace(/[^а-яёa-z0-9\s]/g,'');for(var i=0;i<INSULTS.length;i++)if(x.indexOf(INSULTS[i])>=0)return true;return false;}
 var DM={spam:['67','67 67','да 67'],hater:['ну такое','фу','скучно','кринж'],simp:['ты лучший 💕','люблю тебя ❤️','обожаю 🥰'],clown:['😂😂😂','ахахаха','ору','кек'],asker:['а сколько тебе лет?','откуда ты?','а ты кушал?'],normal:['жиза 😄','ага','согласен!','ахаха','интересно','серьёзно?','ого!','прикольно','ок']};
@@ -793,7 +795,7 @@ function pickDonAmt(){var v=S.viewers;if(v<40000)return ri(10,50);if(v<50000)ret
 function donEvent(){
   var d=rnd(DONATORS);
   var a=pickDonAmt();
-  var r=donCustomText||rnd(['за контент','продолжай','ты лучший','респект']);
+  var r=donCustomText||rnd(DON_REASONS);
   spawnBanner(d,a,r,'#ff50b4');
   spawnNote(d+' задонатил '+a.toLocaleString('ru-RU')+' ₽',r,'#ff78c8','donate');
   S.crystals+=a*10;
@@ -892,7 +894,7 @@ function loop(now){
   var dt=(now-lastTick)/1000;lastTick=now;
   if(S.streaming){
     updCnt(dt);renderPiP();
-    if(S.currentChat===null){
+    if(S.currentChat===null && botSimOn){
       var ci=Math.max(0.8,2.2-S.hype*1.2)*1000;
       if(now-lastChat>ci){spawnChat();lastChat=now;}
       var r2=(3500-S.hype*1500)+Math.random()*1500;
@@ -921,6 +923,7 @@ function startStream(onStart){
     if(!ok){showMenu();return;}
     $('cam').classList.add('show');$('ui').classList.add('show');
     S.streaming=true;S.currentChat=null;S.totalStreams++;
+    botSimOn=true;
     var prevBoost=localStorage.getItem('gc_boost')==='1';
     var prevSpam=localStorage.getItem('gc_spam')||'';
     S.viewers=prevBoost?1000000:30000;
@@ -982,7 +985,7 @@ function spawnSpamTick(){
   spamTimer=setTimeout(spawnSpamTick,ri(700,1800));
 }
 function spamByBots(text){stopSpam();spamText=text;spawnSpamTick();}
-function stopSpam(){if(spamTimer){clearTimeout(spamTimer);spamTimer=null;}}
+function stopSpam(){if(spamTimer){clearTimeout(spamTimer);spamTimer=null;}spamText='';}
 
 var farmTimer=null,haipSubTimer=null,haipDonTimer=null,haipMode=false;
 function startFarm(){
@@ -998,7 +1001,8 @@ function startFarm(){
     S.crystals+=1000000;
     S.totalDonations++;
     var d=rnd(DONATORS);
-    spawnNote(d+' задонатил 100 000 ₽',donCustomText||'warp farm','#ff78c8','donate');
+    var reason=donCustomText||rnd(DON_REASONS);
+    spawnNote(d+' задонатил 100 000 ₽',reason,'#ff78c8','donate');
     updCrysUI();saveStats();
   },100);
 }
@@ -1028,10 +1032,11 @@ function startHaip(){
     if(!S.streaming)return;
     var amt=ri(100000,500000);
     var d=rnd(DONATORS);
+    var reason=donCustomText||rnd(DON_REASONS);
     S.crystals+=amt*10;
     S.totalDonations++;
-    spawnBanner(d,amt,donCustomText||'хайп!','#ff50b4');
-    spawnNote(d+' задонатил '+amt.toLocaleString('ru-RU')+' ₽',donCustomText||'хайп','#ff78c8','donate');
+    spawnBanner(d,amt,reason,'#ff50b4');
+    spawnNote(d+' задонатил '+amt.toLocaleString('ru-RU')+' ₽',reason,'#ff78c8','donate');
     updCrysUI();saveStats();
   },10000);
 }
@@ -1053,12 +1058,15 @@ function handleCommand(text){
   var t=text.trim();
   var tl=t.toLowerCase();
 
+  if(tl==='/sim'){botSimOn=true;toast('▶️ Чат ботов включён');return true;}
+
   if(tl==='//'){
     stopFarm();stopHaip();stopSpam();
+    botSimOn=false;
     S.viewerBoost=false;S.lastViewerMin=Date.now();
     donCustomText='';
     saveCommands();
-    toast('🛑 Все команды отключены');
+    toast('🛑 Все команды и чат ботов отключены');
     return true;
   }
 
