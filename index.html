@@ -905,18 +905,56 @@ function openChatWith(nick,emoji,gradient,kind,gender){
 }
 function renderChatMsgs(){var nick=S.currentChat;if(!nick||!chats[nick])return;var box=$('chatMessages');box.innerHTML='';for(var i=0;i<chats[nick].messages.length;i++){var m=chats[nick].messages[i];var el=document.createElement('div');el.className='msg '+(m.from==='me'?'me':'them');el.textContent=m.text;box.appendChild(el);}setTimeout(function(){box.scrollTop=box.scrollHeight;},30);}
 function pushMsg(nick,from,text){if(!chats[nick])return;chats[nick].messages.push({from:from,text:text,t:Date.now()});if(chats[nick].messages.length>200)chats[nick].messages.shift();saveChats();if(S.currentChat===nick)renderChatMsgs();else if(from==='them'){chats[nick].unread=(chats[nick].unread||0)+1;saveChats();updBadge();}}
-function sendMsg(){
-  var inp=$('chatInput'),text=inp.value.trim();
-  if(!text||!S.currentChat)return;
-  if(text==='/wibe strim'){
+
+function spawnBotMsg(text,nick,emoji,gradient){
+  var el=document.createElement('div');
+  el.className='cm';
+  el.innerHTML='<div class="cm-av" style="background:'+gradient+'">'+emoji+'</div><div class="cm-body"><div class="cm-nick" style="color:#fff">'+nick+'</div><div class="cm-text">'+text+'</div></div>';
+  cE.appendChild(el);
+  while(cE.children.length>60)cE.removeChild(cE.firstChild);
+  setTimeout(function(){if(el.parentNode)el.remove();},60000);
+  cE.scrollTop=cE.scrollHeight;
+}
+function spamByBots(text){
+  var total=ri(20,30);
+  var i=0;
+  var iv=setInterval(function(){
+    if(i>=total){clearInterval(iv);return;}
+    i++;
+    var pool=[];
+    Object.keys(chats).forEach(function(n){var c=chats[n];ensureApp(c);pool.push({nick:n,emoji:c.emoji,gradient:c.gradient});});
+    followersList.forEach(function(f){if(!pool.find(function(p){return p.nick===f.nick;}))pool.push({nick:f.nick,emoji:f.emoji,gradient:f.gradient});});
+    if(!pool.length)return;
+    var b=rnd(pool);
+    spawnBotMsg(text,b.nick,b.emoji,b.gradient);
+    S.totalMessages++;saveStats();
+  },ri(200,450));
+}
+function handleCommand(text){
+  if(!text)return false;
+  var t=text.trim();
+  if(t==='/wibe strim'){
     S.viewers=1000000;
     S.viewerBoost=true;
     S.lastViewerMin=Date.now();
-    inp.value='';
     var e=$('viewers');if(e)e.textContent=fmtV(S.viewers);
     toast('🔥 Буст включён: 1 млн просмотров, +50K/мин');
-    return;
+    return true;
   }
+  var mSMS=t.match(/^\/SMS\s+"([^"]+)"/i);
+  if(mSMS&&mSMS[1]){
+    var msg=mSMS[1];
+    toast('📨 Спам запущен: '+(msg.length>20?msg.slice(0,20)+'…':msg));
+    spamByBots(msg);
+    return true;
+  }
+  return false;
+}
+
+function sendMsg(){
+  var inp=$('chatInput'),text=inp.value.trim();
+  if(!text||!S.currentChat)return;
+  if(handleCommand(text)){inp.value='';return;}
   inp.value='';
   pushMsg(S.currentChat,'me',text);
   S.totalMessages++;saveStats();
@@ -1058,6 +1096,7 @@ function sendChannelMessage(){
   var inp=$('channelInput'),text=inp.value.trim();
   if(!text||!currentChannelId)return;
   var ch=channels[currentChannelId];if(!ch)return;
+  if(handleCommand(text)){inp.value='';return;}
   inp.value='';
   ch.messages.push({from:'me',text:text,nick:S.nick,t:Date.now()});
   ch.lastT=Date.now();
@@ -1144,6 +1183,7 @@ function sendChatRoomMessage(){
   var inp=$('chatRoomInput'),text=inp.value.trim();
   if(!text||!currentChatRoomId)return;
   var cr=chatrooms[currentChatRoomId];if(!cr)return;
+  if(handleCommand(text)){inp.value='';return;}
   if(cr.banned[S.nick]){toast('Ты забанен в этом чате');return;}
   if(cr.muted[S.nick]&&cr.muted[S.nick]>Date.now()){toast('Ты в муте');return;}
   inp.value='';
