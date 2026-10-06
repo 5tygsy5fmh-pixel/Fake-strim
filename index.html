@@ -130,7 +130,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:-ap
 .account-item .toggle::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .2s}
 .account-item .toggle.on{background:#25f4ee}
 .account-item .toggle.on::after{transform:translateX(20px)}
-.account-item .ic.casino-ico svg{stroke:none;fill:none}
 #editModal,#wardrobeModal{position:fixed;inset:0;z-index:2500;background:rgba(0,0,0,.9);display:none;flex-direction:column;align-items:center;justify-content:center;padding:20px;overflow-y:auto}
 #editModal.show,#wardrobeModal.show{display:flex}
 #editModal .box,#wardrobeModal .wd-box{background:#1a1a2e;border-radius:20px;padding:22px;width:100%;max-width:380px;max-height:92vh;overflow-y:auto}
@@ -203,7 +202,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:-ap
 #vvSheet.show{display:flex}
 #vvSheetHead{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 8px;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,.06)}
 #vvSheetHead .t-title{font-size:16px;font-weight:700;flex:1;text-align:center}
-#vvSheetHead .t-ok{width:38px;height:38px;border-radius:50%;background:#2f7fff;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+#vvSheetHead .t-ok{width:38px;height:38px;border-radius:50%;background:#2f7fff;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;pointer-events:auto;touch-action:manipulation}
 #vvSheetHead .t-ok svg{width:20px;height:20px}
 #vvSheetBody{overflow-y:auto;overflow-x:hidden;touch-action:pan-y;max-height:calc(70vh - 60px);scrollbar-width:none}
 #vvSheetBody::-webkit-scrollbar{display:none}
@@ -324,7 +323,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:-ap
 .deposit-info{font-size:13px;opacity:.75;margin-top:-8px;text-align:center}
 .slot-machine{background:linear-gradient(180deg,#3a1a5e,#1a0a2e);border:4px solid #ffd700;border-radius:24px;padding:22px 16px 20px;box-shadow:0 10px 40px rgba(255,215,0,.25),inset 0 0 30px rgba(0,0,0,.5);width:100%;max-width:380px}
 .slot-reels{display:flex;gap:10px;background:#000;padding:14px;border-radius:16px;box-shadow:inset 0 0 20px rgba(0,0,0,.9);justify-content:center}
-.slot-reel{width:70px;height:90px;background:linear-gradient(180deg,#fff,#e8e8e8);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:44px;font-weight:900;color:#000;overflow:hidden;transition:transform .1s}
+.slot-reel{width:70px;height:90px;background:linear-gradient(180deg,#fff,#e8e8e8);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:44px;font-weight:900;color:#000;overflow:hidden;transition:transform .1s;padding:0}
+.slot-reel svg{width:80%;height:80%;display:block;pointer-events:none}
 .slot-reel.spinning{animation:reelSpin .08s linear infinite}
 @keyframes reelSpin{0%{transform:translateY(-6px)}50%{transform:translateY(6px)}100%{transform:translateY(-6px)}}
 .slot-multiplier-row{margin-top:14px;display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
@@ -440,18 +440,14 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:-ap
 
 <div class="panel" id="panelAccount"><div class="panel-head"><div class="back" data-back><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><polyline points="15 6 9 12 15 18"/></svg></div><div class="title">Аккаунт</div></div><div class="panel-body"><div class="account-body"><div class="account-av" id="accAvatar">G</div><div class="account-name" id="accName">grand-cat</div><div class="account-handle" id="accHandle">@grand_cat</div><div class="account-stats"><div class="acc-stat" id="statFollowersBtn"><div class="n" id="accFollowers">0</div><div class="l">подписчики</div></div><div class="acc-stat" id="statFollowingBtn"><div class="n" id="accFollowing">0</div><div class="l">подписки</div></div><div class="acc-stat" id="statCrystalsBtn"><div class="n" id="accCrystalsStat">0</div><div class="l">кристаллы</div></div></div>
 <div class="account-item" id="itemCasino">
-  <div class="ic casino-ico">
-    <svg viewBox="0 0 24 24" style="stroke:none">
-      <rect style="fill:#9370ff" x="2" y="4" width="9" height="12" rx="1.3" transform="rotate(-22 6.5 10)"/>
-      <rect style="fill:#a78aff" x="7" y="3" width="9" height="12" rx="1.3" transform="rotate(-8 11.5 9)"/>
-      <rect style="fill:#6b4fff;stroke:#ffd700;stroke-width:0.9" x="8.5" y="10" width="12" height="12" rx="2"/>
-      <circle style="fill:#ffd700" cx="11.3" cy="13" r="1"/>
-      <circle style="fill:#ffd700" cx="17.7" cy="13" r="1"/>
-      <circle style="fill:#ffd700" cx="14.5" cy="16" r="1"/>
-      <circle style="fill:#ffd700" cx="11.3" cy="19" r="1"/>
-      <circle style="fill:#ffd700" cx="17.7" cy="19" r="1"/>
-    </svg>
-  </div>
+  <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="2.5" y="3.5" width="19" height="17" rx="3"/>
+    <line x1="8.83" y1="5" x2="8.83" y2="19"/>
+    <line x1="15.17" y1="5" x2="15.17" y2="19"/>
+    <circle cx="5.67" cy="12" r="1.4" fill="#fff" stroke="none"/>
+    <circle cx="12" cy="12" r="1.4" fill="#fff" stroke="none"/>
+    <circle cx="18.33" cy="12" r="1.4" fill="#fff" stroke="none"/>
+  </svg></div>
   <div class="lb">Казино</div>
   <div class="ar">›</div>
 </div>
@@ -656,9 +652,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:-ap
     <div class="deposit-info" id="depositInfo">Сначала выберите сумму</div>
     <div class="slot-machine">
       <div class="slot-reels">
-        <div class="slot-reel" id="reel0">7</div>
-        <div class="slot-reel" id="reel1">7</div>
-        <div class="slot-reel" id="reel2">7</div>
+        <div class="slot-reel" id="reel0"></div>
+        <div class="slot-reel" id="reel1"></div>
+        <div class="slot-reel" id="reel2"></div>
       </div>
       <div class="slot-multiplier-row" id="slotMultRow"></div>
       <button class="spin-btn" id="spinBtn" disabled>КРУТИТЬ</button>
@@ -1344,7 +1340,28 @@ var vvOpts={ratio:'none',bgColor:'#000000',filter:'none',filterName:'Normal',rot
 function fmtT(s){if(!s||isNaN(s))return'0:00';var m=Math.floor(s/60);var x=Math.floor(s%60);return m+':'+(x<10?'0':'')+x;}
 function fmtT2(s){if(!s||isNaN(s))return'0:00.0';var m=Math.floor(s/60);var x=s%60;return m+':'+(x<10?'0':'')+x.toFixed(1);}
 var FILTERS=[{name:'Normal',css:'none'},{name:'Chrome',css:'contrast(1.2) saturate(1.3) brightness(1.05)'},{name:'Fade',css:'contrast(.9) saturate(.7) brightness(1.1)'},{name:'Instant',css:'contrast(1.1) saturate(1.4) hue-rotate(-10deg)'},{name:'Mono',css:'grayscale(1) contrast(1.1)'},{name:'Noir',css:'grayscale(1) contrast(1.5) brightness(.9)'},{name:'Process',css:'contrast(1.3) saturate(1.2) hue-rotate(15deg)'},{name:'Tonal',css:'sepia(.4) contrast(1.1)'},{name:'Transfer',css:'contrast(1.4) saturate(.9)'},{name:'Tone',css:'sepia(.2) brightness(1.05)'},{name:'Linear',css:'contrast(1.15) brightness(1.05)'}];
-function openVideoViewer(s){vvStream=s;if(vvUrl){try{URL.revokeObjectURL(vvUrl);}catch(e){}}vvUrl=URL.createObjectURL(s.blob);var v=$('vvVideo');try{v.pause();}catch(e){}v.src=vvUrl;v.playbackRate=1;v.style.transform='';v.style.filter='none';try{v.load();}catch(e){}var frame=$('vvFrame');frame.style.background='#000';frame.style.width='';frame.style.height='';vvOpts={ratio:'none',bgColor:'#000000',filter:'none',filterName:'Normal',rotate:0,flipH:false,flipV:false,speed:1};document.querySelectorAll('.vv-ratio').forEach(function(o){o.classList.toggle('sel',o.getAttribute('data-ratio')==='none');});var sl=$('vvSpeedSlider');if(sl)sl.value=1;var lb=$('vvSpeedLabel');if(lb)lb.textContent='1.0x';$('vvTitle').textContent=s.filename;$('vvSheet').classList.remove('show');$('videoViewer').classList.add('show');try{v.currentTime=0;}catch(e){}setTimeout(function(){try{v.play().catch(function(){});}catch(e){}},120);}
+
+/* === ФИКС: openVideoViewer сразу инициализирует vvTrimDur === */
+function openVideoViewer(s){
+  vvStream=s;if(vvUrl){try{URL.revokeObjectURL(vvUrl);}catch(e){}}vvUrl=URL.createObjectURL(s.blob);var v=$('vvVideo');
+  try{v.pause();}catch(e){}
+  v.src=vvUrl;v.playbackRate=1;v.style.transform='';v.style.filter='none';
+  try{v.load();}catch(e){}
+  vvTrimDur=0;vvTrimStart=0;vvTrimEnd=0;
+  v.onloadedmetadata=function(){
+    vvTrimDur=v.duration||0;vvTrimStart=0;vvTrimEnd=vvTrimDur;
+    var t=$('vvTrimTotalTime');if(t)t.textContent=fmtT(vvTrimDur);
+    updateTrimUI();
+  };
+  var frame=$('vvFrame');frame.style.background='#000';frame.style.width='';frame.style.height='';
+  vvOpts={ratio:'none',bgColor:'#000000',filter:'none',filterName:'Normal',rotate:0,flipH:false,flipV:false,speed:1};
+  document.querySelectorAll('.vv-ratio').forEach(function(o){o.classList.toggle('sel',o.getAttribute('data-ratio')==='none');});
+  var sl=$('vvSpeedSlider');if(sl)sl.value=1;
+  var lb=$('vvSpeedLabel');if(lb)lb.textContent='1.0x';
+  $('vvTitle').textContent=s.filename;$('vvSheet').classList.remove('show');$('videoViewer').classList.add('show');
+  try{v.currentTime=0;}catch(e){}
+  setTimeout(function(){try{v.play().catch(function(){});}catch(e){}},120);
+}
 function closeVideoViewer(){$('videoViewer').classList.remove('show');$('vvSheet').classList.remove('show');try{$('vvVideo').pause();}catch(e){}}
 function openSheet(tool){vvActiveTool=tool;$('vvSheetTitle').textContent=TOOL_TITLES[tool]||'Edit';document.querySelectorAll('.vv-panel').forEach(function(p){p.classList.toggle('active',p.getAttribute('data-panel')===tool);});$('vvSheet').classList.add('show');applyPreview();if(tool==='trim')setTimeout(initTrim,120);if(tool==='filter')setTimeout(fillFilterPreviews,100);}
 function initTrim(){var v=$('vvVideo');function go(){if(!v.duration||isNaN(v.duration)){setTimeout(go,200);return;}vvTrimDur=v.duration;vvTrimStart=0;vvTrimEnd=v.duration;$('vvTrimTotalTime').textContent=fmtT(vvTrimDur);drawThumbs();updateTrimUI();}go();}
@@ -1354,7 +1371,13 @@ function fillFilterPreviews(){var list=$('vvFilterList');if(!list)return;if(list
 function applyPreview(){var v=$('vvVideo');var frame=$('vvFrame');if(!v||!frame)return;var tr=[];if(vvOpts.rotate)tr.push('rotate('+vvOpts.rotate+'deg)');var sx=vvOpts.flipH?-1:1,sy=vvOpts.flipV?-1:1;if(sx!==1||sy!==1)tr.push('scale('+sx+','+sy+')');v.style.transform=tr.join(' ');v.style.filter=vvOpts.filter==='none'?'none':vvOpts.filter;frame.style.background=vvOpts.bgColor;if(vvOpts.ratio==='none'){frame.style.width='';frame.style.height='';}else{var stage=$('vvStage').getBoundingClientRect();var parts=vvOpts.ratio.split(':');var ar=parseFloat(parts[0])/parseFloat(parts[1]);var w=stage.width,h=stage.height;var fw=w,fh=w/ar;if(fh>h){fh=h;fw=h*ar;}frame.style.width=fw+'px';frame.style.height=fh+'px';}}
 
 async function exportEdit(){
-  if(!vvStream||!vvTrimDur){toast('Сначала откройте видео');return;}
+  var v=$('vvVideo');
+  /* ФИКС: если trim не инициализирован — берём с видео */
+  if(v&&v.duration&&isFinite(v.duration)){
+    if(!vvTrimDur)vvTrimDur=v.duration;
+    if(!vvTrimEnd)vvTrimEnd=v.duration;
+  }
+  if(!vvStream||!vvTrimDur){toast('Видео ещё загружается...');return;}
   var prog=$('vvProgress'),pctEl=$('vvPct');
   prog.classList.add('show');pctEl.textContent='0%';
   var setPct=function(p){pctEl.textContent=Math.round(p)+'%';};
@@ -1369,7 +1392,7 @@ async function exportEdit(){
     try{if(wakeLock)wakeLock.release();}catch(e){}
   };
   try{
-    var v=$('vvVideo');v.pause();
+    v.pause();
     var start=vvTrimStart,end=vvTrimEnd;
     var cv=document.createElement('canvas');
     var baseW=v.videoWidth||720,baseH=v.videoHeight||1280;
@@ -1400,7 +1423,6 @@ async function exportEdit(){
         var sx=vvOpts.flipH?-1:1,sy=vvOpts.flipV?-1:1;ctx.scale(sx,sy);
         var vw=baseW,vh=baseH;var drawW=ratioW,drawH=ratioH;
         if(vvOpts.rotate===90||vvOpts.rotate===270){drawW=ratioH;drawH=ratioW;}
-        /* применение фильтра внутри canvas */
         try{ctx.filter=vvOpts.filter==='none'?'none':vvOpts.filter;}catch(e){}
         var sc=Math.min(drawW/vw,drawH/vh);var dw=vw*sc,dh=vh*sc;
         ctx.drawImage(v,-dw/2,-dh/2,dw,dh);
@@ -1450,7 +1472,7 @@ async function exportEdit(){
     saveVideoToIDB(newS).catch(function(){});
     cleanup();
     prog.classList.remove('show');$('vvSheet').classList.remove('show');$('vvSheetBody').scrollTop=0;
-    $('videoViewer').classList.remove('show');try{$('vvVideo').pause();}catch(e){}
+    $('videoViewer').classList.remove('show');try{v.pause();}catch(e){}
     setTimeout(function(){openVideoViewer(newS);toast('✅ Видео сохранено');},150);
   }catch(e){
     cleanup();
@@ -1464,7 +1486,19 @@ var casino={bet:0,mult:2,spinning:false};
 var MULTIPLIERS=[2,5,10,15,20,25,50];
 var JACKPOT_CHANCE={2:40,5:18,10:9,15:6,20:4.5,25:3.5,50:1.5};
 var RETURN_CHANCE=18;
-var SLOT_SYMBOLS=['🍒','🍋','🔔','⭐','💎','7'];
+
+/* === SVG-иконки для барабанов === */
+var SLOT_SVG={
+  cherry:'<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><path d="M20 9 Q14 16 11 23" stroke="#3d8b40" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M20 9 Q26 16 29 23" stroke="#3d8b40" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="11" cy="27" r="7" fill="#e63946" stroke="#8a1420" stroke-width="0.8"/><circle cx="29" cy="27" r="7" fill="#e63946" stroke="#8a1420" stroke-width="0.8"/><ellipse cx="8.5" cy="24" rx="2" ry="1.3" fill="#fff" opacity="0.7"/><ellipse cx="26.5" cy="24" rx="2" ry="1.3" fill="#fff" opacity="0.7"/></svg>',
+  lemon:'<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><ellipse cx="20" cy="22" rx="14" ry="11" fill="#ffe066" stroke="#c9a400" stroke-width="1"/><path d="M6.5 20 Q3 18 5 20.5 Q4 22 5.5 23 Q6 24 7 23" fill="#ffe066" stroke="#c9a400" stroke-width="0.8"/><ellipse cx="14" cy="17" rx="4" ry="1.8" fill="#fff" opacity="0.5"/></svg>',
+  bell:'<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><path d="M14 12 Q14 5 20 5 Q26 5 26 12 L28.5 24 L11.5 24 Z" fill="#ffd60a" stroke="#b58a00" stroke-width="1"/><rect x="9.5" y="24" width="21" height="3" rx="1.2" fill="#e6a700" stroke="#8a5c00" stroke-width="0.6"/><circle cx="20" cy="30.5" r="2.6" fill="#e6a700" stroke="#8a5c00" stroke-width="0.6"/><ellipse cx="17" cy="11" rx="1.5" ry="3" fill="#fff" opacity="0.5"/></svg>',
+  star:'<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><path d="M20 4 L24.5 15 L36 16 L27 23.5 L30 35 L20 28.5 L10 35 L13 23.5 L4 16 L15.5 15 Z" fill="#ffd60a" stroke="#b58a00" stroke-width="1.2" stroke-linejoin="round"/><path d="M20 10 L22 16 L28 17 L23 21 L24.5 27 L20 23.5 L15.5 27 L17 21 L12 17 L18 16 Z" fill="#fff" opacity="0.35"/></svg>',
+  diamond:'<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><path d="M10 15 L20 3 L30 15 L20 37 Z" fill="#7fdbff" stroke="#0a6b9e" stroke-width="1.2" stroke-linejoin="round"/><path d="M10 15 L30 15" stroke="#0a6b9e" stroke-width="0.6"/><path d="M20 3 L15 15 L20 37 M20 3 L25 15 L20 37" stroke="#fff" stroke-width="0.6" fill="none" opacity="0.7"/><path d="M15 15 L20 3 L25 15 Z" fill="#fff" opacity="0.4"/></svg>',
+  seven:'<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><path d="M7 9 L33 9 L18 34 L13.5 31.5 L25 14 L10 14 Z" fill="#ffd60a" stroke="#b58a00" stroke-width="1.3" stroke-linejoin="round"/><path d="M9 11 L31 11 L19.5 22" stroke="#fff" stroke-width="0.8" fill="none" opacity="0.5"/></svg>'
+};
+var SLOT_SYMBOLS=['cherry','lemon','bell','star','diamond','seven'];
+function reelIcon(name){return SLOT_SVG[name]||SLOT_SVG.seven;}
+
 function openCasino(){closeAll();$('casinoScreen').classList.add('show');updateCasinoUI();}
 function closeCasino(){$('casinoScreen').classList.remove('show');$('depositModal').classList.remove('show');}
 function updateCasinoUI(){
@@ -1508,17 +1542,17 @@ function spinSlot(){
   else if(r<chance+RETURN_CHANCE)outcome='return';
   else outcome='lose';
   var finals;
-  if(outcome==='jackpot'){finals=['7','7','7'];}
-  else if(outcome==='return'){var sym=rnd(SLOT_SYMBOLS.filter(function(s){return s!=='7';}));finals=[sym,sym,sym];}
+  if(outcome==='jackpot'){finals=['seven','seven','seven'];}
+  else if(outcome==='return'){var pool=SLOT_SYMBOLS.filter(function(s){return s!=='seven';});var sym=rnd(pool);finals=[sym,sym,sym];}
   else{do{finals=[rnd(SLOT_SYMBOLS),rnd(SLOT_SYMBOLS),rnd(SLOT_SYMBOLS)];}while(finals[0]===finals[1]&&finals[1]===finals[2]);}
   var spinDur=[700,1000,1300];
   var done=0;
   reels.forEach(function(reel,i){
-    var iv=setInterval(function(){reel.textContent=rnd(SLOT_SYMBOLS);},70);
+    var iv=setInterval(function(){reel.innerHTML=reelIcon(rnd(SLOT_SYMBOLS));},70);
     setTimeout(function(){
       clearInterval(iv);
       reel.classList.remove('spinning');
-      reel.textContent=finals[i];
+      reel.innerHTML=reelIcon(finals[i]);
       done++;
       if(done===3)setTimeout(function(){finishSpin(outcome,finals,bet);},280);
     },spinDur[i]);
@@ -1629,13 +1663,11 @@ bind('vvSave','click',function(){
   try{var f=new File([blob],name,{type:blob.type});if(navigator.canShare&&navigator.canShare({files:[f]})){navigator.share({files:[f],title:name}).then(function(){toast('✅ Сохранено');}).catch(function(){});return;}}catch(e){}
   try{var u=URL.createObjectURL(blob);var a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(function(){URL.revokeObjectURL(u);},30000);toast('💾 Файл скачан');}catch(e){toast('Не удалось сохранить');}
 });
-
-/* === ГЛАВНЫЙ ФИКС: ✓ теперь экспортит из ЛЮБОЙ вкладки === */
+/* === ФИКС: ✓ теперь экспортит из ЛЮБОЙ вкладки === */
 bind('vvSheetOk','click',function(){
-  /* сохраняем настройки с текущей вкладки в vvOpts уже сделано на лету */
+  if(casino.spinning)return;
   exportEdit();
 });
-
 bind('vvRotateBtn','click',function(){vvOpts.rotate=(vvOpts.rotate+90)%360;applyPreview();toast('Поворот: '+vvOpts.rotate+'°');});
 bind('vvSpeedSlider','input',function(e){vvOpts.speed=parseFloat(e.target.value);$('vvSpeedLabel').textContent=vvOpts.speed.toFixed(1)+'x';var v=$('vvVideo');if(v)v.playbackRate=vvOpts.speed;});
 document.querySelectorAll('#vvTools .vv-tool').forEach(function(el){el.addEventListener('click',function(){var tool=el.getAttribute('data-tool');var v=$('vvVideo');try{v.pause();}catch(e){}openSheet(tool);});});
@@ -1665,8 +1697,9 @@ loadAllVideos().then(function(list){if(list&&list.length){list.sort(function(a,b
 try{
   updCrysUI();updFolUI();updFolwUI();updProfUI();updBadge();
   renderCasinoMults();
+  [$('reel0'),$('reel1'),$('reel2')].forEach(function(r){if(r)r.innerHTML=reelIcon('seven');});
   requestAnimationFrame(loop);
-  console.log('grand-cat OK v2');
+  console.log('grand-cat OK v3');
 }catch(e){
   var f=$('fatal');
   if(f){f.style.display='block';f.textContent='Ошибка init: '+e.message+'\n'+e.stack;}
