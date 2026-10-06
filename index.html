@@ -998,7 +998,7 @@ function startCo(bot){
 function stopCo(){if(!S.coBot)return;var w=S.coBot.nick;S.coBot=null;S.botPos=null;$('botAvatar').classList.remove('show','speaking');$('rbKick').style.display='none';stopSpeak();toast('👋 '+w+' покинул эфир');}
 
 function openChatWith(nick,emoji,gradient,kind,gender){
-  getChat(nick,emoji,gradient,kind,gender c=chats[nick];
+  getChat(nick,emoji,gradient,kind,gender);var c=chats[nick];
   if(!c.kind&&kind){c.kind=kind;saveChats();}
   if(!c._first){c._first=true;S.totalDialogs++;saveChats();saveStats();for(var i=0;i<5;i++){var n=randNick(),av=randAv();if(!followersList.find(function(f){return f.nick===n;}))followersList.push({nick:n,emoji:av.emoji,gradient:av.gradient,t:Date.now()});}saveFollowers();S.followers=followersList.length;saveStats();updFolUI();}
   c.unread=0;saveChats();S.currentChat=nick;closeAll();$('panelChat').classList.add('show');
