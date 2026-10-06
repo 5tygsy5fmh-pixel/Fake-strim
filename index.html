@@ -20,7 +20,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:-ap
 .live-badge{background:#ff2850;padding:3px 7px;border-radius:4px;font-size:11px;font-weight:800}
 .viewers{display:flex;align-items:center;gap:5px;background:rgba(0,0,0,.5);padding:4px 8px;border-radius:5px;font-size:12px;font-weight:700}
 .viewers svg{width:14px;height:14px}
-.close-x{width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;pointer-events:auto}
+.close-x{width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer}
 .close-x svg{width:22px;height:22px}
 .rail{position:absolute;right:6px;top:14%;display:flex;flex-direction:column;gap:16px;align-items:center;pointer-events:auto;z-index:9}
 .rb{width:42px;height:42px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .12s}
@@ -33,6 +33,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:-ap
 .cm-av{flex:0 0 26px;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer}
 .cm-nick{font-size:11px;opacity:.85;margin-bottom:1px;cursor:pointer;font-weight:600}
 .cm-text{font-size:13px;line-height:1.3;word-break:break-word}
+.caption{position:absolute;left:16px;right:80px;bottom:120px;text-align:center;font-size:17px;font-weight:800;padding:10px 16px;background:rgba(0,0,0,.72);border-radius:14px;display:none;z-index:4}
+.caption.interim{opacity:.75;font-style:italic}
 .hearts{position:absolute;right:20px;bottom:180px;width:80px;height:60vh;overflow:visible;pointer-events:none;z-index:3}
 .heart{position:absolute;bottom:0;left:50%;font-size:28px;transform:translateX(-50%)}
 .notes{position:absolute;top:80px;left:12px;right:12px;display:flex;flex-direction:column;gap:6px;z-index:8;pointer-events:none;align-items:flex-start}
@@ -78,7 +80,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:-ap
 .panel{position:fixed;inset:0;z-index:600;background:#0a0a14;display:none;flex-direction:column}
 .panel.show{display:flex}
 .panel-head{display:flex;align-items:center;gap:10px;padding:calc(14px + env(safe-area-inset-top)) 16px 14px;background:rgba(0,0,0,.6);border-bottom:1px solid rgba(255,255,255,.08);flex-shrink:0}
-.panel-head .back{width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;pointer-events:auto}
+.panel-head .back{width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
 .panel-head .back svg{width:24px;height:24px}
 .panel-head .title{font-size:18px;font-weight:700;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .panel-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
@@ -96,6 +98,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:-ap
 .g-ico.female{color:#ff69b4}
 .g-ico.male{color:#4a90e2}
 .chat-row .last{font-size:13px;opacity:.55;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chat-row .badgeRoom{font-size:10px;background:rgba(37,244,238,.2);color:#25f4ee;padding:2px 6px;border-radius:8px;font-weight:700}
 .empty-inbox{text-align:center;padding:80px 30px;opacity:.55;font-size:14px;line-height:1.6}
 .empty-inbox .em{font-size:60px;display:block;margin-bottom:16px}
 .chat-head-av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff;overflow:hidden;flex-shrink:0}
@@ -105,6 +108,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:-ap
 .msg.me{align-self:flex-end;background:linear-gradient(135deg,#ff0050,#ff5c8a);border-bottom-right-radius:4px}
 .msg.them{align-self:flex-start;background:rgba(255,255,255,.1);border-bottom-left-radius:4px;cursor:pointer}
 .msg.sys{align-self:center;background:rgba(37,244,238,.15);color:#8ee8f4;font-size:12px;padding:6px 14px;border-radius:12px;max-width:90%;text-align:center}
+.msg.gw{align-self:center;background:linear-gradient(135deg,rgba(255,215,0,.2),rgba(255,150,220,.2));border:1px solid rgba(255,215,0,.5);color:#ffd700;font-weight:700;max-width:90%;text-align:center;white-space:pre-line}
 .chat-input-row{flex-shrink:0;display:flex;gap:8px;padding:10px 12px;padding-bottom:calc(10px + env(safe-area-inset-bottom));border-top:1px solid rgba(255,255,255,.08);background:rgba(0,0,0,.5)}
 .chat-input-row input{flex:1;background:rgba(255,255,255,.1);border:none;border-radius:22px;padding:12px 18px;color:#fff;font-size:15px;outline:none;font-family:inherit}
 .chat-input-row button{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#25f4ee,#ff0050);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
@@ -119,34 +123,49 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:-ap
 .acc-stat .l{font-size:11px;opacity:.55;margin-top:2px}
 .account-item{display:flex;align-items:center;gap:14px;padding:16px 4px;border-bottom:1px solid rgba(255,255,255,.06);cursor:pointer}
 .account-item .ic{width:34px;height:34px;border-radius:9px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:17px;color:#fff}
+.account-item .ic svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;display:block}
 .account-item .lb{flex:1;font-size:15px}
 .account-item .ar{opacity:.35;font-size:20px}
 .account-item .toggle{width:46px;height:26px;border-radius:13px;background:rgba(255,255,255,.15);position:relative;transition:background .2s;flex-shrink:0}
 .account-item .toggle::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .2s}
 .account-item .toggle.on{background:#25f4ee}
 .account-item .toggle.on::after{transform:translateX(20px)}
-#editModal{position:fixed;inset:0;z-index:2500;background:rgba(0,0,0,.9);display:none;flex-direction:column;align-items:center;justify-content:center;padding:20px;overflow-y:auto}
-#editModal.show{display:flex}
-#editModal .box{background:#1a1a2e;border-radius:20px;padding:22px;width:100%;max-width:380px;max-height:92vh;overflow-y:auto}
-#editModal h3{font-size:18px;margin-bottom:16px;text-align:center}
-#editModal label{font-size:12px;opacity:.6;display:block;margin-bottom:6px;margin-top:14px}
-#editModal input[type=text]{width:100%;background:rgba(255,255,255,.08);border:none;border-radius:12px;padding:12px 14px;color:#fff;font-size:15px;outline:none;font-family:inherit;text-align:center}
+#editModal,#wardrobeModal{position:fixed;inset:0;z-index:2500;background:rgba(0,0,0,.9);display:none;flex-direction:column;align-items:center;justify-content:center;padding:20px;overflow-y:auto}
+#editModal.show,#wardrobeModal.show{display:flex}
+#editModal .box,#wardrobeModal .wd-box{background:#1a1a2e;border-radius:20px;padding:22px;width:100%;max-width:380px;max-height:92vh;overflow-y:auto}
+#editModal h3,#wardrobeModal h3{font-size:18px;margin-bottom:16px;text-align:center}
+#editModal label,#wardrobeModal label{font-size:12px;opacity:.6;display:block;margin-bottom:6px;margin-top:14px}
+#editModal input[type=text],#wardrobeModal input[type=text]{width:100%;background:rgba(255,255,255,.08);border:none;border-radius:12px;padding:12px 14px;color:#fff;font-size:15px;outline:none;font-family:inherit;text-align:center}
 #editModal .modal-av-wrap{display:flex;justify-content:center;margin-bottom:6px}
-#editModal .modal-av{width:90px;height:90px;border-radius:50%;background:#25a4d3;display:flex;align-items:center;justify-content:center;font-size:46px;font-weight:700;color:#fff;box-shadow:0 0 0 4px #fff;margin:0 auto}
+#editModal .modal-av,#wardrobeModal .wd-av-big{width:90px;height:90px;border-radius:50%;background:#25a4d3;display:flex;align-items:center;justify-content:center;font-size:46px;font-weight:700;color:#fff;box-shadow:0 0 0 4px #fff;margin:0 auto}
 #editModal .av-input{font-size:26px!important;letter-spacing:2px}
-#editModal .color-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:6px;margin-top:6px}
-#editModal .color-opt{aspect-ratio:1;border-radius:50%;cursor:pointer;border:2px solid transparent}
-#editModal .color-opt.sel{border-color:#fff}
-#editModal .color-input{-webkit-appearance:none;appearance:none;width:100%;height:44px;border-radius:12px;border:2px solid rgba(255,255,255,.15);margin-top:8px;cursor:pointer;padding:0;background:#25a4d3;display:block}
-#editModal .color-input::-webkit-color-swatch-wrapper{padding:0}
-#editModal .color-input::-webkit-color-swatch{border:none;border-radius:10px}
-#editModal .emoji-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-top:6px}
-#editModal .emoji-opt{font-size:24px;padding:8px 0;text-align:center;border-radius:8px;cursor:pointer;background:rgba(255,255,255,.05)}
-#editModal .emoji-opt.sel{background:#25f4ee;color:#000}
-#editModal .btns{display:flex;gap:10px;margin-top:20px}
-#editModal .btns button{flex:1;padding:12px;border-radius:12px;border:none;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit}
-#editModal .btns .save{background:#25f4ee;color:#000}
-#editModal .btns .cancel{background:rgba(255,255,255,.1);color:#fff}
+#editModal .color-grid,#wardrobeModal .wd-color-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:6px;margin-top:6px}
+#editModal .color-opt,#wardrobeModal .wd-color-opt{aspect-ratio:1;border-radius:50%;cursor:pointer;border:2px solid transparent}
+#editModal .color-opt.sel,#wardrobeModal .wd-color-opt.sel{border-color:#fff}
+#editModal .color-input,#wardrobeModal .color-input{-webkit-appearance:none;appearance:none;width:100%;height:44px;border-radius:12px;border:2px solid rgba(255,255,255,.15);margin-top:8px;cursor:pointer;padding:0;background:#25a4d3;display:block}
+#editModal .color-input::-webkit-color-swatch-wrapper,#wardrobeModal .color-input::-webkit-color-swatch-wrapper{padding:0}
+#editModal .color-input::-webkit-color-swatch,#wardrobeModal .color-input::-webkit-color-swatch{border:none;border-radius:10px}
+#editModal .color-input::-moz-color-swatch,#wardrobeModal .color-input::-moz-color-swatch{border:none;border-radius:10px}
+#editModal .emoji-grid,#wardrobeModal .wd-emoji-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-top:6px}
+#editModal .emoji-opt,#wardrobeModal .wd-emoji-opt{font-size:24px;padding:8px 0;text-align:center;border-radius:8px;cursor:pointer;background:rgba(255,255,255,.05)}
+#editModal .emoji-opt.sel,#wardrobeModal .wd-emoji-opt.sel{background:#25f4ee;color:#000}
+#editModal .btns,#wardrobeModal .wd-btns{display:flex;gap:10px;margin-top:20px}
+#editModal .btns button,#wardrobeModal .wd-btns button{flex:1;padding:12px;border-radius:12px;border:none;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit}
+#editModal .btns .save,#wardrobeModal .wd-save{background:#25f4ee;color:#000}
+#editModal .btns .cancel,#wardrobeModal .wd-cancel{background:rgba(255,255,255,.1);color:#fff}
+#wardrobeModal .wd-preview{display:flex;justify-content:center;margin-bottom:14px}
+#wardrobeModal .wd-gender-row{display:flex;gap:8px}
+#wardrobeModal .wd-gender-opt{flex:1;padding:12px;text-align:center;background:rgba(255,255,255,.07);border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;border:2px solid transparent}
+#wardrobeModal .wd-gender-opt.sel{background:linear-gradient(135deg,#8b5cf6,#c88cff);border-color:#fff}
+#wardrobeModal .wd-gender-opt[data-gender="female"]{color:#ff69b4}
+#wardrobeModal .wd-gender-opt[data-gender="male"]{color:#4a90e2}
+.rec-item{padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;gap:12px;cursor:pointer}
+.rec-item .ri-icon{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#ff2850,#ff5c8a);display:flex;align-items:center;justify-content:center;font-size:20px}
+.rec-item .ri-body{flex:1;min-width:0}
+.rec-item .ri-name{font-size:14px;font-weight:600;margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rec-item .ri-meta{font-size:11px;opacity:.5}
+.rec-item .ri-btn{padding:8px 14px;border-radius:18px;background:rgba(255,255,255,.12);font-size:12px;font-weight:600}
+.rec-item .ri-del{padding:8px 12px;border-radius:18px;background:rgba(255,60,60,.25);font-size:12px;font-weight:600;color:#ff8080;margin-left:6px}
 .stat-grid{padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .stat-card{padding:16px;border-radius:16px;background:rgba(255,255,255,.06)}
 .stat-card .lbl{font-size:12px;opacity:.6;margin-bottom:6px}
@@ -159,50 +178,133 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:-ap
 #botAvatar{position:absolute;display:none;z-index:5;cursor:grab;touch-action:none;user-select:none;pointer-events:auto}
 #botAvatar.show{display:block}
 #botAvatar .av-ring{position:relative;border-radius:50%;box-shadow:0 8px 30px rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff}
-#botAvatar .av-ring::before{content:"";position:absolute;inset:-3px;border-radius:50%;background:conic-gradient(from 0deg,#ff0050,#ff5c8a,#8b5cf6,#25f4ee,#ff0050);z-index:-1}
+#botAvatar .av-ring::before{content:"";position:absolute;inset:-3px;border-radius:50%;background:conic-gradient(from 0deg,#ff0050,#ff5c8a,#8b5cf6,#25f4ee,#ff0050);z-index:-1;animation:spinRing 4s linear infinite}
+@keyframes spinRing{to{transform:rotate(360deg)}}
+#botAvatar.speaking .av-ring::before{animation:spinRing 1.5s linear infinite,glowPulse .6s ease-in-out infinite alternate}
+@keyframes glowPulse{to{filter:brightness(1.4)}}
 #botAvatar .av-face{width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:inherit;border-radius:50%}
 #botAvatar .av-name{position:absolute;bottom:-28px;left:50%;transform:translateX(-50%);white-space:nowrap;background:linear-gradient(135deg,rgba(255,0,80,.9),rgba(255,92,138,.9));padding:4px 10px;border-radius:12px;font-size:11px;font-weight:800;pointer-events:none}
 #fatal{position:fixed;inset:0;background:#200;color:#fff;padding:20px;font:13px monospace;z-index:99999;display:none;white-space:pre-wrap;overflow:auto}
+#videoViewer{position:fixed;inset:0;z-index:3000;background:#000;display:none;flex-direction:column}
+#videoViewer.show{display:flex}
+#vvStage{flex:1;position:relative;display:flex;align-items:center;justify-content:center;background:#000;overflow:hidden;min-height:0}
+#vvFrame{position:relative;max-width:100%;max-height:100%;background:#000;display:flex;align-items:center;justify-content:center}
+#vvVideo{display:block;max-width:100%;max-height:100%;width:100%;height:100%;object-fit:contain;background:#000}
+#vvHead{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;gap:10px;padding:calc(14px + env(safe-area-inset-top)) 14px 14px;background:linear-gradient(180deg,rgba(0,0,0,.85),transparent);z-index:10;pointer-events:auto}
+#vvHead .vv-btn{width:42px;height:42px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:rgba(255,255,255,.15);border-radius:50%;flex-shrink:0}
+#vvHead .vv-btn svg{width:22px;height:22px}
+#vvHead .vv-title{flex:1;font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center}
+#vvTools{position:absolute;bottom:0;left:0;right:0;display:flex;justify-content:space-around;align-items:flex-end;padding:14px 6px calc(20px + env(safe-area-inset-bottom));background:linear-gradient(0deg,rgba(0,0,0,.95) 60%,transparent);z-index:10;pointer-events:auto}
+#vvTools .vv-tool{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;padding:6px 2px;flex:1;min-width:0}
+#vvTools .vv-tool svg{width:28px;height:28px;flex-shrink:0}
+#vvTools .vv-tool span{font-size:10px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+#vvSheet{position:absolute;left:0;right:0;bottom:70px;background:#1a1a1e;border-radius:20px;z-index:11;display:none;flex-direction:column;max-height:70vh;overflow:hidden;box-shadow:0 8px 30px rgba(0,0,0,.8)}
+#vvSheet.show{display:flex}
+#vvSheetHead{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 8px;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,.06)}
+#vvSheetHead .t-title{font-size:16px;font-weight:700;flex:1;text-align:center}
+#vvSheetHead .t-ok{width:38px;height:38px;border-radius:50%;background:#2f7fff;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+#vvSheetHead .t-ok svg{width:20px;height:20px}
+#vvSheetBody{overflow-y:auto;overflow-x:hidden;touch-action:pan-y;max-height:calc(70vh - 60px);scrollbar-width:none}
+#vvSheetBody::-webkit-scrollbar{display:none}
+.vv-panel{display:none;padding:14px 16px 16px}
+.vv-panel.active{display:block}
+.vv-panel h4{font-size:13px;font-weight:700;opacity:.7;margin-bottom:10px;text-transform:uppercase}
+#vvTrimTrack{position:relative;height:64px;background:#000;border-radius:8px;overflow:hidden;touch-action:none}
+#vvTrimCanvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+#vvTrimOverlay{position:absolute;inset:0;pointer-events:none}
+#vvTrimOverlay .mask{position:absolute;top:0;bottom:0;background:rgba(0,0,0,.65)}
+#vvTrimOverlay .sel{position:absolute;top:0;bottom:0;border-top:3px solid #fff;border-bottom:3px solid #fff;border-radius:4px;pointer-events:none}
+#vvTrimOverlay .h{position:absolute;top:0;bottom:0;width:22px;background:#fff;border-radius:5px;display:flex;align-items:center;justify-content:center;pointer-events:auto;cursor:ew-resize;z-index:2}
+#vvTrimOverlay .h svg{width:14px;height:14px;pointer-events:none}
+#vvTrimOverlay .h.l{left:-11px}
+#vvTrimOverlay .h.r{right:-11px}
+#vvTrimTime{text-align:center;font-size:14px;font-weight:600;margin-top:10px}
+#vvTrimTotal{text-align:right;font-size:12px;opacity:.6;margin-bottom:8px}
+.vv-ratios{display:flex;gap:8px;justify-content:space-between;margin-top:12px}
+.vv-ratio{flex:1;padding:12px 4px;background:rgba(255,255,255,.08);border-radius:10px;text-align:center;cursor:pointer;font-size:12px;font-weight:700;border:2px solid transparent}
+.vv-ratio.sel{background:linear-gradient(135deg,#4a6ec4,#6f92e0);border-color:#fff}
+.vv-filters{display:flex;gap:10px;overflow-x:auto;padding-bottom:8px;scrollbar-width:none}
+.vv-filter{flex:0 0 auto;width:80px;cursor:pointer;text-align:center}
+.vv-filter .fbox{width:80px;height:110px;border-radius:8px;background:#000;overflow:hidden;border:2px solid transparent;margin-bottom:6px;display:flex;align-items:center;justify-content:center}
+.vv-filter .fbox canvas{width:100%;height:100%;object-fit:cover}
+.vv-filter.sel .fbox{border-color:#fff}
+.vv-filter span{font-size:11px;font-weight:600;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vv-rotate-row{display:flex;gap:10px;justify-content:space-around;margin-top:14px}
+.vv-rot-btn{flex:1;padding:14px 6px;background:rgba(255,255,255,.08);border-radius:12px;text-align:center;cursor:pointer;border:2px solid transparent}
+.vv-rot-btn svg{width:28px;height:28px;display:block;margin:0 auto 6px}
+.vv-rot-btn span{font-size:11px;font-weight:700}
+.vv-speed-val{text-align:center;margin:14px 0}
+.vv-speed-val span{background:rgba(255,255,255,.1);padding:6px 16px;border-radius:14px;font-size:16px;font-weight:800}
+.vv-speed-slider{width:100%;height:6px;-webkit-appearance:none;appearance:none;background:rgba(255,255,255,.15);border-radius:3px;outline:none;margin:12px 0 20px}
+.vv-speed-slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:24px;height:24px;border-radius:50%;background:#fff;cursor:pointer}
+#vvProgress{display:none;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.92);padding:18px 28px;border-radius:16px;font-size:14px;font-weight:700;color:#fff;z-index:99;text-align:center;min-width:180px}
+#vvProgress.show{display:block}
+#vvProgress .pct{font-size:32px;font-weight:900;color:#2f7fff;margin-top:6px}
 .roomModal{position:fixed;inset:0;z-index:2600;background:rgba(0,0,0,.9);display:none;align-items:center;justify-content:center;padding:20px;overflow-y:auto}
 .roomModal.show{display:flex}
 .roomBox{background:#1a1a2e;border-radius:20px;padding:22px;width:100%;max-width:400px;max-height:92vh;overflow-y:auto}
 .roomBox h3{font-size:18px;margin-bottom:16px;text-align:center}
 .roomBox label{font-size:12px;opacity:.6;display:block;margin-bottom:6px;margin-top:14px}
 .roomBox input[type=text],.roomBox input[type=number],.roomBox textarea{width:100%;background:rgba(255,255,255,.08);border:none;border-radius:12px;padding:12px 14px;color:#fff;font-size:15px;outline:none;font-family:inherit;box-sizing:border-box;text-align:center}
+.roomBox textarea{min-height:80px;resize:vertical;text-align:left}
+.roomBox .color-input{-webkit-appearance:none;appearance:none;width:100%;height:44px;border-radius:12px;border:2px solid rgba(255,255,255,.15);margin-top:8px;cursor:pointer;padding:0;background:#25a4d3;display:block}
+.roomBox .color-input::-webkit-color-swatch-wrapper{padding:0}
+.roomBox .color-input::-webkit-color-swatch{border:none;border-radius:10px}
+.roomBox .color-input::-moz-color-swatch{border:none;border-radius:10px}
+.roomEmojiGrid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+.roomEmojiGrid .emoji-opt{font-size:22px;padding:8px 0;text-align:center;border-radius:8px;cursor:pointer;background:rgba(255,255,255,.05)}
+.roomEmojiGrid .emoji-opt.sel{background:#25f4ee;color:#000}
+.roomColorGrid{display:grid;grid-template-columns:repeat(8,1fr);gap:6px}
+.roomColorGrid .color-opt{aspect-ratio:1;border-radius:50%;cursor:pointer;border:2px solid transparent}
+.roomColorGrid .color-opt.sel{border-color:#fff}
 .roomBtns{display:flex;gap:10px;margin-top:20px}
 .roomBtns button{flex:1;padding:12px;border-radius:12px;border:none;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit}
 .roomSave{background:#25f4ee;color:#000}
 .roomCancel{background:rgba(255,255,255,.1);color:#fff}
+.chatTypeBtn{width:100%;padding:18px;margin-bottom:10px;border-radius:14px;border:none;color:#fff;font-size:15px;font-weight:800;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;font-family:inherit}
+.chatTypeBtn.public{background:linear-gradient(135deg,#4a6ec4,#6f92e0)}
+.chatTypeBtn.private{background:linear-gradient(135deg,#8b5cf6,#c88cff)}
 .roomGift{width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;background:rgba(255,255,255,.12);border-radius:50%;flex-shrink:0}
 .memberRow{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.05);margin-bottom:6px;cursor:pointer}
 .memberRow .mAv{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff;flex-shrink:0}
 .memberRow .mBody{flex:1;min-width:0}
 .memberRow .mName{font-size:14px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.casino-wrap{display:flex;flex-direction:column;align-items:center;padding:20px 16px;gap:14px}
-.casino-title{font-size:22px;font-weight:900;background:linear-gradient(135deg,#ffd700,#ff8c00);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-align:center}
-.casino-balance{font-size:13px;opacity:.75;text-align:center}
-.casino-balance b{color:#8ee8f4}
-.casino-btn{background:linear-gradient(135deg,#8b5cf6,#c88cff);color:#fff;border:none;padding:14px 28px;border-radius:14px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;width:100%;max-width:300px;transition:.15s}
-.casino-btn:active{transform:scale(.96)}
-.casino-btn.chosen{background:rgba(255,255,255,.08);color:#aaa}
-.casino-chosen{text-align:center;font-size:13px;opacity:.7;min-height:20px;font-weight:700}
-.casino-chosen.active{color:#ffd700;opacity:1}
-.slot-machine{background:linear-gradient(180deg,#2a1a3e,#1a0a2e);border:3px solid #ffd700;border-radius:24px;padding:24px 16px;box-shadow:0 0 40px rgba(255,215,0,.35);width:100%;max-width:340px;position:relative}
-.slot-reels{display:flex;gap:10px;justify-content:center}
-.reel{width:76px;height:114px;background:linear-gradient(180deg,#fff,#e0e0e0);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:56px;font-weight:900;color:#000;box-shadow:inset 0 6px 16px rgba(0,0,0,.35),0 4px 8px rgba(0,0,0,.4);font-family:'Courier New',monospace;overflow:hidden}
-.casino-spin-btn{background:linear-gradient(135deg,#25f4ee,#2f7fff);color:#000;border:none;padding:18px 48px;border-radius:16px;font-size:20px;font-weight:900;cursor:pointer;font-family:inherit;margin-top:14px;transition:.15s;box-shadow:0 6px 20px rgba(37,244,238,.4)}
-.casino-spin-btn:not(:disabled):active{transform:scale(.94)}
-.casino-spin-btn:disabled{background:#444;color:#666;cursor:not-allowed;box-shadow:none}
-.casino-result{font-size:16px;font-weight:800;text-align:center;min-height:24px;margin-top:8px}
-.casino-result.win{color:#ffd700}
-.casino-result.lose{color:#ff6384}
-.amount-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px;max-width:320px;width:100%}
-.amount-btn{padding:14px 4px;background:rgba(255,255,255,.08);border:2px solid transparent;border-radius:12px;color:#fff;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;transition:.12s}
-.amount-btn:active{transform:scale(.94)}
-.amount-btn.sel{background:linear-gradient(135deg,#8b5cf6,#c88cff);border-color:#fff}
-#casinoAmountInput{grid-column:1/-1;width:100%;padding:14px;background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.2);border-radius:12px;color:#fff;font-size:16px;text-align:center;outline:none;font-family:inherit;-webkit-appearance:none;appearance:none}
-#casinoAmountInput::-webkit-outer-spin-button,#casinoAmountInput::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
-#casinoApplyBtn{grid-column:1/-1;max-width:100%;margin-top:4px}
+.memberRow .mRole{font-size:11px;opacity:.55}
+.memberRow.sel{background:rgba(37,244,238,.25);border:1px solid #25f4ee}
+.memberRow .check{width:22px;height:22px;border-radius:50%;border:2px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+.memberRow.sel .check{background:#25f4ee;color:#000;border-color:#25f4ee}
+.roomInfo{background:#f2f2f7;color:#000;border-radius:22px;width:100%;max-width:420px;max-height:92vh;overflow-y:auto;padding:0;position:relative}
+.roomInfoHead{padding:14px 16px 6px;text-align:center;position:relative}
+.roomInfoHead .backBtn{position:absolute;top:14px;left:14px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.roomInfoHead .backBtn svg{width:22px;height:22px;stroke:#2f7fff;fill:none;stroke-width:2.4;stroke-linecap:round}
+.roomInfoHead .editBtn{position:absolute;top:14px;right:14px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.roomInfoHead .editBtn svg{width:22px;height:22px;stroke:#2f7fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.roomInfoHead .bigAv{width:84px;height:84px;border-radius:50%;margin:6px auto 10px;display:flex;align-items:center;justify-content:center;font-size:42px;color:#fff}
+.roomInfoHead .bigName{font-size:22px;font-weight:800;color:#000;margin-bottom:2px}
+.roomInfoHead .bigSub{font-size:13px;color:#666;margin-bottom:10px}
+.roomInfoSection{background:#fff;border-radius:16px;margin:10px 14px;overflow:hidden}
+.roomInfoRow{display:flex;align-items:center;gap:14px;padding:14px 16px;cursor:pointer;border-bottom:1px solid rgba(0,0,0,.06);color:#000;font-family:inherit}
+.roomInfoRow:last-child{border-bottom:none}
+.roomInfoRow:active{background:rgba(0,0,0,.05)}
+.roomInfoRow .ri{width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;color:#333}
+.roomInfoRow .ri svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.roomInfoRow .rl{flex:1;font-size:15px;font-weight:600}
+.roomInfoRow .rr{font-size:14px;color:#8a8a8e;font-weight:500;margin-right:2px}
+.roomInfoRow .ra{color:#c7c7cc;font-size:22px;line-height:1}
+.roomInfoRow.blue .rl{color:#2f7fff}
+.roomInfoRow.blue .ri{color:#2f7fff}
+.roomInfoSectionTitle{padding:14px 22px 4px;font-size:12px;color:#8a8a8e;font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+.roomInfoMember{display:flex;align-items:center;gap:12px;padding:10px 16px;cursor:pointer;color:#000;border-bottom:1px solid rgba(0,0,0,.05)}
+.roomInfoMember:last-child{border-bottom:none}
+.roomInfoMember:active{background:rgba(0,0,0,.05)}
+.roomInfoMember .mAv{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff;flex-shrink:0}
+.roomInfoMember .mBody{flex:1;min-width:0}
+.roomInfoMember .mName{font-size:15px;font-weight:600;color:#000;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.roomInfoMember .mRole{font-size:12px;color:#8a8a8e;margin-top:1px}
+.roomInfoMember .mArrow{color:#c7c7cc;font-size:20px}
+.roomInfoEmpty{padding:30px;text-align:center;color:#8a8a8e;font-size:13px}
+.roomInfoAddBtn{display:block;width:calc(100% - 28px);margin:10px 14px;padding:14px;background:#2f7fff;color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit}
+.roomInfoAddBtn:active{background:#2566cc}
 </style>
 </head>
 <body>
@@ -223,13 +325,14 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:-ap
   <div class="banner" id="banner"></div>
   <div class="comments" id="comments"></div>
   <div class="hearts" id="hearts"></div>
+  <div class="caption" id="caption"></div>
   <div class="toast" id="toast"></div>
   <div id="botAvatar"><div class="av-ring"><div class="av-face" id="botAvFace">🐱</div></div><div class="av-name" id="botAvName">nick</div></div>
   <div class="rail">
     <div class="rb" id="rbRec"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9.2" stroke="#fff" stroke-width="2"/><circle id="recDot" cx="12" cy="12" r="4.5" fill="#ff2850" style="display:none"/></svg></div>
     <div class="rb" id="rbFlip"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M3.5 12a8.5 8.5 0 0 1 14.4-6.1l1.6 1.6"/><polyline points="19.5 3.5 19.5 8.5 14.5 8.5"/><path d="M20.5 12a8.5 8.5 0 0 1-14.4 6.1l-1.6-1.6"/><polyline points="4.5 20.5 4.5 15.5 9.5 15.5"/></svg></div>
-    <div class="rb" id="rbMic"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="9" y="2.5" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="8.5" y1="22" x2="15.5" y2="22"/></svg></div>
-    <div class="rb on" id="rbEmoji"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><circle cx="9.5" cy="11.5" r="0.9" fill="#fff" stroke="none"/><circle cx="14.5" cy="11.5" r="0.9" fill="#fff" stroke="none"/><path d="M9 15 Q12 17.5 15 15"/><line id="emojiSlash" x1="3" y1="3" x2="21" y2="21" stroke="#ff2850" stroke-width="2.4" style="display:none"/></svg></div>
+    <div class="rb" id="rbMic"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="9" y="2.5" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="8.5" y1="22" x2="15.5" y2="22"/><line id="micSlash" x1="4" y1="4" x2="20" y2="20" stroke="#ff2850" stroke-width="2.4" style="display:none"/></svg></div>
+    <div class="rb on" id="rbEmoji"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><circle cx="9.5" cy="11.5" r="0.9" fill="#fff" stroke="none"/><circle cx="14.5" cy="11.5" r="0.9" fill="#fff" stroke="none"/><path d="M9 15 Q12 17.5 15 15"/><path d="M19 5 L19.5 3.5 L20 5 L21.5 5.5 L20 6 L19.5 7.5 L19 6 L17.5 5.5 Z" fill="#fff" stroke="none"/><path d="M21 8 L21.3 7 L21.6 8 L22.6 8.3 L21.6 8.6 L21.3 9.6 L21 8.6 L20 8.3 Z" fill="#fff" stroke="none"/><line id="emojiSlash" x1="3" y1="3" x2="21" y2="21" stroke="#ff2850" stroke-width="2.4" style="display:none"/></svg></div>
     <div class="rb" id="rbKick" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="#ff5050" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><line x1="8" y1="8" x2="16" y2="16"/><line x1="16" y1="8" x2="8" y2="16"/></svg></div>
   </div>
 </div>
@@ -254,52 +357,46 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:-ap
 <div class="panel" id="panelInbox">
   <div class="panel-head"><div class="back" data-back><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><polyline points="15 6 9 12 15 18"/></svg></div><div class="title">Сообщения</div></div>
   <div class="panel-body" id="inboxBody"></div>
+  <div style="padding:10px 12px;display:flex;gap:8px;border-top:1px solid rgba(255,255,255,.08);flex-shrink:0">
+    <button class="chat-big-btn neon" id="btnCreateChannel">📢 Создать канал</button>
+    <button class="chat-big-btn wardrobe" id="btnCreateChatRoom">💬 Создать чат</button>
+  </div>
 </div>
 
 <div class="panel" id="panelChat">
   <div class="panel-head"><div class="back" data-back><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><polyline points="15 6 9 12 15 18"/></svg></div><div class="chat-head-av" id="chatHeadAv"></div><div class="title" id="chatHeadName">nick</div></div>
   <div class="chat-actions-bar">
     <button class="chat-big-btn stream" id="chatCoStreamBtn"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="13" rx="2"/><line x1="9" y1="20" x2="15" y2="20" stroke-width="2.5"/></svg>Позвать в эфир</button>
+    <button class="chat-big-btn wardrobe" id="chatWardrobeBtn"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>Редактор</button>
   </div>
   <div class="chat-messages" id="chatMessages"></div>
   <div class="chat-input-row"><input id="chatInput" type="text" placeholder="Сообщение..."><button id="chatSend"><svg viewBox="0 0 24 24" fill="#fff"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg></button></div>
 </div>
 
-<div class="panel" id="panelAccount"><div class="panel-head"><div class="back" data-back><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><polyline points="15 6 9 12 15 18"/></svg></div><div class="title">Аккаунт</div></div><div class="panel-body"><div class="account-body"><div class="account-av" id="accAvatar">G</div><div class="account-name" id="accName">grand-cat</div><div class="account-handle" id="accHandle">@grand_cat</div><div class="account-stats"><div class="acc-stat" id="statFollowersBtn"><div class="n" id="accFollowers">0</div><div class="l">подписчики</div></div><div class="acc-stat" id="statFollowingBtn"><div class="n" id="accFollowing">0</div><div class="l">подписки</div></div><div class="acc-stat" id="statCrystalsBtn"><div class="n" id="accCrystalsStat">0</div><div class="l">кристаллы</div></div></div><div class="account-item" id="itemCasino"><div class="ic">🎰</div><div class="lb">Казино</div><div class="ar">›</div></div><div class="account-item" id="itemMyStreams"><div class="ic">🎬</div><div class="lb">Мои стримы</div><div class="ar">›</div></div><div class="account-item" id="itemStats"><div class="ic">📊</div><div class="lb">Статистика</div><div class="ar">›</div></div><div class="account-item" id="itemSettings"><div class="ic">⚙️</div><div class="lb">Настройки</div><div class="ar">›</div></div></div></div></div>
-
-<div class="panel" id="panelCasino">
+<div class="panel" id="panelChannel">
   <div class="panel-head">
     <div class="back" data-back><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><polyline points="15 6 9 12 15 18"/></svg></div>
-    <div class="title">🎰 Казино</div>
+    <div class="chat-head-av" id="channelHeadAv" style="cursor:pointer"></div>
+    <div class="title" id="channelHeadName" style="cursor:pointer">Канал</div>
+    <div class="roomGift" id="channelGiftBtn"><svg viewBox="0 0 24 24" fill="#fff" style="width:22px;height:22px"><path d="M20 7h-2.5c.3-.5.5-1 .5-1.5 0-1.4-1.1-2.5-2.5-2.5-1 0-2 .6-2.7 1.5L12 5.5l-.8-1C10.5 3.6 9.5 3 8.5 3 7.1 3 6 4.1 6 5.5c0 .5.2 1 .5 1.5H4c-1.1 0-2 .9-2 2v2c0 .6.4 1 1 1h18c.6 0 1-.4 1-1V9c0-1.1-.9-2-2-2zM4 13v7c0 1.1.9 2 2 2h5v-9H4zm9 9h5c1.1 0 2-.9 2-2v-7h-7v9z"/></svg></div>
+    <div class="roomGift" id="channelDeleteBtn"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M5 6l1 14a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-14"/><line x1="9" y1="11" x2="9" y2="17"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="15" y1="11" x2="15" y2="17"/></svg></div>
   </div>
-  <div class="panel-body">
-    <div class="casino-wrap">
-      <div class="casino-title">🎰 LUCKY SLOT 🎰</div>
-      <div class="casino-balance">Баланс: <b id="casinoBalance">0</b> 💎</div>
-      <button class="casino-btn" id="casinoChooseAmountBtn">Выбрать сумму</button>
-      <div class="casino-chosen" id="casinoChosenText">Сумма не выбрана</div>
-      <div class="amount-grid" id="amountGrid" style="display:none">
-        <button class="amount-btn" data-amt="10">10</button>
-        <button class="amount-btn" data-amt="50">50</button>
-        <button class="amount-btn" data-amt="100">100</button>
-        <button class="amount-btn" data-amt="500">500</button>
-        <button class="amount-btn" data-amt="1000">1 000</button>
-        <button class="amount-btn" data-amt="5000">5 000</button>
-        <input type="number" id="casinoAmountInput" placeholder="Своя сумма" min="1" max="999999999" inputmode="numeric">
-        <button class="casino-btn" id="casinoApplyBtn">Поставить эту сумму</button>
-      </div>
-      <div class="slot-machine">
-        <div class="slot-reels">
-          <div class="reel" id="reel1">7</div>
-          <div class="reel" id="reel2">7</div>
-          <div class="reel" id="reel3">7</div>
-        </div>
-      </div>
-      <button class="casino-spin-btn" id="casinoSpinBtn" disabled>КРУТИТЬ</button>
-      <div class="casino-result" id="casinoResult"></div>
-    </div>
-  </div>
+  <div class="chat-messages" id="channelMessages"></div>
+  <div class="chat-input-row"><input id="channelInput" type="text" placeholder="Сообщение в канал..."><button id="channelSend"><svg viewBox="0 0 24 24" fill="#fff"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg></button></div>
 </div>
+
+<div class="panel" id="panelChatRoom">
+  <div class="panel-head">
+    <div class="back" data-back><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><polyline points="15 6 9 12 15 18"/></svg></div>
+    <div class="chat-head-av" id="chatRoomHeadAv" style="cursor:pointer"></div>
+    <div class="title" id="chatRoomHeadName" style="cursor:pointer">Чат</div>
+    <div class="roomGift" id="chatRoomDeleteBtn"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M5 6l1 14a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-14"/><line x1="9" y1="11" x2="9" y2="17"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="15" y1="11" x2="15" y2="17"/></svg></div>
+  </div>
+  <div class="chat-messages" id="chatRoomMessages"></div>
+  <div class="chat-input-row"><input id="chatRoomInput" type="text" placeholder="Сообщение..."><button id="chatRoomSend"><svg viewBox="0 0 24 24" fill="#fff"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg></button></div>
+</div>
+
+<div class="panel" id="panelAccount"><div class="panel-head"><div class="back" data-back><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><polyline points="15 6 9 12 15 18"/></svg></div><div class="title">Аккаунт</div></div><div class="panel-body"><div class="account-body"><div class="account-av" id="accAvatar">G</div><div class="account-name" id="accName">grand-cat</div><div class="account-handle" id="accHandle">@grand_cat</div><div class="account-stats"><div class="acc-stat" id="statFollowersBtn"><div class="n" id="accFollowers">0</div><div class="l">подписчики</div></div><div class="acc-stat" id="statFollowingBtn"><div class="n" id="accFollowing">0</div><div class="l">подписки</div></div><div class="acc-stat" id="statCrystalsBtn"><div class="n" id="accCrystalsStat">0</div><div class="l">кристаллы</div></div></div><div class="account-item" id="itemMyStreams"><div class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.2"/><rect x="7.5" y="8.5" width="7" height="7" rx="1"/><path d="M14.5 11l3-1.8v5.6l-3-1.8z"/></svg></div><div class="lb">Мои стримы</div><div class="ar">›</div></div><div class="account-item" id="itemStats"><div class="ic"><svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="7"/><line x1="21" y1="21" x2="15.5" y2="15.5"/><line x1="7.5" y1="13" x2="7.5" y2="14.5"/><line x1="10" y1="10" x2="10" y2="14.5"/><line x1="12.5" y1="12" x2="12.5" y2="14.5"/><line x1="6.5" y1="15.5" x2="14" y2="15.5"/></svg></div><div class="lb">Статистика</div><div class="ar">›</div></div><div class="account-item" id="itemSettings"><div class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div><div class="lb">Настройки</div><div class="ar">›</div></div></div></div></div>
 
 <div class="panel" id="panelSettings">
   <div class="panel-head"><div class="back" data-back><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><polyline points="15 6 9 12 15 18"/></svg></div><div class="title">Настройки</div></div>
@@ -309,169 +406,184 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:-ap
     <div class="settings-section">Общение</div>
     <div class="account-item" id="itemSwearing"><div class="ic">🤬</div><div class="lb">Маты (18+)</div><div class="toggle" id="toggleSwearing"></div></div>
     <div class="account-item" id="itemVoice"><div class="ic">🔊</div><div class="lb">Голос бота</div><div class="toggle" id="toggleVoice"></div></div>
+    <div class="settings-section">Запись</div>
+    <div class="account-item" id="itemAutoRec"><div class="ic">🔴</div><div class="lb">Автозапись</div><div class="toggle" id="toggleAutoRec"></div></div>
+    <div class="settings-section">О приложении</div>
+    <div class="account-item"><div class="ic">ℹ️</div><div class="lb">Версия 1.0</div></div>
   </div></div>
 </div>
 
-<div class="panel" id="panelStats"><div class="panel-head"><div class="back" data-back><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><polyline points="15 6 9 12 15 18"/></svg></div><div class="title">Статистика</div></div><div class="panel-body"><div class="stat-grid"><div class="stat-card"><div class="lbl">Всего стримов</div><div class="val cyan" id="stStreams">0</div></div><div class="stat-card"><div class="lbl">Кристаллов</div><div class="val pink" id="stCrystals">0</div></div><div class="stat-card"><div class="lbl">Подписчиков</div><div class="val green" id="stFollowers">0</div></div><div class="stat-card"><div class="lbl">Сообщений</div><div class="val yellow" id="stMessages">0</div></div></div></div></div>
-
+<div class="panel" id="panelMyStreams"><div class="panel-head"><div class="back" data-back><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><polyline points="15 6 9 12 15 18"/></svg></div><div class="title">Мои стримы</div></div><div class="panel-body" id="myStreamsBody"></div></div>
+<div class="panel" id="panelStats"><div class="panel-head"><div class="back" data-back><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><polyline points="15 6 9 12 15 18"/></svg></div><div class="title">Статистика</div></div><div class="panel-body"><div class="stat-grid"><div class="stat-card"><div class="lbl">Всего стримов</div><div class="val cyan" id="stStreams">0</div></div><div class="stat-card"><div class="lbl">Кристаллов</div><div class="val pink" id="stCrystals">0</div></div><div class="stat-card" id="stFollowersCard"><div class="lbl">Подписчиков</div><div class="val green" id="stFollowers">0</div></div><div class="stat-card"><div class="lbl">Сообщений</div><div class="val yellow" id="stMessages">0</div></div><div class="stat-card" id="stDialogsCard"><div class="lbl">Диалогов</div><div class="val cyan" id="stDialogs">0</div></div><div class="stat-card"><div class="lbl">Донатов</div><div class="val pink" id="stDonations">0</div></div></div></div></div>
 <div class="panel" id="panelFollowers"><div class="panel-head"><div class="back" data-back><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><polyline points="15 6 9 12 15 18"/></svg></div><div class="title" id="followersTitle">Подписчики</div></div><div class="panel-body" id="followersBody"></div></div>
-
-<div class="panel" id="panelFollowing"><div class="panel-head"><div class="back" data-back><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><polyline points="15 6 9 12 15 18"/></svg></div><div class="title">Подписки</div></div><div class="panel-body" id="followingBody"></div></div>
+<div class="panel" id="panelFollowing"><div class="panel-head"><div class="back" data-back><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><polyline points="15 6 9 12 15 18"/></svg></div><div class="title">Подписки (диалоги)</div></div><div class="panel-body" id="followingBody"></div></div>
 
 <div id="editModal"><div class="box">
   <h3>Изменить профиль</h3>
   <div class="modal-av-wrap"><div class="modal-av" id="modalAvPreview">G</div></div>
   <label>Аватар</label><input type="text" id="editAvatarChar" maxlength="8" placeholder="🐱" class="av-input">
   <label>Цвет фона</label><div class="color-grid" id="colorGrid"></div><input type="color" id="editAvatarColorPicker" value="#25a4d3" class="color-input">
+  <label>Цвет рамки</label><div class="color-grid" id="ringGrid"></div><input type="color" id="editRingColorPicker" value="#ffffff" class="color-input">
+  <label>Цвет символа</label><div class="color-grid" id="textGrid"></div><input type="color" id="editTextColorPicker" value="#ffffff" class="color-input">
+  <label>Эмодзи</label><div class="emoji-grid" id="editEmojiGrid"></div>
   <label>Никнейм</label><input type="text" id="editNick" maxlength="20" placeholder="grand-cat">
   <div class="btns"><button class="cancel" id="editCancel">Отмена</button><button class="save" id="editSave">Сохранить</button></div>
 </div></div>
 
+<div id="wardrobeModal"><div class="wd-box">
+  <h3>Редактор бота</h3>
+  <div class="wd-preview"><div class="wd-av-big" id="wdAvBig">🐱</div></div>
+  <label>Эмодзи / буква</label><input type="text" id="wdChar" maxlength="8" placeholder="🐱">
+  <label>Быстрый выбор</label><div class="wd-emoji-grid" id="wdEmojiGrid"></div>
+  <label>Цвет фона</label><div class="wd-color-grid" id="wdBgGrid"></div><input type="color" id="wdBgPicker" value="#25a4d3" class="color-input">
+  <label>Цвет рамки</label><div class="wd-color-grid" id="wdRingGrid"></div><input type="color" id="wdRingPicker" value="#ffffff" class="color-input">
+  <label>Цвет символа</label><div class="wd-color-grid" id="wdTextGrid"></div><input type="color" id="wdTextPicker" value="#ffffff" class="color-input">
+  <label>Никнейм</label><input type="text" id="wdNick" maxlength="24" placeholder="имя">
+  <label>Пол (влияет на голос)</label>
+  <div class="wd-gender-row"><div class="wd-gender-opt" data-gender="female">♀ Женский</div><div class="wd-gender-opt" data-gender="male">♂ Мужской</div></div>
+  <div class="wd-btns"><button class="wd-cancel" id="wdCancel">Отмена</button><button class="wd-save" id="wdSave">Сохранить</button></div>
+</div></div>
+
+<div id="createChannelModal" class="roomModal"><div class="roomBox">
+  <h3>📢 Создать канал</h3>
+  <div class="modal-av-wrap" style="display:flex;justify-content:center;margin-bottom:6px"><div class="modal-av" id="chAvPreview" style="width:90px;height:90px;border-radius:50%;background:#25a4d3;display:flex;align-items:center;justify-content:center;font-size:46px;font-weight:700;color:#fff;box-shadow:0 0 0 4px #fff;margin:0 auto">📢</div></div>
+  <label>Название канала</label><input type="text" id="chName" maxlength="30" placeholder="Мой канал">
+  <label>Символ аватарки</label><input type="text" id="chChar" maxlength="8" placeholder="📢">
+  <label>Быстрый выбор</label><div class="roomEmojiGrid" id="chEmojiGrid"></div>
+  <label>Цвет аватарки</label><div class="roomColorGrid" id="chColorGrid"></div><input type="color" id="chColorPicker" value="#25a4d3" class="color-input">
+  <div class="roomBtns"><button class="roomCancel" data-close="createChannelModal">Отмена</button><button class="roomSave" id="chCreateSave">Создать</button></div>
+</div></div>
+
+<div id="createChatModal" class="roomModal"><div class="roomBox">
+  <h3>💬 Создать чат</h3>
+  <p style="font-size:13px;opacity:.7;text-align:center;margin-bottom:16px">Выбери тип чата</p>
+  <button class="chatTypeBtn public" id="chatPublicBtn">🌍 Публичный<span style="font-size:11px;opacity:.75">50% подписчиков</span></button>
+  <button class="chatTypeBtn private" id="chatPrivateBtn">🔒 Приватный<span style="font-size:11px;opacity:.75">выбрать участников вручную</span></button>
+  <div class="roomBtns"><button class="roomCancel" data-close="createChatModal">Отмена</button></div>
+</div></div>
+
+<div id="selectMembersModal" class="roomModal"><div class="roomBox">
+  <h3>Выбери участников</h3>
+  <div id="membersSelectList" style="max-height:50vh;overflow-y:auto;margin:12px 0"></div>
+  <div class="roomBtns"><button class="roomCancel" data-close="selectMembersModal">Отмена</button><button class="roomSave" id="membersSelectNext">Далее</button></div>
+</div></div>
+
+<div id="chatNameModal" class="roomModal"><div class="roomBox">
+  <h3>Название чата</h3>
+  <label>Название</label><input type="text" id="crName" maxlength="30" placeholder="Мой чат">
+  <label>Символ аватарки</label><input type="text" id="crChar" maxlength="8" placeholder="💬">
+  <label>Быстрый выбор</label><div class="roomEmojiGrid" id="crEmojiGrid"></div>
+  <label>Цвет аватарки</label><div class="roomColorGrid" id="crColorGrid"></div><input type="color" id="crColorPicker" value="#8b5cf6" class="color-input">
+  <div class="roomBtns"><button class="roomCancel" data-close="chatNameModal">Отмена</button><button class="roomSave" id="crCreateSave">Создать</button></div>
+</div></div>
+
+<div id="giveawayModal" class="roomModal"><div class="roomBox">
+  <h3>🎁 Розыгрыш</h3>
+  <label>Текст розыгрыша</label><textarea id="gwText" maxlength="200" placeholder="Например: Разыгрываю 1000 кристаллов!"></textarea>
+  <label>Кристаллов победителю</label><input type="number" id="gwCrystals" min="1" max="100000" value="100">
+  <div class="roomBtns"><button class="roomCancel" data-close="giveawayModal">Отмена</button><button class="roomSave" id="gwStart">Запустить</button></div>
+</div></div>
+
+<div id="chatMenuModal" class="roomModal"><div class="roomInfo" id="chatMenuBox"></div></div>
+
+<div id="msgActionModal" class="roomModal"><div class="roomBox" style="max-width:320px">
+  <h3 id="msgActionTitle">Действия</h3>
+  <div class="roomBtns" style="flex-direction:column">
+    <button class="roomSave" id="msgKickBtn" style="background:#ffb84d;color:#000">/kick</button>
+    <button class="roomSave" id="msgBanBtn" style="background:#ff5050;color:#fff">/ban</button>
+    <button class="roomSave" id="msgMutBtn" style="background:#8b5cf6;color:#fff">/mut</button>
+    <button class="roomCancel" data-close="msgActionModal">Отмена</button>
+  </div>
+</div></div>
+
+<div id="muteTimeModal" class="roomModal"><div class="roomBox" style="max-width:320px">
+  <h3>На сколько замутить?</h3>
+  <div class="roomBtns" style="flex-direction:column">
+    <button class="roomSave muteTimeBtn" data-min="1">1 минута</button>
+    <button class="roomSave muteTimeBtn" data-min="5">5 минут</button>
+    <button class="roomSave muteTimeBtn" data-min="30">30 минут</button>
+    <button class="roomSave muteTimeBtn" data-min="60">1 час</button>
+    <button class="roomSave muteTimeBtn" data-min="1440">1 день</button>
+    <button class="roomCancel" data-close="muteTimeModal">Отмена</button>
+  </div>
+</div></div>
+
+<div id="sanctionModal" class="roomModal"><div class="roomBox" style="max-width:340px;text-align:center">
+  <div id="sanctionEmoji" style="font-size:52px;margin-bottom:8px">🚫</div>
+  <h3 id="sanctionText">Пользователь забанен</h3>
+  <div class="roomBtns" style="flex-direction:column">
+    <button class="roomSave" id="sanctionUndoBtn" style="background:#25f4ee;color:#000">Отменить</button>
+    <button class="roomCancel" data-close="sanctionModal">Закрыть</button>
+  </div>
+</div></div>
+
+<div id="deleteRoomModal" class="roomModal"><div class="roomBox" style="max-width:340px;text-align:center">
+  <div style="font-size:52px;margin-bottom:8px">🗑</div>
+  <h3>Удалить?</h3>
+  <p style="font-size:13px;opacity:.7;margin-bottom:16px" id="deleteRoomText">Это действие нельзя отменить</p>
+  <div class="roomBtns">
+    <button class="roomCancel" data-close="deleteRoomModal">Отмена</button>
+    <button class="roomSave" id="deleteRoomConfirm" style="background:#ff5050;color:#fff">Удалить</button>
+  </div>
+</div></div>
+
+<div id="pickMembersModal" class="roomModal"><div class="roomBox">
+  <h3 id="pickMembersTitle">Выбери участников</h3>
+  <div id="pickMembersList" style="max-height:50vh;overflow-y:auto;margin:12px 0"></div>
+  <div class="roomBtns"><button class="roomCancel" data-close="pickMembersModal">Отмена</button><button class="roomSave" id="pickMembersConfirm">Готово</button></div>
+</div></div>
+
+<div id="editRoomModal" class="roomModal"><div class="roomBox">
+  <h3 id="editRoomTitle">Редактировать</h3>
+  <div class="modal-av-wrap" style="display:flex;justify-content:center;margin-bottom:6px"><div class="modal-av" id="erAvPreview" style="width:90px;height:90px;border-radius:50%;background:#25a4d3;display:flex;align-items:center;justify-content:center;font-size:46px;font-weight:700;color:#fff;box-shadow:0 0 0 4px #fff;margin:0 auto">📢</div></div>
+  <label>Название</label><input type="text" id="erName" maxlength="30">
+  <label>Символ аватарки</label><input type="text" id="erChar" maxlength="8" placeholder="📢">
+  <label>Быстрый выбор</label><div class="roomEmojiGrid" id="erEmojiGrid"></div>
+  <label>Цвет фона</label><div class="roomColorGrid" id="erColorGrid"></div><input type="color" id="erColorPicker" value="#25a4d3" class="color-input">
+  <label>Цвет рамки</label><div class="roomColorGrid" id="erRingGrid"></div><input type="color" id="erRingPicker" value="#ffffff" class="color-input">
+  <label>Цвет символа</label><div class="roomColorGrid" id="erTextGrid"></div><input type="color" id="erTextPicker" value="#ffffff" class="color-input">
+  <div class="roomBtns"><button class="roomCancel" data-close="editRoomModal">Отмена</button><button class="roomSave" id="erSave">Сохранить</button></div>
+</div></div>
+
+<div id="videoViewer">
+  <div id="vvStage">
+    <div id="vvFrame"><video id="vvVideo" playsinline controls></video></div>
+    <div id="vvProgress"><div>Сохранение...</div><div class="pct" id="vvPct">0%</div></div>
+  </div>
+  <div id="vvHead">
+    <div class="vv-btn" id="vvBack"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><polyline points="15 6 9 12 15 18"/></svg></div>
+    <div class="vv-title" id="vvTitle">Видео</div>
+    <div class="vv-btn" id="vvEdit"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
+    <div class="vv-btn" id="vvSave"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg></div>
+  </div>
+  <div id="vvTools">
+    <div class="vv-tool" data-tool="trim"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="8.5" y1="8.5" x2="20" y2="20"/><line x1="8.5" y1="15.5" x2="20" y2="4"/></svg><span>TRIM</span></div>
+    <div class="vv-tool" data-tool="canvas"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M3 9h18"/></svg><span>CANVAS</span></div>
+    <div class="vv-tool" data-tool="filter"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="9" cy="14" r="5"/><circle cx="15" cy="10" r="5"/></svg><span>FILTER</span></div>
+    <div class="vv-tool" data-tool="rotate"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><polyline points="21 3 21 9 15 9"/></svg><span>ROTATE</span></div>
+    <div class="vv-tool" data-tool="speed"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 12l4-3"/><path d="M12 12l-2 4"/></svg><span>SPEED</span></div>
+  </div>
+  <div id="vvSheet">
+    <div id="vvSheetHead"><div class="t-title" id="vvSheetTitle">Trim</div><button class="t-ok" id="vvSheetOk"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 13 10 18 20 6"/></svg></button></div>
+    <div id="vvSheetBody">
+      <div class="vv-panel active" data-panel="trim">
+        <div id="vvTrimTotal">Всего: <span id="vvTrimTotalTime">0:00</span></div>
+        <div id="vvTrimWrap"><div id="vvTrimTrack"><canvas id="vvTrimCanvas"></canvas>
+          <div id="vvTrimOverlay"><div class="mask" id="vvMaskL"></div><div class="mask" id="vvMaskR"></div>
+            <div class="sel" id="vvSel"><div class="h l" id="vvHandleL"><svg viewBox="0 0 24 24" fill="#333"><polygon points="15,6 9,12 15,18"/></svg></div><div class="h r" id="vvHandleR"><svg viewBox="0 0 24 24" fill="#333"><polygon points="9,6 15,12 9,18"/></svg></div></div></div></div>
+          <div id="vvTrimTime">0:00.0 - 0:00.0</div></div>
+      </div>
+      <div class="vv-panel" data-panel="canvas"><h4>Select Canvas</h4>
+        <input type="range" min="0" max="100" value="50" class="vv-speed-slider" id="vvCanvasSlider">
+        <div class="vv-ratios"><div class="vv-ratio sel" data-ratio="none">No Frame</div><div class="vv-ratio" data-ratio="1:1">1:1</div><div class="vv-ratio" data-ratio="4:5">4:5</div><div class="vv-ratio" data-ratio="16:9">16:9</div><div class="vv-ratio" data-ratio="9:16">9:16</div></div>
+      </div>
+      <div class="vv-panel" data-panel="filter"><h4>Select Filter</h4><div class="vv-filters" id="vvFilterList"></div></div>
+      <div class="vv-panel" data-panel="rotate"><h4>Rotate</h4><div class="vv-rotate-row"><div class="vv-rot-btn" id="vvRotateBtn"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><polyline points="21 3 21 9 15 9"/></svg><span>Повернуть</span></div></div></div>
+      <div class="vv-panel" data-panel="speed"><h4>Speed</h4><div class="vv-speed-val"><span id="vvSpeedLabel">1.0x</span></div><input type="range" min="1" max="4" step="0.1" value="1" class="vv-speed-slider" id="vvSpeedSlider"></div>
+    </div>
+  </div>
+</div>
+
+<div id="saveModal"><div class="sm-title">🎬 Видео готово</div><div class="sm-sub">Нажми «Сохранить»</div><button class="sm-btn" id="smSave">📥 Сохранить</button><button class="sm-btn secondary" id="smClose">Закрыть</button></div>
+
 <div id="fatal"></div>
-<script>
-"use strict";
-var S={crystals:parseInt(localStorage.getItem('gc_crystals')||'0'),followers:parseInt(localStorage.getItem('gc_followers')||'12400'),nick:localStorage.getItem('gc_nick')||'grand-cat',avatar:localStorage.getItem('gc_avatar')||'G',avatarColor:localStorage.getItem('gc_avatar_color')||'#25a4d3',voiceOn:localStorage.getItem('gc_voiceon')!=='0',swearing:localStorage.getItem('gc_swearing')==='1',totalStreams:parseInt(localStorage.getItem('gc_streams_count')||'0'),totalMessages:parseInt(localStorage.getItem('gc_messages')||'0'),viewers:30000,streaming:false,coBot:null,botPos:null,facing:'user'};
-var chats={},followersList=[],donCustomText=localStorage.getItem('gc_dontext')||'',botSimOn=true,casinoBet=0,currentChat=null,deleteTarget=null,menuType=null;
-try{chats=JSON.parse(localStorage.getItem('gc_chats')||'{}');}catch(e){}
-try{followersList=JSON.parse(localStorage.getItem('gc_followers_list')||'[]');}catch(e){}
-
-function $(id){return document.getElementById(id);}
-function rnd(a){return a[Math.floor(Math.random()*a.length)];}
-function ri(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
-function saveChats(){try{localStorage.setItem('gc_chats',JSON.stringify(chats));}catch(e){}}
-function saveFollowers(){try{localStorage.setItem('gc_followers_list',JSON.stringify(followersList));}catch(e){}}
-function saveStats(){try{localStorage.setItem('gc_crystals',String(S.crystals));localStorage.setItem('gc_followers',String(S.followers));localStorage.setItem('gc_nick',S.nick);localStorage.setItem('gc_avatar',S.avatar);localStorage.setItem('gc_avatar_color',S.avatarColor);localStorage.setItem('gc_streams_count',String(S.totalStreams));localStorage.setItem('gc_messages',String(S.totalMessages));localStorage.setItem('gc_swearing',S.swearing?'1':'0');localStorage.setItem('gc_voiceon',S.voiceOn?'1':'0');localStorage.setItem('gc_dontext',donCustomText||'');}catch(e){}}
-
-var EMOJIS=['G','🐱','🐶','🦊','🐼','🐯','🦁','🐸','🐵','🐰','🐻','🦄','🐲','🐙','🦋','🐢','🦉','🐺','🍕','🎮','🎯','🎸','🎧','🌈','⭐','🔥','⚡','🌸','🌙','☀️','👾','🤖','👻','💀','🎨','🎭'];
-var GRADS=[['#ff6384','#ff9a5c'],['#36a2eb','#5ce1e6'],['#ffce56','#ffb84d'],['#4bc0c0','#6ee7b7'],['#9966ff','#c88cff'],['#ff9f40','#ffcc70'],['#2ecc71','#a2e8b8'],['#e74c3c','#ff8c66'],['#f093fb','#f5576c'],['#4facfe','#00f2fe']];
-var COLORS=['#25a4d3','#4facfe','#00f2fe','#36a2eb','#5ce1e6','#8ee8f4','#43e97b','#38f9d7','#2ecc71','#8cff8c','#4bc0c0','#fee140','#ffce56','#ffb84d','#ff9f40','#ff6384','#ff0050','#fa709a','#f093fb','#c88cff','#9966ff','#80d8ff','#ffffff','#000000'];
-var DONATORS=['Whale_777','KingDonater','MegaBoss','Anonym','RichBoi','TopDon','CryptoKing','MoneyRain','DiamondBoss','GoldShark','RubyHawk','PlatinumFox','NeonWhale','DarkSponsor','LuckyGuy','BigMoney'];
-var NP=['dark','pro','mega','ultra','cyber','neo','pixel','retro','night','star','fire','ice','storm','lucky'];
-var NR=['cat','wolf','fox','dragon','ninja','gamer','legend','boss','king','ghost','demon','robot','troll','panda','tiger','hunter'];
-var NS=['01','07','13','69','77','88','99','228','777','999','xX','_pro'];
-var usedNicks={};
-function randNick(){for(var i=0;i<40;i++){var r=Math.random(),n;if(r<0.3)n=rnd(NP)+'_'+rnd(NR);else if(r<0.6)n=rnd(NR)+'_'+rnd(NS);else if(r<0.8)n='xX_'+rnd(NR)+'_Xx';else n=rnd(NP)+rnd(NR)+ri(1,999);if(!usedNicks[n]){usedNicks[n]=1;return n;}}return'user'+ri(1000,99999);}
-function randAv(){var g=rnd(GRADS);return{emoji:rnd(EMOJIS),gradient:'linear-gradient(135deg,'+g[0]+','+g[1]+')',gender:Math.random()<0.5?'male':'female'};}
-function isEmoji(s){if(!s)return false;if(s.length>1)return true;var c=s.codePointAt(0);return c>=0x1F000&&c<=0x1FAFF||c>=0x2600&&c<=0x27BF;}
-function applyAv(el,ch,bg){if(!el)return;el.textContent=ch;el.style.background=bg;el.style.color=isEmoji(ch)?'#fff':'#fff';}
-function toast(t){var tE=$('toast');if(!tE)return;tE.textContent=t;tE.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(function(){tE.classList.remove('show');},2200);}
-function updCrysUI(){var s=S.crystals.toLocaleString('ru-RU');['menuCrystals','accCrystalsStat','casinoBalance'].forEach(function(id){var e=$(id);if(e)e.textContent=s;});}
-function updFolUI(){var n=followersList.length,s=n>=1000?(n/1000).toFixed(1)+'K':String(n);['menuFollowers','accFollowers'].forEach(function(id){var e=$(id);if(e)e.textContent=s;});}
-function updFolwUI(){var e=$('accFollowing');if(e)e.textContent=Object.keys(chats).length;}
-function openPanel(id){document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('show');});var p=$(id);if(p)p.classList.add('show');}
-function closeAll(){document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('show');});}
-function showMenu(){$('menuScreen').classList.remove('hide');$('ui').classList.remove('show');$('cam').classList.remove('show');S.streaming=false;closeAll();}
-function hideMenu(){$('menuScreen').classList.add('hide');}
-
-function getChat(nick,emoji,gradient){if(!chats[nick]){var a=randAv();chats[nick]={emoji:emoji||a.emoji,gradient:gradient||a.gradient,messages:[],unread:0,gender:a.gender};saveChats();}return chats[nick];}
-function spawnChat(text,nick,color){if(!nick)nick=randNick();if(!color)color=rnd(COLORS);if(!text)text=rnd(['жиза','база','+1','💯','ну да','😂','ахаха']);var av=randAv();var cE=$('comments');if(!cE)return;var el=document.createElement('div');el.className='cm';el.innerHTML='<div class="cm-av" style="background:'+av.gradient+'">'+av.emoji+'</div><div class="cm-body"><div class="cm-nick" style="color:'+color+'">'+nick+'</div><div class="cm-text">'+text+'</div></div>';cE.appendChild(el);while(cE.children.length>60)cE.removeChild(cE.firstChild);setTimeout(function(){if(el.parentNode)el.remove();},60000);cE.scrollTop=cE.scrollHeight;}
-function spawnNote(text,sub,color){color=color||'#ffd700';var nE=$('notes');if(!nE)return;var el=document.createElement('div');el.className='note';el.style.borderLeftColor=color;el.innerHTML='<b style="color:'+color+'">'+text+'</b>'+(sub?'<small>'+sub+'</small>':'');nE.appendChild(el);setTimeout(function(){if(el.parentNode)el.remove();},5000);}
-function spawnBanner(nick,amount,reason,color){var bE=$('banner');if(!bE)return;bE.innerHTML='<div class="b-nick">'+nick+'</div><div class="b-amount" style="color:'+color+'">💎 '+amount.toLocaleString('ru-RU')+' ₽</div><div class="b-text">'+reason+'</div>';bE.style.borderColor=color;bE.style.display='block';clearTimeout(spawnBanner._t);spawnBanner._t=setTimeout(function(){bE.style.display='none';},5000);}
-function boom(emoji,count){count=count||8;var hE=$('hearts');if(!hE)return;for(var i=0;i<count;i++){var el=document.createElement('div');el.className='heart';el.textContent=emoji;el.style.fontSize=ri(22,36)+'px';el.style.marginLeft=((Math.random()-0.5)*50)+'px';hE.appendChild(el);var vy=-ri(220,400);var vx=(Math.random()-0.5)*40;try{el.animate([{transform:'translate(0,0)',opacity:1},{transform:'translate('+vx+'px,'+vy+'px)',opacity:0}],{duration:2000}).onfinish=function(){this.effect.target.remove();};}catch(e){setTimeout(function(){if(el.parentNode)el.remove();},2000);}}}
-
-function donEvent(){var d=rnd(DONATORS),a=ri(50,5000),r=donCustomText||rnd(['за контент','продолжай','ты лучший']);spawnBanner(d,a,r,'#ff50b4');spawnNote(d+' задонатил '+a.toLocaleString('ru-RU')+' ₽',r,'#ff78c8');S.crystals+=a;saveStats();updCrysUI();}
-function subEvent(){var nick=randNick(),av=randAv();spawnNote(nick+' подписался!','новый подписчик','#8cff8c');if(!followersList.find(function(f){return f.nick===nick;})){followersList.push({nick:nick,emoji:av.emoji,gradient:av.gradient,t:Date.now()});if(followersList.length>200)followersList.shift();saveFollowers();S.followers=followersList.length;saveStats();updFolUI();}boom('❤️',6);}
-function fmtV(v){if(v>=1000000){var m=v/1000000;return(m>=10?Math.floor(m):m.toFixed(1))+' млн';}if(v>=1000)return(v/1000).toFixed(1)+'K';return String(Math.floor(v));}
-
-function startCam(){return new Promise(function(res){if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){toast('Камера недоступна');res(false);return;}navigator.mediaDevices.getUserMedia({video:{facingMode:S.facing,width:{ideal:1280},height:{ideal:720}},audio:false}).then(function(s){var c=$('cam');if(c.srcObject)c.srcObject.getTracks().forEach(function(t){t.stop();});c.srcObject=s;c.play().then(function(){res(true);}).catch(function(){res(true);});}).catch(function(e){toast('Камера: '+e.message);res(false);});});}
-function flipCam(){S.facing=S.facing==='user'?'environment':'user';$('cam').style.transform=S.facing==='user'?'scaleX(-1)':'none';startCam();toast(S.facing==='user'?'Фронтальная':'Задняя');}
-
-function startStream(onStart){
-  hideMenu();
-  startCam().then(function(ok){
-    if(!ok){showMenu();return;}
-    $('cam').classList.add('show');$('ui').classList.add('show');
-    S.streaming=true;S.currentChat=null;S.totalStreams++;botSimOn=true;S.viewers=30000;
-    saveStats();updCrysUI();
-    setInterval(function(){if(S.streaming){var e=$('viewers');if(e)e.textContent=fmtV(S.viewers);}},1000);
-    setTimeout(function(){spawnNote('grand-cat в эфире!','Говори','#8cff8c');},600);
-    if(onStart)setTimeout(onStart,1500);
-  });
-}
-
-function openChatWith(nick,emoji,gradient){getChat(nick,emoji,gradient);var c=chats[nick];c.unread=0;saveChats();currentChat=nick;closeAll();$('panelChat').classList.add('show');var box=$('chatHeadAv');if(box){box.innerHTML='';var d=document.createElement('div');d.style.cssText='width:100%;height:100%;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;background:'+c.gradient;d.textContent=c.emoji;box.appendChild(d);}$('chatHeadName').textContent=nick;renderChatMsgs();updBadge();}
-function renderChatMsgs(){if(!currentChat||!chats[currentChat])return;var box=$('chatMessages');if(!box)return;box.innerHTML='';chats[currentChat].messages.forEach(function(m){var el=document.createElement('div');el.className='msg '+(m.from==='me'?'me':'them');el.textContent=m.text;box.appendChild(el);});setTimeout(function(){box.scrollTop=box.scrollHeight;},30);}
-function pushMsg(nick,from,text){if(!chats[nick])return;chats[nick].messages.push({from:from,text:text,t:Date.now()});if(chats[nick].messages.length>200)chats[nick].messages.shift();saveChats();if(currentChat===nick)renderChatMsgs();else if(from==='them'){chats[nick].unread=(chats[nick].unread||0)+1;saveChats();updBadge();}}
-function sendMsg(){var inp=$('chatInput'),text=inp.value.trim();if(!text||!currentChat)return;if(handleCommand(text)){inp.value='';return;}inp.value='';pushMsg(currentChat,'me',text);S.totalMessages++;saveStats();setTimeout(function(){pushMsg(currentChat,'them',rnd(['жиза','ага','согласен','ахаха','прикольно','ок','😄']));},ri(800,1800));}
-function updBadge(){var u=0;Object.keys(chats).forEach(function(k){u+=(chats[k].unread||0);});var b=$('inboxBadge');if(!b)return;if(u>0){b.textContent=u>99?'99+':String(u);b.style.display='flex';}else b.style.display='none';}
-function buildInbox(){var body=$('inboxBody');if(!body)return;body.innerHTML='';var keys=Object.keys(chats);if(!keys.length){body.innerHTML='<div class="empty-inbox"><span class="em">💬</span>Пока никого</div>';return;}keys.forEach(function(nick){var c=chats[nick];var el=document.createElement('div');el.className='chat-row';el.innerHTML='<div class="av" style="background:'+c.gradient+'">'+c.emoji+'</div><div class="body"><div class="nick">'+nick+'</div><div class="last">'+(c.messages.length?c.messages[c.messages.length-1].text:'Начни')+'</div></div>';el.onclick=function(){openChatWith(nick,c.emoji,c.gradient);};body.appendChild(el);});}
-function buildStats(){$('stStreams').textContent=S.totalStreams;$('stCrystals').textContent=S.crystals.toLocaleString('ru-RU');$('stFollowers').textContent=S.followers.toLocaleString('ru-RU');$('stMessages').textContent=S.totalMessages;}
-function buildFollowers(){var body=$('followersBody');body.innerHTML='';if(!followersList.length){body.innerHTML='<div class="empty-inbox"><span class="em">👥</span>Пока никто</div>';$('followersTitle').textContent='Подписчики (0)';return;}followersList.slice().reverse().forEach(function(f){var el=document.createElement('div');el.className='chat-row';el.innerHTML='<div class="av" style="background:'+f.gradient+'">'+f.emoji+'</div><div class="body"><div class="nick">'+f.nick+'</div><div class="last">'+new Date(f.t).toLocaleDateString('ru-RU')+'</div></div>';el.onclick=function(){openChatWith(f.nick,f.emoji,f.gradient);};body.appendChild(el);});$('followersTitle').textContent='Подписчики ('+followersList.length+')';}
-function buildFollowing(){var body=$('followingBody');body.innerHTML='';var keys=Object.keys(chats);if(!keys.length){body.innerHTML='<div class="empty-inbox"><span class="em">💬</span>Пока нет</div>';return;}keys.forEach(function(nick){var c=chats[nick];var el=document.createElement('div');el.className='chat-row';el.innerHTML='<div class="av" style="background:'+c.gradient+'">'+c.emoji+'</div><div class="body"><div class="nick">'+nick+'</div></div>';el.onclick=function(){openChatWith(nick,c.emoji,c.gradient);};body.appendChild(el);});}
-
-function updProfUI(){$('streamNick').textContent=S.nick;$('menuTitle').textContent=S.nick;applyAv($('streamAvatar'),S.avatar,S.avatarColor);applyAv($('menuAvatar'),S.avatar,S.avatarColor);applyAv($('accAvatar'),S.avatar,S.avatarColor);$('accName').textContent=S.nick;$('accHandle').textContent='@'+S.nick.toLowerCase().replace(/\s+/g,'_');}
-function buildColorGrid(id,cur,onPick){var g=$(id);if(!g)return;g.innerHTML='';COLORS.forEach(function(c){var d=document.createElement('div');d.className='color-opt'+(cur===c?' sel':'');d.style.background=c;d.onclick=function(){g.querySelectorAll('.color-opt').forEach(function(o){o.classList.remove('sel');});d.classList.add('sel');onPick(c);};g.appendChild(d);});}
-function openEdit(){$('editNick').value=S.nick;$('editAvatarChar').value=S.avatar;var prev=$('modalAvPreview');prev.textContent=S.avatar;prev.style.background=S.avatarColor;$('editAvatarChar').oninput=function(e){prev.textContent=e.target.value||'G';};var acp=$('editAvatarColorPicker');acp.value=S.avatarColor;acp.style.background=S.avatarColor;acp.oninput=function(e){prev.style.background=e.target.value;acp.style.background=e.target.value;};buildColorGrid('colorGrid',S.avatarColor,function(c){prev.style.background=c;acp.value=c;acp.style.background=c;});$('editModal').classList.add('show');}
-
-function handleCommand(text){if(!text)return false;var t=text.trim(),tl=t.toLowerCase();
-  if(tl==='/sim'){botSimOn=true;toast('▶️ Чат ботов вкл');return true;}
-  if(tl==='//'){botSimOn=false;donCustomText='';saveStats();toast('🛑 Всё отключено');return true;}
-  var mD=t.match(/^\/don\s+"([^"]+)"/i)||t.match(/^\/don\s+(.+)$/i);
-  if(mD&&mD[1]){donCustomText=mD[1].trim();saveStats();toast('💎 '+donCustomText);return true;}
-  return false;
-}
-
-function casinoSetBet(amt){casinoBet=amt;$('casinoChosenText').textContent='Ставка: '+amt.toLocaleString('ru-RU')+' 💎';$('casinoChosenText').classList.add('active');$('casinoChooseAmountBtn').textContent='Сумма: '+amt.toLocaleString('ru-RU')+' 💎';var sp=$('casinoSpinBtn');if(S.crystals>=amt)sp.disabled=false;else{sp.disabled=true;toast('Недостаточно кристаллов');}}
-function casinoSpin(){
-  if(casinoBet<=0){toast('Сначала выбери сумму');return;}
-  if(S.crystals<casinoBet){toast('Недостаточно кристаллов');return;}
-  var sp=$('casinoSpinBtn');sp.disabled=true;$('casinoResult').textContent='';$('casinoResult').className='casino-result';
-  var r1=$('reel1'),r2=$('reel2'),r3=$('reel3');
-  var t1=setInterval(function(){r1.textContent=rnd(['7','🍒','💎','🍋','⭐','🔔']);},60);
-  var t2=setInterval(function(){r2.textContent=rnd(['7','🍒','💎','🍋','⭐','🔔']);},70);
-  var t3=setInterval(function(){r3.textContent=rnd(['7','🍒','💎','🍋','⭐','🔔']);},80);
-  setTimeout(function(){clearInterval(t1);r1.textContent='7';},900);
-  setTimeout(function(){clearInterval(t2);r2.textContent='7';},1200);
-  setTimeout(function(){clearInterval(t3);
-    var isWin=Math.random()<0.25;
-    var syms=['🍒','💎','🍋','⭐','🔔'];
-    if(isWin){r1.textContent='7';r2.textContent='7';r3.textContent='7';}
-    else{r1.textContent=rnd(syms);r2.textContent=rnd(syms);r3.textContent=rnd(syms);}
-    setTimeout(function(){
-      if(isWin){var w=casinoBet*10;S.crystals+=w;saveStats();updCrysUI();$('casinoResult').textContent='🎉 +'+w.toLocaleString('ru-RU')+' 💎';$('casinoResult').classList.add('win');toast('🎉 Победа!');}
-      else{S.crystals-=casinoBet;saveStats();updCrysUI();$('casinoResult').textContent='😢 -'+casinoBet.toLocaleString('ru-RU')+' 💎';$('casinoResult').classList.add('lose');toast('😢 Проигрыш');}
-      if(S.crystals>=casinoBet)sp.disabled=false;else sp.disabled=true;
-    },600);
-  },1500);
-}
-
-function bind(id,ev,fn){var el=$(id);if(el)el.addEventListener(ev,fn);}
-bind('btnInbox','click',function(){buildInbox();openPanel('panelInbox');});
-bind('btnPlus','click',function(){startStream();});
-bind('btnAccount','click',function(){updCrysUI();updFolUI();updFolwUI();updProfUI();openPanel('panelAccount');});
-bind('menuAvatar','click',openEdit);
-document.querySelectorAll('[data-back]').forEach(function(b){b.addEventListener('click',function(){closeAll();updBadge();});});
-bind('rbFlip','click',flipCam);
-bind('rbMic','click',function(){toast('🎤 Микрофон');});
-bind('rbEmoji','click',function(){toast('😀 Смайлики');});
-bind('rbRec','click',function(){toast('🎬 Запись');});
-bind('rbKick','click',function(){if(S.coBot){S.coBot=null;$('botAvatar').classList.remove('show');$('rbKick').style.display='none';toast('👋 Бот вышел');}});
-bind('closeX','click',function(){var c=$('cam');if(c&&c.srcObject){c.srcObject.getTracks().forEach(function(t){t.stop();});c.srcObject=null;}S.streaming=false;currentChat=null;var cE=$('comments');if(cE)cE.innerHTML='';var hE=$('hearts');if(hE)hE.innerHTML='';showMenu();toast('Стрим завершён');});
-bind('chatSend','click',sendMsg);
-bind('chatInput','keydown',function(e){if(e.key==='Enter')sendMsg();});
-bind('chatCoStreamBtn','click',function(){if(!currentChat)return;var c=chats[currentChat];if(!c)return;S.coBot={nick:currentChat,emoji:c.emoji,gradient:c.gradient};$('botAvFace').textContent=c.emoji;$('botAvFace').style.background=c.gradient;$('botAvName').textContent=currentChat;$('botAvatar').classList.add('show');$('rbKick').style.display='flex';closeAll();toast('🐱 Бот в эфире');});
-bind('accAvatar','click',openEdit);
-bind('itemCasino','click',function(){updCrysUI();casinoBet=0;$('amountGrid').style.display='none';$('casinoChosenText').textContent='Сумма не выбрана';$('casinoChosenText').classList.remove('active');$('casinoChooseAmountBtn').classList.remove('chosen');$('casinoChooseAmountBtn').textContent='Выбрать сумму';$('casinoSpinBtn').disabled=true;$('casinoResult').textContent='';document.querySelectorAll('.amount-btn').forEach(function(b){b.classList.remove('sel');});$('casinoAmountInput').value='';openPanel('panelCasino');});
-bind('casinoChooseAmountBtn','click',function(){$('amountGrid').style.display='grid';$('casinoChooseAmountBtn').classList.add('chosen');});
-document.querySelectorAll('.amount-btn').forEach(function(b){b.addEventListener('click',function(){casinoSetBet(parseInt(b.dataset.amt));});});
-bind('casinoApplyBtn','click',function(){var v=parseInt($('casinoAmountInput').value);if(!v||v<1){toast('Введи сумму');return;}if(v>S.crystals){toast('Недостаточно кристаллов');return;}casinoSetBet(v);document.querySelectorAll('.amount-btn').forEach(function(b){b.classList.remove('sel');});$('casinoAmountInput').value='';});
-bind('casinoSpinBtn','click',casinoSpin);
-bind('itemMyStreams','click',function(){toast('🎬 Мои стримы');});
-bind('itemStats','click',function(){buildStats();openPanel('panelStats');});
-bind('itemSettings','click',function(){var b=$('toggleSwearing');if(b)b.classList.toggle('on',S.swearing);var c=$('toggleVoice');if(c)c.classList.toggle('on',S.voiceOn);openPanel('panelSettings');});
-bind('itemEdit','click',openEdit);
-bind('itemSwearing','click',function(){S.swearing=!S.swearing;var b=$('toggleSwearing');if(b)b.classList.toggle('on',S.swearing);saveStats();toast(S.swearing?'🤬 Маты вкл':'Маты выкл');});
-bind('itemVoice','click',function(){S.voiceOn=!S.voiceOn;var c=$('toggleVoice');if(c)c.classList.toggle('on',S.voiceOn);saveStats();toast(S.voiceOn?'🔊 Голос вкл':'🔇 Голос выкл');});
-bind('editCancel','click',function(){$('editModal').classList.remove('show');});
-bind('editSave','click',function(){S.nick=$('editNick').value.trim()||'grand-cat';S.avatar=$('editAvatarChar').value.trim()||'G';S.avatarColor=$('editAvatarColorPicker').value;saveStats();updProfUI();$('editModal').classList.remove('show');toast('✅ Сохранено');});
-bind('statFollowersBtn','click',function(){buildFollowers();openPanel('panelFollowers');});
-bind('statFollowingBtn','click',function(){buildFollowing();openPanel('panelFollowing');});
-bind('statCrystalsBtn','click',function(){updCrysUI();openPanel('panelCasino');});
-document.querySelectorAll('.roomModal').forEach(function(m){m.addEventListener('click',function(e){if(e.target===m)m.classList.remove('show');});});
-
-(function loop(){if(S.streaming){if(botSimOn&&!currentChat){if(Math.random()<0.4)spawnChat();if(Math.random()<0.02)donEvent();if(Math.random()<0.015)subEvent();}}setTimeout(loop,1500);})();
-
-try{updCrysUI();updFolUI();updFolwUI();updProfUI();updBadge();console.log('grand-cat OK');}catch(e){var f=$('fatal');if(f){f.style.display='block';f.textContent='Ошибка: '+e.message;}}
-</script>
-</body>
-</html>
