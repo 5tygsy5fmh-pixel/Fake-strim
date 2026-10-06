@@ -2190,4 +2190,65 @@ bind('chatPrivateBtn','click',pickPrivateChat);
 bind('membersSelectNext','click',nextFromMembersSelect);
 bind('crCreateSave','click',createChatRoom);
 bind('chatRoomSend','click',sendChatRoomMessage);
-bind('
+bind('chatRoomInput','keydown',function(e){if(e.key==='Enter')sendChatRoomMessage();});
+bind('chatRoomHeadName','click',function(){openChatMenu('chatroom');});
+bind('chatRoomHeadAv','click',function(){openChatMenu('chatroom');});
+bind('chatRoomDeleteBtn','click',function(){if(currentChatRoomId)openDeleteConfirm('chatroom',currentChatRoomId);});
+bind('deleteRoomConfirm','click',confirmDeleteRoom);
+bind('msgKickBtn','click',doKick);
+bind('msgBanBtn','click',doBan);
+bind('msgMutBtn','click',doMut);
+document.querySelectorAll('.muteTimeBtn').forEach(function(b){b.addEventListener('click',function(){var min=parseInt(b.getAttribute('data-min'))||5;applyMute(min);});});
+bind('sanctionUndoBtn','click',undoSanction);
+bind('pickMembersConfirm','click',confirmPick);
+bind('erSave','click',saveEditRoom);
+document.querySelectorAll('.roomModal').forEach(function(m){m.addEventListener('click',function(e){if(e.target===m)m.classList.remove('show');});});
+document.body.addEventListener('touchstart',function(){initAudio();unlockVoice();},{once:true});
+document.body.addEventListener('click',function(){initAudio();unlockVoice();},{once:true});
+bind('vvBack','click',closeVideoViewer);
+bind('vvEdit','click',function(){var v=$('vvVideo');try{v.pause();}catch(e){}openSheet('trim');});
+bind('vvSave','click',function(){
+  if(!vvStream||!vvStream.blob){toast('Нет видео');return;}
+  var blob=vvStream.blob;var name=vvStream.filename||'video.webm';
+  try{var f=new File([blob],name,{type:blob.type});if(navigator.canShare&&navigator.canShare({files:[f]})){navigator.share({files:[f],title:name}).then(function(){toast('✅ Сохранено');}).catch(function(){});return;}}catch(e){}
+  try{var u=URL.createObjectURL(blob);var a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(function(){URL.revokeObjectURL(u);},30000);toast('💾 Файл скачан');}catch(e){toast('Не удалось сохранить');}
+});
+bind('vvSheetOk','click',function(){if(vvActiveTool==='trim'){exportEdit();}else{$('vvSheet').classList.remove('show');toast('Настройки применены');}});
+bind('vvRotateBtn','click',function(){vvOpts.rotate=(vvOpts.rotate+90)%360;applyPreview();toast('Поворот: '+vvOpts.rotate+'°');});
+bind('vvSpeedSlider','input',function(e){vvOpts.speed=parseFloat(e.target.value);$('vvSpeedLabel').textContent=vvOpts.speed.toFixed(1)+'x';var v=$('vvVideo');if(v)v.playbackRate=vvOpts.speed;});
+document.querySelectorAll('#vvTools .vv-tool').forEach(function(el){el.addEventListener('click',function(){var tool=el.getAttribute('data-tool');var v=$('vvVideo');try{v.pause();}catch(e){}openSheet(tool);});});
+document.querySelectorAll('.vv-ratio').forEach(function(el){el.addEventListener('click',function(){document.querySelectorAll('.vv-ratio').forEach(function(o){o.classList.remove('sel');});el.classList.add('sel');vvOpts.ratio=el.getAttribute('data-ratio');applyPreview();});});
+(function(){var track=$('vvTrimTrack');if(!track)return;function pctFromEvent(e){var r=track.getBoundingClientRect();var x=(e.touches?e.touches[0].clientX:e.clientX)-r.left;return Math.max(0,Math.min(1,x/r.width));}function down(e){var t=e.target;if(t.closest&&t.closest('#vvHandleL'))vvDragging='L';else if(t.closest&&t.closest('#vvHandleR'))vvDragging='R';else vvDragging=null;if(vvDragging){try{$('vvVideo').pause();}catch(err){}if(e.cancelable)e.preventDefault();e.stopPropagation();}}function move(e){if(!vvDragging)return;if(e.cancelable)e.preventDefault();e.stopPropagation();var p=pctFromEvent(e);var t=p*vvTrimDur;if(vvDragging==='L')vvTrimStart=Math.max(0,Math.min(vvTrimEnd-0.15,t));else vvTrimEnd=Math.min(vvTrimDur,Math.max(vvTrimStart+0.15,t));updateTrimUI();}function up(){vvDragging=null;}track.addEventListener('touchstart',down,{passive:false});track.addEventListener('touchmove',move,{passive:false});track.addEventListener('touchend',up);track.addEventListener('touchcancel',up);track.addEventListener('mousedown',down);document.addEventListener('mousemove',move);document.addEventListener('mouseup',up);})();
+bind('smSave','click',async function(){if(!lastBlob)return;var f;try{f=new File([lastBlob],lastName,{type:lastBlob.type});}catch(e){f=null;}if(f&&navigator.canShare&&navigator.canShare({files:[f]})){try{await navigator.share({files:[f],title:lastName});toast('✅ Сохранено');$('saveModal').classList.remove('show');return;}catch(e){}}try{var u=URL.createObjectURL(lastBlob);var a=document.createElement('a');a.href=u;a.download=lastName;document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(function(){URL.revokeObjectURL(u);},30000);toast('💾 Файл скачан');$('saveModal').classList.remove('show');}catch(e){toast('Не удалось');}});
+bind('smClose','click',function(){$('saveModal').classList.remove('show');});
+bind('tapLayer','click',function(){try{window.scrollTo(0,1);setTimeout(function(){window.scrollTo(0,0);},60);}catch(e){}});
+bind('casinoBack','click',closeCasino);
+bind('depositBtn','click',openDepositModal);
+bind('depositCancel','click',function(){$('depositModal').classList.remove('show');});
+bind('depositOk','click',confirmDeposit);
+bind('spinBtn','click',spinSlot);
+(function(){var dm=$('depositModal');if(dm)dm.addEventListener('click',function(e){if(e.target===dm)dm.classList.remove('show');});})();
+
+window.closeChatMenu=closeChatMenu;
+window.openMenuSub=openMenuSub;
+window.editRoom=editRoom;
+window.addAdminsToRoom=addAdminsToRoom;
+window.addMembersToRoom=addMembersToRoom;
+window.openRemoveAdmin=openRemoveAdmin;
+window.openSanctionUndo=openSanctionUndo;
+window.openMemberChat=openMemberChat;
+
+loadAllVideos().then(function(list){if(list&&list.length){list.sort(function(a,b){return new Date(b.date)-new Date(a.date);});myStreams=list;}}).catch(function(){});
+
+try{
+  updCrysUI();updFolUI();updFolwUI();updProfUI();updBadge();
+  renderCasinoMults();
+  requestAnimationFrame(loop);
+  console.log('grand-cat OK');
+}catch(e){
+  var f=$('fatal');
+  if(f){f.style.display='block';f.textContent='Ошибка init: '+e.message+'\n'+e.stack;}
+}
+</script>
+</body>
+</html>
