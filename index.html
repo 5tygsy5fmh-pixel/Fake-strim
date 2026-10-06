@@ -52,7 +52,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:-ap
 .rec-badge .dot{width:8px;height:8px;border-radius:50%;background:#ff3838;animation:dotPulse 1.2s infinite}
 @keyframes dotPulse{50%{opacity:.35}}
 #tapLayer{position:fixed;inset:0;z-index:1}
-  #saveModal{position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.85);display:none;flex-direction:column;align-items:center;justify-content:center;padding:30px;text-align:center}
+#saveModal{position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.85);display:none;flex-direction:column;align-items:center;justify-content:center;padding:30px;text-align:center}
 #saveModal.show{display:flex}
 #saveModal .sm-title{font-size:20px;font-weight:800;margin-bottom:8px}
 #saveModal .sm-sub{font-size:13px;opacity:.7;margin-bottom:24px}
@@ -130,7 +130,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:-ap
 .account-item .toggle::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .2s}
 .account-item .toggle.on{background:#25f4ee}
 .account-item .toggle.on::after{transform:translateX(20px)}
-  #editModal,#wardrobeModal{position:fixed;inset:0;z-index:2500;background:rgba(0,0,0,.9);display:none;flex-direction:column;align-items:center;justify-content:center;padding:20px;overflow-y:auto}
+#editModal,#wardrobeModal{position:fixed;inset:0;z-index:2500;background:rgba(0,0,0,.9);display:none;flex-direction:column;align-items:center;justify-content:center;padding:20px;overflow-y:auto}
 #editModal.show,#wardrobeModal.show{display:flex}
 #editModal .box,#wardrobeModal .wd-box{background:#1a1a2e;border-radius:20px;padding:22px;width:100%;max-width:380px;max-height:92vh;overflow-y:auto}
 #editModal h3,#wardrobeModal h3{font-size:18px;margin-bottom:16px;text-align:center}
@@ -305,6 +305,29 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:-ap
 .roomInfoEmpty{padding:30px;text-align:center;color:#8a8a8e;font-size:13px}
 .roomInfoAddBtn{display:block;width:calc(100% - 28px);margin:10px 14px;padding:14px;background:#2f7fff;color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit}
 .roomInfoAddBtn:active{background:#2566cc}
+.casino-wrap{display:flex;flex-direction:column;align-items:center;padding:20px 16px;gap:14px}
+.casino-title{font-size:22px;font-weight:900;background:linear-gradient(135deg,#ffd700,#ff8c00);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-align:center}
+.casino-balance{font-size:13px;opacity:.75;text-align:center}
+.casino-balance b{color:#8ee8f4}
+.casino-btn{background:linear-gradient(135deg,#8b5cf6,#c88cff);color:#fff;border:none;padding:14px 28px;border-radius:14px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;width:100%;max-width:300px;transition:.15s}
+.casino-btn:active{transform:scale(.96)}
+.casino-btn.chosen{background:rgba(255,255,255,.08);color:#aaa;border:1px solid rgba(255,255,255,.15)}
+.casino-chosen{text-align:center;font-size:13px;opacity:.7;min-height:20px;font-weight:700}
+.casino-chosen.active{color:#ffd700;opacity:1}
+.slot-machine{background:linear-gradient(180deg,#2a1a3e,#1a0a2e);border:3px solid #ffd700;border-radius:24px;padding:24px 16px;box-shadow:0 0 40px rgba(255,215,0,.35),inset 0 0 40px rgba(255,215,0,.1);width:100%;max-width:340px;position:relative}
+.slot-machine::before{content:"🎰";position:absolute;top:-18px;left:50%;transform:translateX(-50%);background:#1a0a2e;padding:0 10px;font-size:24px}
+.slot-reels{display:flex;gap:10px;justify-content:center}
+.reel{width:76px;height:114px;background:linear-gradient(180deg,#fff,#e0e0e0);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:56px;font-weight:900;color:#000;box-shadow:inset 0 6px 16px rgba(0,0,0,.35),0 4px 8px rgba(0,0,0,.4);font-family:'Courier New',monospace;overflow:hidden;position:relative}
+.casino-spin-btn{background:linear-gradient(135deg,#25f4ee,#2f7fff);color:#000;border:none;padding:18px 48px;border-radius:16px;font-size:20px;font-weight:900;cursor:pointer;font-family:inherit;margin-top:14px;transition:.15s;box-shadow:0 6px 20px rgba(37,244,238,.4)}
+.casino-spin-btn:not(:disabled):active{transform:scale(.94)}
+.casino-spin-btn:disabled{background:#444;color:#666;cursor:not-allowed;box-shadow:none}
+.casino-result{font-size:16px;font-weight:800;text-align:center;min-height:24px;margin-top:8px}
+.casino-result.win{color:#ffd700;text-shadow:0 0 12px rgba(255,215,0,.7)}
+.casino-result.lose{color:#ff6384}
+.amount-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px;max-width:320px}
+.amount-btn{padding:14px 4px;background:rgba(255,255,255,.08);border:2px solid transparent;border-radius:12px;color:#fff;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;transition:.12s}
+.amount-btn:active{transform:scale(.94)}
+.amount-btn.sel{background:linear-gradient(135deg,#8b5cf6,#c88cff);border-color:#fff}
 </style>
 </head>
 <body>
@@ -336,6 +359,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:-ap
     <div class="rb" id="rbKick" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="#ff5050" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><line x1="8" y1="8" x2="16" y2="16"/><line x1="16" y1="8" x2="8" y2="16"/></svg></div>
   </div>
 </div>
+
 <div id="menuScreen">
   <div class="menu-top">
     <h1 id="menuTitle">grand-cat</h1>
@@ -394,7 +418,40 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:-ap
   <div class="chat-messages" id="chatRoomMessages"></div>
   <div class="chat-input-row"><input id="chatRoomInput" type="text" placeholder="Сообщение..."><button id="chatRoomSend"><svg viewBox="0 0 24 24" fill="#fff"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg></button></div>
 </div>
-<div class="panel" id="panelAccount"><div class="panel-head"><div class="back" data-back><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><polyline points="15 6 9 12 15 18"/></svg></div><div class="title">Аккаунт</div></div><div class="panel-body"><div class="account-body"><div class="account-av" id="accAvatar">G</div><div class="account-name" id="accName">grand-cat</div><div class="account-handle" id="accHandle">@grand_cat</div><div class="account-stats"><div class="acc-stat" id="statFollowersBtn"><div class="n" id="accFollowers">0</div><div class="l">подписчики</div></div><div class="acc-stat" id="statFollowingBtn"><div class="n" id="accFollowing">0</div><div class="l">подписки</div></div><div class="acc-stat" id="statCrystalsBtn"><div class="n" id="accCrystalsStat">0</div><div class="l">кристаллы</div></div></div><div class="account-item" id="itemMyStreams"><div class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.2"/><rect x="7.5" y="8.5" width="7" height="7" rx="1"/><path d="M14.5 11l3-1.8v5.6l-3-1.8z"/></svg></div><div class="lb">Мои стримы</div><div class="ar">›</div></div><div class="account-item" id="itemStats"><div class="ic"><svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="7"/><line x1="21" y1="21" x2="15.5" y2="15.5"/><line x1="7.5" y1="13" x2="7.5" y2="14.5"/><line x1="10" y1="10" x2="10" y2="14.5"/><line x1="12.5" y1="12" x2="12.5" y2="14.5"/><line x1="6.5" y1="15.5" x2="14" y2="15.5"/></svg></div><div class="lb">Статистика</div><div class="ar">›</div></div><div class="account-item" id="itemSettings"><div class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div><div class="lb">Настройки</div><div class="ar">›</div></div></div></div></div>
+
+<div class="panel" id="panelAccount"><div class="panel-head"><div class="back" data-back><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><polyline points="15 6 9 12 15 18"/></svg></div><div class="title">Аккаунт</div></div><div class="panel-body"><div class="account-body"><div class="account-av" id="accAvatar">G</div><div class="account-name" id="accName">grand-cat</div><div class="account-handle" id="accHandle">@grand_cat</div><div class="account-stats"><div class="acc-stat" id="statFollowersBtn"><div class="n" id="accFollowers">0</div><div class="l">подписчики</div></div><div class="acc-stat" id="statFollowingBtn"><div class="n" id="accFollowing">0</div><div class="l">подписки</div></div><div class="acc-stat" id="statCrystalsBtn"><div class="n" id="accCrystalsStat">0</div><div class="l">кристаллы</div></div></div><div class="account-item" id="itemCasino"><div class="ic">🎰</div><div class="lb">Казино</div><div class="ar">›</div></div><div class="account-item" id="itemMyStreams"><div class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.2"/><rect x="7.5" y="8.5" width="7" height="7" rx="1"/><path d="M14.5 11l3-1.8v5.6l-3-1.8z"/></svg></div><div class="lb">Мои стримы</div><div class="ar">›</div></div><div class="account-item" id="itemStats"><div class="ic"><svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="7"/><line x1="21" y1="21" x2="15.5" y2="15.5"/><line x1="7.5" y1="13" x2="7.5" y2="14.5"/><line x1="10" y1="10" x2="10" y2="14.5"/><line x1="12.5" y1="12" x2="12.5" y2="14.5"/><line x1="6.5" y1="15.5" x2="14" y2="15.5"/></svg></div><div class="lb">Статистика</div><div class="ar">›</div></div><div class="account-item" id="itemSettings"><div class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div><div class="lb">Настройки</div><div class="ar">›</div></div></div></div></div>
+
+<div class="panel" id="panelCasino">
+  <div class="panel-head">
+    <div class="back" data-back><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><polyline points="15 6 9 12 15 18"/></svg></div>
+    <div class="title">🎰 Казино</div>
+  </div>
+  <div class="panel-body">
+    <div class="casino-wrap">
+      <div class="casino-title">🎰 LUCKY SLOT 🎰</div>
+      <div class="casino-balance">Баланс: <b id="casinoBalance">0</b> 💎</div>
+      <button class="casino-btn" id="casinoChooseAmountBtn">Выбрать сумму</button>
+      <div class="casino-chosen" id="casinoChosenText">Сумма не выбрана</div>
+      <div class="amount-grid" id="amountGrid" style="display:none">
+        <button class="amount-btn" data-amt="10">10</button>
+        <button class="amount-btn" data-amt="50">50</button>
+        <button class="amount-btn" data-amt="100">100</button>
+        <button class="amount-btn" data-amt="500">500</button>
+        <button class="amount-btn" data-amt="1000">1 000</button>
+        <button class="amount-btn" data-amt="5000">5 000</button>
+      </div>
+      <div class="slot-machine">
+        <div class="slot-reels">
+          <div class="reel" id="reel1">7</div>
+          <div class="reel" id="reel2">7</div>
+          <div class="reel" id="reel3">7</div>
+        </div>
+      </div>
+      <button class="casino-spin-btn" id="casinoSpinBtn" disabled>КРУТИТЬ</button>
+      <div class="casino-result" id="casinoResult"></div>
+    </div>
+  </div>
+</div>
 
 <div class="panel" id="panelSettings">
   <div class="panel-head"><div class="back" data-back><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><polyline points="15 6 9 12 15 18"/></svg></div><div class="title">Настройки</div></div>
@@ -415,6 +472,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:-ap
 <div class="panel" id="panelStats"><div class="panel-head"><div class="back" data-back><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><polyline points="15 6 9 12 15 18"/></svg></div><div class="title">Статистика</div></div><div class="panel-body"><div class="stat-grid"><div class="stat-card"><div class="lbl">Всего стримов</div><div class="val cyan" id="stStreams">0</div></div><div class="stat-card"><div class="lbl">Кристаллов</div><div class="val pink" id="stCrystals">0</div></div><div class="stat-card" id="stFollowersCard"><div class="lbl">Подписчиков</div><div class="val green" id="stFollowers">0</div></div><div class="stat-card"><div class="lbl">Сообщений</div><div class="val yellow" id="stMessages">0</div></div><div class="stat-card" id="stDialogsCard"><div class="lbl">Диалогов</div><div class="val cyan" id="stDialogs">0</div></div><div class="stat-card"><div class="lbl">Донатов</div><div class="val pink" id="stDonations">0</div></div></div></div></div>
 <div class="panel" id="panelFollowers"><div class="panel-head"><div class="back" data-back><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><polyline points="15 6 9 12 15 18"/></svg></div><div class="title" id="followersTitle">Подписчики</div></div><div class="panel-body" id="followersBody"></div></div>
 <div class="panel" id="panelFollowing"><div class="panel-head"><div class="back" data-back><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><polyline points="15 6 9 12 15 18"/></svg></div><div class="title">Подписки (диалоги)</div></div><div class="panel-body" id="followingBody"></div></div>
+
 <div id="editModal"><div class="box">
   <h3>Изменить профиль</h3>
   <div class="modal-av-wrap"><div class="modal-av" id="modalAvPreview">G</div></div>
@@ -473,6 +531,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:-ap
   <label>Цвет аватарки</label><div class="roomColorGrid" id="crColorGrid"></div><input type="color" id="crColorPicker" value="#8b5cf6" class="color-input">
   <div class="roomBtns"><button class="roomCancel" data-close="chatNameModal">Отмена</button><button class="roomSave" id="crCreateSave">Создать</button></div>
 </div></div>
+
 <div id="giveawayModal" class="roomModal"><div class="roomBox">
   <h3>🎁 Розыгрыш</h3>
   <label>Текст розыгрыша</label><textarea id="gwText" maxlength="200" placeholder="Например: Разыгрываю 1000 кристаллов!"></textarea>
@@ -596,6 +655,7 @@ var S={crystals:parseInt(localStorage.getItem('gc_crystals')||'0'),followers:par
 var myStreams=[],followersList=[],chats={},currentTopic=null,lastTick=performance.now(),lastChat=0,lastEv=0,lastNotify=0,lastResident=0,lastAutoEmoji=0;
 var donCustomText=localStorage.getItem('gc_dontext')||'';
 var botSimOn=true;
+var casinoBet=0;
 try{followersList=JSON.parse(localStorage.getItem('gc_followers_list')||'[]');}catch(e){}
 try{chats=JSON.parse(localStorage.getItem('gc_chats')||'{}');}catch(e){}
 
@@ -647,34 +707,28 @@ var GREET=['привет! 👋','о, привет!','хай','приветик',
 var HOWRU=['норм, а ты?','всё круто! ты как?','хорошо, спасибо 😊','отлично, сам как?','да норм','живой пока)'];
 function detectThemes(t){t=(t||'').toLowerCase();var out=[];var TH=[{name:'музыка',keys:['музык','трек','песн','бит','рэп'],replies:['что за трек?','топ 🔥','поставь ещё']},{name:'игры',keys:['игр','дот','кс','фортнайт'],replies:['катка?','го в пати','я тоже играю']},{name:'еда',keys:['ед','куш','пицц','голод'],replies:['дай мне 🍕','приятного!']}];for(var i=0;i<TH.length;i++)for(var j=0;j<TH[i].keys.length;j++)if(t.indexOf(TH[i].keys[j])>=0){out.push(TH[i]);break;}return out;}
 function isQuestion(t){if(!t)return false;var x=t.trim().toLowerCase();if(x.slice(-1)==='?')return true;var st=['что','кто','где','когда','почему','зачем','как','сколько'];for(var i=0;i<st.length;i++)if(x.indexOf(st[i])===0)return true;return false;}
-
 var SWEARS_HARD=['блядь','хуй','пиздец','нахуй','ёбаный','сука','нихуя','пиздецки','залупа','мразь'];
 function addSwear(text,force){if(!S.swearing)return text;if(!force&&Math.random()>0.45)return text;var s=rnd(SWEARS_HARD);var patterns=[s+', '+text,text+' '+s,s+'! '+text,'ну '+s+', '+text];return rnd(patterns);}
 
 function botReply(t,kind){
-  var trimmed=(t||'').trim();
-  var tl=trimmed.toLowerCase();
-  var isHate=isInsult(tl);
-  var themes=detectThemes(trimmed);
-  var q=isQuestion(trimmed);
-  if(isHate){var hateAnswers;if(S.swearing){hateAnswers=['да пошёл ты нахуй, дебил','иди нахуй, мразь','сам ты лох, хуйло','завали хлебало, уёбок','ты вообще кто такой, пиздюк?','сам такой, иди нахуй отсюда'];}else{hateAnswers=['иди отсюда','сам такой','закрой рот','ты вообще кто?','мне пох на тебя','слышь, потише'];}return rnd(hateAnswers);}
+  var trimmed=(t||'').trim();var tl=trimmed.toLowerCase();var isHate=isInsult(tl);var themes=detectThemes(trimmed);var q=isQuestion(trimmed);
+  if(isHate){var ha;if(S.swearing){ha=['да пошёл ты нахуй, дебил','иди нахуй, мразь','сам ты лох, хуйло','завали хлебало, уёбок','ты вообще кто такой, пиздюк?','сам такой, иди нахуй отсюда'];}else{ha=['иди отсюда','сам такой','закрой рот','ты вообще кто?','мне пох на тебя','слышь, потише'];}return rnd(ha);}
   if(/^(привет|хай|hi|hello|ку|здарова)\b/.test(tl)) return rnd(GREET);
-  if(/спасибо|спс|пасиб/.test(tl)){var ans=rnd(['пожалуйста! 😊','не за что 💕','обращайся!','да без проблем']);return S.swearing?addSwear(ans):ans;}
+  if(/спасибо|спс|пасиб/.test(tl)){var a=rnd(['пожалуйста! 😊','не за что 💕','обращайся!','да без проблем']);return S.swearing?addSwear(a):a;}
   if(/пока|бай|до свид/.test(tl)) return rnd(['пока! 👋','до связи','давай!','ну давай']);
-  if(/классн|крут|топ|молодец|красив|супер|нравишься/.test(tl)){if(kind==='simp')return rnd(['спасибо 💕','😍😍😍','ты тоже классный!']);var ans2=rnd(['спасибо!','ты тоже','приятно 🥺','ну спасибо']);return S.swearing?addSwear(ans2):ans2;}
+  if(/классн|крут|топ|молодец|красив|супер|нравишься/.test(tl)){if(kind==='simp')return rnd(['спасибо 💕','😍😍😍','ты тоже классный!']);var a2=rnd(['спасибо!','ты тоже','приятно 🥺','ну спасибо']);return S.swearing?addSwear(a2):a2;}
   if(/любл|люблю|обожа|скуча/.test(tl)){if(kind==='simp')return rnd(['я тебя тоже! 💕','😍😍😍 обожаю!','ты мой 💕']);return rnd(['взаимно ❤️','и я тебя!','😊']);}
   if(/как дела|как ты|чё делаешь/.test(tl)) return rnd(HOWRU);
   if(q){var qa=rnd(['хм, интересно','а сам как думаешь?','ну я думаю да','не уверен','а ты как считаешь?','да хз если честно']);return S.swearing?addSwear(qa):qa;}
-  if(/ты бот|ты ии/.test(tl)){var ans3=rnd(['сам ты бот 😂','я настоящий!','да ладно','ну да, я бот. и что?']);return S.swearing?addSwear(ans3):ans3;}
-  if(themes.length>0){var ans4=rnd(rnd(themes).replies);return S.swearing?addSwear(ans4):ans4;}
+  if(/ты бот|ты ии/.test(tl)){var a3=rnd(['сам ты бот 😂','я настоящий!','да ладно','ну да, я бот. и что?']);return S.swearing?addSwear(a3):a3;}
+  if(themes.length>0){var a4=rnd(rnd(themes).replies);return S.swearing?addSwear(a4):a4;}
   var generic;
   if(kind==='simp'){generic=rnd(['ты лучший 💕','мой любимый 💖','ты очень клёвый','обнимаю 🥰']);}
   else if(kind==='hater'){generic=rnd(['ну такое','фу','кринж','да ладно тебе','серьёзно?']);}
   else if(kind==='clown'){generic=rnd(['😂😂😂','ору','ахахах','кек','клоун']);}
   else if(kind==='spam'){generic=rnd(['67','67 67','да 67']);}
   else {generic=rnd(['жиза 😄','ага','согласен!','ахаха','интересно','серьёзно?','ого!','прикольно','ок','ну такое','хм','да ладно','вот это поворот','уважаю','респект','красава','ну ты даёшь']);}
-  if(S.swearing) generic=addSwear(generic);
-  return generic;
+  if(S.swearing) generic=addSwear(generic);return generic;
 }
 
 var AC=null;
@@ -683,7 +737,10 @@ function tone(f,d,v,t,dl){v=v||0.25;t=t||'sine';dl=dl||0;if(!AC)return;try{var t
 function sfxDonBig(){[523,659,784,1047,1319].forEach(function(f,i){tone(f,0.2,0.2,'triangle',i*0.06);});tone(2093,0.6,0.12,'sine',0.3);}
 function sfxDonSm(){tone(660,0.15,0.2);tone(880,0.2,0.2,'sine',0.1);}
 function sfxSub(){tone(660,0.15,0.2);tone(880,0.15,0.2,'sine',0.1);tone(1320,0.25,0.22,'sine',0.2);}
-</script>
+function sfxSpin(){for(var i=0;i<8;i++)tone(400+i*80,0.08,0.15,'square',i*0.08);}
+function sfxWin(){[523,659,784,1047,1319,1568,2093].forEach(function(f,i){tone(f,0.25,0.22,'triangle',i*0.09);});}
+function sfxLose(){tone(400,0.15,0.2,'sawtooth',0);tone(300,0.2,0.2,'sawtooth',0.15);tone(200,0.4,0.2,'sawtooth',0.3);}
+
 var vc=[];
 function refreshV(){try{if(window.speechSynthesis)vc=window.speechSynthesis.getVoices()||[];}catch(e){}}
 if(window.speechSynthesis){refreshV();window.speechSynthesis.onvoiceschanged=refreshV;setTimeout(refreshV,200);setTimeout(refreshV,1000);setTimeout(refreshV,3000);}
@@ -707,8 +764,7 @@ function applyBotAv(){
   var ring=el.querySelector('.av-ring');
   if(ring){ring.style.width=size+'px';ring.style.height=size+'px';}
   face.style.fontSize=Math.round(size*0.5)+'px';
-  var rc=c?c.ringColor:'#ffffff';
-  var tc=c?c.textColor:'#ffffff';
+  var rc=c?c.ringColor:'#ffffff';var tc=c?c.textColor:'#ffffff';
   if(ring){ring.style.boxShadow='0 0 0 3px '+rc+',0 8px 30px rgba(0,0,0,.5)';}
   face.style.color=isEmoji(face.textContent)?'#fff':tc;
   if(!S.botPos)S.botPos={x:window.innerWidth-size-16,y:window.innerHeight-size-140};
@@ -722,17 +778,14 @@ function applyBotAv(){
   function dn(e){if(!S.coBot)return;drag=true;var p=e.touches?e.touches[0]:e;sx=p.clientX;sy=p.clientY;sl=S.botPos?S.botPos.x:0;st=S.botPos?S.botPos.y:0;e.preventDefault();e.stopPropagation();}
   function mv(e){if(!drag)return;var p=e.touches?e.touches[0]:e;if(!S.botPos)S.botPos={x:0,y:0};S.botPos.x=sl+(p.clientX-sx);S.botPos.y=st+(p.clientY-sy);applyBotAv();e.preventDefault();e.stopPropagation();}
   function up(){if(!drag)return;drag=false;}
-  el.addEventListener('touchstart',dn,{passive:false});
-  el.addEventListener('touchmove',mv,{passive:false});
+  el.addEventListener('touchstart',dn,{passive:false});el.addEventListener('touchmove',mv,{passive:false});
   el.addEventListener('touchend',up);el.addEventListener('touchcancel',up);
-  el.addEventListener('mousedown',dn);
-  document.addEventListener('mousemove',mv);
-  document.addEventListener('mouseup',up);
+  el.addEventListener('mousedown',dn);document.addEventListener('mousemove',mv);document.addEventListener('mouseup',up);
 })();
 
 var cE=$('comments'),nE=$('notes'),bE=$('banner'),hE=$('hearts'),capE=$('caption'),tE=$('toast');
 function toast(t){if(!tE)return;tE.textContent=t;tE.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(function(){tE.classList.remove('show');},2200);}
-function updCrysUI(){var s=S.crystals.toLocaleString('ru-RU');['menuCrystals','accCrystalsStat'].forEach(function(id){var e=$(id);if(e)e.textContent=s;});}
+function updCrysUI(){var s=S.crystals.toLocaleString('ru-RU');['menuCrystals','accCrystalsStat'].forEach(function(id){var e=$(id);if(e)e.textContent=s;});var cb=$('casinoBalance');if(cb)cb.textContent=S.crystals.toLocaleString('ru-RU');}
 function updFolUI(){var n=followersList.length,s=n>=1000?(n/1000).toFixed(1)+'K':String(n);['menuFollowers','accFollowers'].forEach(function(id){var e=$(id);if(e)e.textContent=s;});}
 function updFolwUI(){var e=$('accFollowing');if(e)e.textContent=Object.keys(chats).length.toLocaleString('ru-RU');}
 function showMenu(){$('menuScreen').classList.remove('hide');$('ui').classList.remove('show');$('cam').classList.remove('show');S.streaming=false;if(S.coBot)stopCo();stopSpeak();closeAll();}
@@ -753,11 +806,413 @@ function spawnChat(text,nick,color,opts){
   else{var av=randAv();emoji=av.emoji;gradient=av.gradient;gender=av.gender;avH='<div class="cm-av" style="background:'+av.gradient+'">'+av.emoji+'</div>';kind=opts.kind||rnd(['spam','hater','simp','clown','asker','normal','normal','normal']);}
   var el=document.createElement('div');el.className='cm'+(isBot?' cm-bot':'');el.innerHTML=avH+'<div class="cm-body"><div class="cm-nick" style="color:'+color+'">'+nick+'</div><div class="cm-text">'+text+'</div></div>';
   var oh=function(e){e.stopPropagation();openChatWith(nick,emoji,gradient,kind,gender);};
-  el.querySelector('.cm-av').addEventListener('click',oh);
-  el.querySelector('.cm-nick').addEventListener('click',oh);
+  el.querySelector('.cm-av').addEventListener('click',oh);el.querySelector('.cm-nick').addEventListener('click',oh);
   cE.appendChild(el);while(cE.children.length>60)cE.removeChild(cE.firstChild);
   setTimeout(function(){if(el.parentNode)el.remove();},60000);
   cE.scrollTop=cE.scrollHeight;
   if(!isRes){S.totalMessages++;saveStats();}
-  if(S.coBot&&!isBot&&nick!==S.coBot.nick&&!isRes&&botCanPost()){var replyChance=0.7;if(isQuestion(text))replyChance=1.0;if(isInsult(text))replyChance=1.0;if(/бот|котик|кот|котенок|grand-cat/i.test(text))replyChance=1.0;if(kind==='hater')replyChance=1.0;if(Math.random()<replyChance){var botRef=S.coBot;var r=botReply(text,kind||'normal');setTimeout(function(){if(!botRef)return;if(!botCanPost())return;spawnChat(r,botRef.nick,botRef.gradient||'#ff6384',{kind:'normal',isBot:true});speak(botRef,r);},ri(700,1800));}}
+  if(S.coBot&&!isBot&&nick!==S.coBot.nick&&!isRes&&botCanPost()){var rc2=0.7;if(isQuestion(text))rc2=1;if(isInsult(text))rc2=1;if(/бот|котик|кот|котенок|grand-cat/i.test(text))rc2=1;if(kind==='hater')rc2=1;if(Math.random()<rc2){var botRef=S.coBot;var r=botReply(text,kind||'normal');setTimeout(function(){if(!botRef)return;if(!botCanPost())return;spawnChat(r,botRef.nick,botRef.gradient||'#ff6384',{kind:'normal',isBot:true});speak(botRef,r);},ri(700,1800));}}
 }
+
+var activeNotes=[];
+function roundRect(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();}
+function spawnNote(text,sub,color,cls){sub=sub||'';color=color||'#ffd700';cls=cls||'';var el=document.createElement('div');el.className='note '+cls;el.style.borderLeftColor=color;el.innerHTML='<b style="color:'+color+'">'+text+'</b>'+(sub?'<small>'+sub+'</small>':'');nE.appendChild(el);var entry={text:text,sub:sub,color:color,expire:Date.now()+5000};activeNotes.push(entry);setTimeout(function(){if(el.parentNode)el.remove();var i=activeNotes.indexOf(entry);if(i>=0)activeNotes.splice(i,1);},5000);}
+function spawnBanner(nick,amount,reason,color){bE.innerHTML='<div class="b-nick">'+nick+'</div><div class="b-amount" style="color:'+color+'">💎 '+amount.toLocaleString('ru-RU')+' ₽</div><div class="b-text">'+reason+'</div>';bE.style.borderColor=color;bE.style.display='block';clearTimeout(spawnBanner._t);spawnBanner._t=setTimeout(function(){bE.style.display='none';},5000);}
+function boom(emoji,count){count=count||16;for(var i=0;i<count;i++){var el=document.createElement('div');el.className='heart';el.textContent=emoji;el.style.marginLeft=((Math.random()-0.5)*50)+'px';el.style.fontSize=ri(22,36)+'px';hE.appendChild(el);var vx=(Math.random()-0.5)*40;var vy=-ri(220,400);try{el.animate([{transform:'translate(0,0) scale(.5)',opacity:1},{transform:'translate('+vx+'px,'+vy+'px) scale(1.2)',opacity:0}],{duration:ri(1500,2400),easing:'ease-out'}).onfinish=function(){this.effect.target.remove();};}catch(e){setTimeout(function(){if(el.parentNode)el.remove();},2000);}}}
+function resSpam(r){spawnChat(rnd(r.lines),r.nick,r.color,{isResident:true,kind:r.kind,gender:r.gender});}
+function showCap(text,interim){capE.textContent=text;capE.style.display='block';capE.classList.toggle('interim',!!interim);clearTimeout(capE._t);if(!interim)capE._t=setTimeout(function(){capE.style.display='none';},2500);}
+
+function onUserSpoke(text){
+  if(!text||text.trim().length<2)return;
+  var th=detectThemes(text);if(th.length>0){var t1=rnd(th);currentTopic={name:t1.name,replies:t1.replies,expires:Date.now()+25000};}
+  var q=isQuestion(text),n=q?ri(3,5):ri(2,4);
+  if(S.coBot&&botCanPost()){var botRef=S.coBot;var bc=chats[botRef.nick],kind=bc?bc.kind:'normal';var sr=q||isInsult(text)||/бот|котик|кот|котенок|grand-cat/i.test(text)||Math.random()<0.75;if(sr){var r=botReply(text,kind);setTimeout(function(){if(!botRef)return;if(!botCanPost())return;spawnChat(r,botRef.nick,botRef.gradient||'#ff6384',{kind:kind,isBot:true});speak(botRef,r);},ri(500,1200));}}
+  for(var i=0;i<n;i++){(function(idx){setTimeout(function(){if(q&&Math.random()<0.7)spawnChat(rnd(['хороший вопрос!','думаю да','думаю нет','хм, не уверен']));else if(currentTopic&&Date.now()<currentTopic.expires&&Math.random()<0.75)spawnChat(rnd(currentTopic.replies));else spawnChat();},idx*ri(180,420));})(i);}
+  S.hype=Math.min(1,S.hype+0.15);
+}
+
+function pickAmtWeighted(weights){var roll=Math.random()*100;var acc=0;for(var i=0;i<weights.length;i++){acc+=weights[i][2];if(roll<acc)return ri(weights[i][0],weights[i][1]);}return ri(weights[weights.length-1][0],weights[weights.length-1][1]);}
+function pickDonAmt(){return pickAmtWeighted([[1,100,60],[100,1000,20],[1000,10000,20]]);}
+function pickWibeAmt(){return pickAmtWeighted([[1,100,55],[100,1000,25],[1000,10000,10],[10000,1000000,10]]);}
+function pickHaipAmt(){return pickAmtWeighted([[1,100,45],[100,1000,35],[1000,10000,10],[10000,1000000,10]]);}
+
+function donEvent(){
+  var d=rnd(DONATORS);var a=pickDonAmt();var r=donCustomText||rnd(DON_REASONS);
+  spawnBanner(d,a,r,'#ff50b4');spawnNote(d+' задонатил '+a.toLocaleString('ru-RU')+' ₽',r,'#ff78c8','donate');
+  S.crystals+=a*10;S.totalDonations++;saveStats();updCrysUI();S.hype=Math.min(1,S.hype+0.5);
+  if(a>=1000)sfxDonBig();else sfxDonSm();boom('💎',10+Math.min(20,Math.floor(a/200)));
+  if(S.coBot&&botCanPost()){var botRef=S.coBot;var th=rnd(['Ого, спасибо за донат!','Вау, спасибо большое!','Круто! Спасибо за поддержку!','Ничего себе, спасибо огромное!']);if(S.swearing)th=addSwear(th);setTimeout(function(){if(!botRef)return;if(!botCanPost())return;spawnChat(th,botRef.nick,botRef.gradient||'#ff6384',{kind:'normal',isBot:true});speak(botRef,th);},1200);}
+}
+function subEvent(){
+  var nick=randNick(),av=randAv();spawnNote(nick+' подписался!','новый подписчик ✅','#8cff8c','sub');
+  if(!followersList.find(function(f){return f.nick===nick;})){followersList.push({nick:nick,emoji:av.emoji,gradient:av.gradient,t:Date.now()});if(followersList.length>200)followersList.shift();saveFollowers();S.followers=followersList.length;saveStats();updFolUI();}
+  S.hype=Math.min(1,S.hype+0.2);sfxSub();boom('❤️',8);
+}
+function fmtV(v){if(v>=1000000){var m=v/1000000;return(m>=10?Math.floor(m):m.toFixed(1))+' млн';}if(v>=1000)return(v/1000).toFixed(1)+'K';return String(Math.floor(v));}
+function updCnt(dt){S.hype=Math.max(0,S.hype-dt*0.18);if(haipMode){S.viewers=10000000;var eh=$('viewers');if(eh)eh.textContent=fmtV(S.viewers);return;}var now=Date.now();if(!S.lastViewerMin)S.lastViewerMin=now;if(now-S.lastViewerMin>=60000){var steps=Math.floor((now-S.lastViewerMin)/60000);S.viewers += (S.viewerBoost?50000:1000)*steps;S.lastViewerMin += steps*60000;}var e=$('viewers');if(e)e.textContent=fmtV(S.viewers);}
+
+var pipCan=document.createElement('canvas');pipCan.width=540;pipCan.height=960;var pipCx=pipCan.getContext('2d');var pipVideo=$('pipVideo');
+function drawCov(ctx,v,W,H,mir){if(!v||v.readyState<2||!v.videoWidth)return;var vw=v.videoWidth,vh=v.videoHeight,sc=Math.max(W/vw,H/vh),dw=vw*sc,dh=vh*sc,dx=(W-dw)/2,dy=(H-dh)/2;if(mir){ctx.save();ctx.translate(W,0);ctx.scale(-1,1);ctx.drawImage(v,W-dx-dw,dy,dw,dh);ctx.restore();}else ctx.drawImage(v,dx,dy,dw,dh);}
+function renderPiP(){
+  var W=pipCan.width,H=pipCan.height;pipCx.fillStyle='#000';pipCx.fillRect(0,0,W,H);
+  drawCov(pipCx,$('cam'),W,H,S.facing==='user');
+  if(S.coBot&&S.botPos){var av=$('botAvatar'),rct=av.getBoundingClientRect(),scX=W/window.innerWidth,scY=H/window.innerHeight;var ax=rct.left*scX,ay=rct.top*scY,aw=rct.width*scX,ah=rct.height*scY;pipCx.save();pipCx.beginPath();pipCx.arc(ax+aw/2,ay+ah/2,aw/2,0,Math.PI*2);pipCx.clip();var c=chats[S.coBot.nick];pipCx.fillStyle=(c&&c.gradient)||'#ff6384';pipCx.fillRect(ax,ay,aw,ah);pipCx.font=Math.round(aw*0.55)+'px sans-serif';pipCx.textAlign='center';pipCx.textBaseline='middle';pipCx.fillStyle='#fff';pipCx.fillText((c&&c.emoji)||'🐱',ax+aw/2,ay+ah/2);pipCx.restore();pipCx.strokeStyle=(c&&c.ringColor)||'rgba(255,255,255,.7)';pipCx.lineWidth=4;pipCx.beginPath();pipCx.arc(ax+aw/2,ay+ah/2,aw/2,0,Math.PI*2);pipCx.stroke();}
+  pipCx.fillStyle='#ff2850';pipCx.fillRect(14,14,58,26);pipCx.fillStyle='#fff';pipCx.font='800 14px -apple-system,sans-serif';pipCx.textAlign='left';pipCx.textBaseline='middle';pipCx.fillText('LIVE',26,28);
+  var now=Date.now();var y=90;
+  for(var i=0;i<activeNotes.length;i++){var n=activeNotes[i];if(n.expire<now)continue;pipCx.font='bold 15px -apple-system,sans-serif';var tw=pipCx.measureText(n.text).width;var boxW=Math.min(W-24,tw+24);var boxH=n.sub?52:38;pipCx.fillStyle='rgba(0,0,0,0.75)';roundRect(pipCx,12,y,boxW,boxH,14);pipCx.fill();pipCx.strokeStyle=n.color;pipCx.lineWidth=3;pipCx.stroke();pipCx.fillStyle=n.color;pipCx.textAlign='left';pipCx.textBaseline='top';pipCx.font='bold 15px -apple-system,sans-serif';pipCx.fillText(n.text,24,y+9);if(n.sub){pipCx.font='12px -apple-system,sans-serif';pipCx.fillStyle='rgba(255,255,255,0.85)';pipCx.fillText(n.sub,24,y+30);}y+=boxH+8;if(y>H-100)break;}
+}
+
+var mediaRec=null,recChunks=[],lastBlob=null,lastName='',micStream=null;
+function startRec(auto){try{var vs=pipCan.captureStream(30);function withMic(ms){micStream=ms;var tr=vs.getVideoTracks().slice();if(ms)tr=tr.concat(ms.getAudioTracks());var comb=new MediaStream(tr);var mime='';var tries=['video/mp4;codecs=avc1,mp4a','video/mp4','video/webm;codecs=vp9,opus','video/webm'];for(var i=0;i<tries.length;i++){if(window.MediaRecorder&&MediaRecorder.isTypeSupported(tries[i])){mime=tries[i];break;}}mediaRec=new MediaRecorder(comb,mime?{mimeType:mime}:undefined);recChunks=[];mediaRec.ondataavailable=function(e){if(e.data&&e.data.size>0)recChunks.push(e.data);};mediaRec.onstop=function(){try{var type=mediaRec.mimeType||'video/webm';var ext=type.indexOf('mp4')>=0?'mp4':'webm';var stamp=new Date().toISOString().replace(/[:.]/g,'-').slice(0,19);lastName='grand-cat-'+stamp+'.'+ext;lastBlob=new Blob(recChunks,{type:type});var entry={blob:lastBlob,filename:lastName,date:new Date().toISOString(),size:lastBlob.size};myStreams.unshift(entry);if(myStreams.length>20){var rm=myStreams.pop();if(rm&&rm.filename)deleteVideoFromIDB(rm.filename).catch(function(){});}saveVideoToIDB(entry).catch(function(){});if(!auto)$('saveModal').classList.add('show');}catch(err){toast('Ошибка: '+err.message);}};mediaRec.start(1000);S.isRecording=true;$('recDot').style.display='block';$('recBadge').classList.add('show');if(!auto)toast(ms?'🔴 Запись со звуком':'🔴 Запись');}
+if(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia){navigator.mediaDevices.getUserMedia({audio:true}).then(withMic).catch(function(){withMic(null);});}else{withMic(null);}}catch(e){toast('Ошибка записи: '+(e.message||''));}}
+function stopRec(){try{if(mediaRec&&mediaRec.state!=='inactive')mediaRec.stop();}catch(e){}S.isRecording=false;$('recDot').style.display='none';$('recBadge').classList.remove('show');if(micStream){micStream.getTracks().forEach(function(t){t.stop();});micStream=null;}}
+
+function resetTimers(){var n=performance.now();lastChat=n-900000;lastEv=n-900000;lastNotify=n-900000;lastResident=n-900000;lastAutoEmoji=n-900000;}
+function loop(now){
+  var dt=(now-lastTick)/1000;lastTick=now;
+  if(S.streaming){updCnt(dt);
+    if(S.currentChat===null && botSimOn){
+      var ci=Math.max(0.8,2.2-S.hype*1.2)*1000;if(now-lastChat>ci){spawnChat();lastChat=now;}
+      var r2=(3500-S.hype*1500)+Math.random()*1500;if(now-lastResident>r2){resSpam(rnd(RES));lastResident=now;}
+      if(now-lastEv>60000+Math.random()*20000){donEvent();lastEv=now;}
+      if(now-lastNotify>45000+Math.random()*20000){subEvent();lastNotify=now;}
+      if(S.emojisOn){var ai=700+Math.random()*900;if(now-lastAutoEmoji>ai){boom(rnd(EMOJIS_ALL),ri(1,3));lastAutoEmoji=now;}}
+      if(S.coBot&&botCanPost()&&Math.random()<0.015){var botRef=S.coBot;var bl=rnd(['Классный чат сегодня!','Ого, сколько зрителей!','Ребят, подписывайтесь! 💕','Я тут с '+S.nick+'!','Кто смотрит нас?','Спасибо что смотрите!']);if(S.swearing)bl=addSwear(bl);spawnChat(bl,botRef.nick,botRef.gradient||'#ff6384',{kind:'normal',isBot:true});speak(botRef,bl);}
+    }
+  }
+  requestAnimationFrame(loop);
+}
+
+function startCam(){return new Promise(function(res){if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){toast('Камера не поддерживается');res(false);return;}navigator.mediaDevices.getUserMedia({video:{facingMode:S.facing,width:{ideal:1280},height:{ideal:720}},audio:false}).then(function(s){var c=$('cam');if(c.srcObject)c.srcObject.getTracks().forEach(function(t){t.stop();});c.srcObject=s;c.play().then(function(){res(true);}).catch(function(){res(true);});}).catch(function(e){toast('Камера: '+e.message);res(false);});});}
+function flipCam(){S.facing=S.facing==='user'?'environment':'user';toast(S.facing==='user'?'Фронтальная':'Задняя');$('cam').style.transform=S.facing==='user'?'scaleX(-1)':'none';startCam();}
+
+var recog=null,micRun=false;
+function startMic(){var SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){toast('Речь не поддерживается');return;}if(micRun)return;try{recog=new SR();recog.lang='ru-RU';recog.continuous=true;recog.interimResults=true;recog.onresult=function(e){var it='',fin='';for(var i=e.resultIndex;i<e.results.length;i++){var t=e.results[i][0].transcript;if(e.results[i].isFinal)fin+=t;else it+=t;}if(S.micMuted)return;if(it)showCap(it,true);if(fin){showCap(fin,false);onUserSpoke(fin.trim());}};recog.onerror=function(e){if(e.error==='not-allowed')toast('Разреши микрофон');};recog.onend=function(){if(S.micOn&&!S.micMuted){micRun=false;setTimeout(function(){if(S.micOn&&!S.micMuted)startMic();},300);}else micRun=false;};recog.start();micRun=true;S.micOn=true;$('micSlash').style.display='none';}catch(e){}}
+function toggleMic(){if(!S.micMuted){S.micMuted=true;$('micSlash').style.display='block';toast('🔇 Микрофон выключен');capE.style.display='none';}else{S.micMuted=false;$('micSlash').style.display='none';toast('🎤 Микрофон включён');if(!micRun)startMic();}}
+function toggleEmoji(){S.emojisOn=!S.emojisOn;localStorage.setItem('gc_emojison',S.emojisOn?'1':'0');var slash=$('emojiSlash');if(slash)slash.style.display=S.emojisOn?'none':'block';var rb=$('rbEmoji');if(rb)rb.classList.toggle('on',S.emojisOn);toast(S.emojisOn?'😀 Смайлики включены':'🚫 Смайлики выключены');}
+function pulse(el){el.classList.add('pulse');setTimeout(function(){el.classList.remove('pulse');},380);}
+
+function startStream(onStart){
+  initAudio();unlockVoice();hideMenu();
+  startCam().then(function(ok){
+    if(!ok){showMenu();return;}
+    $('cam').classList.add('show');$('ui').classList.add('show');
+    S.streaming=true;S.currentChat=null;S.totalStreams++;botSimOn=true;
+    var prevBoost=localStorage.getItem('gc_boost')==='1';var prevSpam=localStorage.getItem('gc_spam')||'';
+    S.viewers=prevBoost?1000000:30000;S.viewerBoost=prevBoost;S.lastViewerMin=Date.now();
+    stopSpam();if(prevSpam)spamByBots(prevSpam);
+    saveStats();
+    pipVideo.srcObject=pipCan.captureStream(30);pipVideo.muted=true;try{pipVideo.play();}catch(e){}
+    if(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia)navigator.mediaDevices.getUserMedia({audio:true}).then(function(){startMic();}).catch(function(){});
+    resetTimers();S.lastActivity=Date.now();
+    setTimeout(function(){for(var i=0;i<3;i++){var n=randNick(),av=randAv();if(!followersList.find(function(f){return f.nick===n;}))followersList.push({nick:n,emoji:av.emoji,gradient:av.gradient,t:Date.now()});}saveFollowers();S.followers=followersList.length;saveStats();updFolUI();},2000);
+    setTimeout(function(){spawnNote('grand-cat в эфире!','Говори — бот ответит голосом','#8cff8c','sub');},600);
+    if(S.autoRec)setTimeout(function(){if(!S.isRecording)startRec(true);},1500);
+    if(onStart)setTimeout(onStart,1500);
+  });
+}
+function startCo(bot){
+  if(!S.streaming){toast('Сначала запустите стрим');return;}
+  S.coBot=bot;var c=chats[bot.nick];
+  if(c&&typeof c.posX==='number'&&typeof c.posY==='number')S.botPos={x:c.posX,y:c.posY};else S.botPos=null;
+  applyBotAv();$('botAvatar').classList.add('show');$('rbKick').style.display='flex';closeAll();
+  spawnNote(bot.nick+' в эфире!','Можно перетаскивать бота пальцем','#8cff8c','sub');
+  unlockVoice();
+  if(botCanPost()){var g=rnd(['Всем привет, я с '+S.nick+'!','Привет, ребята! 👋','Приветик! 💕','Хай, чат!','Мы в эфире! 🔥','О, я в кадре!']);if(S.swearing)g=addSwear(g);setTimeout(function(){if(!S.coBot)return;if(!botCanPost())return;spawnChat(g,S.coBot.nick,S.coBot.gradient||'#ff6384',{kind:bot.kind||'normal',isBot:true});speak(bot,g);},700);}
+  S.hype=Math.min(1,S.hype+0.4);sfxSub();boom('❤️',10);
+}
+function stopCo(){if(!S.coBot)return;var w=S.coBot.nick;S.coBot=null;S.botPos=null;$('botAvatar').classList.remove('show','speaking');$('rbKick').style.display='none';stopSpeak();toast('👋 '+w+' покинул эфир');}
+
+function openChatWith(nick,emoji,gradient,kind,gender){
+  getChat(nick,emoji,gradient,kind,gender);var c=chats[nick];
+  if(!c.kind&&kind){c.kind=kind;saveChats();}
+  if(!c._first){c._first=true;S.totalDialogs++;saveChats();saveStats();for(var i=0;i<5;i++){var n=randNick(),av=randAv();if(!followersList.find(function(f){return f.nick===n;}))followersList.push({nick:n,emoji:av.emoji,gradient:av.gradient,t:Date.now()});}saveFollowers();S.followers=followersList.length;saveStats();updFolUI();}
+  c.unread=0;saveChats();S.currentChat=nick;closeAll();$('panelChat').classList.add('show');
+  renderChatHead(nick);$('chatHeadName').textContent=nick;renderChatMsgs();updBadge();
+}
+function renderChatMsgs(){var nick=S.currentChat;if(!nick||!chats[nick])return;var box=$('chatMessages');box.innerHTML='';for(var i=0;i<chats[nick].messages.length;i++){var m=chats[nick].messages[i];var el=document.createElement('div');el.className='msg '+(m.from==='me'?'me':'them');el.textContent=m.text;box.appendChild(el);}setTimeout(function(){box.scrollTop=box.scrollHeight;},30);}
+function pushMsg(nick,from,text){if(!chats[nick])return;chats[nick].messages.push({from:from,text:text,t:Date.now()});if(chats[nick].messages.length>200)chats[nick].messages.shift();saveChats();if(S.currentChat===nick)renderChatMsgs();else if(from==='them'){chats[nick].unread=(chats[nick].unread||0)+1;saveChats();updBadge();}}
+
+function spawnBotMsg(text,nick,emoji,gradient){var el=document.createElement('div');el.className='cm';el.innerHTML='<div class="cm-av" style="background:'+gradient+'">'+emoji+'</div><div class="cm-body"><div class="cm-nick" style="color:#fff">'+nick+'</div><div class="cm-text">'+text+'</div></div>';cE.appendChild(el);while(cE.children.length>60)cE.removeChild(cE.firstChild);setTimeout(function(){if(el.parentNode)el.remove();},60000);cE.scrollTop=cE.scrollHeight;}
+var spamTimer=null,spamText='';
+function spawnSpamTick(){if(!spamText){spamTimer=null;return;}var pool=[];Object.keys(chats).forEach(function(n){var c=chats[n];ensureApp(c);pool.push({nick:n,emoji:c.emoji,gradient:c.gradient});});followersList.forEach(function(f){if(!pool.find(function(p){return p.nick===f.nick;}))pool.push({nick:f.nick,emoji:f.emoji,gradient:f.gradient});});if(!pool.length){spamTimer=setTimeout(spawnSpamTick,2000);return;}var count=ri(1,2);for(var i=0;i<count;i++){var b=rnd(pool);spawnBotMsg(spamText,b.nick,b.emoji,b.gradient);S.totalMessages++;}saveStats();spamTimer=setTimeout(spawnSpamTick,ri(700,1800));}
+function spamByBots(text){stopSpam();spamText=text;spawnSpamTick();}
+function stopSpam(){if(spamTimer){clearTimeout(spamTimer);spamTimer=null;}spamText='';}
+
+var farmTimer=null,wibeTimer=null,haipSubTimer=null,haipDonTimer=null,haipMode=false;
+function startFarm(){stopFarm();farmTimer=setInterval(function(){if(!S.streaming)return;var nick=randNick(),av=randAv();if(!followersList.find(function(f){return f.nick===nick;})){followersList.push({nick:nick,emoji:av.emoji,gradient:av.gradient,t:Date.now()});if(followersList.length>500)followersList.shift();saveFollowers();S.followers=followersList.length;updFolUI();spawnNote(nick+' подписался!','+1 подписчик','#8cff8c','sub');}S.crystals+=1000000000;S.totalDonations++;var d=rnd(DONATORS);var reason=donCustomText||rnd(DON_REASONS);spawnNote(d+' задонатил 1 000 000 000 ₽',reason,'#ff78c8','donate');updCrysUI();saveStats();},100);}
+function stopFarm(){if(farmTimer){clearInterval(farmTimer);farmTimer=null;}}
+function startWibe(){stopWibe();S.viewers=Math.max(S.viewers,1000000);S.viewerBoost=true;S.lastViewerMin=Date.now();var e=$('viewers');if(e)e.textContent=fmtV(S.viewers);wibeTimer=setInterval(function(){if(!S.streaming)return;var amt=pickWibeAmt();var d=rnd(DONATORS);var reason=donCustomText||rnd(DON_REASONS);S.crystals+=amt*10;S.totalDonations++;spawnBanner(d,amt,reason,'#ff50b4');spawnNote(d+' задонатил '+amt.toLocaleString('ru-RU')+' ₽',reason,'#ff78c8','donate');updCrysUI();saveStats();},1000);}
+function stopWibe(){if(wibeTimer){clearInterval(wibeTimer);wibeTimer=null;}}
+function startHaip(){stopHaip();haipMode=true;S.viewers=10000000;S.viewerBoost=true;S.lastViewerMin=Date.now();var e=$('viewers');if(e)e.textContent=fmtV(S.viewers);toast('🚀 Хайп: 10 млн зрителей');haipSubTimer=setInterval(function(){if(!S.streaming)return;var nick=randNick(),av=randAv();if(!followersList.find(function(f){return f.nick===nick;})){followersList.push({nick:nick,emoji:av.emoji,gradient:av.gradient,t:Date.now()});if(followersList.length>500)followersList.shift();saveFollowers();S.followers=followersList.length;spawnNote(nick+' подписался!','+1 подписчик','#8cff8c','sub');updFolUI();saveStats();}},10000);haipDonTimer=setInterval(function(){if(!S.streaming)return;var amt=pickHaipAmt();var d=rnd(DONATORS);var reason=donCustomText||rnd(DON_REASONS);S.crystals+=amt*10;S.totalDonations++;spawnBanner(d,amt,reason,'#ff50b4');spawnNote(d+' задонатил '+amt.toLocaleString('ru-RU')+' ₽',reason,'#ff78c8','donate');updCrysUI();saveStats();},15000);}
+function stopHaip(){if(haipSubTimer){clearInterval(haipSubTimer);haipSubTimer=null;}if(haipDonTimer){clearInterval(haipDonTimer);haipDonTimer=null;}haipMode=false;}
+
+function saveCommands(){try{localStorage.setItem('gc_boost',S.viewerBoost?'1':'0');localStorage.setItem('gc_spam',spamText||'');localStorage.setItem('gc_dontext',donCustomText||'');}catch(e){}}
+function handleCommand(text){
+  if(!text)return false;var t=text.trim();var tl=t.toLowerCase();
+  if(tl==='/sim'){botSimOn=true;toast('▶️ Чат ботов включён');return true;}
+  if(tl==='//'){stopFarm();stopWibe();stopHaip();stopSpam();botSimOn=false;S.viewerBoost=false;S.lastViewerMin=Date.now();donCustomText='';saveCommands();toast('🛑 Все команды и чат ботов отключены');return true;}
+  var mDon=t.match(/^\/don\s+"([^"]+)"/i)||t.match(/^\/don\s+(.+)$/i);
+  if(mDon&&mDon[1]){donCustomText=mDon[1].trim();saveCommands();toast('💎 Текст донатов: '+donCustomText);return true;}
+  if(tl==='/warp farm'){startFarm();toast('💰 Фарм: 1 000 000 000 ₽ каждые 0.1 сек + подписки');return true;}
+  if(tl==='//warp farm'){stopFarm();toast('🛑 Фарм отключён');return true;}
+  if(tl==='/haip'){startHaip();toast('🚀 Хайп: подписки 10 сек, донаты 15 сек');return true;}
+  if(tl==='//haip'){stopHaip();toast('🛑 Хайп отключён');return true;}
+  if(tl==='/wibe strim'){startWibe();toast('🔥 Вайб: 1 млн зрителей + донаты каждую 1 сек');return true;}
+  if(tl==='//wibe strim'){stopWibe();S.viewerBoost=false;S.lastViewerMin=Date.now();saveCommands();toast('🛑 Вайб отключён');return true;}
+  var mSMS=t.match(/^\/sms\s+"([^"]+)"/i);
+  if(mSMS&&mSMS[1]){spamByBots(mSMS[1]);saveCommands();toast('📨 Спам включён');return true;}
+  var mSMSOff=t.match(/^\/\/sms(\s|$)/i);
+  if(mSMSOff){stopSpam();saveCommands();toast('🛑 Спам отключён');return true;}
+  return false;
+}
+
+function sendMsg(){var inp=$('chatInput'),text=inp.value.trim();if(!text||!S.currentChat)return;if(handleCommand(text)){inp.value='';return;}inp.value='';pushMsg(S.currentChat,'me',text);S.totalMessages++;saveStats();showTyping();var d=ri(800,2200),k=chats[S.currentChat]?chats[S.currentChat].kind:'normal',n=S.currentChat;setTimeout(function(){hideTyping();var r=botReply(text,k);pushMsg(n,'them',r);if(S.coBot&&S.coBot.nick===n)speak(S.coBot,r);},d);}
+function showTyping(){var b=$('chatMessages'),el=document.createElement('div');el.className='msg typing';el.id='typingIndicator';el.innerHTML='<span></span><span></span><span></span>';b.appendChild(el);setTimeout(function(){b.scrollTop=b.scrollHeight;},30);}
+function hideTyping(){var el=$('typingIndicator');if(el)el.remove();}
+
+function updBadge(){var u=0,ks=Object.keys(chats);for(var i=0;i<ks.length;i++)u+=(chats[ks[i]].unread||0);var b=$('inboxBadge');if(!b)return;if(u>0){b.textContent=u>99?'99+':String(u);b.style.display='flex';}else b.style.display='none';}
+function buildInbox(){
+  var body=$('inboxBody');if(!body)return;body.innerHTML='';var list=[];
+  Object.keys(channels).forEach(function(id){list.push({type:'channel',id:id,data:channels[id],ts:channels[id].lastT||0});});
+  Object.keys(chatrooms).forEach(function(id){list.push({type:'chatroom',id:id,data:chatrooms[id],ts:chatrooms[id].lastT||0});});
+  Object.keys(chats).forEach(function(nick){var c=chats[nick];var t=c.messages.length?c.messages[c.messages.length-1].t:0;list.push({type:'dialog',id:nick,data:c,ts:t});});
+  if(!list.length){body.innerHTML='<div class="empty-inbox"><span class="em">💬</span>Пока никого.</div>';return;}
+  list.sort(function(a,b){return b.ts-a.ts;});
+  list.forEach(function(item){
+    var el=document.createElement('div');el.className='chat-row';
+    if(item.type==='channel'){var ch=item.data;el.innerHTML='<div class="av" style="background:'+(ch.color||'#25a4d3')+'">'+(ch.emoji||'📢')+'</div><div class="body"><div class="nick">'+ch.name+'</div><div class="last">'+(ch.messages.length?ch.messages[ch.messages.length-1].text:'Пусто')+'</div></div>';el.onclick=function(){openChannel(item.id);};}
+    else if(item.type==='chatroom'){var cr=item.data;el.innerHTML='<div class="av" style="background:'+(cr.color||'#8b5cf6')+'">'+(cr.emoji||'💬')+'</div><div class="body"><div class="nick">'+cr.name+'</div><div class="last">'+(cr.messages.length?cr.messages[cr.messages.length-1].text:'Пусто')+'</div></div>';el.onclick=function(){openChatRoom(item.id);};}
+    else{var c=item.data;ensureApp(c);var last=c.messages.length?c.messages[c.messages.length-1]:null;el.innerHTML='<div class="av"><div style="width:100%;height:100%;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;background:'+c.gradient+'">'+c.emoji+'</div></div><div class="body"><div class="nick">'+item.id+gIcon(c.gender)+'</div><div class="last">'+(last?(last.from==='me'?'Ты: ':'')+last.text:'Начни переписку')+'</div></div>';el.onclick=function(){openChatWith(item.id,c.emoji,c.gradient,c.kind,c.gender);};}
+    body.appendChild(el);
+  });
+}
+function buildStats(){$('stStreams').textContent=S.totalStreams;$('stCrystals').textContent=S.crystals.toLocaleString('ru-RU');$('stFollowers').textContent=S.followers.toLocaleString('ru-RU');$('stMessages').textContent=S.totalMessages;$('stDialogs').textContent=S.totalDialogs;$('stDonations').textContent=S.totalDonations;}
+function buildFollowers(){var body=$('followersBody');body.innerHTML='';if(!followersList.length){body.innerHTML='<div class="empty-inbox"><span class="em">👥</span>Пока никто.</div>';$('followersTitle').textContent='Подписчики (0)';return;}for(var i=followersList.length-1;i>=0;i--){var f=followersList[i];var el=document.createElement('div');el.className='chat-row';el.innerHTML='<div class="av" style="background:'+f.gradient+'">'+f.emoji+'</div><div class="body"><div class="nick">'+f.nick+'</div><div class="last">подписался '+new Date(f.t).toLocaleDateString('ru-RU')+'</div></div>';el.onclick=(function(nick,emoji,gradient){return function(){openChatWith(nick,emoji,gradient,null,null);};})(f.nick,f.emoji,f.gradient);body.appendChild(el);}$('followersTitle').textContent='Подписчики ('+followersList.length+')';}
+function buildFollowing(){var body=$('followingBody');body.innerHTML='';var keys=Object.keys(chats);if(!keys.length){body.innerHTML='<div class="empty-inbox"><span class="em">💬</span>Пока нет диалогов.</div>';return;}keys.sort(function(a,b){var la=chats[a].messages.length?chats[a].messages[chats[a].messages.length-1].t:0;var lb=chats[b].messages.length?chats[b].messages[chats[b].messages.length-1].t:0;return lb-la;});keys.forEach(function(nick){var c=chats[nick];ensureApp(c);var last=c.messages.length?c.messages[c.messages.length-1]:null;var el=document.createElement('div');el.className='chat-row';el.innerHTML='<div class="av" style="background:'+c.gradient+'">'+c.emoji+'</div><div class="body"><div class="nick">'+nick+gIcon(c.gender)+'</div><div class="last">'+(last?(last.from==='me'?'Ты: ':'')+last.text:'Начни переписку')+'</div></div>';el.onclick=(function(nick2,emoji,gradient,kind,gender){return function(){openChatWith(nick2,emoji,gradient,kind,gender);};})(nick,c.emoji,c.gradient,c.kind,c.gender);body.appendChild(el);});}
+function buildMyStreams(){var body=$('myStreamsBody');body.innerHTML='';if(!myStreams.length){body.innerHTML='<div class="empty-inbox"><span class="em">🎬</span>Пока нет записей.</div>';return;}myStreams.forEach(function(s){var el=document.createElement('div');el.className='rec-item';var mb=(s.size/1024/1024).toFixed(1);el.innerHTML='<div class="ri-icon">🎬</div><div class="ri-body"><div class="ri-name">'+s.filename+'</div><div class="ri-meta">'+new Date(s.date).toLocaleString('ru-RU')+' • '+mb+' МБ</div></div><div class="ri-btn">▶</div><div class="ri-del">🗑</div>';el.querySelector('.ri-btn').onclick=(function(s2){return function(e){e.stopPropagation();openVideoViewer(s2);};})(s);el.querySelector('.ri-del').onclick=(function(s2){return function(e){e.stopPropagation();if(!confirm('Удалить?'))return;deleteVideoFromIDB(s2.filename).then(function(){myStreams=myStreams.filter(function(x){return x.filename!==s2.filename;});buildMyStreams();toast('Удалено');});};})(s);body.appendChild(el);});}
+
+function updProfUI(){var ring=S.avatarRing||'#ffffff',tc=S.avatarText||'#ffffff';$('streamNick').textContent=S.nick;applyAv($('streamAvatar'),S.avatar,S.avatarColor,'0 0 0 2px '+ring,tc);$('menuTitle').textContent=S.nick;applyAv($('menuAvatar'),S.avatar,S.avatarColor,'0 0 0 4px '+ring,tc);applyAv($('accAvatar'),S.avatar,S.avatarColor,'0 0 0 4px '+ring,tc);$('accName').textContent=S.nick;$('accHandle').textContent='@'+S.nick.toLowerCase().replace(/\s+/g,'_');}
+function buildMGrid(id,preset,cur,onPick){var g=$(id);if(!g)return;g.innerHTML='';for(var i=0;i<preset.length;i++){(function(c){var d=document.createElement('div');d.className='color-opt'+(cur===c?' sel':'');d.style.background=c;d.dataset.chosen=c;d.onclick=function(){g.querySelectorAll('.color-opt').forEach(function(o){o.classList.remove('sel');});d.classList.add('sel');onPick(c);};g.appendChild(d);})(preset[i]);}}
+function updMPrev(){applyAv($('modalAvPreview'),S._pAv||'G',S._pAvC||'#25a4d3','0 0 0 4px '+(S._pRing||'#ffffff'),S._pText||'#ffffff');}
+function openEdit(){
+  $('editNick').value=S.nick;$('editAvatarChar').value=S.avatar;S._pAv=S.avatar;S._pAvC=S.avatarColor;S._pRing=S.avatarRing;S._pText=S.avatarText;updMPrev();
+  buildMGrid('colorGrid',COLORS,S.avatarColor,function(c){S._pAvC=c;var p=$('editAvatarColorPicker');p.value=c;p.style.background=c;updMPrev();});
+  var acp=$('editAvatarColorPicker');acp.value=S.avatarColor;acp.style.background=S.avatarColor;acp.oninput=function(e){S._pAvC=e.target.value;acp.style.background=e.target.value;updMPrev();};
+  buildMGrid('ringGrid',RINGS,S.avatarRing,function(c){S._pRing=c;var p=$('editRingColorPicker');p.value=c;p.style.background=c;updMPrev();});
+  var rcp=$('editRingColorPicker');rcp.value=S.avatarRing;rcp.style.background=S.avatarRing;rcp.oninput=function(e){S._pRing=e.target.value;rcp.style.background=e.target.value;updMPrev();};
+  buildMGrid('textGrid',TEXTS,S.avatarText,function(c){S._pText=c;var p=$('editTextColorPicker');p.value=c;p.style.background=c;updMPrev();});
+  var tcp=$('editTextColorPicker');tcp.value=S.avatarText;tcp.style.background=S.avatarText;tcp.oninput=function(e){S._pText=e.target.value;tcp.style.background=e.target.value;updMPrev();};
+  var grid=$('editEmojiGrid');grid.innerHTML='';for(var i=0;i<EMOJIS_PICK.length;i++){(function(e){var d=document.createElement('div');d.className='emoji-opt'+(S.avatar===e?' sel':'');d.textContent=e;d.onclick=function(){grid.querySelectorAll('.emoji-opt').forEach(function(o){o.classList.remove('sel');});d.classList.add('sel');$('editAvatarChar').value=e;S._pAv=e;updMPrev();};grid.appendChild(d);})(EMOJIS_PICK[i]);}
+  $('editAvatarChar').oninput=function(e){S._pAv=e.target.value||'G';updMPrev();};
+  $('editModal').classList.add('show');
+}
+
+var wdNick=null,wdP=null;
+function openWardrobe(nick){
+  if(!nick)return;var c=chats[nick];if(!c)return;ensureApp(c);wdNick=nick;
+  wdP={emoji:c.emoji,gradient:c.gradient,gender:c.gender,nick:nick,ringColor:c.ringColor||'#ffffff',textColor:c.textColor||'#ffffff'};
+  $('wdChar').value=c.emoji;$('wdNick').value=nick;$('wdAvBig').textContent=c.emoji;$('wdAvBig').style.background=c.gradient;$('wdAvBig').style.boxShadow='0 0 0 4px '+wdP.ringColor;$('wdAvBig').style.color=isEmoji(c.emoji)?'#fff':wdP.textColor;
+  document.querySelectorAll('#wardrobeModal .wd-gender-opt').forEach(function(el){el.classList.toggle('sel',el.getAttribute('data-gender')===c.gender);});
+  buildWGrid('wdBgGrid',COLORS,extractMain(c.gradient),function(col){wdP.gradient='linear-gradient(135deg,'+col+','+lighten(col,30)+')';var p=$('wdBgPicker');p.value=col;p.style.background=col;$('wdAvBig').style.background=wdP.gradient;});
+  var bp=$('wdBgPicker');bp.value=extractMain(c.gradient);bp.style.background=extractMain(c.gradient);bp.oninput=function(e){var v=e.target.value;wdP.gradient='linear-gradient(135deg,'+v+','+lighten(v,30)+')';bp.style.background=v;$('wdAvBig').style.background=wdP.gradient;};
+  buildWGrid('wdRingGrid',RINGS,wdP.ringColor,function(col){wdP.ringColor=col;var p=$('wdRingPicker');p.value=col;p.style.background=col;$('wdAvBig').style.boxShadow='0 0 0 4px '+col;});
+  var rp=$('wdRingPicker');rp.value=wdP.ringColor;rp.style.background=wdP.ringColor;rp.oninput=function(e){wdP.ringColor=e.target.value;rp.style.background=e.target.value;$('wdAvBig').style.boxShadow='0 0 0 4px '+wdP.ringColor;};
+  buildWGrid('wdTextGrid',TEXTS,wdP.textColor,function(col){wdP.textColor=col;var p=$('wdTextPicker');p.value=col;p.style.background=col;$('wdAvBig').style.color=isEmoji(wdP.emoji)?'#fff':col;});
+  var tp=$('wdTextPicker');tp.value=wdP.textColor;tp.style.background=wdP.textColor;tp.oninput=function(e){wdP.textColor=e.target.value;tp.style.background=e.target.value;$('wdAvBig').style.color=isEmoji(wdP.emoji)?'#fff':wdP.textColor;};
+  var grid=$('wdEmojiGrid');grid.innerHTML='';for(var j=0;j<EMOJIS_PICK.length;j++){(function(e){var d=document.createElement('div');d.className='wd-emoji-opt'+(c.emoji===e?' sel':'');d.textContent=e;d.onclick=function(){grid.querySelectorAll('.wd-emoji-opt').forEach(function(o){o.classList.remove('sel');});d.classList.add('sel');wdP.emoji=e;$('wdChar').value=e;$('wdAvBig').textContent=e;$('wdAvBig').style.color=isEmoji(e)?'#fff':wdP.textColor;};grid.appendChild(d);})(EMOJIS_PICK[j]);}
+  $('wardrobeModal').classList.add('show');
+}
+function extractMain(g){if(!g)return'#ff6384';var m=g.match(/#[0-9a-f]{6}/gi);return m&&m[0]?m[0]:'#ff6384';}
+function lighten(hex,amt){var c=hex.replace('#','');if(c.length===3)c=c.split('').map(function(x){return x+x;}).join('');var r=clamp(parseInt(c.substr(0,2),16)+amt,0,255);var g=clamp(parseInt(c.substr(2,2),16)+amt,0,255);var b=clamp(parseInt(c.substr(4,2),16)+amt,0,255);return'#'+[r,g,b].map(function(x){var s=x.toString(16);return s.length<2?'0'+s:s;}).join('');}
+function buildWGrid(id,colors,cur,onPick){var g=$(id);if(!g)return;g.innerHTML='';for(var i=0;i<colors.length;i++){(function(c){var d=document.createElement('div');d.className='wd-color-opt'+(cur===c?' sel':'');d.style.background=c;d.dataset.chosen=c;d.onclick=function(){g.querySelectorAll('.wd-color-opt').forEach(function(o){o.classList.remove('sel');});d.classList.add('sel');onPick(c);};g.appendChild(d);})(colors[i]);}}
+
+function buildRoomEmojiGrid(gridId,selected){var g=$(gridId);if(!g)return;g.innerHTML='';for(var i=0;i<EMOJIS_PICK.length;i++){(function(e){var d=document.createElement('div');d.className='emoji-opt'+(selected===e?' sel':'');d.textContent=e;d.dataset.chosen=e;d.onclick=function(){g.querySelectorAll('.emoji-opt').forEach(function(o){o.classList.remove('sel');});d.classList.add('sel');d.dataset.chosen=e;};g.appendChild(d);})(EMOJIS_PICK[i]);}}
+function buildRoomColorGrid(gridId,selected){var g=$(gridId);if(!g)return;g.innerHTML='';for(var i=0;i<COLORS.length;i++){(function(c){var d=document.createElement('div');d.className='color-opt'+(selected===c?' sel':'');d.style.background=c;d.dataset.chosen=c;d.onclick=function(){g.querySelectorAll('.color-opt').forEach(function(o){o.classList.remove('sel');});d.classList.add('sel');d.dataset.chosen=c;};g.appendChild(d);})(COLORS[i]);}}
+function buildRoomRingGrid(gridId,selected){var g=$(gridId);if(!g)return;g.innerHTML='';for(var i=0;i<RINGS.length;i++){(function(c){var d=document.createElement('div');d.className='color-opt'+(selected===c?' sel':'');d.style.background=c;d.dataset.chosen=c;d.onclick=function(){g.querySelectorAll('.color-opt').forEach(function(o){o.classList.remove('sel');});d.classList.add('sel');d.dataset.chosen=c;};g.appendChild(d);})(RINGS[i]);}}
+function buildRoomTextGrid(gridId,selected){var g=$(gridId);if(!g)return;g.innerHTML='';for(var i=0;i<TEXTS.length;i++){(function(c){var d=document.createElement('div');d.className='color-opt'+(selected===c?' sel':'');d.style.background=c;d.dataset.chosen=c;d.onclick=function(){g.querySelectorAll('.color-opt').forEach(function(o){o.classList.remove('sel');});d.classList.add('sel');d.dataset.chosen=c;};g.appendChild(d);})(TEXTS[i]);}}
+function getChosen(gridId){var el=$(gridId);if(!el)return null;var s=el.querySelector('.sel');return s?(s.dataset.chosen||s.textContent):null;}
+
+function openCreateChannel(){$('chName').value='';$('chChar').value='📢';var prev=$('chAvPreview');prev.textContent='📢';prev.style.background='#25a4d3';prev.style.color='#fff';buildRoomEmojiGrid('chEmojiGrid','📢');buildRoomColorGrid('chColorGrid','#25a4d3');var cp=$('chColorPicker');cp.value='#25a4d3';cp.style.background='#25a4d3';cp.oninput=function(e){prev.style.background=e.target.value;cp.style.background=e.target.value;};$('chChar').oninput=function(e){var v=e.target.value||'📢';prev.textContent=v;};document.querySelectorAll('#chEmojiGrid .emoji-opt').forEach(function(o){o.addEventListener('click',function(){prev.textContent=o.dataset.chosen;$('chChar').value=o.dataset.chosen;});});document.querySelectorAll('#chColorGrid .color-opt').forEach(function(o){o.addEventListener('click',function(){prev.style.background=o.dataset.chosen;var p=$('chColorPicker');p.value=o.dataset.chosen;p.style.background=o.dataset.chosen;});});$('createChannelModal').classList.add('show');}
+function createChannel(){var name=$('chName').value.trim()||'Мой канал';var emoji=$('chChar').value.trim()||getChosen('chEmojiGrid')||'📢';var color=$('chColorPicker').value||getChosen('chColorGrid')||'#25a4d3';var id=uid();var members=[];var count=Math.floor(followersList.length*0.65);var pool=followersList.slice();for(var i=0;i<count&&pool.length;i++){var idx=Math.floor(Math.random()*pool.length);members.push(pool[idx]);pool.splice(idx,1);}channels[id]={id:id,name:name,emoji:emoji,color:color,ringColor:'#ffffff',textColor:'#ffffff',owner:S.nick,members:members,admins:[],banned:{},muted:{},messages:[],lastT:Date.now()};channels[id].messages.push({from:'system',text:'Канал создан. Участников: '+members.length,t:Date.now()});saveChannels();$('createChannelModal').classList.remove('show');toast('📢 Канал «'+name+'» создан');buildInbox();}
+function openChannel(id){var ch=channels[id];if(!ch)return;currentChannelId=id;applyAv($('channelHeadAv'),ch.emoji,ch.color,'0 0 0 2px '+(ch.ringColor||'rgba(255,255,255,.3)'),isEmoji(ch.emoji)?'#fff':(ch.textColor||'#fff'));$('channelHeadName').textContent=ch.name;closeAll();$('panelChannel').classList.add('show');renderChannelMessages();}
+function renderChannelMessages(){var ch=channels[currentChannelId];if(!ch)return;var box=$('channelMessages');box.innerHTML='';for(var i=0;i<ch.messages.length;i++){var m=ch.messages[i];var el=document.createElement('div');if(m.from==='system'){el.className='msg sys';el.textContent=m.text;}else if(m.from==='giveaway'){el.className='msg gw';el.textContent=m.text;}else if(m.from==='me'){el.className='msg me';el.textContent=m.text;}else{el.className='msg them';el.textContent=(m.nick||'user')+': '+m.text;}box.appendChild(el);}setTimeout(function(){box.scrollTop=box.scrollHeight;},30);}
+function sendChannelMessage(){var inp=$('channelInput'),text=inp.value.trim();if(!text||!currentChannelId)return;var ch=channels[currentChannelId];if(!ch)return;if(handleCommand(text)){inp.value='';return;}inp.value='';ch.messages.push({from:'me',text:text,nick:S.nick,t:Date.now()});ch.lastT=Date.now();if(ch.messages.length>300)ch.messages.shift();saveChannels();renderChannelMessages();}
+function openGiveaway(){$('gwText').value='';$('gwCrystals').value='100';$('giveawayModal').classList.add('show');}
+function startGiveaway(){var ch=channels[currentChannelId];if(!ch)return;var text=$('gwText').value.trim()||'Розыгрыш!';var amount=parseInt($('gwCrystals').value)||100;if(amount>S.crystals){toast('Недостаточно кристаллов');return;}if(!ch.members.length){toast('Нет участников');return;}$('giveawayModal').classList.remove('show');S.crystals-=amount;saveStats();updCrysUI();ch.messages.push({from:'giveaway',text:'🎁 '+text+'\nПриз: '+amount+' 💎',t:Date.now()});saveChannels();renderChannelMessages();setTimeout(function(){var winner=ch.members[Math.floor(Math.random()*ch.members.length)];ch.messages.push({from:'giveaway',text:'🏆 Победитель: '+winner.nick+'!\nПолучает '+amount+' 💎',t:Date.now()});saveChannels();renderChannelMessages();toast('🎉 '+winner.nick);},2500);}
+
+var crTemp={type:null,members:[]};
+function openCreateChat(){$('createChatModal').classList.add('show');}
+function pickPublicChat(){crTemp.type='public';crTemp.members=[];var count=Math.floor(followersList.length*0.5);var pool=followersList.slice();for(var i=0;i<count&&pool.length;i++){var idx=Math.floor(Math.random()*pool.length);crTemp.members.push(pool[idx]);pool.splice(idx,1);}$('createChatModal').classList.remove('show');$('crName').value='';$('crChar').value='💬';buildRoomEmojiGrid('crEmojiGrid','💬');buildRoomColorGrid('crColorGrid','#8b5cf6');var cp=$('crColorPicker');cp.value='#8b5cf6';cp.style.background='#8b5cf6';cp.oninput=function(e){cp.style.background=e.target.value;};$('chatNameModal').classList.add('show');}
+function pickPrivateChat(){crTemp.type='private';crTemp.members=[];var candidates=[];Object.keys(chats).forEach(function(nick){var c=chats[nick];ensureApp(c);candidates.push({nick:nick,emoji:c.emoji,gradient:c.gradient,kind:c.kind,gender:c.gender});});followersList.forEach(function(f){if(!candidates.find(function(x){return x.nick===f.nick;}))candidates.push({nick:f.nick,emoji:f.emoji,gradient:f.gradient,gender:null,kind:'follow'});});if(!candidates.length){toast('Нет подписок');return;}$('createChatModal').classList.remove('show');$('membersSelectList').innerHTML='';crTemp.allCandidates=candidates;crTemp.selected={};candidates.forEach(function(c){var row=document.createElement('div');row.className='memberRow';row.dataset.nick=c.nick;row.innerHTML='<div class="mAv" style="background:'+c.gradient+'">'+c.emoji+'</div><div class="mBody"><div class="mName">'+c.nick+'</div></div><div class="check"></div>';row.onclick=function(){if(crTemp.selected[c.nick]){delete crTemp.selected[c.nick];row.classList.remove('sel');}else{crTemp.selected[c.nick]=c;row.classList.add('sel');}};$('membersSelectList').appendChild(row);});$('selectMembersModal').classList.add('show');}
+function nextFromMembersSelect(){var keys=Object.keys(crTemp.selected||{});if(!keys.length){toast('Выбери хотя бы одного');return;}crTemp.members=keys.map(function(k){return crTemp.selected[k];});$('selectMembersModal').classList.remove('show');$('crName').value='';$('crChar').value='💬';buildRoomEmojiGrid('crEmojiGrid','💬');buildRoomColorGrid('crColorGrid','#8b5cf6');var cp=$('crColorPicker');cp.value='#8b5cf6';cp.style.background='#8b5cf6';cp.oninput=function(e){cp.style.background=e.target.value;};$('chatNameModal').classList.add('show');}
+function createChatRoom(){var name=$('crName').value.trim()||'Мой чат';var emoji=$('crChar').value.trim()||getChosen('crEmojiGrid')||'💬';var color=$('crColorPicker').value||getChosen('crColorGrid')||'#8b5cf6';var id=uid();chatrooms[id]={id:id,name:name,emoji:emoji,color:color,ringColor:'#ffffff',textColor:'#ffffff',owner:S.nick,members:crTemp.members||[],admins:[],messages:[],lastT:Date.now(),isPrivate:crTemp.type==='private',banned:{},muted:{},lastMsgTime:{}};chatrooms[id].messages.push({from:'system',text:'Чат создан.',t:Date.now()});saveChatrooms();$('chatNameModal').classList.remove('show');toast('💬 Чат «'+name+'» создан');buildInbox();crTemp={type:null,members:[]};}
+function openChatRoom(id){var cr=chatrooms[id];if(!cr)return;currentChatRoomId=id;applyAv($('chatRoomHeadAv'),cr.emoji,cr.color,'0 0 0 2px '+(cr.ringColor||'rgba(255,255,255,.3)'),isEmoji(cr.emoji)?'#fff':(cr.textColor||'#fff'));$('chatRoomHeadName').textContent=cr.name;closeAll();$('panelChatRoom').classList.add('show');renderChatRoomMessages();}
+function renderChatRoomMessages(){var cr=chatrooms[currentChatRoomId];if(!cr)return;var box=$('chatRoomMessages');box.innerHTML='';for(var i=0;i<cr.messages.length;i++){var m=cr.messages[i];var el=document.createElement('div');if(m.from==='system'){el.className='msg sys';el.textContent=m.text;}else if(m.from==='me'){el.className='msg me';el.textContent=m.text;}else{el.className='msg them';el.textContent=m.nick+': '+m.text;(function(nk){el.onclick=function(){openMsgActions(nk);};})(m.nick);}box.appendChild(el);}setTimeout(function(){box.scrollTop=box.scrollHeight;},30);}
+function sendChatRoomMessage(){var inp=$('chatRoomInput'),text=inp.value.trim();if(!text||!currentChatRoomId)return;var cr=chatrooms[currentChatRoomId];if(!cr)return;if(handleCommand(text)){inp.value='';return;}if(cr.banned[S.nick]){toast('Забанен');return;}inp.value='';cr.messages.push({from:'me',text:text,nick:S.nick,t:Date.now()});cr.lastT=Date.now();if(cr.messages.length>300)cr.messages.shift();saveChatrooms();renderChatRoomMessages();}
+
+var LIVE_PHRASES=['норм','погнали','жиза','ты чё','лол','кек','ору','пздц','огонь','да ладно','серьёзно?','ахаха'];
+function simulateChatRoomReplies(cr){if(!cr.members.length)return;var m=cr.members[Math.floor(Math.random()*cr.members.length)];var text=rnd(LIVE_PHRASES);cr.messages.push({from:'them',nick:m.nick,text:text,t:Date.now()});cr.lastT=Date.now();if(cr.messages.length>300)cr.messages.shift();saveChatrooms();if(currentChatRoomId===cr.id)renderChatRoomMessages();}
+
+var menuType=null,menuSubScreen=null;
+function getMenuObj(){if(menuType==='channel')return channels[currentChannelId];if(menuType==='chatroom')return chatrooms[currentChatRoomId];return null;}
+function openChatMenu(type){menuType=type;menuSubScreen=null;var obj=getMenuObj();if(!obj)return;renderChatMenu();$('chatMenuModal').classList.add('show');}
+function closeChatMenu(){$('chatMenuModal').classList.remove('show');menuType=null;menuSubScreen=null;}
+function renderChatMenu(){var obj=getMenuObj();if(!obj)return;var box=$('chatMenuBox');if(!box)return;var isChannel=menuType==='channel';if(!menuSubScreen){var members=obj.members||[];var admins=obj.admins||[];var html='<div class="roomInfoHead"><div class="backBtn" onclick="closeChatMenu()"><svg viewBox="0 0 24 24"><polyline points="15 6 9 12 15 18"/></svg></div><div class="editBtn" onclick="editRoom()"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1();stopFarm();stop-4L16.5 3.5z"/></svg></div><div class="bigAv" style="background:'+obj.color+'">'+obj.emoji+'</div><div class="bigName">'+obj.name+'</div><div class="bigSub">'+(members.length+1)+' участников</div></div>';html+='<div class="roomInfoSectionTitle">Участники</div><div class="roomInfoSection"><div class="roomInfoRow" onclick="openMenuSub(\'members\')"><div class="rl">Показать всех</div><div class="ra">›</div></div></div>';box.innerHTML=html;}else{var members2=obj.members||[];var html2='<div class="roomInfoHead"><div class="backBtn" onclick="openMenuSub(null)"><svg viewBox="0 0 24 24"><polyline points="15 6 9 12 15 18"/></svg></div><div class="bigName" style="margin-top:20px">Участники</div></div>';members2.forEach(function(m){html2+='<div class="roomInfoMember"><div class="mAv" style="background:'+m.gradient+'">'+m.emoji+'</div><div class="mBody"><div class="mName">'+m.nick+'</div></div></div>';});box.innerHTML=html2;}}
+function openMenuSub(tab){menuSubScreen=tab;renderChatMenu();}
+
+var editingRoomType=null,erP=null;
+function editRoom(){editingRoomType=menuType;var obj=getMenuObj();if(!obj)return;$('editRoomTitle').textContent='Редактировать';erP={emoji:obj.emoji||'📢',color:obj.color||'#25a4d3',ringColor:obj.ringColor||'#ffffff',textColor:obj.textColor||'#ffffff',name:obj.name||''};$('erName').value=erP.name;$('erChar').value=erP.emoji;closeChatMenu();$('editRoomModal').classList.add('show');}
+function saveEditRoom(){var obj=editingRoomType==='channel'?channels[currentChannelId]:chatrooms[currentChatRoomId];if(!obj||!erP)return;obj.name=$('erName').value.trim()||obj.name;obj.emoji=$('erChar').value.trim()||obj.emoji;if(editingRoomType==='channel')saveChannels();else saveChatrooms();$('editRoomModal').classList.remove('show');erP=null;toast('✅ Сохранено');buildInbox();}
+
+var deleteTarget=null;
+function openDeleteConfirm(type,id){deleteTarget={type:type,id:id};var name='';if(type==='channel'){var ch=channels[id];if(!ch)return;name=ch.name;}else{var cr=chatrooms[id];if(!cr)return;name=cr.name;}$('deleteRoomText').textContent='Удалить «'+name+'»?';$('deleteRoomModal').classList.add('show');}
+function confirmDeleteRoom(){if(!deleteTarget)return;if(deleteTarget.type==='channel'){delete channels[deleteTarget.id];saveChannels();}else{delete chatrooms[deleteTarget.id];saveChatrooms();}deleteTarget=null;$('deleteRoomModal').classList.remove('show');closeAll();toast('🗑 Удалено');buildInbox();}
+
+function openMsgActions(nick){toast('Управление: '+nick);}
+function doKick(){}
+function doBan(){}
+function doMut(){}
+function applyMute(){}
+function showSanction(){}
+function openSanctionUndo(){}
+function undoSanction(){}
+function openRemoveAdmin(){}
+function addAdminsToRoom(){}
+function addMembersToRoom(){}
+function confirmPick(){}
+
+var vvStream=null,vvUrl=null;
+var vvTrimStart=0,vvTrimEnd=0,vvTrimDur=0,vvDragging=null;
+var TOOL_TITLES={trim:'Trim',canvas:'Canvas',filter:'Select Filter',rotate:'Rotate',speed:'Speed'};
+var vvActiveTool='trim';
+var vvOpts={ratio:'none',bgColor:'#000000',filter:'none',filterName:'Normal',rotate:0,flipH:false,flipV:false,speed:1.0};
+function fmtT(s){if(!s||isNaN(s))return'0:00';var m=Math.floor(s/60);var x=Math.floor(s%60);return m+':'+(x<10?'0':'')+x;}
+function fmtT2(s){if(!s||isNaN(s))return'0:00.0';var m=Math.floor(s/60);var x=s%60;return m+':'+(x<10?'0':'')+x.toFixed(1);}
+function openVideoViewer(s){vvStream=s;if(vvUrl){try{URL.revokeObjectURL(vvUrl);}catch(e){}}vvUrl=URL.createObjectURL(s.blob);var v=$('vvVideo');try{v.pause();}catch(e){}v.src=vvUrl;v.playbackRate=1;v.style.transform='';v.style.filter='none';try{v.load();}catch(e){}$('vvTitle').textContent=s.filename;$('vvSheet').classList.remove('show');$('videoViewer').classList.add('show');try{v.currentTime=0;}catch(e){}setTimeout(function(){try{v.play().catch(function(){});}catch(e){}},120);}
+function closeVideoViewer(){$('videoViewer').classList.remove('show');$('vvSheet').classList.remove('show');try{$('vvVideo').pause();}catch(e){}}
+function openSheet(tool){vvActiveTool=tool;$('vvSheetTitle').textContent=TOOL_TITLES[tool]||'Edit';document.querySelectorAll('.vv-panel').forEach(function(p){p.classList.toggle('active',p.getAttribute('data-panel')===tool);});$('vvSheet').classList.add('show');applyPreview();}
+function initTrim(){}
+function drawThumbs(){}
+function updateTrimUI(){}
+function fillFilterPreviews(){}
+function applyPreview(){}
+async function exportEdit(){}
+
+function casinoChooseAmount(){var grid=$('amountGrid');var btn=$('casinoChooseAmountBtn');grid.style.display='grid';btn.classList.add('chosen');btn.textContent='Сумма выбрана: '+casinoBet+' 💎';}
+function casinoSetBet(amt){
+  casinoBet=amt;
+  document.querySelectorAll('.amount-btn').forEach(function(b){b.classList.toggle('sel',parseInt(b.dataset.amt)===amt);});
+  $('casinoChosenText').textContent='Ставка: '+amt.toLocaleString('ru-RU')+' 💎';
+  $('casinoChosenText').classList.add('active');
+  $('casinoChooseAmountBtn').textContent='Сумма выбрана: '+amt.toLocaleString('ru-RU')+' 💎';
+  var spin=$('casinoSpinBtn');
+  if(S.crystals>=amt){spin.disabled=false;}else{spin.disabled=true;toast('Недостаточно кристаллов');}
+}
+function casinoSpin(){
+  if(casinoBet<=0){toast('Сначала выбери сумму');return;}
+  if(S.crystals<casinoBet){toast('Недостаточно кристаллов');return;}
+  var spin=$('casinoSpinBtn');spin.disabled=true;
+  $('casinoResult').textContent='';$('casinoResult').className='casino-result';
+  sfxSpin();
+  var r1=$('reel1'),r2=$('reel2'),r3=$('reel3');
+  var t1=setInterval(function(){r1.textContent=rnd(['7','🍒','💎','🍋','⭐','🔔']);},60);
+  var t2=setInterval(function(){r2.textContent=rnd(['7','🍒','💎','🍋','⭐','🔔']);},70);
+  var t3=setInterval(function(){r3.textContent=rnd(['7','🍒','💎','🍋','⭐','🔔']);},80);
+  setTimeout(function(){clearInterval(t1);r1.textContent='7';},900);
+  setTimeout(function(){clearInterval(t2);r2.textContent='7';},1200);
+  setTimeout(function(){
+    clearInterval(t3);
+    var isWin=Math.random()<0.25;
+    if(isWin){r1.textContent='7';r2.textContent='7';r3.textContent='7';}
+    else{var syms=['🍒','💎','🍋','⭐','🔔'];var pos=ri(0,2);var bad=['7'];for(var i=0;i<3;i++){if(i===pos)bad=rnd(syms);else bad='7';}var r=rnd([r1,r2,r3]);var list=[rnd(syms),rnd(syms),rnd(syms)];r1.textContent=list[0];r2.textContent=list[1];r3.textContent=list[2];}
+    setTimeout(function(){
+      if(isWin){var win=casinoBet*10;S.crystals+=win;saveStats();updCrysUI();sfxWin();$('casinoResult').textContent='🎉 ВЫИГРЫШ! +'+win.toLocaleString('ru-RU')+' 💎';$('casinoResult').classList.add('win');toast('🎉 +'+win.toLocaleString('ru-RU')+' 💎');}
+      else{S.crystals-=casinoBet;saveStats();updCrysUI();sfxLose();$('casinoResult').textContent='😢 Проигрыш -'+casinoBet.toLocaleString('ru-RU')+' 💎';$('casinoResult').classList.add('lose');toast('😢 -'+casinoBet.toLocaleString('ru-RU')+' 💎');}
+      if(S.crystals>=casinoBet){spin.disabled=false;}else{spin.disabled=true;}
+    },600);
+  },1500);
+}
+
+function bind(id,ev,fn){var el=$(id);if(el)el.addEventListener(ev,fn);}
+bind('btnInbox','click',function(){buildInbox();openPanel('panelInbox');});
+bind('btnPlus','click',function(){startStream();});
+bind('btnAccount','click',function(){updCrysUI();updFolUI();updFolwUI();updProfUI();openPanel('panelAccount');});
+bind('menuAvatar','click',openEdit);
+document.querySelectorAll('[data-back]').forEach(function(b){b.addEventListener('click',function(){closeAll();updBadge();});});
+document.querySelectorAll('[data-close]').forEach(function(b){b.addEventListener('click',function(){var id=b.getAttribute('data-close');var el=$(id);if(el)el.classList.remove('show');});});
+bind('rbRec','click',function(e){pulse(e.currentTarget);if(S.isRecording)stopRec();else startRec();});
+bind('rbFlip','click',function(e){pulse(e.currentTarget);flipCam();});
+bind('rbMic','click',function(e){pulse(e.currentTarget);toggleMic();});
+bind('rbEmoji','click',function(e){pulse(e.currentTarget);toggleEmoji();});
+bind('rbKick','click',function(e){pulse(e.currentTarget);stopCo();});
+bind('closeX','click',function(){if(confirm('Завершить стрим?')){if(S.isRecording)stopRec();if(S.coBot)stopCo();stopSpeak();stopSpamWibe();stopHaip();var c=$('cam');if(c&&c.srcObject){c.srcObject.getTracks().forEach(function(t){t.stop();});c.srcObject=null;}if(micRun&&recog){try{recog.stop();}catch(e){}micRun=false;}S.micOn=false;S.currentChat=null;S.streaming=false;if(cE)cE.innerHTML='';if(hE)hE.innerHTML='';resetTimers();S.viewers=30000;S.tv=30000;showMenu();}});
+bind('chatSend','click',sendMsg);bind('chatInput','keydown',function(e){if(e.key==='Enter')sendMsg();});
+bind('chatWardrobeBtn','click',function(){if(S.currentChat)openWardrobe(S.currentChat);});
+bind('chatCoStreamBtn','click',function(){if(!S.currentChat)return;var bot=chats[S.currentChat];if(!bot)return;ensureApp(bot);var bi={nick:S.currentChat,emoji:bot.emoji,gradient:bot.gradient,gender:bot.gender,kind:bot.kind};if(!S.streaming){closeAll();startStream(function(){startCo(bi);});}else startCo(bi);});
+bind('accAvatar','click',openEdit);
+bind('itemCasino','click',function(){updCrysUI();casinoBet=0;$('amountGrid').style.display='none';$('casinoChosenText').textContent='Сумма не выбрана';$('casinoChosenText').classList.remove('active');$('casinoChooseAmountBtn').classList.remove('chosen');$('casinoChooseAmountBtn').textContent='Выбрать сумму';$('casinoSpinBtn').disabled=true;$('casinoResult').textContent='';document.querySelectorAll('.amount-btn').forEach(function(b){b.classList.remove('sel');});openPanel('panelCasino');});
+bind('casinoChooseAmountBtn','click',casinoChooseAmount);
+document.querySelectorAll('.amount-btn').forEach(function(b){b.addEventListener('click',function(){casinoSetBet(parseInt(b.dataset.amt));});});
+bind('casinoSpinBtn','click',casinoSpin);
+bind('itemMyStreams','click',function(){buildMyStreams();openPanel('panelMyStreams');});
+bind('itemStats','click',function(){buildStats();openPanel('panelStats');});
+bind('itemSettings','click',function(){var a=$('toggleAutoRec'),b=$('toggleSwearing'),c=$('toggleVoice');if(a)a.classList.toggle('on',S.autoRec);if(b)b.classList.toggle('on',S.swearing);if(c)c.classList.toggle('on',S.voiceOn);openPanel('panelSettings');});
+bind('itemEdit','click',openEdit);
+bind('itemAutoRec','click',function(){S.autoRec=!S.autoRec;var a=$('toggleAutoRec');if(a)a.classList.toggle('on',S.autoRec);saveStats();toast(S.autoRec?'🔴 Автозапись вкл':'Автозапись выкл');});
+bind('itemSwearing','click',function(){S.swearing=!S.swearing;var b=$('toggleSwearing');if(b)b.classList.toggle('on',S.swearing);saveStats();toast(S.swearing?'🤬 Маты вкл':'Маты выкл');});
+bind('itemVoice','click',function(){S.voiceOn=!S.voiceOn;var c=$('toggleVoice');if(c)c.classList.toggle('on',S.voiceOn);saveStats();if(!S.voiceOn)stopSpeak();toast(S.voiceOn?'🔊 Голос вкл':'🔇 Голос выкл');});
+bind('editCancel','click',function(){$('editModal').classList.remove('show');});
+bind('editSave','click',function(){S.nick=$('editNick').value.trim()||'grand-cat';S.avatar=S._pAv||'G';S.avatarColor=S._pAvC||'#25a4d3';S.avatarRing=S._pRing||'#ffffff';S.avatarText=S._pText||'#ffffff';saveStats();updProfUI();$('editModal').classList.remove('show');toast('✅ Профиль обновлён');});
+bind('statFollowersBtn','click',function(){buildFollowers();openPanel('panelFollowers');});
+bind('statFollowingBtn','click',function(){buildFollowing();openPanel('panelFollowing');});
+bind('statCrystalsBtn','click',function(){updCrysUI();openPanel('panelCasino');});
+bind('stFollowersCard','click',function(){buildFollowers();openPanel('panelFollowers');});
+bind('stDialogsCard','click',function(){buildFollowing();openPanel('panelFollowing');});
+bind('wdChar','input',function(e){if(!wdP)return;var v=e.target.value||'🐱';wdP.emoji=v;$('wdAvBig').textContent=v;$('wdAvBig').style.color=isEmoji(v)?'#fff':wdP.textColor;});
+bind('wdNick','input',function(e){if(!wdP)return;var v=e.target.value.trim();if(!v||v===wdNick)return;if(chats[v]){toast('Ник занят');return;}chats[v]=chats[wdNick];delete chats[wdNick];chats[v].nick=v;wdNick=v;wdP.nick=v;saveChats();});
+document.querySelectorAll('#wardrobeModal .wd-gender-opt').forEach(function(el){el.addEventListener('click',function(){if(!wdP)return;wdP.gender=el.getAttribute('data-gender');document.querySelectorAll('#wardrobeModal .wd-gender-opt').forEach(function(o){o.classList.toggle('sel',o===el);});});});
+bind('wdCancel','click',function(){wdP=null;wdNick=null;$('wardrobeModal').classList.remove('show');});
+bind('wdSave','click',function(){if(!wdNick||!wdP)return;var c=chats[wdNick];if(!c)return;c.emoji=wdP.emoji;c.gradient=wdP.gradient;c.gender=wdP.gender;c.ringColor=wdP.ringColor;c.textColor=wdP.textColor;saveChats();if(S.coBot&&S.coBot.nick===wdNick){S.coBot.emoji=c.emoji;S.coBot.gradient=c.gradient;S.coBot.gender=c.gender;applyBotAv();}if(S.currentChat===wdNick)renderChatHead(wdNick);toast('✅ Сохранено');wdP=null;wdNick=null;$('wardrobeModal').classList.remove('show');});
+bind('btnCreateChannel','click',openCreateChannel);
+bind('chCreateSave','click',createChannel);
+bind('channelSend','click',sendChannelMessage);bind('channelInput','keydown',function(e){if(e.key==='Enter')sendChannelMessage();});
+bind('channelGiftBtn','click',openGiveaway);
+bind('channelDeleteBtn','click',function(){if(currentChannelId)openDeleteConfirm('channel',currentChannelId);});
+bind('channelHeadName','click',function(){openChatMenu('channel');});
+bind('channelHeadAv','click',function(){openChatMenu('channel');});
+bind('gwStart','click',startGiveaway);
+bind('btnCreateChatRoom','click',openCreateChat);
+bind('chatPublicBtn','click',pickPublicChat);
+bind('chatPrivateBtn','click',pickPrivateChat);
+bind('membersSelectNext','click',nextFromMembersSelect);
+bind('crCreateSave','click',createChatRoom);
+bind('chatRoomSend','click',sendChatRoomMessage);bind('chatRoomInput','keydown',function(e){if(e.key==='Enter')sendChatRoomMessage();});
+bind('chatRoomHeadName','click',function(){openChatMenu('chatroom');});
+bind('chatRoomHeadAv','click',function(){openChatMenu('chatroom');});
+bind('chatRoomDeleteBtn','click',function(){if(currentChatRoomId)openDeleteConfirm('chatroom',currentChatRoomId);});
+bind('deleteRoomConfirm','click',confirmDeleteRoom);
+bind('erSave','click',saveEditRoom);
+document.querySelectorAll('.roomModal').forEach(function(m){m.addEventListener('click',function(e){if(e.target===m)m.classList.remove('show');});});
+document.body.addEventListener('touchstart',function(){initAudio();unlockVoice();},{once:true});
+document.body.addEventListener('click',function(){initAudio();unlockVoice();},{once:true});
+bind('vvBack','click',closeVideoViewer);
+
+window.closeChatMenu=closeChatMenu;
+window.openMenuSub=openMenuSub;
+window.editRoom=editRoom;
+
+loadAllVideos().then(function(list){if(list&&list.length){list.sort(function(a,b){return new Date(b.date)-new Date(a.date);});myStreams=list;}}).catch(function(){});
+
+try{
+  updCrysUI();updFolUI();updFolwUI();updProfUI();updBadge();
+  requestAnimationFrame(loop);
+  setInterval(function(){if(S.streaming)renderPiP();},33);
+  console.log('grand-cat OK');
+}catch(e){
+  var f=$('fatal');
+  if(f){f.style.display='block';f.textContent='Ошибка init: '+e.message+'\n'+e.stack;}
+}
+</script>
+</body>
+</html>
