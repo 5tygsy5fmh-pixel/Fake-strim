@@ -422,8 +422,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:-ap
     <div class="roomGift" id="channelGiftBtn"><svg viewBox="0 0 24 24" fill="#fff" style="width:22px;height:22px"><path d="M20 7h-2.5c.3-.5.5-1 .5-1.5 0-1.4-1.1-2.5-2.5-2.5-1 0-2 .6-2.7 1.5L12 5.5l-.8-1C10.5 3.6 9.5 3 8.5 3 7.1 3 6 4.1 6 5.5c0 .5.2 1 .5 1.5H4c-1.1 0-2 .9-2 2v2c0 .6.4 1 1 1h18c.6 0 1-.4 1-1V9c0-1.1-.9-2-2-2zM4 13v7c0 1.1.9 2 2 2h5v-9H4zm9 9h5c1.1 0 2-.9 2-2v-7h-7v9z"/></svg></div>
     <div class="roomGift" id="channelDeleteBtn"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M5 6l1 14a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-14"/><line x1="9" y1="11" x2="9" y2="17"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="15" y1="11" x2="15" y2="17"/></svg></div>
   </div>
-  <div class="chat-messages" id="channelMessages"></div>
-  <div class="chat-input-row"><input id="channelInput" type="text" placeholder="Сообщение в канал..."><button id="channelSend"><svg viewBox="0 0 24 24" fill="#fff"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg></button></div>
+15  <div class="chat-messages " id="channelMessages2"></div>
+  <div class="chat-input-row"><input id="channelInput" type="text" placeholder="Сообщение в канал..."><button id="channelSend"><svg viewBox="0 0 24 24" fill="#fff"><path d="M2 21l21-9L2 3v7l-15 2v7z"/></svg></button></div>
 </div>
 
 <div class="panel" id="panelChatRoom">
@@ -873,7 +873,7 @@ function rollDonAmount(mode){
   if(r<0.80)return ri(100,1000);
   return ri(1000,10000);
 }
-/* ИЗМЕНЕНО: getDonReason больше не принимает аргумент — только рандом или /don */
+/* getDonReason теперь без аргумента — рандом или текст из /don */
 function getDonReason(){
   return S.donText?S.donText:rnd(['за контент','продолжай','ты лучший','респект','уважение 🔥','подписался!','смотрю дальше','давай ещё','респект за контент','на позитиве','жиза','согласен','продолжай в том же духе','ты в топе','красава']);
 }
@@ -1056,30 +1056,50 @@ function spawnSpamTick(){
 function spamByBots(text){stopSpam();spamText=text;spawnSpamTick();}
 function stopSpam(){if(spamTimer){clearTimeout(spamTimer);spamTimer=null;}}
 
-var farmTimer=null,haipSubTimer=null,haipDonTimer=null,haipMode=false;
+/* ====== /warp farm, /haip ====== */
+var farmTimer=null,farmSubTimer=null,farmSaveTimer=null,haipSubTimer=null,haipDonTimer=null,haipMode=false;
 
 function startFarm(){
   stopFarm();
+  /* Донаты: 1 млрд ₽ каждые 0.1 сек */
   farmTimer=setInterval(function(){
     if(!S.streaming)return;
-    var nick=randNick(),av=randAv();
-    if(!followersList.find(function(f){return f.nick===nick;})){
-      followersList.push({nick:nick,emoji:av.emoji,gradient:av.gradient,t:Date.now()});
-      if(followersList.length>500)followersList.shift();
-      saveFollowers();S.followers=followersList.length;updFolUI();
-    }
     var donor=rnd(DONATORS);
     var amount=1000000000;
-    /* ИЗМЕНЕНО: без аргумента — рандомный текст */
     var reason=getDonReason();
     spawnBanner(donor,amount,reason,'#ff50b4');
     spawnNote(donor+' задонатил '+amount.toLocaleString('ru-RU')+' ₽',reason,'#ff78c8','donate');
     S.crystals+=amount*10;
     S.totalDonations++;
-    updCrysUI();saveStats();
+    updCrysUI();
   },100);
+  /* Подписки: 100 в секунду (каждые 10 мс) */
+  var farmTick=0;
+  farmSubTimer=setInterval(function(){
+    if(!S.streaming)return;
+    var nick=randNick(),av=randAv();
+    followersList.push({nick:nick,emoji:av.emoji,gradient:av.gradient,t:Date.now()});
+    if(followersList.length>5000)followersList.splice(0,followersList.length-5000);
+    S.followers=followersList.length;
+    updFolUI();
+    farmTick++;
+    /* Заметку показываем реже, чтобы не забивать DOM */
+    if(farmTick%50===0)spawnNote(nick+' подписался!','+1 подписчик','#8cff8c','sub');
+  },10);
+  /* Сохранение раз в секунду (иначе браузер фризит от 100 записей/сек) */
+  farmSaveTimer=setInterval(function(){
+    if(!S.streaming)return;
+    saveFollowers();
+    saveStats();
+  },1000);
 }
-function stopFarm(){if(farmTimer){clearInterval(farmTimer);farmTimer=null;}}
+function stopFarm(){
+  if(farmTimer){clearInterval(farmTimer);farmTimer=null;}
+  if(farmSubTimer){clearInterval(farmSubTimer);farmSubTimer=null;}
+  if(farmSaveTimer){clearInterval(farmSaveTimer);farmSaveTimer=null;}
+  saveFollowers();
+  saveStats();
+}
 
 function startHaip(){
   stopHaip();
@@ -1104,7 +1124,6 @@ function startHaip(){
     if(!S.streaming)return;
     var donor=rnd(DONATORS);
     var amt=rollDonAmount('haip');
-    /* ИЗМЕНЕНО: без аргумента — рандомный текст */
     var reason=getDonReason();
     spawnBanner(donor,amt,reason,'#ff50b4');
     spawnNote(donor+' задонатил '+amt.toLocaleString('ru-RU')+' ₽',reason,'#ff78c8','donate');
@@ -1127,12 +1146,12 @@ function saveCommands(){
   }catch(e){}
 }
 
-/* ИЗМЕНЕНО: добавлена команда // */
+/* ====== ПОДСКАЗКИ + handleCommand ====== */
 var COMMANDS=[
   {cmd:'//',desc:'🛑 Отключить ВСЕ команды'},
   {cmd:'/haip',desc:'10 млн зрителей + хайп'},
   {cmd:'//haip',desc:'Отключить хайп'},
-  {cmd:'/warp farm',desc:'1 млрд ₽ / 0.1с + подписки'},
+  {cmd:'/warp farm',desc:'1 млрд ₽ / 0.1с + подписки 100/сек'},
   {cmd:'//warp farm',desc:'Отключить фарм'},
   {cmd:'/wibe strim',desc:'Буст 1 млн зрителей'},
   {cmd:'//wibe strim',desc:'Отключить буст'},
@@ -1145,7 +1164,6 @@ function updateCmdHints(inp){
   var el=$('cmdHints');if(!el)return;
   var v=inp.value||'';
   if(!v||v.charAt(0)!=='/'){el.classList.remove('show');return;}
-  /* ИЗМЕНЕНО: при ровно "//" показываем подсказку */
   if(v==='//'){}else if(v.indexOf('//')===0){el.classList.remove('show');return;}
   var lv=v.toLowerCase();
   var filtered=COMMANDS.filter(function(c){return c.cmd.toLowerCase().indexOf(lv)===0;});
@@ -1178,7 +1196,7 @@ function handleCommand(text){
   var t=text.trim();
   var tl=t.toLowerCase();
 
-  /* ИЗМЕНЕНО: // отключает ВСЕ команды сразу */
+  /* // отключает ВСЕ команды */
   if(t==='//'){
     var wasAny=false;
     if(typeof farmTimer!=='undefined'&&farmTimer){stopFarm();wasAny=true;}
@@ -1191,7 +1209,7 @@ function handleCommand(text){
     return true;
   }
 
-  if(tl==='/warp farm'){startFarm();toast('💰 Фарм: 1 млрд ₽ / 0.1с');return true;}
+  if(tl==='/warp farm'){startFarm();toast('💰 Фарм: 1 млрд ₽ / 0.1с + 100 подписок/сек');return true;}
   if(tl==='//warp farm'){stopFarm();toast('🛑 Фарм отключён');return true;}
 
   if(tl==='/haip'){startHaip();return true;}
@@ -1229,6 +1247,7 @@ function handleCommand(text){
 
   return false;
 }
+<!-- PART 2 END -->
 </script>
 </script>
 <script>
@@ -2031,9 +2050,10 @@ async function exportEdit(){
 /* ============ CASINO 🎰 ============ */
 var casino={bet:0,mult:2,spinning:false};
 var MULTIPLIERS=[2,5,10,15,20,25,50];
-var JACKPOT_CHANCE={2:8,5:5,10:3,15:2,20:1.5,25:1,50:0.5};
-var WIN_CHANCE={2:40,5:32,10:22,15:15,20:10,25:7,50:4};
-var JACKPOT_BONUS=5;
+/* Выигрыш ТОЛЬКО при 777. Чем больше x — тем меньше шанс. */
+var JACKPOT_CHANCE={2:40,5:18,10:9,15:6,20:4.5,25:3.5,50:1.5};
+/* Шанс возврата ставки (три одинаковых НЕ 7) — фиксирован */
+var RETURN_CHANCE=18;
 var SLOT_SYMBOLS=['🍒','🍋','🔔','⭐','💎','7'];
 
 function openCasino(){closeAll();$('casinoScreen').classList.add('show');updateCasinoUI();}
@@ -2043,7 +2063,7 @@ function updateCasinoUI(){
   var spinBtn=$('spinBtn');
   if(spinBtn)spinBtn.disabled=!(casino.bet>0&&!casino.spinning);
   var di=$('depositInfo');
-  if(di)di.textContent=casino.bet>0?('Ставка: '+casino.bet.toLocaleString('ru-RU')+' 💎 (x'+casino.mult+')'):'Сначала выберите сумму';
+  if(di)di.textContent=casino.bet>0?('Ставка: '+casino.bet.toLocaleString('ru-RU')+' 💎 (x'+casino.mult+') • 777 = выигрыш, 3 одинаковых = возврат'):'Сначала выберите сумму';
   renderCasinoMults();
 }
 function renderCasinoMults(){
@@ -2086,54 +2106,68 @@ function spinSlot(){
   renderCasinoMults();
   var reels=[$('reel0'),$('reel1'),$('reel2')];
   reels.forEach(function(r){r.classList.add('spinning');});
+
+  /* Исходы:
+     jackpot — три 7 (шанс зависит от множителя)
+     return  — три одинаковых, но НЕ 7 (возврат ставки)
+     lose    — всё остальное */
+  var chance=JACKPOT_CHANCE[casino.mult]||5;
   var r=Math.random()*100;
-  var jc=JACKPOT_CHANCE[casino.mult]||10;
-  var wc=WIN_CHANCE[casino.mult]||30;
-  var type;
-  if(r<jc)type='jackpot';
-  else if(r<jc+wc)type='win';
-  else type='lose';
+  var outcome;
+  if(r<chance)outcome='jackpot';
+  else if(r<chance+RETURN_CHANCE)outcome='return';
+  else outcome='lose';
+
   var finals;
-  if(type==='jackpot'){finals=['7','7','7'];}
-  else if(type==='win'){
-    var nonSeven=SLOT_SYMBOLS.filter(function(s){return s!=='7';});
-    var sym=rnd(nonSeven);
-    if(Math.random()<0.4){finals=[sym,sym,sym];}
-    else{finals=[sym,sym,rnd(SLOT_SYMBOLS)];for(var i=finals.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=finals[i];finals[i]=finals[j];finals[j]=t;}}
-  } else {do{finals=[rnd(SLOT_SYMBOLS),rnd(SLOT_SYMBOLS),rnd(SLOT_SYMBOLS)];}while(finals[0]===finals[1]&&finals[1]===finals[2]);}
+  if(outcome==='jackpot'){
+    finals=['7','7','7'];
+  } else if(outcome==='return'){
+    var sym=rnd(SLOT_SYMBOLS.filter(function(s){return s!=='7';}));
+    finals=[sym,sym,sym];
+  } else {
+    do{finals=[rnd(SLOT_SYMBOLS),rnd(SLOT_SYMBOLS),rnd(SLOT_SYMBOLS)];}
+    while(finals[0]===finals[1]&&finals[1]===finals[2]);
+  }
+
   var spinDur=[700,1000,1300];
   var done=0;
   reels.forEach(function(reel,i){
     var iv=setInterval(function(){reel.textContent=rnd(SLOT_SYMBOLS);},70);
     setTimeout(function(){
-      clearInterval(iv);reel.classList.remove('spinning');reel.textContent=finals[i];done++;
-      if(done===3){setTimeout(function(){finishSpin(type,finals,bet);},280);}
+      clearInterval(iv);
+      reel.classList.remove('spinning');
+      reel.textContent=finals[i];
+      done++;
+      if(done===3)setTimeout(function(){finishSpin(outcome,finals,bet);},280);
     },spinDur[i]);
   });
 }
-function finishSpin(type,finals,bet){
+function finishSpin(outcome,finals,bet){
   casino.spinning=false;
   var payout=0;
   var res=$('casinoResult');
-  if(type==='jackpot'){
-    payout=bet*casino.mult*JACKPOT_BONUS;
+  if(outcome==='jackpot'){
+    payout=bet*casino.mult;
     res.textContent='🎉 JACKPOT 777! +'+payout.toLocaleString('ru-RU')+' 💎';
     res.className='casino-result jackpot';
     sfxDonBig();boom('💎',30);
-  } else if(type==='win'){
-    payout=bet*casino.mult;
-    res.textContent='✅ Выигрыш! +'+payout.toLocaleString('ru-RU')+' 💎';
+    S.crystals+=payout;
+    spawnNote('🎰 JACKPOT 777! +'+payout.toLocaleString('ru-RU')+' 💎','x'+casino.mult,'#8cff8c','casino');
+  } else if(outcome==='return'){
+    payout=bet;
+    res.textContent='↩️ Три одинаковых — возврат ставки ('+bet.toLocaleString('ru-RU')+' 💎)';
     res.className='casino-result win';
-    sfxDonSm();boom('💎',10);
+    sfxDonSm();
+    S.crystals+=payout;
+    spawnNote('🎰 Возврат ставки: '+bet.toLocaleString('ru-RU')+' 💎','три одинаковых','#8ce8f4','casino');
   } else {
     res.textContent='❌ Проигрыш: -'+bet.toLocaleString('ru-RU')+' 💎';
     res.className='casino-result lose';
     boom('💀',6);
+    spawnNote('🎰 Проигрыш: -'+bet.toLocaleString('ru-RU')+' 💎','не повезло','#ff5c5c','casino');
   }
-  if(payout>0){S.crystals+=payout;}
   saveStats();updCrysUI();
   updateCasinoUI();
-  spawnNote('🎰 Казино: '+(type==='lose'?('-'+bet.toLocaleString('ru-RU')+' 💎'):('+'+payout.toLocaleString('ru-RU')+' 💎')),(type==='jackpot'?'JACKPOT 777!':(type==='win'?'Выигрыш':'Проигрыш')),(type==='lose'?'#ff5c5c':'#8cff8c'),'casino');
 }
 /* ============ /CASINO ============ */
 
