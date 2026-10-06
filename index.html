@@ -969,7 +969,7 @@ function startStream(onStart){
     S.streaming=true;S.currentChat=null;S.totalStreams++;
     botSimOn=true;
     var prevBoost=localStorage.getItem('gc_boost')==='1';
-var prevSpam=localStorage.getItem('gc_spam')||'';
+    var prevSpam=localStorage.getItem('gc_spam')||'';
     S.viewers=prevBoost?1000000:30000;
     S.viewerBoost=prevBoost;
     S.lastViewerMin=Date.now();
