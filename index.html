@@ -1273,10 +1273,10 @@ function openWardrobe(nick){
         wdP.emoji=e;$('wdChar').value=e;$('wdAvBig').textContent=e;
         $('wdAvBig').style.color=isEmoji(e)?'#fff':wdP.textNameColor;
       };
-').      grid.appendChild(d);
+grid.appendChild(d);
    text })(EMOJContentIS_PICK[j]);
-=  }
-  $('wardobjrobeModal').classList.add('show');
+}
+  $('wardrobeModal').classList.add('show');
 }
 function extractMain(g){if(!g)return'#ff6384';var m=g.match(/#[0-9a-f]{6}/gi);return m&&m[0]?m[0]:'#ff6384';}
 function lighten(hex,amt){var c=hex.replace('#','');if(c.length===3)c=c.split('').map(function(x){return x+x;}).join('');var r=clamp(parseInt(c.substr(0,2),16)+amt,0,255);var g=clamp(parseInt(c.substr(2,2),16)+amt,0,255);var b=clamp(parseInt(c.substr(4,2),16)+amt,0,255);return'#'+[r,g,b].map(function(x){var s=x.toString(16);return s.length<2?'0'+s:s;}).join('');}
