@@ -311,6 +311,41 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:-ap
 .cmd-hint:active{background:rgba(255,255,255,.15)}
 .cmd-hint .cmd-name{font-weight:800;color:#25f4ee;font-family:ui-monospace,monospace}
 .cmd-hint .cmd-desc{font-size:11px;opacity:.6;text-align:right}
+#casinoScreen{position:fixed;inset:0;z-index:700;background:linear-gradient(180deg,#1a0a2e,#0a0a14);display:none;flex-direction:column}
+#casinoScreen.show{display:flex}
+.casino-top{display:flex;align-items:center;gap:10px;padding:calc(14px + env(safe-area-inset-top)) 16px 14px;background:rgba(0,0,0,.6);border-bottom:1px solid rgba(255,255,255,.08);flex-shrink:0}
+.casino-back{width:40px;height:40px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:rgba(255,255,255,.1);border-radius:50%;flex-shrink:0}
+.casino-back svg{width:22px;height:22px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round}
+.casino-title{flex:1;font-size:18px;font-weight:800;text-align:center}
+.casino-balance{font-size:13px;background:rgba(37,244,238,.15);color:#8ee8f4;padding:6px 12px;border-radius:12px;font-weight:800;flex-shrink:0}
+.casino-body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px 16px;gap:16px;overflow-y:auto}
+.deposit-btn{padding:14px 24px;background:linear-gradient(135deg,#25f4ee,#2f7fff);color:#000;border:none;border-radius:16px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:0 6px 20px rgba(37,244,238,.4);min-width:240px}
+.deposit-info{font-size:13px;opacity:.75;margin-top:-8px;text-align:center}
+.slot-machine{background:linear-gradient(180deg,#3a1a5e,#1a0a2e);border:4px solid #ffd700;border-radius:24px;padding:22px 16px 20px;box-shadow:0 10px 40px rgba(255,215,0,.25),inset 0 0 30px rgba(0,0,0,.5);width:100%;max-width:380px}
+.slot-reels{display:flex;gap:10px;background:#000;padding:14px;border-radius:16px;box-shadow:inset 0 0 20px rgba(0,0,0,.9);justify-content:center}
+.slot-reel{width:70px;height:90px;background:linear-gradient(180deg,#fff,#e8e8e8);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:44px;font-weight:900;color:#000;overflow:hidden;transition:transform .1s}
+.slot-reel.spinning{animation:reelSpin .08s linear infinite}
+@keyframes reelSpin{0%{transform:translateY(-6px)}50%{transform:translateY(6px)}100%{transform:translateY(-6px)}}
+.slot-multiplier-row{margin-top:14px;display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.slot-mult{flex:0 0 auto;min-width:48px;padding:8px 10px;background:rgba(255,255,255,.08);border:2px solid transparent;border-radius:12px;font-size:13px;font-weight:800;cursor:pointer;color:#fff;font-family:inherit;transition:all .15s}
+.slot-mult.sel{background:linear-gradient(135deg,#ff0050,#ff5c8a);border-color:#fff;box-shadow:0 0 12px rgba(255,0,80,.5)}
+.slot-mult:disabled{opacity:.35;cursor:not-allowed}
+.spin-btn{margin-top:18px;width:100%;padding:16px;border-radius:18px;border:none;font-size:18px;font-weight:900;color:#fff;background:linear-gradient(135deg,#43e97b,#38f9d7);cursor:pointer;font-family:inherit;box-shadow:0 6px 20px rgba(67,233,123,.4);letter-spacing:2px}
+.spin-btn:disabled{background:rgba(255,255,255,.12);color:rgba(255,255,255,.4);box-shadow:none;cursor:not-allowed;letter-spacing:2px}
+.casino-result{font-size:16px;font-weight:800;text-align:center;min-height:26px;padding:0 10px;line-height:1.3}
+.casino-result.win{color:#8cff8c}
+.casino-result.lose{color:#ff5c5c}
+.casino-result.jackpot{color:#ffd700;font-size:22px;text-shadow:0 0 20px #ffd700}
+#depositModal{position:fixed;inset:0;z-index:800;background:rgba(0,0,0,.9);display:none;align-items:center;justify-content:center;padding:20px}
+#depositModal.show{display:flex}
+#depositModal .box{background:#1a1a2e;border-radius:20px;padding:22px;width:100%;max-width:340px;text-align:center}
+#depositModal h3{font-size:18px;margin-bottom:6px}
+#depositModal .sub{font-size:12px;opacity:.6;margin-bottom:14px}
+#depositModal input{width:100%;background:rgba(255,255,255,.08);border:none;border-radius:12px;padding:14px;color:#fff;font-size:20px;font-weight:800;text-align:center;outline:none;font-family:inherit;box-sizing:border-box}
+#depositModal .btns{display:flex;gap:10px;margin-top:18px}
+#depositModal .btns button{flex:1;padding:12px;border-radius:12px;border:none;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit}
+#depositModal .save{background:#25f4ee;color:#000}
+#depositModal .cancel{background:rgba(255,255,255,.1);color:#fff}
 </style>
 </head>
 <body>
@@ -402,7 +437,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:-ap
   <div class="chat-input-row"><input id="chatRoomInput" type="text" placeholder="Сообщение..."><button id="chatRoomSend"><svg viewBox="0 0 24 24" fill="#fff"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg></button></div>
 </div>
 
-<div class="panel" id="panelAccount"><div class="panel-head"><div class="back" data-back><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><polyline points="15 6 9 12 15 18"/></svg></div><div class="title">Аккаунт</div></div><div class="panel-body"><div class="account-body"><div class="account-av" id="accAvatar">G</div><div class="account-name" id="accName">grand-cat</div><div class="account-handle" id="accHandle">@grand_cat</div><div class="account-stats"><div class="acc-stat" id="statFollowersBtn"><div class="n" id="accFollowers">0</div><div class="l">подписчики</div></div><div class="acc-stat" id="statFollowingBtn"><div class="n" id="accFollowing">0</div><div class="l">подписки</div></div><div class="acc-stat" id="statCrystalsBtn"><div class="n" id="accCrystalsStat">0</div><div class="l">кристаллы</div></div></div><div class="account-item" id="itemMyStreams"><div class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.2"/><rect x="7.5" y="8.5" width="7" height="7" rx="1"/><path d="M14.5 11l3-1.8v5.6l-3-1.8z"/></svg></div><div class="lb">Мои стримы</div><div class="ar">›</div></div><div class="account-item" id="itemStats"><div class="ic"><svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="7"/><line x1="21" y1="21" x2="15.5" y2="15.5"/><line x1="7.5" y1="13" x2="7.5" y2="14.5"/><line x1="10" y1="10" x2="10" y2="14.5"/><line x1="12.5" y1="12" x2="12.5" y2="14.5"/><line x1="6.5" y1="15.5" x2="14" y2="15.5"/></svg></div><div class="lb">Статистика</div><div class="ar">›</div></div><div class="account-item" id="itemSettings"><div class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div><div class="lb">Настройки</div><div class="ar">›</div></div></div></div></div>
+<div class="panel" id="panelAccount"><div class="panel-head"><div class="back" data-back><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><polyline points="15 6 9 12 15 18"/></svg></div><div class="title">Аккаунт</div></div><div class="panel-body"><div class="account-body"><div class="account-av" id="accAvatar">G</div><div class="account-name" id="accName">grand-cat</div><div class="account-handle" id="accHandle">@grand_cat</div><div class="account-stats"><div class="acc-stat" id="statFollowersBtn"><div class="n" id="accFollowers">0</div><div class="l">подписчики</div></div><div class="acc-stat" id="statFollowingBtn"><div class="n" id="accFollowing">0</div><div class="l">подписки</div></div><div class="acc-stat" id="statCrystalsBtn"><div class="n" id="accCrystalsStat">0</div><div class="l">кристаллы</div></div></div><div class="account-item" id="itemCasino"><div class="ic">🎰</div><div class="lb">Казино</div><div class="ar">›</div></div><div class="account-item" id="itemMyStreams"><div class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.2"/><rect x="7.5" y="8.5" width="7" height="7" rx="1"/><path d="M14.5 11l3-1.8v5.6l-3-1.8z"/></svg></div><div class="lb">Мои стримы</div><div class="ar">›</div></div><div class="account-item" id="itemStats"><div class="ic"><svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="7"/><line x1="21" y1="21" x2="15.5" y2="15.5"/><line x1="7.5" y1="13" x2="7.5" y2="14.5"/><line x1="10" y1="10" x2="10" y2="14.5"/><line x1="12.5" y1="12" x2="12.5" y2="14.5"/><line x1="6.5" y1="15.5" x2="14" y2="15.5"/></svg></div><div class="lb">Статистика</div><div class="ar">›</div></div><div class="account-item" id="itemSettings"><div class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div><div class="lb">Настройки</div><div class="ar">›</div></div></div></div></div>
 
 <div class="panel" id="panelSettings">
   <div class="panel-head"><div class="back" data-back><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><polyline points="15 6 9 12 15 18"/></svg></div><div class="title">Настройки</div></div>
@@ -592,6 +627,34 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:-ap
 
 <div id="saveModal"><div class="sm-title">🎬 Видео готово</div><div class="sm-sub">Нажми «Сохранить»</div><button class="sm-btn" id="smSave">📥 Сохранить</button><button class="sm-btn secondary" id="smClose">Закрыть</button></div>
 
+<div id="casinoScreen">
+  <div class="casino-top">
+    <div class="casino-back" id="casinoBack"><svg viewBox="0 0 24 24"><polyline points="15 6 9 12 15 18"/></svg></div>
+    <div class="casino-title">🎰 Казино</div>
+    <div class="casino-balance" id="casinoBalance">💎 0</div>
+  </div>
+  <div class="casino-body">
+    <button class="deposit-btn" id="depositBtn">💰 Внести кристаллы</button>
+    <div class="deposit-info" id="depositInfo">Сначала выберите сумму</div>
+    <div class="slot-machine">
+      <div class="slot-reels">
+        <div class="slot-reel" id="reel0">7</div>
+        <div class="slot-reel" id="reel1">7</div>
+        <div class="slot-reel" id="reel2">7</div>
+      </div>
+      <div class="slot-multiplier-row" id="slotMultRow"></div>
+      <button class="spin-btn" id="spinBtn" disabled>КРУТИТЬ</button>
+    </div>
+    <div class="casino-result" id="casinoResult"></div>
+  </div>
+</div>
+<div id="depositModal"><div class="box">
+  <h3>💰 Внести кристаллы</h3>
+  <div class="sub">Сколько ставим?</div>
+  <input type="number" id="depositInput" placeholder="Например 1000" min="1">
+  <div class="btns"><button class="cancel" id="depositCancel">Отмена</button><button class="save" id="depositOk">Внести</button></div>
+</div></div>
+
 <div id="fatal"></div>
 <div id="cmdHints"></div>
 <script>
@@ -748,7 +811,7 @@ function applyBotAv(){
 
 var cE=$('comments'),nE=$('notes'),bE=$('banner'),hE=$('hearts'),capE=$('caption'),tE=$('toast');
 function toast(t){if(!tE)return;tE.textContent=t;tE.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(function(){tE.classList.remove('show');},2200);}
-function updCrysUI(){var s=S.crystals.toLocaleString('ru-RU');['menuCrystals','accCrystalsStat'].forEach(function(id){var e=$(id);if(e)e.textContent=s;});}
+function updCrysUI(){var s=S.crystals.toLocaleString('ru-RU');['menuCrystals','accCrystalsStat'].forEach(function(id){var e=$(id);if(e)e.textContent=s;});var cb=$('casinoBalance');if(cb)cb.textContent='💎 '+s;}
 function updFolUI(){var n=followersList.length,s=n>=1000?(n/1000).toFixed(1)+'K':String(n);['menuFollowers','accFollowers'].forEach(function(id){var e=$(id);if(e)e.textContent=s;});}
 function updFolwUI(){var e=$('accFollowing');if(e)e.textContent=Object.keys(chats).length.toLocaleString('ru-RU');}
 function showMenu(){$('menuScreen').classList.remove('hide');$('ui').classList.remove('show');$('cam').classList.remove('show');S.streaming=false;if(S.coBot)stopCo();stopSpeak();closeAll();}
@@ -792,7 +855,6 @@ function onUserSpoke(text){
   S.hype=Math.min(1,S.hype+0.15);
 }
 
-/* ====== ДОНАТЫ (обновлено) ====== */
 function rollDonAmount(mode){
   var r=Math.random();
   if(mode==='haip'){
@@ -835,7 +897,6 @@ function donEvent(){
     setTimeout(function(){if(!botRef)return;if(!botCanPost())return;spawnChat(th,botRef.nick,botRef.gradient||'#ff6384',{kind:'normal',isBot:true});speak(botRef,th);},1200);
   }
 }
-/* ====== /ДОНАТЫ ====== */
 
 function subEvent(){
   var nick=randNick(),av=randAv();
@@ -994,7 +1055,6 @@ function spawnSpamTick(){
 function spamByBots(text){stopSpam();spamText=text;spawnSpamTick();}
 function stopSpam(){if(spamTimer){clearTimeout(spamTimer);spamTimer=null;}}
 
-/* ====== /warp farm и /haip (обновлено) ====== */
 var farmTimer=null,haipSubTimer=null,haipDonTimer=null,haipMode=false;
 
 function startFarm(){
@@ -1055,7 +1115,6 @@ function stopHaip(){
   if(haipDonTimer){clearInterval(haipDonTimer);haipDonTimer=null;}
   haipMode=false;
 }
-/* ====== конец farm/haip ====== */
 
 function saveCommands(){
   try{
@@ -1065,7 +1124,6 @@ function saveCommands(){
   }catch(e){}
 }
 
-/* ====== ПОДСКАЗКИ КОМАНД + handleCommand ====== */
 var COMMANDS=[
   {cmd:'/haip',desc:'10 млн зрителей + хайп'},
   {cmd:'//haip',desc:'Отключить хайп'},
@@ -1152,6 +1210,7 @@ function handleCommand(text){
 
   return false;
 }
+<script>
 function sendMsg(){
   var inp=$('chatInput'),text=inp.value.trim();
   if(!text||!S.currentChat)return;
@@ -1846,7 +1905,6 @@ function updateTrimUI(){var total=vvTrimDur||1;var lp=(vvTrimStart/total)*100,rp
 function fillFilterPreviews(){var list=$('vvFilterList');if(!list)return;if(list.dataset.filled==='1')return;list.dataset.filled='1';FILTERS.forEach(function(f,i){var el=document.createElement('div');el.className='vv-filter'+(i===0?' sel':'');var box=document.createElement('div');box.className='fbox';var cvs=document.createElement('canvas');cvs.width=160;cvs.height=220;box.appendChild(cvs);var name=document.createElement('span');name.textContent=f.name;el.appendChild(box);el.appendChild(name);el.onclick=function(){list.querySelectorAll('.vv-filter').forEach(function(o){o.classList.remove('sel');});el.classList.add('sel');vvOpts.filter=f.css;vvOpts.filterName=f.name;var v=$('vvVideo');if(v)v.style.filter=f.css==='none'?'none':f.css;};list.appendChild(el);try{var tmp=document.createElement('video');tmp.src=vvUrl;tmp.muted=true;tmp.preload='auto';tmp.addEventListener('loadeddata',function(){try{tmp.currentTime=Math.min(0.5,vvTrimDur*0.1||0.5);tmp.addEventListener('seeked',function(){try{var w=cvs.width,h=cvs.height;var scale=Math.max(w/tmp.videoWidth,h/tmp.videoHeight);var dw=tmp.videoWidth*scale,dh=tmp.videoHeight*scale;var ctx=cvs.getContext('2d');ctx.filter=f.css==='none'?'none':f.css;ctx.drawImage(tmp,(w-dw)/2,(h-dh)/2,dw,dh);}catch(e){}},{once:true});}catch(e){}},{once:true});}catch(e){}});}
 function applyPreview(){var v=$('vvVideo');var frame=$('vvFrame');if(!v||!frame)return;var tr=[];if(vvOpts.rotate)tr.push('rotate('+vvOpts.rotate+'deg)');var sx=vvOpts.flipH?-1:1,sy=vvOpts.flipV?-1:1;if(sx!==1||sy!==1)tr.push('scale('+sx+','+sy+')');v.style.transform=tr.join(' ');v.style.filter=vvOpts.filter==='none'?'none':vvOpts.filter;frame.style.background=vvOpts.bgColor;if(vvOpts.ratio==='none'){frame.style.width='';frame.style.height='';}else{var stage=$('vvStage').getBoundingClientRect();var parts=vvOpts.ratio.split(':');var ar=parseFloat(parts[0])/parseFloat(parts[1]);var w=stage.width,h=stage.height;var fw=w,fh=w/ar;if(fh>h){fh=h;fw=h*ar;}frame.style.width=fw+'px';frame.style.height=fh+'px';}}
 
-/* ====== ЭКСПОРТ ВИДЕО (не виснет на кадре) ====== */
 async function exportEdit(){
   if(!vvStream||!vvTrimDur)return;
   var prog=$('vvProgress'),pctEl=$('vvPct');prog.classList.add('show');pctEl.textContent='0%';
@@ -1968,7 +2026,139 @@ async function exportEdit(){
     toast('Ошибка: '+e.message);
   }
 }
-/* ====== конец export ====== */
+
+/* ============ CASINO 🎰 ============ */
+var casino={bet:0,mult:2,spinning:false};
+var MULTIPLIERS=[2,5,10,15,20,25,50];
+var JACKPOT_CHANCE={2:8,5:5,10:3,15:2,20:1.5,25:1,50:0.5};
+var WIN_CHANCE={2:40,5:32,10:22,15:15,20:10,25:7,50:4};
+var JACKPOT_BONUS=5;
+var SLOT_SYMBOLS=['🍒','🍋','🔔','⭐','💎','7'];
+
+function openCasino(){
+  closeAll();
+  $('casinoScreen').classList.add('show');
+  updateCasinoUI();
+}
+function closeCasino(){
+  $('casinoScreen').classList.remove('show');
+  $('depositModal').classList.remove('show');
+}
+function updateCasinoUI(){
+  var bal=$('casinoBalance');if(bal)bal.textContent='💎 '+S.crystals.toLocaleString('ru-RU');
+  var spinBtn=$('spinBtn');
+  if(spinBtn)spinBtn.disabled=!(casino.bet>0&&!casino.spinning);
+  var di=$('depositInfo');
+  if(di)di.textContent=casino.bet>0?('Ставка: '+casino.bet.toLocaleString('ru-RU')+' 💎 (x'+casino.mult+')'):'Сначала выберите сумму';
+  renderCasinoMults();
+}
+function renderCasinoMults(){
+  var row=$('slotMultRow');if(!row)return;
+  row.innerHTML='';
+  MULTIPLIERS.forEach(function(m){
+    var b=document.createElement('button');
+    b.className='slot-mult'+(casino.mult===m?' sel':'');
+    b.textContent='x'+m;
+    b.disabled=casino.spinning;
+    b.onclick=function(){
+      if(casino.spinning)return;
+      casino.mult=m;
+      renderCasinoMults();
+      updateCasinoUI();
+    };
+    row.appendChild(b);
+  });
+}
+function openDepositModal(){
+  if(casino.spinning)return;
+  $('depositInput').value=casino.bet>0?casino.bet:'';
+  $('depositModal').classList.add('show');
+  setTimeout(function(){try{$('depositInput').focus();}catch(e){}},120);
+}
+function confirmDeposit(){
+  var v=parseInt($('depositInput').value)||0;
+  if(v<=0){toast('Введите сумму больше 0');return;}
+  if(v>S.crystals){toast('Недостаточно кристаллов');return;}
+  casino.bet=v;
+  $('depositModal').classList.remove('show');
+  updateCasinoUI();
+  toast('💰 Ставка: '+v.toLocaleString('ru-RU'));
+}
+function spinSlot(){
+  if(casino.spinning)return;
+  var bet=casino.bet;
+  if(bet<=0){toast('Сначала введите сумму');return;}
+  if(bet>S.crystals){toast('Недостаточно кристаллов');return;}
+  S.crystals-=bet;
+  saveStats();updCrysUI();
+  casino.spinning=true;
+  $('casinoResult').textContent='';
+  $('casinoResult').className='casino-result';
+  $('spinBtn').disabled=true;
+  renderCasinoMults();
+  var reels=[$('reel0'),$('reel1'),$('reel2')];
+  reels.forEach(function(r){r.classList.add('spinning');});
+  var r=Math.random()*100;
+  var jc=JACKPOT_CHANCE[casino.mult]||10;
+  var wc=WIN_CHANCE[casino.mult]||30;
+  var type;
+  if(r<jc)type='jackpot';
+  else if(r<jc+wc)type='win';
+  else type='lose';
+  var finals;
+  if(type==='jackpot'){
+    finals=['7','7','7'];
+  } else if(type==='win'){
+    var nonSeven=SLOT_SYMBOLS.filter(function(s){return s!=='7';});
+    var sym=rnd(nonSeven);
+    if(Math.random()<0.4){
+      finals=[sym,sym,sym];
+    } else {
+      finals=[sym,sym,rnd(SLOT_SYMBOLS)];
+      for(var i=finals.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=finals[i];finals[i]=finals[j];finals[j]=t;}
+    }
+  } else {
+    do{finals=[rnd(SLOT_SYMBOLS),rnd(SLOT_SYMBOLS),rnd(SLOT_SYMBOLS)];}
+    while(finals[0]===finals[1]&&finals[1]===finals[2]);
+  }
+  var spinDur=[700,1000,1300];
+  var done=0;
+  reels.forEach(function(reel,i){
+    var iv=setInterval(function(){reel.textContent=rnd(SLOT_SYMBOLS);},70);
+    setTimeout(function(){
+      clearInterval(iv);
+      reel.classList.remove('spinning');
+      reel.textContent=finals[i];
+      done++;
+      if(done===3){setTimeout(function(){finishSpin(type,finals,bet);},280);}
+    },spinDur[i]);
+  });
+}
+function finishSpin(type,finals,bet){
+  casino.spinning=false;
+  var payout=0;
+  var res=$('casinoResult');
+  if(type==='jackpot'){
+    payout=bet*casino.mult*JACKPOT_BONUS;
+    res.textContent='🎉 JACKPOT 777! +'+payout.toLocaleString('ru-RU')+' 💎';
+    res.className='casino-result jackpot';
+    sfxDonBig();boom('💎',30);
+  } else if(type==='win'){
+    payout=bet*casino.mult;
+    res.textContent='✅ Выигрыш! +'+payout.toLocaleString('ru-RU')+' 💎';
+    res.className='casino-result win';
+    sfxDonSm();boom('💎',10);
+  } else {
+    res.textContent='❌ Проигрыш: -'+bet.toLocaleString('ru-RU')+' 💎';
+    res.className='casino-result lose';
+    boom('💀',6);
+  }
+  if(payout>0){S.crystals+=payout;}
+  saveStats();updCrysUI();
+  updateCasinoUI();
+  spawnNote('🎰 Казино: '+(type==='lose'?('-'+bet.toLocaleString('ru-RU')+' 💎'):('+'+payout.toLocaleString('ru-RU')+' 💎')),(type==='jackpot'?'JACKPOT 777!':(type==='win'?'Выигрыш':'Проигрыш')),(type==='lose'?'#ff5c5c':'#8cff8c'),'casino');
+}
+/* ============ /CASINO ============ */
 
 function bind(id,ev,fn){var el=$(id);if(el)el.addEventListener(ev,fn);}
 bind('btnInbox','click',function(){buildInbox();openPanel('panelInbox');});
@@ -1982,12 +2172,13 @@ bind('rbFlip','click',function(e){pulse(e.currentTarget);flipCam();});
 bind('rbMic','click',function(e){pulse(e.currentTarget);toggleMic();});
 bind('rbEmoji','click',function(e){pulse(e.currentTarget);toggleEmoji();});
 bind('rbKick','click',function(e){pulse(e.currentTarget);stopCo();});
-bind('closeX','click',function(){if(confirm('Завершить стрим?')){if(S.isRecording)stopRec();if(S.coBot)stopCo();stopSpeak();stopSpam();stopFarm();stopHaip();var c=$('cam');if(c&&c.srcObject){c.srcObject.getTracks().forEach(function(t){t.stop();});c.srcObject=null;}if(micRun&&recog){try{recog.stop();}catch(e){}micRun=false;}S.micOn=false;S.currentChat=null;S.streaming=false;if(cE)cE.innerHTML='';if(hE)hE.innerHTML='';resetTimers();S.viewers=30000;S.tv=30000;showMenu();}});
+bind('closeX','click',function(){closeCasino();if(confirm('Завершить стрим?')){if(S.isRecording)stopRec();if(S.coBot)stopCo();stopSpeak();stopSpam();stopFarm();stopHaip();var c=$('cam');if(c&&c.srcObject){c.srcObject.getTracks().forEach(function(t){t.stop();});c.srcObject=null;}if(micRun&&recog){try{recog.stop();}catch(e){}micRun=false;}S.micOn=false;S.currentChat=null;S.streaming=false;if(cE)cE.innerHTML='';if(hE)hE.innerHTML='';resetTimers();S.viewers=30000;S.tv=30000;showMenu();}});
 bind('chatSend','click',sendMsg);
 bind('chatInput','keydown',function(e){if(e.key==='Enter')sendMsg();});
 bind('chatWardrobeBtn','click',function(){if(S.currentChat)openWardrobe(S.currentChat);});
 bind('chatCoStreamBtn','click',function(){if(!S.currentChat)return;var bot=chats[S.currentChat];if(!bot)return;ensureApp(bot);var bi={nick:S.currentChat,emoji:bot.emoji,gradient:bot.gradient,gender:bot.gender,kind:bot.kind};if(!S.streaming){closeAll();startStream(function(){startCo(bi);});}else startCo(bi);});
 bind('accAvatar','click',openEdit);
+bind('itemCasino','click',openCasino);
 bind('itemMyStreams','click',function(){buildMyStreams();openPanel('panelMyStreams');});
 bind('itemStats','click',function(){buildStats();openPanel('panelStats');});
 bind('itemSettings','click',function(){var a=$('toggleAutoRec'),b=$('toggleSwearing'),c=$('toggleVoice');if(a)a.classList.toggle('on',S.autoRec);if(b)b.classList.toggle('on',S.swearing);if(c)c.classList.toggle('on',S.voiceOn);openPanel('panelSettings');});
@@ -2054,6 +2245,12 @@ document.querySelectorAll('.vv-ratio').forEach(function(el){el.addEventListener(
 bind('smSave','click',async function(){if(!lastBlob)return;var f;try{f=new File([lastBlob],lastName,{type:lastBlob.type});}catch(e){f=null;}if(f&&navigator.canShare&&navigator.canShare({files:[f]})){try{await navigator.share({files:[f],title:lastName});toast('✅ Сохранено');$('saveModal').classList.remove('show');return;}catch(e){}}try{var u=URL.createObjectURL(lastBlob);var a=document.createElement('a');a.href=u;a.download=lastName;document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(function(){URL.revokeObjectURL(u);},30000);toast('💾 Файл скачан');$('saveModal').classList.remove('show');}catch(e){toast('Не удалось');}});
 bind('smClose','click',function(){$('saveModal').classList.remove('show');});
 bind('tapLayer','click',function(){try{window.scrollTo(0,1);setTimeout(function(){window.scrollTo(0,0);},60);}catch(e){}});
+bind('casinoBack','click',closeCasino);
+bind('depositBtn','click',openDepositModal);
+bind('depositCancel','click',function(){$('depositModal').classList.remove('show');});
+bind('depositOk','click',confirmDeposit);
+bind('spinBtn','click',spinSlot);
+(function(){var dm=$('depositModal');if(dm)dm.addEventListener('click',function(e){if(e.target===dm)dm.classList.remove('show');});})();
 
 window.closeChatMenu=closeChatMenu;
 window.openMenuSub=openMenuSub;
@@ -2068,6 +2265,7 @@ loadAllVideos().then(function(list){if(list&&list.length){list.sort(function(a,b
 
 try{
   updCrysUI();updFolUI();updFolwUI();updProfUI();updBadge();
+  renderCasinoMults();
   requestAnimationFrame(loop);
   console.log('grand-cat OK');
 }catch(e){
