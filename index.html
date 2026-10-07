@@ -2400,5 +2400,219 @@ window.sendChatRoomMessage=function(){
 };
 console.log('sendChatRoomMessage OK');
 </script>
+  <script>
+"use strict";
+
+/* =========================================================
+   ПАТЧ v7: приватные стримы + чистая Главная
+========================================================= */
+
+/* ---------- 1. Добавляем кнопку "Не публичный" ---------- */
+(function(){
+  var modal = document.getElementById('typeStreamModal');
+  if(!modal) return;
+  var box = modal.querySelector('.box');
+  if(!box) return;
+  if(document.getElementById('typePrivate')) return;
+  var adultBtn = document.getElementById('typeAdult');
+  var privBtn = document.createElement('button');
+  privBtn.className = 'opt';
+  privBtn.id = 'typePrivate';
+  privBtn.style.background = 'linear-gradient(135deg,#555,#888)';
+  privBtn.textContent = '🔒 Не публичный (только для себя)';
+  if(adultBtn && adultBtn.parentNode) {
+    adultBtn.parentNode.insertBefore(privBtn, adultBtn.nextSibling);
+  } else {
+    box.appendChild(privBtn);
+  }
+  privBtn.onclick = function(){
+    // Приватный стрим — просто запускаем, ничего не публикуем
+    var m = document.getElementById('typeStreamModal');
+    if(m) m.classList.remove('show');
+    toast('🔒 Приватный стрим — в Главной не появится');
+    if(typeof startStream === 'function') startStream();
+  };
+})();
+
+/* ---------- 2. Убираем фейковые стримы из Главной ---------- */
+// Полностью перезаписываем spawnFakeContent — оставляем только видео
+window.spawnFakeContent = function(){
+  publicStreams = []; // никаких фейковых стримов
+  // Видео оставляем, чтобы Главная не была пустой
+  while(publicVideos.length < 6){
+    var av = randAv();
+    var titles = ['Смешное видео','Тренд','Мой влог','Реакция','Пранк','Обзор','Нарезка','Момент с стрима','Топ 10','Угадай мелодию'];
+    publicVideos.push({
+      id: 'v_' + Date.now() + Math.random(),
+      authorNick: randNick(),
+      authorEmoji: av.emoji,
+      authorGradient: av.gradient,
+      title: rnd(titles),
+      is18: Math.random() < 0.15,
+      likes: ri(20000, 300000),
+      saves: ri(5000, 50000),
+      liked: false,
+      comments: [],
+      published: Date.now() - ri(1, 72) * 3600000,
+      isMine: false
+    });
+  }
+  savePublicStreams();
+  savePublicVideos();
+};
+
+/* ---------- 3. Обновляем renderHome — показываем только свои стримы ---------- */
+window.renderHome = function(){
+  var body = document.getElementById('homeBody');
+  if(!body) return;
+  body.innerHTML = '';
+  
+  // Только СВОИ публичные активные стримы
+  var myActiveStreams = publicStreams.filter(function(s){
+    return s.authorNick === S.nick && s.isLive && !s.isPrivate;
+  });
+  
+  // Заголовок если есть свои стримы
+  if(myActiveStreams.length > 0){
+    var t = document.createElement('div');
+    t.style.cssText = 'padding:10px 16px 6px;font-size:12px;opacity:.55;font-weight:700;text-transform:uppercase;letter-spacing:.8px';
+    t.textContent = '🔴 В эфире сейчас';
+    body.appendChild(t);
+  }
+  
+  myActiveStreams.forEach(function(s){
+    var card = document.createElement('div');
+    card.className = 'vid-card';
+    card.innerHTML = (s.cover ? '<img class="vc-cover" src="'+s.cover+'">' : '<div class="vc-thumb">'+(s.authorEmoji||'🐱')+'</div>') +
+      (s.is18 ? '<div class="vc-18">18+</div>' : '') +
+      '<div class="vc-live">LIVE</div>' +
+      '<div class="vc-play">▶</div>' +
+      '<div class="vc-meta"><div class="vc-av" style="background:'+(s.authorGradient||'#ff6384')+'">'+(s.authorEmoji||'🐱')+'</div>' +
+      '<div class="vc-info"><div class="vc-title">'+(s.title||'Стрим')+'</div><div class="vc-sub">'+s.authorNick+' • '+(typeof fmtV==='function'?fmtV(s.viewers||0):s.viewers)+' 👁</div></div></div>';
+    card.onclick = function(){ if(typeof openWatch==='function') openWatch(s); };
+    body.appendChild(card);
+  });
+  
+  // Заголовок для видео
+  var t2 = document.createElement('div');
+  t2.style.cssText = 'padding:14px 16px 6px;font-size:12px;opacity:.55;font-weight:700;text-transform:uppercase;letter-spacing:.8px';
+  t2.textContent = '🎬 Рекомендации';
+  body.appendChild(t2);
+  
+  // Видео
+  publicVideos.forEach(function(v){
+    var card = document.createElement('div');
+    card.className = 'vid-card';
+    card.innerHTML = (v.cover ? '<img class="vc-cover" src="'+v.cover+'">' : '<div class="vc-thumb">'+(v.authorEmoji||'🎬')+'</div>') +
+      (v.is18 ? '<div class="vc-18">18+</div>' : '') +
+      '<div class="vc-play">▶</div>' +
+      '<div class="vc-meta"><div class="vc-av" style="background:'+(v.authorGradient||'#ff6384')+'">'+(v.authorEmoji||'🎬')+'</div>' +
+      '<div class="vc-info"><div class="vc-title">'+v.title+'</div><div class="vc-sub">'+v.authorNick+' • '+Math.round(v.likes/1000)+'K ❤ • '+Math.round(v.saves/1000)+'K 💾</div></div></div>';
+    card.onclick = function(){ if(typeof openWatchVideo==='function') openWatchVideo(v); };
+    body.appendChild(card);
+  });
+  
+  if(!myActiveStreams.length && !publicVideos.length){
+    body.innerHTML = '<div class="empty-inbox"><span class="em">🏠</span>Пока пусто.<br>Запусти свой стрим — он появится здесь!</div>';
+  }
+};
+
+/* ---------- 4. startPublicStream — учитываем приватный тип ---------- */
+// Оборачиваем оригинал
+var _origStartPublicStream = startPublicStream;
+window.startPublicStream = function(is18, isPrivate){
+  if(isPrivate){
+    // Приватный — запускаем, но НЕ добавляем в publicStreams
+    if(is18 && !ageVerified){
+      window._agePending = 'stream_private';
+      var am = document.getElementById('ageModal');
+      var at = document.getElementById('ageText');
+      var tm = document.getElementById('typeStreamModal');
+      if(at) at.textContent = 'Тебе есть 18 лет?';
+      if(tm) tm.classList.remove('show');
+      if(am) am.classList.add('show');
+      return;
+    }
+    // Чистим старую запись на всякий случай
+    publicStreams = publicStreams.filter(function(s){ return s.authorNick !== S.nick; });
+    savePublicStreams();
+    var tm2 = document.getElementById('typeStreamModal');
+    if(tm2) tm2.classList.remove('show');
+    toast('🔒 Приватный стрим запущен');
+    if(typeof startStream === 'function') startStream();
+    return;
+  }
+  // Публичный — как было
+  _origStartPublicStream(is18);
+};
+
+/* ---------- 5. handleCommand — синхронизация с приватным ---------- */
+var _origHandleCommand2 = handleCommand;
+window.handleCommand = function(text){
+  if(!text) return false;
+  var t = text.trim().toLowerCase();
+  // Команда для быстрого запуска приватного стрима
+  if(t === '/private' || t === '/priv' || t === '/непубличный'){
+    var tm = document.getElementById('typeStreamModal');
+    if(tm) tm.classList.remove('show');
+    publicStreams = publicStreams.filter(function(s){ return s.authorNick !== S.nick; });
+    savePublicStreams();
+    toast('🔒 Приватный стрим');
+    if(typeof startStream === 'function') startStream();
+    return true;
+  }
+  return _origHandleCommand2(text);
+};
+
+/* ---------- 6. При старте чистим старые публичные стримы ---------- */
+// Чистим мои старые записи стримов при загрузке
+(function(){
+  var before = publicStreams.length;
+  publicStreams = publicStreams.filter(function(s){
+    // Оставляем только чужие (не мои) стримы
+    return s.authorNick !== S.nick;
+  });
+  // Убираем и все фейковые (у них isMine:false и мы сами их генерировали)
+  // Оставляем только те, что имеют реальный флаг «не фейк»
+  // Проще — удалить все чужие фейки, оставить только мои активные
+  publicStreams = publicStreams.filter(function(s){
+    return false; // пока в этой игре нет других реальных стримеров
+  });
+  if(before !== publicStreams.length){
+    savePublicStreams();
+    console.log('Очищено стримов:', before - publicStreams.length);
+  }
+})();
+
+/* ---------- 7. При завершении стрима — убираем из публичных ---------- */
+// endStreamFully уже чистит, дублируем на всякий
+var _origEnd = endStreamFully;
+window.endStreamFully = function(){
+  publicStreams = publicStreams.filter(function(s){ return s.authorNick !== S.nick; });
+  savePublicStreams();
+  _origEnd();
+};
+
+/* ---------- 8. Автозакрытие фейковых стримов, если они ещё где-то есть ---------- */
+setInterval(function(){
+  // Раз в 10 сек проверяем: если в publicStreams есть стримы не от S.nick — удаляем
+  var before = publicStreams.length;
+  publicStreams = publicStreams.filter(function(s){
+    return s.authorNick === S.nick && s.isLive;
+  });
+  if(before !== publicStreams.length) savePublicStreams();
+}, 10000);
+
+/* ---------- 9. Перезапускаем spawnFakeContent (только видео) ---------- */
+try { spawnFakeContent(); } catch(e) {}
+
+/* ---------- 10. Обновляем Главную сразу ---------- */
+try {
+  var hb = document.getElementById('homeBody');
+  if(hb) renderHome();
+} catch(e) {}
+
+console.log('grand-cat PATCH v7 OK');
+</script>
 </body>
 </html>
