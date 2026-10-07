@@ -2197,7 +2197,7 @@ bind('chatPublicBtn','click',pickPublicChat);
 bind('chatPrivateBtn','click',pickPrivateChat);
 bind('membersSelectNext','click',nextFromMembersSelect);
 bind('crCreateSave','click',createChatRoom);
-bind('chatRoomSend','click',sendChatRoomMessage);
+    bind('chatRoomSend','click',function(){if(window.sendChatRoomMessage)window.sendChatRoomMessage();});
 bind('chatRoomInput','keydown',function(e){if(e.key==='Enter')sendChatRoomMessage();});
 bind('chatRoomHeadName','click',function(){openChatMenu('chatroom');});
 bind('chatRoomHeadAv','click',function(){openChatMenu('chatroom');});
@@ -2375,6 +2375,29 @@ function sendChatRoomMessage(){
   setTimeout(function(){multipleBotReplies(cr);},ri(1200,2500));
   setTimeout(function(){simulateChatRoomReplies(cr);},ri(2500,4500));
 }
+console.log('sendChatRoomMessage OK');
+</script>
+  <script>
+"use strict";
+window.sendChatRoomMessage=function(){
+  var inp=document.getElementById('chatRoomInput');
+  var text=inp.value.trim();
+  if(!text||!currentChatRoomId)return;
+  var cr=chatrooms[currentChatRoomId];
+  if(!cr)return;
+  if(typeof handleCommand==='function'&&handleCommand(text)){inp.value='';return;}
+  if(cr.banned[S.nick]){toast('Ты забанен в этом чате');return;}
+  if(cr.muted[S.nick]&&cr.muted[S.nick]>Date.now()){toast('Ты в муте');return;}
+  inp.value='';
+  cr.messages.push({from:'me',text:text,nick:S.nick,t:Date.now()});
+  cr.lastT=Date.now();
+  if(cr.messages.length>300)cr.messages.shift();
+  saveChatrooms();
+  renderChatRoomMessages();
+  if(typeof botModerate==='function')botModerate(cr,S.nick,text);
+  setTimeout(function(){if(typeof multipleBotReplies==='function')multipleBotReplies(cr);},ri(1200,2500));
+  setTimeout(function(){if(typeof simulateChatRoomReplies==='function')simulateChatRoomReplies(cr);},ri(2500,4500));
+};
 console.log('sendChatRoomMessage OK');
 </script>
 </body>
