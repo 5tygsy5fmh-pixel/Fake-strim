@@ -2736,10 +2736,9 @@ try {
 
 console.log('grand-cat PATCH v9 OK');
 </script>
-  <script type="module">
-    alert('Firebase started');
-import { getAuth, onAuthStateChanged, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, GoogleAuthProvider } from
-import { getAuth, onAuthStateChanged, signInWithPopup, signOut, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signInWithRedirect, getRedirectResult, signOut, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 const firebaseConfig = {
   apiKey: "AIzaSyAUIrQTOW_aDL6ziFVpXerHf6pPD6waRI8",
   authDomain: "fake-strim.firebaseapp.com",
@@ -2750,13 +2749,9 @@ const firebaseConfig = {
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
 window.fbLogin = function(){
   signInWithRedirect(auth, provider);
-};
-window.fbLogin = function(){
-  signInWithPopup(auth, provider).catch(function(e){
-    if(typeof toast === 'function') toast('Ошибка: ' + e.message);
-  });
 };
 window.fbLogout = function(){
   signOut(auth).then(function(){ location.reload(); });
@@ -2765,7 +2760,7 @@ getRedirectResult(auth).catch(function(e){
   console.error('Redirect error:', e);
   if(typeof toast === 'function') toast('Ошибка: ' + e.message);
 });
-    onAuthStateChanged(auth, function(user){
+onAuthStateChanged(auth, function(user){
   var btn = document.getElementById('fbLoginBtn');
   if(!btn){
     btn = document.createElement('button');
