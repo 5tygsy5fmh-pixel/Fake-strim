@@ -2736,5 +2736,49 @@ try {
 
 console.log('grand-cat PATCH v9 OK');
 </script>
+  <script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signInWithPopup, signOut, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+const firebaseConfig = {
+  apiKey: "AIzaSyAUIrQTOW_aDL6ziFVpXerHf6pPD6waRI8",
+  authDomain: "fake-strim.firebaseapp.com",
+  projectId: "fake-strim",
+  storageBucket: "fake-strim.firebasestorage.app",
+  messagingSenderId: "838988558430",
+  appId: "1:838988558430:web:579a441e92556fb4d384cf"
+};
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
+window.fbLogin = function(){
+  signInWithPopup(auth, provider).catch(function(e){
+    if(typeof toast === 'function') toast('Ошибка: ' + e.message);
+  });
+};
+window.fbLogout = function(){
+  signOut(auth).then(function(){ location.reload(); });
+};
+onAuthStateChanged(auth, function(user){
+  var btn = document.getElementById('fbLoginBtn');
+  if(!btn){
+    btn = document.createElement('button');
+    btn.id = 'fbLoginBtn';
+    btn.style.cssText = 'display:block;width:100%;padding:14px;margin:10px 0;border-radius:12px;border:none;color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit';
+    var accBody = document.querySelector('#panelAccount .account-body');
+    if(accBody) accBody.insertBefore(btn, accBody.firstChild);
+  }
+  if(user){
+    window.currentUser = { uid: user.uid, name: user.displayName };
+    btn.textContent = 'Выйти (' + (user.displayName || '') + ')';
+    btn.style.background = 'linear-gradient(135deg,#555,#333)';
+    btn.onclick = function(){ window.fbLogout(); };
+  } else {
+    btn.textContent = 'Войти через Google';
+    btn.style.background = 'linear-gradient(135deg,#4285f4,#34a853)';
+    btn.onclick = function(){ window.fbLogin(); };
+  }
+});
+console.log('Firebase OK');
+</script>
 </body>
 </html>
