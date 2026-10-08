@@ -2750,7 +2750,9 @@ const firebaseConfig = {
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const provider = new GoogleAuthProvider();
+window.fbLogin = function(){
+  signInWithRedirect(auth, provider);
+};
 window.fbLogin = function(){
   signInWithPopup(auth, provider).catch(function(e){
     if(typeof toast === 'function') toast('Ошибка: ' + e.message);
@@ -2759,7 +2761,11 @@ window.fbLogin = function(){
 window.fbLogout = function(){
   signOut(auth).then(function(){ location.reload(); });
 };
-onAuthStateChanged(auth, function(user){
+getRedirectResult(auth).catch(function(e){
+  console.error('Redirect error:', e);
+  if(typeof toast === 'function') toast('Ошибка: ' + e.message);
+});
+    onAuthStateChanged(auth, function(user){
   var btn = document.getElementById('fbLoginBtn');
   if(!btn){
     btn = document.createElement('button');
