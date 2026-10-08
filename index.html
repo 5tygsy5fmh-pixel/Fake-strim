@@ -2614,5 +2614,127 @@ try {
 
 console.log('grand-cat PATCH v7 OK');
 </script>
+  <script>
+"use strict";
+
+/* =========================================================
+   ПАТЧ v9: полная очистка фейков + фикс клика по стриму
+========================================================= */
+
+/* ---------- 1. Жёстко вычищаем всё фейковое при загрузке ---------- */
+(function(){
+  var v0 = publicVideos.length;
+  var s0 = publicStreams.length;
+
+  // Оставляем ТОЛЬКО видео с флагом isMine (тобой опубликованные)
+  publicVideos = publicVideos.filter(function(v){ return v.isMine === true; });
+
+  // Оставляем ТОЛЬКО свои активные публичные стримы
+  publicStreams = publicStreams.filter(function(s){
+    return s.authorNick === S.nick && s.isLive && !s.isPrivate;
+  });
+
+  if(v0 !== publicVideos.length || s0 !== publicStreams.length){
+    savePublicVideos();
+    savePublicStreams();
+    console.log('ПАТЧ v9: удалено видео: '+(v0-publicVideos.length)+', стримов: '+(s0-publicStreams.length));
+  }
+})();
+
+/* ---------- 2. spawnFakeContent больше НИЧЕГО не создаёт ---------- */
+window.spawnFakeContent = function(){
+  publicVideos = publicVideos.filter(function(v){ return v.isMine === true; });
+  publicStreams = publicStreams.filter(function(s){
+    return s.authorNick === S.nick && s.isLive && !s.isPrivate;
+  });
+  savePublicVideos();
+  savePublicStreams();
+};
+
+/* ---------- 3. openWatch — не открываем чужие/фейковые стримы ---------- */
+var _origOpenWatch_v9 = openWatch;
+window.openWatch = function(s){
+  if(!s) return;
+  // Открываем только СВОЙ стрим
+  if(s.authorNick !== S.nick){
+    toast('❌ Этот стрим недоступен');
+    return;
+  }
+  _origOpenWatch_v9(s);
+};
+
+/* ---------- 4. openWatchVideo — не выключаем свой стрим ---------- */
+var _origOpenWatchVideo_v9 = openWatchVideo;
+window.openWatchVideo = function(v){
+  if(!v) return;
+  // Если играет свой стрим — не трогаем его
+  var wasStreaming = S.streaming;
+  _origOpenWatchVideo_v9(v);
+  // Возвращаем флаг, чтобы свой стрим не остановился зря
+  if(wasStreaming) S.streaming = true;
+};
+
+/* ---------- 5. renderHome — только мои данные ---------- */
+window.renderHome = function(){
+  var body = document.getElementById('homeBody');
+  if(!body) return;
+  body.innerHTML = '';
+
+  var myStreams = publicStreams.filter(function(s){
+    return s.authorNick === S.nick && s.isLive && !s.isPrivate;
+  });
+  var myVideos = publicVideos.filter(function(v){ return v.isMine === true; });
+
+  if(myStreams.length > 0){
+    var t1 = document.createElement('div');
+    t1.style.cssText = 'padding:10px 16px 6px;font-size:12px;opacity:.55;font-weight:700;text-transform:uppercase;letter-spacing:.8px';
+    t1.textContent = '🔴 В эфире сейчас';
+    body.appendChild(t1);
+    myStreams.forEach(function(s){
+      var card = document.createElement('div');
+      card.className = 'vid-card';
+      card.innerHTML = (s.cover ? '<img class="vc-cover" src="'+s.cover+'">' : '<div class="vc-thumb">'+(s.authorEmoji||'🐱')+'</div>') +
+        (s.is18 ? '<div class="vc-18">18+</div>' : '') +
+        '<div class="vc-live">LIVE</div><div class="vc-play">▶</div>' +
+        '<div class="vc-meta"><div class="vc-av" style="background:'+(s.authorGradient||'#ff6384')+'">'+(s.authorEmoji||'🐱')+'</div>' +
+        '<div class="vc-info"><div class="vc-title">'+(s.title||'Стрим')+'</div><div class="vc-sub">'+s.authorNick+' • '+(typeof fmtV==='function'?fmtV(s.viewers||0):s.viewers)+' 👁</div></div></div>';
+      card.onclick = function(){ window.openWatch(s); };
+      body.appendChild(card);
+    });
+  }
+
+  if(myVideos.length > 0){
+    var t2 = document.createElement('div');
+    t2.style.cssText = 'padding:14px 16px 6px;font-size:12px;opacity:.55;font-weight:700;text-transform:uppercase;letter-spacing:.8px';
+    t2.textContent = '🎬 Мои видео';
+    body.appendChild(t2);
+    myVideos.forEach(function(v){
+      var card = document.createElement('div');
+      card.className = 'vid-card';
+      card.innerHTML = (v.cover ? '<img class="vc-cover" src="'+v.cover+'">' : '<div class="vc-thumb">'+(v.authorEmoji||'🎬')+'</div>') +
+        (v.is18 ? '<div class="vc-18">18+</div>' : '') +
+        '<div class="vc-play">▶</div>' +
+        '<div class="vc-meta"><div class="vc-av" style="background:'+(v.authorGradient||'#ff6384')+'">'+(v.authorEmoji||'🎬')+'</div>' +
+        '<div class="vc-info"><div class="vc-title">'+v.title+'</div><div class="vc-sub">'+v.authorNick+' • '+Math.round(v.likes/1000)+'K ❤ • '+Math.round(v.saves/1000)+'K 💾</div></div></div>';
+      card.onclick = function(){ window.openWatchVideo(v); };
+      body.appendChild(card);
+    });
+  }
+
+  if(!myStreams.length && !myVideos.length){
+    body.innerHTML = '<div class="empty-inbox"><span class="em">🏠</span>Пока пусто.<br><br>' +
+      '▶ Запусти стрим через <b>+</b> — он появится здесь.<br>' +
+      '▶ Или опубликуй видео в <b>Аккаунт → Мои стримы → +</b></div>';
+  }
+};
+
+/* ---------- 6. Обновляем Главную сразу ---------- */
+try {
+  if(typeof spawnFakeContent === 'function') spawnFakeContent();
+  if(document.getElementById('homeBody')) window.renderHome();
+} catch(e) { console.error(e); }
+
+console.log('grand-cat PATCH v9 OK');
+</script>
 </body>
 </html>
