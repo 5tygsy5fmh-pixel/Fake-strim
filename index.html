@@ -2835,7 +2835,7 @@ function updateLoginUI(isLoggedIn, user){
     btn.style.cssText = 'display:block;width:100%;padding:14px;margin:10px 0;border-radius:12px;border:none;background:linear-gradient(135deg,#4285f4,#34a853);color:#fff(this;font-size:15px;);
 font-weight:700;cursor:pointer;font-family:     inherit';
     const accBody = document.querySelector('#panelAccount . ifaccount-body');
-    if(acc(aBody) accBody.insertBefore(btn, acc
+    if(accBody) accBody.insertBefore(btn, accBody.firstChild);
   }
   if(isLoggedIn && user){
     btn.textContent = '🚪 Выйти (' + (user.displayName || user.email) + ')';
