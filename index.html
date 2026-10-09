@@ -2763,10 +2763,6 @@ window.fbLogin = function(){
 window.fbLogout = function(){
   signOut(auth).then(function(){ location.reload(); });
 };
-getRedirectResult(auth).catch(function(e){
-  console.error('Redirect error:', e);
-  if(typeof toast === 'function') toast('Ошибка: ' + e.message);
-});
 onAuthStateChanged(auth, function(user){
   var btn = document.getElementById('fbLoginBtn');
   if(!btn){
