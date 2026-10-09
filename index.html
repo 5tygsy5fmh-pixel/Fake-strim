@@ -2739,6 +2739,7 @@ console.log('grand-cat PATCH v9 OK');
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signInWithPopup, signOut, GoogleAuthProvider, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 const firebaseConfig = {
   apiKey: "AIzaSyAUIrQTOW_aDL6ziFVpXerHf6pPD6waRI8",
   authDomain: "fake-strim.firebaseapp.com",
@@ -2748,6 +2749,7 @@ const firebaseConfig = {
   appId: "1:838988558430:web:579a441e92556fb4d384cf"
 };
 const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
 const auth = getAuth(app);
   setPersistence(auth, browserLocalPersistence);
 const provider = new GoogleAuthProvider();
@@ -2826,6 +2828,9 @@ onAuthStateChanged(auth, async function(user){
   }
 });
 console.log('Firebase OK');
+  setInterval(function(){
+  if(window.fbSaveProfile) window.fbSaveProfile().catch(function(){});
+}, 15000);
 </script>
 </body>
 </html>
