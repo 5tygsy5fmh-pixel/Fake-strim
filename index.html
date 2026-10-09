@@ -2738,7 +2738,7 @@ console.log('grand-cat PATCH v9 OK');
 </script>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, onAuthStateChanged, signInWithRedirect, getRedirectResult, signOut, GoogleAuthProvider, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getAuth, onAuthStateChanged, signInWithPopup, signOut, GoogleAuthProvider, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 const firebaseConfig = {
   apiKey: "AIzaSyAUIrQTOW_aDL6ziFVpXerHf6pPD6waRI8",
   authDomain: "fake-strim.firebaseapp.com",
@@ -2753,7 +2753,12 @@ const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
   provider.setCustomParameters({ prompt: 'select_account' });
 window.fbLogin = function(){
-  signInWithRedirect(auth, provider);
+  signInWithPopup(auth, provider).then(function(result){
+    if(typeof toast === 'function') toast('✅ Вошёл как ' + result.user.displayName);
+  }).catch(function(e){
+    console.error(e);
+    if(typeof toast === 'function') toast('Ошибка: ' + e.message);
+  });
 };
 window.fbLogout = function(){
   signOut(auth).then(function(){ location.reload(); });
