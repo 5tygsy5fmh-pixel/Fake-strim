@@ -2807,7 +2807,6 @@ window.fbSaveProfile = async function(){
 };
 
 onAuthStateChanged(auth, async function(user){
-  await window.fbLoadProfile(user.uid);
   var btn = document.getElementById('fbLoginBtn');
   if(!btn){
     btn = document.createElement('button');
@@ -2817,6 +2816,7 @@ onAuthStateChanged(auth, async function(user){
     if(accBody) accBody.insertBefore(btn, accBody.firstChild);
   }
   if(user){
+    await window.fbLoadProfile(user.uid);
     window.currentUser = { uid: user.uid, name: user.displayName };
     btn.textContent = 'Выйти (' + (user.displayName || '') + ')';
     btn.style.background = 'linear-gradient(135deg,#555,#333)';
