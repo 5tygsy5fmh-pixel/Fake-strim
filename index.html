@@ -2760,10 +2760,52 @@ window.fbLogin = function(){
     if(typeof toast === 'function') toast('Ошибка: ' + e.message);
   });
 };
-window.fbLogout = function(){
+window.fbLogout = async function(){
+  if(auth.currentUser) await window.fbSaveProfile();
   signOut(auth).then(function(){ location.reload(); });
 };
-onAuthStateChanged(auth, function(user){
+  window.fbLoadProfile = async function(uid){
+  var userRef = doc(db, 'users', uid);
+  var snap = await getDoc(userRef);
+  if(snap.exists()){
+    var d = snap.data();
+    if(d.nick) S.nick = d.nick;
+    if(d.avatar) S.avatar = d.avatar;
+    if(d.avatarColor) S.avatarColor = d.avatarColor;
+    if(d.avatarRing) S.avatarRing = d.avatarRing;
+    if(d.avatarText) S.avatarText = d.avatarText;
+    if(d.avatarPhoto) S.avatarPhoto = d.avatarPhoto;
+    if(typeof d.crystals === 'number') S.crystals = d.crystals;
+    if(typeof d.followers === 'number') S.followers = d.followers;
+    if(typeof updProfUI === 'function') updProfUI();
+    if(typeof updCrysUI === 'function') updCrysUI();
+    if(typeof updFolUI === 'function') updFolUI();
+    console.log('Профиль загружен');
+  } else {
+    await window.fbSaveProfile();
+  }
+};
+
+window.fbSaveProfile = async function(){
+  if(!auth.currentUser) return;
+  var userRef = doc(db, 'users', auth.currentUser.uid);
+  await setDoc(userRef, {
+    uid: auth.currentUser.uid,
+    nick: S.nick,
+    avatar: S.avatar,
+    avatarColor: S.avatarColor,
+    avatarRing: S.avatarRing,
+    avatarText: S.avatarText,
+    avatarPhoto: S.avatarPhoto || null,
+    crystals: S.crystals,
+    followers: S.followers,
+    email: auth.currentUser.email,
+    updatedAt: Date.now()
+  }, { merge: true });
+};
+
+onAuthStateChanged(auth, async function(user){
+  await window.fbLoadProfile(user.uid);
   var btn = document.getElementById('fbLoginBtn');
   if(!btn){
     btn = document.createElement('button');
