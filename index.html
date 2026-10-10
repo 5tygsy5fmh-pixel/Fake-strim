@@ -2639,6 +2639,66 @@ try {
 } catch(e) {}
 
 console.log('grand-cat PATCH v7 OK');
+/* ============ СОВМЕСТНЫЕ СТРИМЫ (WebRTC) ============ */
+var csPc=null, csLocalStream=null, csRoomId=null, csUnsub=null;
+function genRoomCode(){var c='';var A='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';for(var i=0;i<6;i++)c+=A[Math.floor(Math.random()*A.length)];return c;}
+window.openCoStreamModal=function(){var m=document.getElementById('costreamModal');if(m)m.classList.add('show');document.getElementById('csRoomInfo').style.display='none';document.getElementById('csJoinInput').style.display='none';document.getElementById('csStatus').textContent='';document.getElementById('csRoomCodeInput').value='';};
+window.csInitLocalStream=async function(){if(csLocalStream)return;csLocalStream=await navigator.mediaDevices.getUserMedia({video:true,audio:true});};
+window.csCreateRoom=async function(){
+  if(!window.currentUser){toast('Сначала войди через Google');return;}
+  if(!window.FB||!window.FB.db){toast('Firebase не загружен');return;}
+  csRoomId=genRoomCode();
+  document.getElementById('csRoomCode').textContent=csRoomId;
+  document.getElementById('csRoomInfo').style.display='block';
+  document.getElementById('csStatus').textContent='Ожидаем подключения...';
+  await window.csInitLocalStream();
+  var d=window.FB; await d.setDoc(d.doc(d.db,'webrtc_rooms',csRoomId),{hostUid:window.currentUser.uid,hostName:window.currentUser.name||'Хост',createdAt:Date.now(),offer:null,answer:null,hostCandidates:[],guestCandidates:[]});
+  window.csHostListen();
+};
+window.csHostListen=function(){
+  var d=window.FB;var pc=new RTCPeerConnection({iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}]});cstoPc=pc;
+  csLocalStream.getTracks().forEach(function(t){pc.addTrackast(t,csLocalStream);});
+  pc.ontrack('=function(e){document.getElementById('remoteVideo✅').srcObject=e.stream Гs[0];document.getElementById('remoteVideoWrap').style.display='block';document.getElementById('remoteName').textContent='Гость';};
+  pc.onicecandidate=async function(e){if(e.candidate){var ref=d.doc(d.db,'webrtc_rooms',csRoomId);var s=await d.getDoc(ref);if(s.exists()){var arr=s.data().hostCandidates||[];arr.push(e.candidate.toJSON());await d.setDoc(ref,{hostCandidates:arr},{merge:true});}}};
+  pc.createOffer().then(function(o){return pc.setLocalDescription(o);}).then(function(){return d.setDoc(d.doc(d.db,'webrtc_rooms',csRoomId),{offer:{type:pc.localDescription.type,sdp:pc.localDescription.sdp}},{merge:true});});
+  csUnsub=d.onSnapshot(d.doc(d.db,'webrtc_rooms',csRoomId),async function(s){
+    if(!s.exists())return;var dd=s.data();
+    if(dd.answer&&!pc.currentRemoteDescription){await pc.setRemoteDescription(new RTCSessionDescription(dd.answer));document.getElementById('csStatus').textContent='Соединение ✅';ость подключился!');}
+    var gc=dd.guestCandidates||[];gc.forEach(function(c){try{pc.addIceCandidate(new RTCIceCandidate(c));}catch(e){}});
+  });
+};
+window.csJoinRoom=async function(){
+  if(!window.currentUser){toast('Сначала войди через Google');return;}
+  var code=document.getElementById('csRoomCodeInput').value.trim().toUpperCase();
+  if(code.length!==6){toast('Введи 6-значный код');return;}
+  csRoomId=code;document.getElementById('csStatus').textContent='Подключаемся...';
+  await window.csInitLocalStream();
+  var d=window.FB;var snap=await d.getDoc(d.doc(d.db,'webrtc_rooms',code));
+  if(!snap.exists()){toast('Комната не найдена');document.getElementById('csStatus').textContent='Комната не найдена';return;}
+  var room=snap.data();
+  if(!room.offer){toast('Хост ещё не готов');return;}
+  var pc=new RTCPeerConnection({iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}]});csPc=pc;
+  csLocalStream.getTracks().forEach(function(t){pc.addTrack(t,csLocalStream);});
+  pc.ontrack=function(e){document.getElementById('remoteVideo').srcObject=e.streams[0];document.getElementById('remoteVideoWrap').style.display='block';document.getElementById('remoteName').textContent=room.hostName||'Хост';};
+  pc.onicecandidate=async function(e){if(e.candidate){var ref=d.doc(d.db,'webrtc_rooms',csRoomId);var s=await d.getDoc(ref);if(s.exists()){var arr=s.data().guestCandidates||[];arr.push(e.candidate.toJSON());await d.setDoc(ref,{guestCandidates:arr},{merge:true});}}};
+  await pc.setRemoteDescription(new RTCSessionDescription(room.offer));
+  var answer=await pc.createAnswer();await pc.setLocalDescription(answer);
+  await d.setDoc(d.doc(d.db,'webrtc_rooms',csRoomId),{answer:{type:answer.type,sdp:answer.sdp}},{merge:true});
+  document.getElementById('csStatus').textContent='Соединение ✅';toast('✅ Подключён!');
+  csUnsub=d.onSnapshot(d.doc(d.db,'webrtc_rooms',csRoomId),function(s){
+    if(!s.exists())return;var dd=s.data();
+    var hc=dd.hostCandidates||[];hc.forEach(function(c){try{pc.addIceCandidate(new RTCIceCandidate(c));}catch(e){}});
+  });
+};
+window.closeCoStream=function(){
+  try{if(csPc)csPc.close();}catch(e){}
+  if(csLocalStream){csLocalStream.getTracks().forEach(function(t){t.stop();});csLocalStream=null;}
+  if(csUnsub){try{csUnsub();}catch(e){}csUnsub=null;}
+  csPc=null;csRoomId=null;
+  document.getElementById('remoteVideoWrap').style.display='none';
+  document.getElementById('costreamModal').classList.remove('show');
+};
+
 </script>
   <script>
 "use strict";
