@@ -795,6 +795,32 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:-ap
   <div class="btns"><button class="cancel" id="pubCancel">Отмена</button><button class="publish" id="pubPublish">Опубликовать</button></div>
 </div></div>
 
+<div id="costreamModal" class="roomModal"><div class="roomBox">
+  <h3>📹 Совместный стрим</h3>
+  <p style="font-size:13px;opacity:.7;text-align:center;margin-bottom:16px">Соединись с другим юзером в реальном времени</p>
+  <button class="chat-big-btn neon" id="csCreateBtn" style="margin-bottom:10px;padding:16px">🎬 Создать комнату</button>
+  <button class="chat-big-btn wardrobe" id="csJoinBtn" style="padding:16px">🔗 Присоединиться по коду</button>
+  <div id="csRoomInfo" style="display:none;text-align:center;margin-top:16px;padding:14px;background:rgba(37,244,238,.15);border-radius:12px">
+    <div style="font-size:12px;opacity:.7;margin-bottom:6px">Твой код комнаты:</div>
+    <div id="csRoomCode" style="font-size:24px;font-weight:900;letter-spacing:4px;color:#25f4ee">------</div>
+    <div style="font-size:11px;opacity:.6;margin-top:6px">Отправь другу этот код</div>
+  </div>
+  <div id="csJoinInput" style="display:none;margin-top:16px">
+    <label style="font-size:12px;opacity:.6;display:block;margin-bottom:6px">Введи код комнаты друга</label>
+    <input type="text" id="csRoomCodeInput" maxlength="6" style="width:100%;padding:14px;background:rgba(255,255,255,.08);border:none;border-radius:12px;color:#fff;font-size:20px;font-weight:800;text-align:center;letter-spacing:4px;outline:none;font-family:inherit;box-sizing:border-box" placeholder="ABC123">
+    <button id="csJoinConfirm" style="width:100%;padding:14px;margin-top:10px;border:none;border-radius:12px;font-size:15px;font-weight:700;background:#25f4ee;color:#000;cursor:pointer;font-family:inherit">Присоединиться</button>
+  </div>
+  <div id="csStatus" style="text-align:center;margin-top:12px;font-size:13px;opacity:.7;min-height:18px"></div>
+  <div class="roomBtns" style="margin-top:16px">
+    <button class="roomCancel" id="csCloseBtn">Закрыть</button>
+  </div>
+</div></div>
+
+
+<div id="remoteVideoWrap" style="display:none;position:fixed;right:8px;top:80px;width:140px;height:200px;border-radius:14px;overflow:hidden;z-index:8;border:2px solid #ff2850;box-shadow:0 6px 24px rgba(0,0,0,.6)">
+  <video id="remoteVideo" autoplay playsinline style="width:100%;height:100%;object-fit:cover;background:#000"></video>
+  <div style="position:absolute;bottom:0;left:0;right:0;padding:4px;background:linear-gradient(0deg,rgba(0,0,0,.85),transparent);font-size:10px;font-weight:700;text-align:center" id="remoteName">Собеседник</div>
+</div>
 <div id="fatal"></div>
 <div id="cmdHints"></div>
 <script>
