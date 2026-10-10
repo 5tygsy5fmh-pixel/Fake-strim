@@ -2653,7 +2653,7 @@ window.csCreateRoom=async function(){
 window.csHostListen=function(){
   var d=window.FB;var pc=new RTCPeerConnection({iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}]});cstoPc=pc;
   csLocalStream.getTracks().forEach(function(t){pc.addTrackast(t,csLocalStream);});
-  pc.ontrack('=function(e){document.getElementById('remoteVideo✅').srcObject=e.stream Гs[0];document.getElementById('remoteVideoWrap').style.display='block';document.getElementById('remoteName').textContent='Гость';};
+  pc.ontrack=function(e){document.getElementById('remoteVideo').srcObject=e.streams[0];document.getElementById('remoteVideoWrap').style.display='block';document.getElementById('remoteName').textContent='Гость';};
   pc.onicecandidate=async function(e){if(e.candidate){var ref=d.doc(d.db,'webrtc_rooms',csRoomId);var s=await d.getDoc(ref);if(s.exists()){var arr=s.data().hostCandidates||[];arr.push(e.candidate.toJSON());await d.setDoc(ref,{hostCandidates:arr},{merge:true});}}};
   pc.createOffer().then(function(o){return pc.setLocalDescription(o);}).then(function(){return d.setDoc(d.doc(d.db,'webrtc_rooms',csRoomId),{offer:{type:pc.localDescription.type,sdp:pc.localDescription.sdp}},{merge:true});});
   csUnsub=d.onSnapshot(d.doc(d.db,'webrtc_rooms',csRoomId),async function(s){
