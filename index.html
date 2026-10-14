@@ -2661,12 +2661,14 @@ window.csHostListen=function(){
     var dd=s.data();
     if(dd.answer&&!pc.currentRemoteDescription){
       await pc.setRemoteDescription(new RTCSessionDescription(dd.answer));
-      document.getElementById('csStatus').textContent='Соединение ✅';
-      toast('✅ Гость подключился!');
+      document.getElementById('csStatus').textContent='Соединение';
+      toast('Гость подключился');
     }
     var gc=dd.guestCandidates||[];
-    gc.forEach(function(c){try{pc.addIceCandidate(new RTCIceCandidate(c));}catch(e){}});
-};
+    gc.forEach(function(c){
+      try{pc.addIceCandidate(new RTCIceCandidate(c));}catch(e){}
+    });
+  });
 window.csJoinRoom=async function(){
   if(!window.currentUser){toast('Сначала войди через Google');return;}
   var code=document.getElementById('csRoomCodeInput').value.trim().toUpperCase();
