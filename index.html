@@ -2657,10 +2657,15 @@ window.csHostListen=function(){
   pc.onicecandidate=async function(e){if(e.candidate){var ref=d.doc(d.db,'webrtc_rooms',csRoomId);var s=await d.getDoc(ref);if(s.exists()){var arr=s.data().hostCandidates||[];arr.push(e.candidate.toJSON());await d.setDoc(ref,{hostCandidates:arr},{merge:true});}}};
   pc.createOffer().then(function(o){return pc.setLocalDescription(o);}).then(function(){return d.setDoc(d.doc(d.db,'webrtc_rooms',csRoomId),{offer:{type:pc.localDescription.type,sdp:pc.localDescription.sdp}},{merge:true});});
   csUnsub=d.onSnapshot(d.doc(d.db,'webrtc_rooms',csRoomId),async function(s){
-    if(!s.exists())return;var dd=s.data();
-    if(dd.answer&&!pc.currentRemoteDescription){await pc.setRemoteDescription(new RTCSessionDescription(dd.answer));document.getElementById('csStatus').textContent='Соединение ✅';ость подключился!');}
-    var gc=dd.guestCandidates||[];gc.forEach(function(c){try{pc.addIceCandidate(new RTCIceCandidate(c));}catch(e){}});
-  });
+    if(!s.exists())return;
+    var dd=s.data();
+    if(dd.answer&&!pc.currentRemoteDescription){
+      await pc.setRemoteDescription(new RTCSessionDescription(dd.answer));
+      document.getElementById('csStatus').textContent='Соединение ✅';
+      toast('✅ Гость подключился!');
+    }
+    var gc=dd.guestCandidates||[];
+    gc.forEach(function(c){try{pc.addIceCandidate(new RTCIceCandidate(c));}catch(e){}});
 };
 window.csJoinRoom=async function(){
   if(!window.currentUser){toast('Сначала войди через Google');return;}
