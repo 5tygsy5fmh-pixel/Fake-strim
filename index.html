@@ -2913,5 +2913,72 @@ console.log('Firebase OK');
   if(window.fbSaveProfile) window.fbSaveProfile().catch(function(){});
 }, 15000);
 </script>
+<script>
+"use strict";
+/* ============ ОБЪЕДИНЁННЫЙ ПАТЧ: WebRTC + Кристаллы ============ */
+(function(){
+var CSS=[
+'#costreamModal{position:fixed;inset:0;z-index:900;background:rgba(0,0,0,.9);display:none;align-items:center;justify-content:center;padding:20px}',
+'#costreamModal.show{display:flex}',
+'#costreamModal .roomBox{background:#1a1a2e;border-radius:20px;padding:22px;width:100%;max-width:380px}',
+'#costreamModal h3{font-size:18px;margin-bottom:14px;text-align:center}',
+'#costreamModal p{font-size:13px;opacity:.7;text-align:center;margin-bottom:16px}',
+'#remoteVideoWrap{display:none;position:fixed;right:8px;top:80px;width:140px;height:200px;border-radius:14px;overflow:hidden;z-index:8;border:2px solid #ff2850;box-shadow:0 6px 24px rgba(0,0,0,.6)}',
+'#remoteVideoWrap video{width:100%;height:100%;object-fit:cover;background:#000}',
+'#crmModal{position:fixed;inset:0;z-index:900;background:rgba(0,0,0,.9);display:none;align-items:center;justify-content:center;padding:20px}',
+'#crmModal.show{display:flex}',
+'#crmModal .box{background:#1a1a2e;border-radius:20px;padding:22px;width:100%;max-width:360px;display:flex;flex-direction:column;gap:12px}',
+'#crmModal h3{font-size:18px;text-align:center;margin-bottom:8px}',
+'.crm-btn{padding:18px;border-radius:14px;border:none;color:#fff;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:10px}',
+'.crm-btn.casino{background:linear-gradient(135deg,#ff2850,#ff5c8a)}',
+'.crm-btn.stocks{background:linear-gradient(135deg,#43e97b,#38f9d7)}',
+'.crm-btn.votings{background:linear-gradient(135deg,#8b5cf6,#c88cff)}',
+'.crm-btn.close{background:rgba(255,255,255,.1)}',
+'#stocksScreen,#votingsScreen{position:fixed;inset:0;z-index:800;background:#0a0a14;display:none;flex-direction:column}',
+'#stocksScreen.show,#votingsScreen.show{display:flex}',
+'.crm-head{display:flex;align-items:center;gap:10px;padding:calc(14px + env(safe-area-inset-top)) 16px 14px;background:rgba(0,0,0,.6);border-bottom:1px solid rgba(255,255,255,.08);flex-shrink:0}',
+'.crm-head .back{width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer}',
+'.crm-head .back svg{width:24px;height:24px}',
+'.crm-head .title{font-size:18px;font-weight:700;flex:1}',
+'.stock-row{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.06);cursor:pointer}',
+'.stock-ic{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:16px;flex-shrink:0;color:#000}',
+'.stock-body{flex:1;min-width:0}',
+'.stock-name{font-size:14px;font-weight:700;margin-bottom:3px}',
+'.stock-sub{font-size:11px;opacity:.55}',
+'.stock-price{text-align:right;flex-shrink:0}',
+'.stock-price .p{font-size:15px;font-weight:800}',
+'.stock-price .d{font-size:12px;font-weight:700;margin-top:2px}',
+'.stock-price .d.up{color:#8cff8c}',
+'.stock-price .d.down{color:#ff5c5c}',
+'#stockDetail{position:fixed;inset:0;z-index:850;background:#0a0a14;display:none;flex-direction:column}',
+'#stockDetail.show{display:flex}',
+'.sd-head{display:flex;align-items:center;gap:12px;padding:14px 16px;background:rgba(0,0,0,.6);border-bottom:1px solid rgba(255,255,255,.08);flex-shrink:0}',
+'.sd-head .back{width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:rgba(255,255,255,.1);border-radius:50%}',
+'.sd-head .back svg{width:20px;height:20px}',
+'.sd-title{flex:1;font-size:16px;font-weight:800}',
+'.sd-price{font-size:15px;font-weight:800}',
+'.sd-chart-wrap{background:#12121e;margin:12px 16px;border-radius:14px;padding:12px;height:220px;position:relative;overflow:hidden}',
+'#sdCanvas{width:100%;height:100%;display:block}',
+'.sd-info{display:flex;justify-content:space-around;padding:10px 16px;font-size:12px;opacity:.6}',
+'.sd-btns{display:flex;gap:10px;padding:14px 16px;margin-top:auto;padding-bottom:calc(14px + env(safe-area-inset-bottom))}',
+'.sd-btns button{flex:1;padding:16px;border-radius:14px;border:none;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit}',
+'.sd-btn-buy{background:linear-gradient(135deg,#43e97b,#38f9d7);color:#000}',
+'.sd-btn-sell{background:rgba(255,255,255,.12);color:#fff;cursor:not-allowed}',
+'.sd-btn-sell.active{background:linear-gradient(135deg,#ff2850,#ff5c8a);color:#fff;cursor:pointer}',
+'.sd-hold{padding:10px 16px;font-size:13px;text-align:center;opacity:.8}',
+'.sd-hold b{color:#8ee8f4}',
+'.voting-card{background:linear-gradient(135deg,#1a1a2e,#2a1a3e);margin:10px 14px;padding:16px;border-radius:16px;border:1px solid rgba(139,92,246,.3)}',
+'.voting-q{font-size:14px;font-weight:700;margin-bottom:12px;line-height:1.4}',
+'.voting-sub{font-size:11px;opacity:.55;margin-bottom:12px}',
+'.voting-btns{display:flex;gap:8px}',
+'.voting-btns button{flex:1;padding:12px 8px;border-radius:12px;border:none;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;color:#fff}',
+'.voting-yes{background:linear-gradient(135deg,#43e97b,#2ecc71)}',
+'.voting-no{background:linear-gradient(135deg,#ff2850,#ff5c8a)}',
+'.voting-result{padding:10px;border-radius:10px;background:rgba(37,244,238,.15);text-align:center;font-size:13px;font-weight:700;color:#8ee8f4;line-height:1.4}'
+].join('');
+var st=document.createElement('style');st.textContent=CSS;document.head.appendChild(st);
+})();
+console.log('CSS ok');
+</script>
 </body>
 </html>
