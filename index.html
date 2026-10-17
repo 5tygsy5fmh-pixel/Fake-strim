@@ -2299,7 +2299,7 @@ document.querySelectorAll('#typeStreamModal,#ageModal,#publishModal,#donateModal
   var account=bottom.querySelector('#btnAccount');
   if(account)bottom.insertBefore(casinoBtn,account);else bottom.appendChild(casinoBtn);
   home.onclick=function(){renderHome();openPanel('panelHome');};
-  casinoBtn.onclick=function(){var m=document.getElementById('crmModal'); if(m)m.classList.add('show');};
+  casinoBtn.onclick=function(){var m=document.getElementById('crmModal'); if(m){m.classList.add('show');} else {alert('Меню Кристаллов отсутствует в HTML');}};
 })();
 
 /* ============ СКРЕПКИ В ЧАТАХ ============ */
