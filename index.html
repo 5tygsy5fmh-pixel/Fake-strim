@@ -3252,5 +3252,57 @@ setTimeout(function(){
   }
 }, 1000);
 </script>
+<!-- ФИНАЛЬНЫЙ ФИКС -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signInWithPopup, signOut, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAUIrQTOW_aDL6ziFVpXerHf6pPD6waRI8",
+    authDomain: "fake-strim.firebaseapp.com",
+    projectId: "fake-strim",
+    storageBucket: "fake-strim.firebasestorage.app",
+    messagingSenderId: "838988558430",
+    appId: "1:838988558430:web:579a441e92556fb4d384cf"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const provider = new GoogleAuthProvider();
+
+  window.fbLogin = function() {
+    signInWithPopup(auth, provider).catch(function(e) {
+      alert("Ошибка Firebase: " + e.message);
+    });
+  };
+
+  onAuthStateChanged(auth, function(user) {
+    var btn = document.getElementById('myFbLoginBtn');
+    if (!btn) return;
+    if (user) {
+      btn.textContent = '🚪 Выйти (' + (user.displayName || '') + ')';
+      btn.style.background = 'linear-gradient(135deg,#555,#333)';
+      btn.onclick = function() { signOut(auth); };
+    } else {
+      btn.textContent = '🔐 Войти через Google';
+      btn.style.background = 'linear-gradient(135deg,#4285f4,#34a853)';
+      btn.onclick = window.fbLogin;
+    }
+  });
+</script>
+
+<script>
+  // Привязка кнопок Кристаллов через 2 секунды после загрузки
+  setTimeout(function() {
+    var cb = document.getElementById('btnCasino');
+    if (cb) {
+      cb.onclick = function() {
+        var m = document.getElementById('crmModal');
+        if (m) m.classList.add('show');
+        else alert('Меню кристаллов не найдено в HTML');
+      };
+    }
+  }, 2000);
+</script>
 </body>
 </html>
