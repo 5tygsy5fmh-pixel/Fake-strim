@@ -2294,11 +2294,11 @@ document.querySelectorAll('#typeStreamModal,#ageModal,#publishModal,#donateModal
   bottom.insertBefore(home,bottom.firstChild);
   var casinoBtn=document.createElement('div');
   casinoBtn.className='menu-btn';casinoBtn.id='btnCasino';
-  casinoBtn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><rect x="2.5" y="3.5" width="19" height="17" rx="3"/><line x1="8.83" y1="5" x2="8.83" y2="19"/><line x1="15.17" y1="5" x2="15.17" y2="19"/><circle cx="5.67" cy="12" r="1.2" fill="#fff"/><circle cx="12" cy="12" r="1.2" fill="#fff"/><circle cx="18.33" cy="12" r="1.2" fill="#fff"/></svg><span>Казино</span>';
+  casinoBtn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6"><path d="M12 2 L4 9 L12 22 L20 9 Z M4 9 L20 9 M12 2 L8 9 M12 2 L16 9 M12 22 L8 9 M12 22 L16 9"/><circle cx="2.5" cy="12" r="0.9" fill="#fff"/><circle cx="21.5" cy="12" r="0.9" fill="#fff"/><circle cx="6" cy="20.5" r="0.9" fill="#fff"/><circle cx="18" cy="20.5" r="0.9" fill="#fff"/></svg><span>Кристаллы</span>';
   var account=bottom.querySelector('#btnAccount');
   if(account)bottom.insertBefore(casinoBtn,account);else bottom.appendChild(casinoBtn);
   home.onclick=function(){renderHome();openPanel('panelHome');};
-  casinoBtn.onclick=function(){openCasino();};
+  casinoBtn.onclick=function(){var m=document.getElementById('crmModal'); if(m)m.classList.add('show');};
 })();
 
 /* ============ СКРЕПКИ В ЧАТАХ ============ */
