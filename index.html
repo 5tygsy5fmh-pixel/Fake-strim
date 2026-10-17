@@ -3197,5 +3197,48 @@ console.log('CSS ok');
   console.log('SUPER FIX OK');
 })();
 </script>
+<script>
+"use strict";
+setTimeout(function(){
+  console.log('FIX-2 START');
+
+  // 1. Принудительно привязываем Кристаллы
+  var cb = document.getElementById('btnCasino');
+  if(cb){
+    cb.onclick = function(){
+      var m = document.getElementById('crmModal');
+      if(m) m.classList.add('show');
+      else alert('Меню Кристаллов не найдено в коде');
+    };
+    console.log('Кнопка Кристаллы привязана');
+  } else {
+    console.log('Кнопка btnCasino НЕ найдена');
+  }
+
+  // 2. Принудительно привязываем кнопку Войти
+  var lb = document.getElementById('myFbLoginBtn');
+  if(lb){
+    lb.onclick = function(){
+      if(window.fbLogin) window.fbLogin();
+      else alert('Скрипт Firebase сломан. Нужно починить блок <script type="module">');
+    };
+    console.log('Кнопка Войти привязана');
+  }
+
+  // 3. Привязываем кнопки внутри меню Кристаллов (Казино, Акции, Голосования)
+  var mc = document.getElementById('crmCasinoBtn');
+  if(mc) mc.onclick = function(){ document.getElementById('crmModal').classList.remove('show'); if(window.openCasino) openCasino(); };
+  
+  var ms = document.getElementById('crmStocksBtn');
+  if(ms) ms.onclick = function(){ if(window.openStocksScreen) openStocksScreen(); };
+  
+  var mv = document.getElementById('crmVotingsBtn');
+  if(mv) mv.onclick = function(){ if(window.openVotingsScreen) openVotingsScreen(); };
+  
+  var mcl = document.getElementById('crmCloseBtn');
+  if(mcl) mcl.onclick = function(){ document.getElementById('crmModal').classList.remove('show'); };
+
+}, 1000);
+</script>
 </body>
 </html>
