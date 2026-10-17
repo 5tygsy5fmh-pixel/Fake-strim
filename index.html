@@ -3290,132 +3290,59 @@ setTimeout(function(){
     }
   });
 </script>
-
 <script>
-  // Привязка кнопок Кристаллов через 2 секунды после загрузки
   setTimeout(function() {
-    var cb = document.getElementById('btnCasino');
-    if (cb) {
-      cb.onclick = function() {
-        var m = document.getElementById('crmModal');
-        if (m) m.classList.add('show');
-        else alert('Меню кристаллов не найдено в HTML');
-      };
+    // 1. Если окна нет, создаём его прямо в памяти
+    if (!document.getElementById('crmModal')) {
+      var div = document.createElement('div');
+      div.id = 'crmModal';
+      div.style.cssText = 'position:fixed;inset:0;z-index:900;background:rgba(0,0,0,.9);display:none;align-items:center;justify-content:center;padding:20px';
+      
+      div.innerHTML = `
+        <div style="background:#1a1a2e;border-radius:20px;padding:22px;width:100%;max-width:360px;display:flex;flex-direction:column;gap:12px">
+          <h3 style="font-size:18px;text-align:center;margin-bottom:8px;color:#fff">💎 Кристаллы</h3>
+          <button id="crmCasinoBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-size:15px;font-weight:800;cursor:pointer;background:linear-gradient(135deg,#ff2850,#ff5c8a)">🎰 Казино</button>
+          <button id="crmStocksBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-size:15px;font-weight:800;cursor:pointer;background:linear-gradient(135deg,#43e97b,#38f9d7)">📈 Акции</button>
+          <button id="crmVotingsBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-size:15px;font-weight:800;cursor:pointer;background:linear-gradient(135deg,#8b5cf6,#c88cff)">🗳️ Голосования</button>
+          <button id="crmCloseBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-size:15px;font-weight:800;cursor:pointer;background:rgba(255,255,255,.1)">Закрыть</button>
+        </div>
+      `;
+      document.body.appendChild(div);
     }
-  }, 2000);
-</script>
-<script>
-  // Принудительная привязка кнопок в обход ошибок
-  setTimeout(function() {
-    // 1. Включаем кнопку Кристаллы
+
+    // 2. Включаем кнопку открытия внизу экрана
     var cb = document.getElementById('btnCasino');
     if(cb) {
       cb.onclick = function(){
-        var m = document.getElementById('crmModal');
-        if(m) { m.classList.add('show'); }
-        else { alert('Кнопка работает, но HTML меню не вставилось!'); }
+        document.getElementById('crmModal').style.display = 'flex';
       };
     }
 
-    // 2. Включаем кнопку Войти
-    var lb = document.getElementById('myFbLoginBtn');
-    if(lb) {
-      lb.onclick = function(){
-        if(window.fbLogin) { window.fbLogin(); }
-        else { alert('Скрипт Firebase сломан. Ищем ошибку в коде.'); }
+    // 3. Включаем кнопку "Закрыть" внутри меню
+    var closeBtn = document.getElementById('crmCloseBtn');
+    if(closeBtn) {
+      closeBtn.onclick = function(){
+        document.getElementById('crmModal').style.display = 'none';
       };
     }
-  }, 1500);
-</script>
 
-<!-- АВТОНОМНЫЙ FIREBASE -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getAuth, onAuthStateChanged, signInWithPopup, signOut, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-  
-  const app = initializeApp({
-    apiKey: "AIzaSyAUIrQTOW_aDL6ziFVpXerHf6pPD6waRI8",
-    authDomain: "fake-strim.firebaseapp.com",
-    projectId: "fake-strim",
-    storageBucket: "fake-strim.firebasestorage.app",
-    messagingSenderId: "838988558430",
-    appId: "1:838988558430:web:579a441e92556fb4d384cf"
-  });
-  
-  const auth = getAuth(app);
-  const provider = new GoogleAuthProvider();
-
-  // Перезаписываем функцию входа
-  window.fbLogin = function(){
-    signInWithPopup(auth, provider).catch(function(e){ alert(e.message); });
-  };
-
-  // Следим за состоянием
-  onAuthStateChanged(auth, function(user) {
-    var btn = document.getElementById('myFbLoginBtn');
-    if (!btn) return;
-    if (user) {
-      btn.textContent = '🚪 Выйти (' + (user.displayName || '') + ')';
-      btn.style.background = '#333';
-      btn.onclick = function() { signOut(auth); };
-    } else {
-      btn.textContent = '🔐 Войти через Google';
-      btn.style.background = 'linear-gradient(135deg,#4285f4,#34a853)';
-      btn.onclick = window.fbLogin;
-    }
-  });
-</script>
-<!-- FIREBASE COMPAT (Работает в любом Safari) -->
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-<script>
-  // 1. Инициализация Firebase
-  if (!firebase.apps.length) {
-    firebase.initializeApp({
-      apiKey: "AIzaSyAUIrQTOW_aDL6ziFVpXerHf6pPD6waRI8",
-      authDomain: "fake-strim.firebaseapp.com",
-      projectId: "fake-strim",
-      storageBucket: "fake-strim.firebasestorage.app",
-      messagingSenderId: "838988558430",
-      appId: "1:838988558430:web:579a441e92556fb4d384cf"
-    });
-  }
-  
-  var auth = firebase.auth();
-  var provider = new firebase.auth.GoogleAuthProvider();
-
-  // 2. Функция входа
-  window.fbLogin = function() {
-    auth.signInWithPopup(provider).catch(function(error) {
-       alert("Ошибка входа: " + error.message);
-    });
-  };
-
-  // 3. Следим за входом (меняем текст кнопки)
-  auth.onAuthStateChanged(function(user) {
-    var btn = document.getElementById('myFbLoginBtn');
-    if (!btn) return;
-    if (user) {
-      btn.textContent = '🚪 Выйти (' + (user.displayName || '') + ')';
-      btn.style.background = 'linear-gradient(135deg,#555,#333)';
-      btn.onclick = function() { auth.signOut(); };
-    } else {
-      btn.textContent = '🔐 Войти через Google';
-      btn.style.background = 'linear-gradient(135deg,#4285f4,#34a853)';
-      btn.onclick = window.fbLogin;
-    }
-  });
-
-  // 4. Оживляем кнопку Кристаллы
-  setTimeout(function() {
-    var cb = document.getElementById('btnCasino');
-    if (cb) {
-      cb.onclick = function() {
-        var m = document.getElementById('crmModal');
-        if (m) m.classList.add('show');
-        else alert('HTML меню Кристаллов не найден!');
+    // 4. Включаем кнопку Казино внутри меню
+    var casinoBtn = document.getElementById('crmCasinoBtn');
+    if(casinoBtn) {
+      casinoBtn.onclick = function(){
+        document.getElementById('crmModal').style.display = 'none';
+        if(window.openCasino) openCasino();
+        else alert('Функция казино не найдена');
       };
     }
+    
+    // 5. Акции и Голосования (пока заглушки)
+    var stocksBtn = document.getElementById('crmStocksBtn');
+    if(stocksBtn) stocksBtn.onclick = function(){ alert('Экран Акций скоро появится!'); };
+    
+    var votingsBtn = document.getElementById('crmVotingsBtn');
+    if(votingsBtn) votingsBtn.onclick = function(){ alert('Экран Голосований скоро появится!'); };
+
   }, 1000);
 </script>
 </body>
