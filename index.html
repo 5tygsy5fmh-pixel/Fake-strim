@@ -3125,5 +3125,76 @@ console.log('CSS ok');
   console.log('FIX OK');
 })();
 </script>
+<script>
+"use strict";
+(function(){
+  console.log('SUPER FIX START');
+
+  // --- 1. ЗАМЕНА КНОПКИ КАЗИНО НА КРИСТАЛЛЫ ---
+  function replaceBtn(){
+    // Ищем кнопку внизу
+    var btn = document.getElementById('btnCasino');
+    if(!btn){
+      // Если id нет, ищем по тексту "Казино" в нижнем меню
+      var btns = document.querySelectorAll('.menu-btn');
+      for(var i=0;i<btns.length;i++){
+        if(btns[i].textContent.indexOf('Казино') >= 0){
+          btn = btns[i]; break;
+        }
+      }
+    }
+    if(btn){
+      btn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6"><path d="M12 2 L4 9 L12 22 L20 9 Z M4 9 L20 9 M12 2 L8 9 M12 2 L16 9 M12 22 L8 9 M12 22 L16 9"/><circle cx="2.5" cy="12" r="0.9" fill="#fff"/><circle cx="21.5" cy="12" r="0.9" fill="#fff"/><circle cx="6" cy="20.5" r="0.9" fill="#fff"/><circle cx="18" cy="20.5" r="0.9" fill="#fff"/></svg><span>Кристаллы</span>';
+      btn.onclick = function(){
+        var m = document.getElementById('crmModal');
+        if(m) m.classList.add('show');
+      };
+      console.log('Кнопка заменена');
+    } else {
+      setTimeout(replaceBtn, 500);
+    }
+  }
+  setTimeout(replaceBtn, 1000);
+
+  // --- 2. КНОПКА ВХОДА В АККАУНТ ---
+  function addLoginBtn(){
+    var accBody = document.querySelector('#panelAccount .account-body');
+    if(!accBody) return;
+    if(document.getElementById('myFbLoginBtn')) return; // уже есть
+
+    var btn = document.createElement('button');
+    btn.id = 'myFbLoginBtn';
+    btn.style.cssText = 'display:block;width:100%;padding:14px;margin:10px 0 20px 0;border-radius:12px;border:none;color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;background:linear-gradient(135deg,#4285f4,#34a853);';
+    btn.textContent = '🔐 Войти через Google';
+    
+    btn.onclick = function(){
+      if(window.fbLogin) window.fbLogin();
+      else alert('Firebase не загружен. Подождите или проверьте код.');
+    };
+
+    // Вставляем в самое начало профиля
+    accBody.insertBefore(btn, accBody.firstChild);
+  }
+  setTimeout(addLoginBtn, 1500);
+
+  // --- 3. КНОПКИ ВНУТРИ МЕНЮ КРИСТАЛЛОВ ---
+  function bindMenuBtns(){
+    var c = document.getElementById('crmCasinoBtn');
+    if(c) c.onclick = function(){ document.getElementById('crmModal').classList.remove('show'); if(window.openCasino) openCasino(); };
+    
+    var s = document.getElementById('crmStocksBtn');
+    if(s) s.onclick = function(){ if(window.openStocksScreen) openStocksScreen(); };
+    
+    var v = document.getElementById('crmVotingsBtn');
+    if(v) v.onclick = function(){ if(window.openVotingsScreen) openVotingsScreen(); };
+    
+    var cl = document.getElementById('crmCloseBtn');
+    if(cl) cl.onclick = function(){ document.getElementById('crmModal').classList.remove('show'); };
+  }
+  setTimeout(bindMenuBtns, 1500);
+
+  console.log('SUPER FIX OK');
+})();
+</script>
 </body>
 </html>
