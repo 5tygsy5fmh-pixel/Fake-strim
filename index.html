@@ -3240,5 +3240,17 @@ setTimeout(function(){
 
 }, 1000);
 </script>
+<script>
+setTimeout(function(){
+  var cb = document.getElementById('btnCasino');
+  if(cb){
+    cb.onclick = function(){
+      var m = document.getElementById('crmModal');
+      if(m){ m.classList.add('show'); }
+      else { alert('Окно Кристаллов не найдено'); }
+    };
+  }
+}, 1000);
+</script>
 </body>
 </html>
