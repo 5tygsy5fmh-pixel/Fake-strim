@@ -2647,9 +2647,8 @@ console.log('grand-cat PATCH v7 OK');
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script>
-// Ждем 1.5 секунды, чтобы весь сайт прогрузился
-setTimeout(function() {
-  console.log("Запуск финального фикса");
+window.addEventListener('load', function() {
+  console.log("Запуск финального фикса с 3 кнопками");
 
   // 1. FIREBASE
   if (!firebase.apps.length) {
@@ -2669,7 +2668,7 @@ setTimeout(function() {
     auth.signInWithPopup(provider).catch(function(error) { alert("Ошибка: " + error.message); });
   };
 
-  // 2. СОЗДАЕМ ОКНО КРИСТАЛЛОВ
+  // 2. СОЗДАЕМ ОКНО КРИСТАЛЛОВ (С 3 КНОПКАМИ)
   if (!document.getElementById('myCrystalModal')) {
     var mod = document.createElement('div');
     mod.id = 'myCrystalModal';
@@ -2678,13 +2677,15 @@ setTimeout(function() {
       <div style="background:#1a1a2e;border-radius:20px;padding:22px;width:100%;max-width:360px;display:flex;flex-direction:column;gap:12px">
         <h3 style="font-size:18px;text-align:center;margin-bottom:8px;color:#fff">💎 Кристаллы</h3>
         <button id="myCasinoBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-size:15px;font-weight:800;background:linear-gradient(135deg,#ff2850,#ff5c8a)">🎰 Казино</button>
+        <button id="myStocksBtn" style="padding:18px;border-radius:14px;border:none;color:#000;font-size:15px;font-weight:800;background:linear-gradient(135deg,#43e97b,#38f9d7)">📈 Акции</button>
+        <button id="myVotesBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-size:15px;font-weight:800;background:linear-gradient(135deg,#8b5cf6,#c88cff)">🗳️ Голосования</button>
         <button id="myCloseBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-size:15px;font-weight:800;background:rgba(255,255,255,.1)">Закрыть</button>
       </div>
     `;
     document.body.appendChild(mod);
   }
 
-  // 3. ГЛОБАЛЬНЫЙ ПЕРЕХВАТЧИК КЛИКОВ (Ловит нажатия по тексту)
+  // 3. ГЛОБАЛЬНЫЙ ПЕРЕХВАТЧИК КЛИКОВ
   document.body.addEventListener('click', function(e) {
     var target = e.target;
     var text = target.innerText || "";
@@ -2692,31 +2693,37 @@ setTimeout(function() {
         text = target.parentElement.innerText || "";
     }
 
-    // Открыть Кристаллы
+    // Открыть меню Кристаллов (если кликнули по Казино внизу)
     if (text.includes('Казино') || text.includes('Кристаллы')) {
         if (target.closest('.menu-btn') || (target.parentElement && target.parentElement.closest('.menu-btn'))) {
             document.getElementById('myCrystalModal').style.display = 'flex';
         }
     }
 
-    // Войти / Выйти
+    // Вход / Выход
     if (text.includes('Войти через Google') || text.includes('Выйти')) {
-        if (auth.currentUser) {
-            auth.signOut();
-        } else {
-            window.fbLogin();
-        }
+        if (auth.currentUser) { auth.signOut(); } else { window.fbLogin(); }
     }
 
-    // Кнопки внутри окна
-    if (target.id === 'myCloseBtn') document.getElementById('myCrystalModal').style.display = 'none';
+    // Кнопки внутри меню Кристаллов
+    if (target.id === 'myCloseBtn') {
+        document.getElementById('myCrystalModal').style.display = 'none';
+    }
     if (target.id === 'myCasinoBtn') {
         document.getElementById('myCrystalModal').style.display = 'none';
         if (window.openCasino) window.openCasino();
     }
+    if (target.id === 'myStocksBtn') {
+        document.getElementById('myCrystalModal').style.display = 'none';
+        alert('📈 Биржа: здесь будут графики акций и кнопки покупки/продажи!');
+    }
+    if (target.id === 'myVotesBtn') {
+        document.getElementById('myCrystalModal').style.display = 'none';
+        alert('🗳️ Голосования MEXC: здесь будут вопросы "Да/Нет"!');
+    }
   });
 
-  // 4. ВСТАВЛЯЕМ КНОПКУ ВХОДА В АККАУНТ
+  // 4. ДОБАВЛЯЕМ КНОПКУ ВХОДА В АККАУНТ
   var acc = document.querySelector('#panelAccount .account-body');
   if (acc && !document.getElementById('myFbLoginBtn')) {
     var b = document.createElement('button');
@@ -2726,7 +2733,7 @@ setTimeout(function() {
     acc.insertBefore(b, acc.firstChild);
   }
 
-  // Меняем текст кнопки при входе/выходе
+  // 5. СТАТУС ВХОДА
   auth.onAuthStateChanged(function(user) {
     var btn = document.getElementById('myFbLoginBtn');
     if (!btn) return;
@@ -2739,7 +2746,7 @@ setTimeout(function() {
     }
   });
 
-}, 1500);
+});
 </script>
 </body>
 </html>
