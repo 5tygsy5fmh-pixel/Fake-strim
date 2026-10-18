@@ -2916,7 +2916,73 @@ try {
   if(typeof spawnFakeContent === 'function') spawnFakeContent();
   if(document.getElementById('homeBody')) window.renderHome();
 } catch(e) { console.error(e); }
+</script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 1. FIREBASE
+    if (!firebase.apps.length) {
+      firebase.initializeApp({
+        apiKey: "AIzaSyAUIrQTOW_aDL6ziFVpXerHf6pPD6waRI8",
+        authDomain: "fake-strim.firebaseapp.com",
+        projectId: "fake-strim",
+        storageBucket: "fake-strim.firebasestorage.app",
+        messagingSenderId: "838988558430",
+        appId: "1:838988558430:web:579a441e92556fb4d384cf"
+      });
+    }
+    var auth = firebase.auth();
+    var provider = new firebase.auth.GoogleAuthProvider();
 
+    window.fbLogin = function() {
+      auth.signInWithPopup(provider).catch(function(error) { alert("Ошибка: " + error.message); });
+    };
+
+    auth.onAuthStateChanged(function(user) {
+      var btn = document.getElementById('myFbLoginBtn');
+      if (!btn) return;
+      if (user) {
+        btn.textContent = '🚪 Выйти (' + (user.displayName || '') + ')';
+        btn.style.background = '#333';
+        btn.onclick = function() { auth.signOut(); };
+      } else {
+        btn.textContent = '🔐 Войти через Google';
+        btn.style.background = 'linear-gradient(135deg,#4285f4,#34a853)';
+        btn.onclick = window.fbLogin;
+      }
+    });
+
+    // 2. ОКНО КРИСТАЛЛОВ
+    var crystalModal = document.createElement('div');
+    crystalModal.id = 'crmModal';
+    crystalModal.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.9);display:none;align-items:center;justify-content:center;padding:20px;';
+    crystalModal.innerHTML = `
+      <div style="background:#1a1a2e;border-radius:20px;padding:22px;width:100%;max-width:360px;display:flex;flex-direction:column;gap:12px">
+        <h3 style="font-size:18px;text-align:center;margin-bottom:8px;color:#fff">💎 Кристаллы</h3>
+        <button id="crmCasinoBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-size:15px;font-weight:800;background:linear-gradient(135deg,#ff2850,#ff5c8a)">🎰 Казино</button>
+        <button id="crmCloseBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-size:15px;font-weight:800;background:rgba(255,255,255,.1)">Закрыть</button>
+      </div>
+    `;
+    document.body.appendChild(crystalModal);
+
+    // 3. ПРИВЯЗКА КНОПОК
+    setInterval(function() {
+        var cb = document.getElementById('btnCasino');
+        if (cb && !cb.dataset.bound) {
+            cb.dataset.bound = '1';
+            cb.onclick = function(e) { e.preventDefault(); crystalModal.style.display = 'flex'; };
+        }
+        var lb = document.getElementById('myFbLoginBtn');
+        if (lb && !lb.dataset.bound) {
+            lb.dataset.bound = '1';
+            lb.onclick = function() { if(window.fbLogin) window.fbLogin(); };
+        }
+    }, 500);
+
+    document.getElementById('crmCloseBtn').onclick = function() { crystalModal.style.display = 'none'; };
+    document.getElementById('crmCasinoBtn').onclick = function() { crystalModal.style.display = 'none'; if(window.openCasino) window.openCasino(); };
+});
 </script>
 </body>
 </html>
