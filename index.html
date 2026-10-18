@@ -2647,8 +2647,9 @@ console.log('grand-cat PATCH v7 OK');
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script>
-window.addEventListener('load', function() {
-  console.log('Чистый старт: Firebase + Кнопки');
+// Ждем 1.5 секунды, чтобы весь сайт прогрузился
+setTimeout(function() {
+  console.log("Запуск финального фикса");
 
   // 1. FIREBASE
   if (!firebase.apps.length) {
@@ -2668,51 +2669,77 @@ window.addEventListener('load', function() {
     auth.signInWithPopup(provider).catch(function(error) { alert("Ошибка: " + error.message); });
   };
 
-  // 2. ОКНО КРИСТАЛЛОВ
-  var mod = document.createElement('div');
-  mod.id = 'myCrystalModal';
-  mod.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.9);display:none;align-items:center;justify-content:center;padding:20px;';
-  mod.innerHTML = `
-    <div style="background:#1a1a2e;border-radius:20px;padding:22px;width:100%;max-width:360px;display:flex;flex-direction:column;gap:12px">
-      <h3 style="font-size:18px;text-align:center;margin-bottom:8px;color:#fff">💎 Кристаллы</h3>
-      <button id="myCasinoBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-size:15px;font-weight:800;background:linear-gradient(135deg,#ff2850,#ff5c8a)">🎰 Казино</button>
-      <button id="myCloseBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-size:15px;font-weight:800;background:rgba(255,255,255,.1)">Закрыть</button>
-    </div>
-  `;
-  document.body.appendChild(mod);
+  // 2. СОЗДАЕМ ОКНО КРИСТАЛЛОВ
+  if (!document.getElementById('myCrystalModal')) {
+    var mod = document.createElement('div');
+    mod.id = 'myCrystalModal';
+    mod.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.9);display:none;align-items:center;justify-content:center;padding:20px;';
+    mod.innerHTML = `
+      <div style="background:#1a1a2e;border-radius:20px;padding:22px;width:100%;max-width:360px;display:flex;flex-direction:column;gap:12px">
+        <h3 style="font-size:18px;text-align:center;margin-bottom:8px;color:#fff">💎 Кристаллы</h3>
+        <button id="myCasinoBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-size:15px;font-weight:800;background:linear-gradient(135deg,#ff2850,#ff5c8a)">🎰 Казино</button>
+        <button id="myCloseBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-size:15px;font-weight:800;background:rgba(255,255,255,.1)">Закрыть</button>
+      </div>
+    `;
+    document.body.appendChild(mod);
+  }
 
-  document.getElementById('myCloseBtn').onclick = function() { mod.style.display = 'none'; };
-  document.getElementById('myCasinoBtn').onclick = function() { mod.style.display = 'none'; if(window.openCasino) window.openCasino(); };
-
-  // 3. ПРИВЯЗКА КНОПОК
-  setInterval(function() {
-    var cb = document.getElementById('btnCasino');
-    if (cb && !cb.dataset.bound) {
-      cb.dataset.bound = '1';
-      cb.onclick = function(e) { e.preventDefault(); mod.style.display = 'flex'; };
+  // 3. ГЛОБАЛЬНЫЙ ПЕРЕХВАТЧИК КЛИКОВ (Ловит нажатия по тексту)
+  document.body.addEventListener('click', function(e) {
+    var target = e.target;
+    var text = target.innerText || "";
+    if (target.tagName === 'SPAN' || target.tagName === 'SVG' || target.tagName === 'PATH') {
+        text = target.parentElement.innerText || "";
     }
-    var lb = document.getElementById('myFbLoginBtn');
-    if (lb && !lb.dataset.bound) {
-      lb.dataset.bound = '1';
-      lb.onclick = function() { if(window.fbLogin) window.fbLogin(); };
-    }
-  }, 500);
 
-  // 4. СТАТУС ВХОДА
+    // Открыть Кристаллы
+    if (text.includes('Казино') || text.includes('Кристаллы')) {
+        if (target.closest('.menu-btn') || (target.parentElement && target.parentElement.closest('.menu-btn'))) {
+            document.getElementById('myCrystalModal').style.display = 'flex';
+        }
+    }
+
+    // Войти / Выйти
+    if (text.includes('Войти через Google') || text.includes('Выйти')) {
+        if (auth.currentUser) {
+            auth.signOut();
+        } else {
+            window.fbLogin();
+        }
+    }
+
+    // Кнопки внутри окна
+    if (target.id === 'myCloseBtn') document.getElementById('myCrystalModal').style.display = 'none';
+    if (target.id === 'myCasinoBtn') {
+        document.getElementById('myCrystalModal').style.display = 'none';
+        if (window.openCasino) window.openCasino();
+    }
+  });
+
+  // 4. ВСТАВЛЯЕМ КНОПКУ ВХОДА В АККАУНТ
+  var acc = document.querySelector('#panelAccount .account-body');
+  if (acc && !document.getElementById('myFbLoginBtn')) {
+    var b = document.createElement('button');
+    b.id = 'myFbLoginBtn';
+    b.style.cssText = 'display:block;width:100%;padding:14px;margin:10px 0 20px 0;border-radius:12px;border:none;color:#fff;font-size:15px;font-weight:700;background:linear-gradient(135deg,#4285f4,#34a853);';
+    b.innerText = '🔐 Войти через Google';
+    acc.insertBefore(b, acc.firstChild);
+  }
+
+  // Меняем текст кнопки при входе/выходе
   auth.onAuthStateChanged(function(user) {
     var btn = document.getElementById('myFbLoginBtn');
     if (!btn) return;
     if (user) {
       btn.textContent = '🚪 Выйти (' + (user.displayName || '') + ')';
       btn.style.background = '#333';
-      btn.onclick = function() { auth.signOut(); };
     } else {
       btn.textContent = '🔐 Войти через Google';
       btn.style.background = 'linear-gradient(135deg,#4285f4,#34a853)';
-      btn.onclick = window.fbLogin;
     }
   });
-});
+
+}, 1500);
 </script>
 </body>
 </html>
