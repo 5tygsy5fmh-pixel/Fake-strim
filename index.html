@@ -3198,56 +3198,6 @@ console.log('CSS ok');
 })();
 </script>
 <script>
-setTimeout(function(){
-  var cb = document.getElementById('btnCasino');
-  if(cb){
-    cb.onclick = function(){
-      var m = document.getElementById('crmModal');
-      if(m){ m.classList.add('show'); }
-      else { alert('Окно Кристаллов не найдено'); }
-    };
-  }
-}, 1000);
-</script>
-<!-- ФИНАЛЬНЫЙ ФИКС -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getAuth, onAuthStateChanged, signInWithPopup, signOut, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyAUIrQTOW_aDL6ziFVpXerHf6pPD6waRI8",
-    authDomain: "fake-strim.firebaseapp.com",
-    projectId: "fake-strim",
-    storageBucket: "fake-strim.firebasestorage.app",
-    messagingSenderId: "838988558430",
-    appId: "1:838988558430:web:579a441e92556fb4d384cf"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const provider = new GoogleAuthProvider();
-
-  window.fbLogin = function() {
-    signInWithPopup(auth, provider).catch(function(e) {
-      alert("Ошибка Firebase: " + e.message);
-    });
-  };
-
-  onAuthStateChanged(auth, function(user) {
-    var btn = document.getElementById('myFbLoginBtn');
-    if (!btn) return;
-    if (user) {
-      btn.textContent = '🚪 Выйти (' + (user.displayName || '') + ')';
-      btn.style.background = 'linear-gradient(135deg,#555,#333)';
-      btn.onclick = function() { signOut(auth); };
-    } else {
-      btn.textContent = '🔐 Войти через Google';
-      btn.style.background = 'linear-gradient(135deg,#4285f4,#34a853)';
-      btn.onclick = window.fbLogin;
-    }
-  });
-</script>
-<script>
   setTimeout(function() {
     // 1. Если окна нет, создаём его прямо в памяти
     if (!document.getElementById('crmModal')) {
@@ -3300,6 +3250,42 @@ setTimeout(function(){
     var votingsBtn = document.getElementById('crmVotingsBtn');
     if(votingsBtn) votingsBtn.onclick = function(){ alert('Экран Голосований скоро появится!'); };
 
+  }, 1000);
+</script>
+<script>
+  setTimeout(function() {
+    // Создаем окно меню прямо в памяти
+    var crystalModal = document.createElement('div');
+    crystalModal.id = 'crmModal';
+    crystalModal.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.9);display:none;align-items:center;justify-content:center;padding:20px;';
+    
+    crystalModal.innerHTML = `
+      <div style="background:#1a1a2e;border-radius:20px;padding:22px;width:100%;max-width:360px;display:flex;flex-direction:column;gap:12px">
+        <h3 style="font-size:18px;text-align:center;margin-bottom:8px;color:#fff">💎 Кристаллы</h3>
+        <button id="crmCasinoBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-size:15px;font-weight:800;cursor:pointer;background:linear-gradient(135deg,#ff2850,#ff5c8a)">🎰 Казино</button>
+        <button id="crmStocksBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-size:15px;font-weight:800;cursor:pointer;background:linear-gradient(135deg,#43e97b,#38f9d7)">📈 Акции</button>
+        <button id="crmVotingsBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-size:15px;font-weight:800;cursor:pointer;background:linear-gradient(135deg,#8b5cf6,#c88cff)">🗳️ Голосования</button>
+        <button id="crmCloseBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-size:15px;font-weight:800;cursor:pointer;background:rgba(255,255,255,.1)">Закрыть</button>
+      </div>
+    `;
+    document.body.appendChild(crystalModal);
+
+    // Привязываем кнопку "Кристаллы"
+    var cb = document.getElementById('btnCasino');
+    if(cb) {
+      cb.onclick = function(e) {
+        e.preventDefault();
+        crystalModal.style.display = 'flex';
+      };
+    }
+    
+    // Привязываем кнопку Закрыть
+    var closeBtn = document.getElementById('crmCloseBtn');
+    if(closeBtn) closeBtn.onclick = function(){ crystalModal.style.display = 'none'; };
+
+    // Привязываем кнопку Казино
+    var casinoBtn = document.getElementById('crmCasinoBtn');
+    if(casinoBtn) casinoBtn.onclick = function(){ crystalModal.style.display = 'none'; if(window.openCasino) openCasino(); };
   }, 1000);
 </script>
 <script>
