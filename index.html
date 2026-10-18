@@ -2984,5 +2984,38 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('crmCasinoBtn').onclick = function() { crystalModal.style.display = 'none'; if(window.openCasino) window.openCasino(); };
 });
 </script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script>
+  firebase.initializeApp({
+    apiKey: "AIzaSyAUIrQTOW_aDL6ziFVpXerHf6pPD6waRI8",
+    authDomain: "fake-strim.firebaseapp.com",
+    projectId: "fake-strim",
+    storageBucket: "fake-strim.firebasestorage.app",
+    messagingSenderId: "838988558430",
+    appId: "1:838988558430:web:579a441e92556fb4d384cf"
+  });
+  
+  var auth = firebase.auth();
+  var provider = new firebase.auth.GoogleAuthProvider();
+
+  window.fbLogin = function() {
+    auth.signInWithPopup(provider).catch(function(error) { alert("Ошибка: " + error.message); });
+  };
+
+  auth.onAuthStateChanged(function(user) {
+    var btn = document.getElementById('myFbLoginBtn');
+    if (!btn) return;
+    if (user) {
+      btn.textContent = '🚪 Выйти (' + (user.displayName || '') + ')';
+      btn.style.background = '#333';
+      btn.onclick = function() { auth.signOut(); };
+    } else {
+      btn.textContent = '🔐 Войти через Google';
+      btn.style.background = 'linear-gradient(135deg,#4285f4,#34a853)';
+      btn.onclick = window.fbLogin;
+    }
+  });
+</script>
 </body>
 </html>
