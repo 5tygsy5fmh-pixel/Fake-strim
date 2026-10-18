@@ -3198,49 +3198,6 @@ console.log('CSS ok');
 })();
 </script>
 <script>
-"use strict";
-setTimeout(function(){
-  console.log('FIX-2 START');
-
-  // 1. Принудительно привязываем Кристаллы
-  var cb = document.getElementById('btnCasino');
-  if(cb){
-    cb.onclick = function(){
-      var m = document.getElementById('crmModal');
-      if(m) m.classList.add('show');
-      else alert('Меню Кристаллов не найдено в коде');
-    };
-    console.log('Кнопка Кристаллы привязана');
-  } else {
-    console.log('Кнопка btnCasino НЕ найдена');
-  }
-
-  // 2. Принудительно привязываем кнопку Войти
-  var lb = document.getElementById('myFbLoginBtn');
-  if(lb){
-    lb.onclick = function(){
-      if(window.fbLogin) window.fbLogin();
-      else alert('Скрипт Firebase сломан. Нужно починить блок <script type="module">');
-    };
-    console.log('Кнопка Войти привязана');
-  }
-
-  // 3. Привязываем кнопки внутри меню Кристаллов (Казино, Акции, Голосования)
-  var mc = document.getElementById('crmCasinoBtn');
-  if(mc) mc.onclick = function(){ document.getElementById('crmModal').classList.remove('show'); if(window.openCasino) openCasino(); };
-  
-  var ms = document.getElementById('crmStocksBtn');
-  if(ms) ms.onclick = function(){ if(window.openStocksScreen) openStocksScreen(); };
-  
-  var mv = document.getElementById('crmVotingsBtn');
-  if(mv) mv.onclick = function(){ if(window.openVotingsScreen) openVotingsScreen(); };
-  
-  var mcl = document.getElementById('crmCloseBtn');
-  if(mcl) mcl.onclick = function(){ document.getElementById('crmModal').classList.remove('show'); };
-
-}, 1000);
-</script>
-<script>
 setTimeout(function(){
   var cb = document.getElementById('btnCasino');
   if(cb){
@@ -3343,6 +3300,42 @@ setTimeout(function(){
     var votingsBtn = document.getElementById('crmVotingsBtn');
     if(votingsBtn) votingsBtn.onclick = function(){ alert('Экран Голосований скоро появится!'); };
 
+  }, 1000);
+</script>
+<script>
+  setTimeout(function() {
+    // Создаем окно меню прямо в памяти
+    var crystalModal = document.createElement('div');
+    crystalModal.id = 'crmModal';
+    crystalModal.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.9);display:none;align-items:center;justify-content:center;padding:20px;';
+    
+    crystalModal.innerHTML = `
+      <div style="background:#1a1a2e;border-radius:20px;padding:22px;width:100%;max-width:360px;display:flex;flex-direction:column;gap:12px">
+        <h3 style="font-size:18px;text-align:center;margin-bottom:8px;color:#fff">💎 Кристаллы</h3>
+        <button id="crmCasinoBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-size:15px;font-weight:800;cursor:pointer;background:linear-gradient(135deg,#ff2850,#ff5c8a)">🎰 Казино</button>
+        <button id="crmStocksBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-size:15px;font-weight:800;cursor:pointer;background:linear-gradient(135deg,#43e97b,#38f9d7)">📈 Акции</button>
+        <button id="crmVotingsBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-size:15px;font-weight:800;cursor:pointer;background:linear-gradient(135deg,#8b5cf6,#c88cff)">🗳️ Голосования</button>
+        <button id="crmCloseBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-size:15px;font-weight:800;cursor:pointer;background:rgba(255,255,255,.1)">Закрыть</button>
+      </div>
+    `;
+    document.body.appendChild(crystalModal);
+
+    // Привязываем кнопку "Кристаллы"
+    var cb = document.getElementById('btnCasino');
+    if(cb) {
+      cb.onclick = function(e) {
+        e.preventDefault();
+        crystalModal.style.display = 'flex';
+      };
+    }
+    
+    // Привязываем кнопку Закрыть
+    var closeBtn = document.getElementById('crmCloseBtn');
+    if(closeBtn) closeBtn.onclick = function(){ crystalModal.style.display = 'none'; };
+
+    // Привязываем кнопку Казино
+    var casinoBtn = document.getElementById('crmCasinoBtn');
+    if(casinoBtn) casinoBtn.onclick = function(){ crystalModal.style.display = 'none'; if(window.openCasino) openCasino(); };
   }, 1000);
 </script>
 </body>
