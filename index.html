@@ -2762,11 +2762,10 @@ window.addEventListener('load', function() {
       if(updatedStock) {
         window.currentOpenStock.price = updatedStock.price;
         window.currentOpenStock.hist = updatedStock.hist;
-        var el = document.getElementById('detailPrice');
-        if(el) el.innerText = '$' + updatedStock.price.toFixed(2);
       }
-      if(window.drawStockChartFunc) window.drawStockChartFunc();
+      if(window.updateDetailUI) window.updateDetailUI();
     }
+    
     var ss = document.getElementById('myStocksScreen');
     if(ss && ss.style.display === 'flex') {
       renderStocksList();
