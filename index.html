@@ -2795,95 +2795,206 @@ window.addEventListener('load', function() {
     var boughtPrice = holdings[stock.sym] ? holdings[stock.sym].buyPrice : null;
 
     detail.innerHTML = `
-      <div style="display:flex;align-items:center;padding:14px;border-bottom:1px solid #222;background:#000;">
-        <button id="detailBackBtn" style="background:none;border:none;color:#fff;font-size:16px;">◀ Назад</button>
-        <div style="flex:1;text-align:center;color:#fff;font-weight:bold;">${stock.sym}</div>
-        <div style="width:50px;"></div>
+// Открыть Акцию (Детали как на MEXC)
+  function openStockDetail(stock) {
+    var detail = document.createElement('div');
+    detail.id = 'myStockDetail';
+    detail.style.cssText = 'position:fixed;inset:0;z-index:99999;background:#0a0a14;display:flex;flex-direction:column;color:#fff;';
+    
+    var holdings = JSON.parse(localStorage.getItem('my_holdings') || '{}');
+    var boughtPrice = holdings[stock.sym] ? parseFloat(holdings[stock.sym].buyPrice) : null;
+
+    // Генерируем свечи (Open, High, Low, Close)
+    var candles = [];
+    var currP = stock.price;
+    for(var i=0; i<40; i++){
+      var open = currP + (Math.random()-0.5)*currP*0.01;
+      var close = open + (Math.random()-0.5)*currP*0.01;
+      var high = Math.max(open, close) + Math.random()*currP*0.005;
+      var low = Math.min(open, close) - Math.random()*currP*0.005;
+      candles.push({o: open, h: high, l: low, c: close});
+      currP = close;
+    }
+
+    detail.innerHTML = `
+      <!-- Верхняя панель (Статистика) -->
+      <div style="padding:15px; background:#111; border-bottom:1px solid #222;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+           <button id="detailBackBtn" style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer;">←</button>
+           <div style="font-size:18px;font-weight:bold;">${stock.sym}USDT</div>
+           <div style="width:20px;"></div>
+        </div>
+        <div style="font-size:28px;font-weight:bold;color:${stock.prev > stock.price ? '#ff5c5c' : '#25f4ee'};" id="detailPrice">$${stock.price.toFixed(2)}</div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:#888;margin-top:10px;">
+           <div>Макс 24ч: <span style="color:#fff;">$${(stock.price*1.02).toFixed(2)}</span></div>
+           <div>Мин 24ч: <span style="color:#fff;">$${(stock.price*0.98).toFixed(2)}</span></div>
+        </div>
       </div>
-      <div style="padding:20px;text-align:center;">
-        <div style="color:#fff;font-size:32px;font-weight:bold;">$${stock.price.toFixed(2)}</div>
-        <div style="color:#888;">${stock.name}</div>
-      </div>
-      <div style="flex:1;position:relative;margin:10px;background:#111;border-radius:15px;overflow:hidden;" id="chartContainer">
+
+      <!-- График -->
+      <div style="flex:1;position:relative;background:#0a0a14;" id="chartContainer">
         <canvas id="stockChart" style="width:100%;height:100%;"></canvas>
       </div>
-      <div style="padding:20px;">
-        ${boughtPrice ? `
-          <div style="text-align:center;color:#8cff8c;margin-bottom:10px;">Куплено по $${boughtPrice}</div>
-          <button id="sellStockBtn" style="width:100%;padding:15px;background:#ff2850;color:#fff;border:none;border-radius:15px;font-weight:bold;font-size:16px;">Продать за 💎 ${Math.floor(stock.price * 100)}</button>
-        ` : `
-          <button id="buyStockBtn" style="width:100%;padding:15px;background:#25f4ee;color:#000;border:none;border-radius:15px;font-weight:bold;font-size:16px;">Купить за 💎 ${Math.floor(stock.price * 100)}</button>
-        `}
+
+      <!-- Нижняя панель (Покупка/Продажа) -->
+      <div style="padding:15px; background:#111; border-top:1px solid #222;">
+        <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:10px;">
+           <div style="color:#888;">Сумма (USDT):</div>
+           <div style="font-weight:bold;">${(stock.price * 100).toLocaleString()} USDT</div>
+        </div>
+        
+        <div style="display:flex; gap:10px;">
+          <button id="btnBuy" style="flex:1; padding:16px; border-radius:12px; border:none; font-weight:bold; font-size:16px; cursor:pointer; 
+            background:${boughtPrice ? '#333' : 'linear-gradient(135deg,#43e97b,#38f9d7)'}; 
+            color:${boughtPrice ? '#888' : '#000'};"
+            ${boughtPrice ? 'disabled' : ''}>
+            ${boughtPrice ? 'Куплено' : 'Купить'}
+          </button>
+          
+          <button id="btnSell" style="flex:1; padding:16px; border-radius:12px; border:none; font-weight:bold; font-size:16px; cursor:pointer; 
+            background:${boughtPrice ? 'linear-gradient(135deg,#ff2850,#ff5c8a)' : 'rgba(255,255,255,0.1)'}; 
+            color:${boughtPrice ? '#fff' : '#666'};"
+            ${!boughtPrice ? 'disabled' : ''}>
+            ${boughtPrice ? 'Продать' : 'Продать'}
+          </button>
+        </div>
       </div>
     `;
     document.body.appendChild(detail);
 
-    // Рисуем график
+    // Рисуем Свечной график
     setTimeout(function() {
       var canvas = document.getElementById('stockChart');
       var ctx = canvas.getContext('2d');
-      canvas.width = canvas.clientWidth;
-      canvas.height = canvas.clientHeight;
-      var w = canvas.width, h = canvas.height;
-
-      // Генерируем линию (свечи)
-      ctx.beginPath();
-      ctx.strokeStyle = stock.color === '#000000' ? '#fff' : stock.color;
-      ctx.lineWidth = 3;
-      for (var i = 0; i < w; i += 10) {
-        var y = h / 2 + Math.sin(i / 30) * 30 + (Math.random() - 0.5) * 20;
-        if (i === 0) ctx.moveTo(i, y);
-        else ctx.lineTo(i, y);
+      
+      var dpr = window.devicePixelRatio || 1;
+      var rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.scale(dpr, dpr);
+      
+      var w = rect.width;
+      var h = rect.height;
+      
+      var maxP = 0, minP = Infinity;
+      candles.forEach(function(c) {
+        if(c.h > maxP) maxP = c.h;
+        if(c.l < minP) minP = c.l;
+      });
+      if(boughtPrice) { 
+        if(boughtPrice > maxP) maxP = boughtPrice;
+        if(boughtPrice < minP) minP = boughtPrice;
       }
-      ctx.stroke();
+      
+      var pad = 20;
+      var usableH = h - pad*2;
+      var usableW = w - pad*2;
+      
+      function pToY(price) {
+        return pad + usableH - ((price - minP) / (maxP - minP)) * usableH;
+      }
 
-      // Если куплено, рисуем ЧЕРНУЮ ЛИНИЮ (как ты просил)
-      if (boughtPrice) {
+      // Сетка
+      ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+      ctx.lineWidth = 1;
+      for(var i=0; i<=4; i++) {
+        var y = pad + (usableH / 4) * i;
+        ctx.beginPath(); ctx.moveTo(pad, y); ctx.lineTo(w-pad, y); ctx.stroke();
+        
+        var priceLabel = maxP - ((maxP - minP) / 4) * i;
+        ctx.fillStyle = '#555'; ctx.font = '10px sans-serif';
+        ctx.fillText(priceLabel.toFixed(1), 2, y - 2);
+      }
+
+      // Свечи
+      var candleW = usableW / candles.length;
+      var bodyW = Math.max(2, candleW * 0.6);
+      
+      candles.forEach(function(c, i) {
+        var x = pad + i * candleW + candleW / 2;
+        var isUp = c.c >= c.o;
+        
+        ctx.strokeStyle = isUp ? '#25f4ee' : '#ff2850';
+        ctx.fillStyle = isUp ? '#25f4ee' : '#ff2850';
+        
+        // Фитиль
         ctx.beginPath();
-        ctx.strokeStyle = '#000'; // Черная линия
-        ctx.lineWidth = 2;
-        ctx.setLineDash([5, 5]); // Пунктир
-        ctx.moveTo(0, h / 2); // Условно посередине
-        ctx.lineTo(w, h / 2);
+        ctx.moveTo(x, pToY(c.h));
+        ctx.lineTo(x, pToY(c.l));
         ctx.stroke();
-        ctx.setLineDash([]); // Сброс
+        
+        // Тело
+        var yO = pToY(c.o);
+        var yC = pToY(c.c);
+        var bodyTop = Math.min(yO, yC);
+        var bodyH = Math.max(1, Math.abs(yO - yC));
+        
+        ctx.fillRect(x - bodyW/2, bodyTop, bodyW, bodyH);
+      });
+
+      // Черная линия покупки
+      if (boughtPrice) {
+        var buyY = pToY(boughtPrice);
+        
+        ctx.beginPath();
+        ctx.strokeStyle = '#000'; 
+        ctx.lineWidth = 2;
+        ctx.setLineDash([5, 5]);
+        ctx.moveTo(pad, buyY);
+        ctx.lineTo(w - pad, buyY);
+        ctx.stroke();
+        ctx.setLineDash([]);
         
         ctx.fillStyle = '#000';
-        ctx.fillRect(10, (h/2) - 20, 80, 18);
+        ctx.fillRect(pad, buyY - 20, 70, 16);
         ctx.fillStyle = '#fff';
-        ctx.font = '12px sans-serif';
-        ctx.fillText('КУПЛЕНО', 15, (h/2) - 7);
+        ctx.font = 'bold 10px sans-serif';
+        ctx.fillText('КУПЛЕНО', pad + 5, buyY - 8);
       }
+
     }, 100);
 
-    // Обработчики
     document.getElementById('detailBackBtn').onclick = function() { detail.remove(); };
 
-    if (boughtPrice) {
-      document.getElementById('sellStockBtn').onclick = function() {
-        if (window.S) {
-          S.crystals += Math.floor(stock.price * 100);
-          saveStats(); updCrysUI(); updateStocksBalance();
-        }
-        delete holdings[stock.sym];
-        localStorage.setItem('my_holdings', JSON.stringify(holdings));
-        detail.remove();
-        toast('Акция продана!');
-      };
-    } else {
-      document.getElementById('buyStockBtn').onclick = function() {
-        var cost = Math.floor(stock.price * 100);
+    var btnBuy = document.getElementById('btnBuy');
+    var btnSell = document.getElementById('btnSell');
+
+    if (!boughtPrice && btnBuy) {
+      btnBuy.onclick = function() {
+        var cost = Math.floor(stock.price * 100); 
         if (!window.S || S.crystals < cost) { alert('Недостаточно кристаллов!'); return; }
+        
         S.crystals -= cost;
-        saveStats(); updCrysUI(); updateStocksBalance();
+        saveStats(); 
+        if(window.updCrysUI) updCrysUI(); 
+        if(window.updateStocksBalance) updateStocksBalance();
+        
         holdings[stock.sym] = { buyPrice: stock.price.toFixed(2) };
         localStorage.setItem('my_holdings', JSON.stringify(holdings));
-        detail.remove();
-        toast('Акция куплена!');
+        
+        detail.remove(); 
+        openStockDetail(stock);
+      };
+    }
+
+    if (boughtPrice && btnSell) {
+      btnSell.onclick = function() {
+        var profit = Math.floor(stock.price * 100); 
+        if (window.S) {
+          S.crystals += profit;
+          saveStats(); 
+          if(window.updCrysUI) updCrysUI(); 
+          if(window.updateStocksBalance) updateStocksBalance();
+        }
+        
+        delete holdings[stock.sym];
+        localStorage.setItem('my_holdings', JSON.stringify(holdings));
+        
+        detail.remove(); 
+        openStockDetail(stock);
       };
     }
   }
-
   // Обработчик кнопки "Акции" из меню кристаллов
   var stocksBtn = document.getElementById('myStocksBtn');
   if (stocksBtn) {
