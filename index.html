@@ -2784,18 +2784,7 @@ window.addEventListener('load', function() {
     renderStocksList(e.target.value);
   };
 
-  // Открыть Акцию (Детали)
-  function openStockDetail(stock) {
-    var detail = document.createElement('div');
-    detail.id = 'myStockDetail';
-    detail.style.cssText = 'position:fixed;inset:0;z-index:99999;background:#0a0a14;display:flex;flex-direction:column;';
-    
-    // Проверяем, куплена ли уже
-    var holdings = JSON.parse(localStorage.getItem('my_holdings') || '{}');
-    var boughtPrice = holdings[stock.sym] ? holdings[stock.sym].buyPrice : null;
-
-    detail.innerHTML = `
-// Открыть Акцию (Детали как на MEXC)
+  // Открыть Акцию (Безопасная версия)
   function openStockDetail(stock) {
     var detail = document.createElement('div');
     detail.id = 'myStockDetail';
@@ -2804,7 +2793,6 @@ window.addEventListener('load', function() {
     var holdings = JSON.parse(localStorage.getItem('my_holdings') || '{}');
     var boughtPrice = holdings[stock.sym] ? parseFloat(holdings[stock.sym].buyPrice) : null;
 
-    // Генерируем свечи (Open, High, Low, Close)
     var candles = [];
     var currP = stock.price;
     for(var i=0; i<40; i++){
@@ -2816,53 +2804,35 @@ window.addEventListener('load', function() {
       currP = close;
     }
 
-    detail.innerHTML = `
-      <!-- Верхняя панель (Статистика) -->
-      <div style="padding:15px; background:#111; border-bottom:1px solid #222;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-           <button id="detailBackBtn" style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer;">←</button>
-           <div style="font-size:18px;font-weight:bold;">${stock.sym}USDT</div>
-           <div style="width:20px;"></div>
-        </div>
-        <div style="font-size:28px;font-weight:bold;color:${stock.prev > stock.price ? '#ff5c5c' : '#25f4ee'};" id="detailPrice">$${stock.price.toFixed(2)}</div>
-        <div style="display:flex;justify-content:space-between;font-size:12px;color:#888;margin-top:10px;">
-           <div>Макс 24ч: <span style="color:#fff;">$${(stock.price*1.02).toFixed(2)}</span></div>
-           <div>Мин 24ч: <span style="color:#fff;">$${(stock.price*0.98).toFixed(2)}</span></div>
-        </div>
-      </div>
+    var html = '<div style="padding:15px; background:#111; border-bottom:1px solid #222;">';
+    html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">';
+    html += '<button id="detailBackBtn" style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer;">←</button>';
+    html += '<div style="font-size:18px;font-weight:bold;">' + stock.sym + 'USDT</div>';
+    html += '<div style="width:20px;"></div></div>';
+    html += '<div style="font-size:28px;font-weight:bold;color:' + (stock.prev > stock.price ? '#ff5c5c' : '#25f4ee') + ';" id="detailPrice">$' + stock.price.toFixed(2) + '</div>';
+    html += '<div style="display:flex;justify-content:space-between;font-size:12px;color:#888;margin-top:10px;">';
+    html += '<div>Макс 24ч: <span style="color:#fff;">$' + (stock.price*1.02).toFixed(2) + '</span></div>';
+    html += '<div>Мин 24ч: <span style="color:#fff;">$' + (stock.price*0.98).toFixed(2) + '</span></div>';
+    html += '</div></div>';
 
-      <!-- График -->
-      <div style="flex:1;position:relative;background:#0a0a14;" id="chartContainer">
-        <canvas id="stockChart" style="width:100%;height:100%;"></canvas>
-      </div>
+    html += '<div style="flex:1;position:relative;background:#0a0a14;" id="chartContainer">';
+    html += '<canvas id="stockChart" style="width:100%;height:100%;"></canvas></div>';
 
-      <!-- Нижняя панель (Покупка/Продажа) -->
-      <div style="padding:15px; background:#111; border-top:1px solid #222;">
-        <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:10px;">
-           <div style="color:#888;">Сумма (USDT):</div>
-           <div style="font-weight:bold;">${(stock.price * 100).toLocaleString()} USDT</div>
-        </div>
-        
-        <div style="display:flex; gap:10px;">
-          <button id="btnBuy" style="flex:1; padding:16px; border-radius:12px; border:none; font-weight:bold; font-size:16px; cursor:pointer; 
-            background:${boughtPrice ? '#333' : 'linear-gradient(135deg,#43e97b,#38f9d7)'}; 
-            color:${boughtPrice ? '#888' : '#000'};"
-            ${boughtPrice ? 'disabled' : ''}>
-            ${boughtPrice ? 'Куплено' : 'Купить'}
-          </button>
-          
-          <button id="btnSell" style="flex:1; padding:16px; border-radius:12px; border:none; font-weight:bold; font-size:16px; cursor:pointer; 
-            background:${boughtPrice ? 'linear-gradient(135deg,#ff2850,#ff5c8a)' : 'rgba(255,255,255,0.1)'}; 
-            color:${boughtPrice ? '#fff' : '#666'};"
-            ${!boughtPrice ? 'disabled' : ''}>
-            ${boughtPrice ? 'Продать' : 'Продать'}
-          </button>
-        </div>
-      </div>
-    `;
+    html += '<div style="padding:15px; background:#111; border-top:1px solid #222;">';
+    html += '<div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:10px;">';
+    html += '<div style="color:#888;">Сумма (USDT):</div>';
+    html += '<div style="font-weight:bold;">' + (stock.price * 100).toLocaleString() + ' USDT</div></div>';
+    
+    html += '<div style="display:flex; gap:10px;">';
+    html += '<button id="btnBuy" style="flex:1; padding:16px; border-radius:12px; border:none; font-weight:bold; font-size:16px; cursor:pointer; background:' + (boughtPrice ? '#333' : 'linear-gradient(135deg,#43e97b,#38f9d7)') + '; color:' + (boughtPrice ? '#888' : '#000') + ';" ' + (boughtPrice ? 'disabled' : '') + '>' + (boughtPrice ? 'Куплено' : 'Купить') + '</button>';
+    
+    html += '<button id="btnSell" style="flex:1; padding:16px; border-radius:12px; border:none; font-weight:bold; font-size:16px; cursor:pointer; background:' + (boughtPrice ? 'linear-gradient(135deg,#ff2850,#ff5c8a)' : 'rgba(255,255,255,0.1)') + '; color:' + (boughtPrice ? '#fff' : '#666') + ';" ' + (!boughtPrice ? 'disabled' : '') + '>Продать</button>';
+    
+    html += '</div></div>';
+    
+    detail.innerHTML = html;
     document.body.appendChild(detail);
 
-    // Рисуем Свечной график
     setTimeout(function() {
       var canvas = document.getElementById('stockChart');
       var ctx = canvas.getContext('2d');
@@ -2894,19 +2864,13 @@ window.addEventListener('load', function() {
         return pad + usableH - ((price - minP) / (maxP - minP)) * usableH;
       }
 
-      // Сетка
       ctx.strokeStyle = 'rgba(255,255,255,0.05)';
       ctx.lineWidth = 1;
       for(var i=0; i<=4; i++) {
         var y = pad + (usableH / 4) * i;
         ctx.beginPath(); ctx.moveTo(pad, y); ctx.lineTo(w-pad, y); ctx.stroke();
-        
-        var priceLabel = maxP - ((maxP - minP) / 4) * i;
-        ctx.fillStyle = '#555'; ctx.font = '10px sans-serif';
-        ctx.fillText(priceLabel.toFixed(1), 2, y - 2);
       }
 
-      // Свечи
       var candleW = usableW / candles.length;
       var bodyW = Math.max(2, candleW * 0.6);
       
@@ -2917,13 +2881,11 @@ window.addEventListener('load', function() {
         ctx.strokeStyle = isUp ? '#25f4ee' : '#ff2850';
         ctx.fillStyle = isUp ? '#25f4ee' : '#ff2850';
         
-        // Фитиль
         ctx.beginPath();
         ctx.moveTo(x, pToY(c.h));
         ctx.lineTo(x, pToY(c.l));
         ctx.stroke();
         
-        // Тело
         var yO = pToY(c.o);
         var yC = pToY(c.c);
         var bodyTop = Math.min(yO, yC);
@@ -2932,10 +2894,8 @@ window.addEventListener('load', function() {
         ctx.fillRect(x - bodyW/2, bodyTop, bodyW, bodyH);
       });
 
-      // Черная линия покупки
       if (boughtPrice) {
         var buyY = pToY(boughtPrice);
-        
         ctx.beginPath();
         ctx.strokeStyle = '#000'; 
         ctx.lineWidth = 2;
@@ -2944,18 +2904,10 @@ window.addEventListener('load', function() {
         ctx.lineTo(w - pad, buyY);
         ctx.stroke();
         ctx.setLineDash([]);
-        
-        ctx.fillStyle = '#000';
-        ctx.fillRect(pad, buyY - 20, 70, 16);
-        ctx.fillStyle = '#fff';
-        ctx.font = 'bold 10px sans-serif';
-        ctx.fillText('КУПЛЕНО', pad + 5, buyY - 8);
       }
-
     }, 100);
 
     document.getElementById('detailBackBtn').onclick = function() { detail.remove(); };
-
     var btnBuy = document.getElementById('btnBuy');
     var btnSell = document.getElementById('btnSell');
 
@@ -2963,17 +2915,11 @@ window.addEventListener('load', function() {
       btnBuy.onclick = function() {
         var cost = Math.floor(stock.price * 100); 
         if (!window.S || S.crystals < cost) { alert('Недостаточно кристаллов!'); return; }
-        
         S.crystals -= cost;
-        saveStats(); 
-        if(window.updCrysUI) updCrysUI(); 
-        if(window.updateStocksBalance) updateStocksBalance();
-        
+        saveStats(); if(window.updCrysUI) updCrysUI(); if(window.updateStocksBalance) updateStocksBalance();
         holdings[stock.sym] = { buyPrice: stock.price.toFixed(2) };
         localStorage.setItem('my_holdings', JSON.stringify(holdings));
-        
-        detail.remove(); 
-        openStockDetail(stock);
+        detail.remove(); openStockDetail(stock);
       };
     }
 
@@ -2982,16 +2928,11 @@ window.addEventListener('load', function() {
         var profit = Math.floor(stock.price * 100); 
         if (window.S) {
           S.crystals += profit;
-          saveStats(); 
-          if(window.updCrysUI) updCrysUI(); 
-          if(window.updateStocksBalance) updateStocksBalance();
+          saveStats(); if(window.updCrysUI) updCrysUI(); if(window.updateStocksBalance) updateStocksBalance();
         }
-        
         delete holdings[stock.sym];
         localStorage.setItem('my_holdings', JSON.stringify(holdings));
-        
-        detail.remove(); 
-        openStockDetail(stock);
+        detail.remove(); openStockDetail(stock);
       };
     }
   }
