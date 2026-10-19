@@ -2772,23 +2772,52 @@ window.addEventListener('load', function() {
       renderStocksList();
     }
   }, 2000);
-    document.getElementById('detailBackBtn').onclick = function() { detail.remove(); };
+    window.currentOpenStock = null;
+
+  function openStockDetail(stock) {
+    window.currentOpenStock = stock;
+    var detail = document.createElement('div');
+    detail.id = 'myStockDetail';
+    detail.style.cssText = 'position:fixed;inset:0;z-index:99999;background:#ffffff;display:flex;flex-direction:column;color:#000;';
+    
+    var holdings = JSON.parse(localStorage.getItem('my_holdings') || '{}');
+    var boughtPrice = holdings[stock.sym] ? parseFloat(holdings[stock.sym].buyPrice) : null;
+
+    var html = '<div style="padding:15px; background:#f8f9fa; border-bottom:1px solid #e0e0e0;">';
+    html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">';
+    html += '<button id="detailBackBtn" style="background:none;border:none;color:#000;font-size:20px;cursor:pointer;">←</button>';
+    html += '<div style="font-size:18px;font-weight:bold;color:#000;">' + stock.sym + 'USDT</div>';
+    html += '<div style="width:20px;"></div></div>';
+    html += '<div style="font-size:28px;font-weight:bold;color:#000;" id="detailPrice">$' + stock.price.toFixed(2) + '</div>';
+    html += '</div>';
+
+    html += '<div style="flex:1;position:relative;background:#ffffff;" id="chartContainer">';
+    html += '<canvas id="stockChart" style="width:100%;height:100%;"></canvas></div>';
+
+    html += '<div style="padding:15px; background:#f8f9fa; border-top:1px solid #e0e0e0;">';
+    if(boughtPrice) {
+       html += '<div style="text-align:center; color:#007aff; font-size:12px; margin-bottom:10px; font-weight:bold;">Куплено по $' + boughtPrice + '</div>';
+    }
+    html += '<div style="display:flex; gap:10px;">';
+    html += '<button id="btnBuy" style="flex:1; padding:16px; border-radius:12px; border:none; font-weight:bold; font-size:16px; cursor:pointer;">Купить</button>';
+    html += '<button id="btnSell" style="flex:1; padding:16px; border-radius:12px; border:none; font-weight:bold; font-size:16px; cursor:pointer;">Продать</button>';
+    html += '</div></div>';
+    
+    detail.innerHTML = html;
+    document.body.appendChild(detail);
+
     var btnBuy = document.getElementById('btnBuy');
     var btnSell = document.getElementById('btnSell');
 
-    if (!boughtPrice && btnBuy) {
-      btnBuy.onclick = function() {
-        var cost = Math.floor(stock.price * 100); 
-        if (!window.S || S.crystals < cost) { alert('Недостаточно кристаллов!'); return; }
-        S.crystals -= cost;
-        saveStats(); if(window.updCrysUI) updCrysUI(); if(window.updateStocksBalance) updateStocksBalance();
-        holdings[stock.sym] = { buyPrice: stock.price.toFixed(2) };
-        localStorage.setItem('my_holdings', JSON.stringify(holdings));
-        detail.remove(); openStockDetail(stock);
-      };
-    }
+    if (boughtPrice) {
+      btnBuy.disabled = true;
+      btnBuy.style.background = '#e0e0e0';
+      btnBuy.style.color = '#999';
+      
+      btnSell.disabled = false;
+      btnSell.style.background = '#ff3b30';
+      btnSell.style.color = '#fff';
 
-    if (boughtPrice && btnSell) {
       btnSell.onclick = function() {
         var profit = Math.floor(stock.price * 100); 
         if (window.S) {
@@ -2797,8 +2826,120 @@ window.addEventListener('load', function() {
         }
         delete holdings[stock.sym];
         localStorage.setItem('my_holdings', JSON.stringify(holdings));
-        detail.remove(); openStockDetail(stock);
+        detail.remove(); 
+        window.currentOpenStock = null;
+        openStockDetail(stock);
       };
+    } else {
+      btnBuy.disabled = false;
+      btnBuy.style.background = '#34c759';
+      btnBuy.style.color = '#fff';
+      
+      btnSell.disabled = true;
+      btnSell.style.background = '#e0e0e0';
+      btnSell.style.color = '#999';
+
+      btnBuy.onclick = function() {
+        var cost = Math.floor(stock.price * 100); 
+        if (!window.S || S.crystals < cost) { alert('Недостаточно кристаллов!'); return; }
+        S.crystals -= cost;
+        saveStats(); if(window.updCrysUI) updCrysUI(); if(window.updateStocksBalance) updateStocksBalance();
+        holdings[stock.sym] = { buyPrice: stock.price.toFixed(2) };
+        localStorage.setItem('my_holdings', JSON.stringify(holdings));
+        detail.remove(); 
+        openStockDetail(stock);
+      };
+    }
+
+    document.getElementById('detailBackBtn').onclick = function() { 
+        detail.remove(); 
+        window.currentOpenStock = null; 
+    };
+
+    window.drawStockChartFunc = function() { drawStockChart(stock, boughtPrice); };
+    setTimeout(window.drawStockChartFunc, 100);
+  }
+
+  function drawStockChart(stock, boughtPrice) {
+    var canvas = document.getElementById('stockChart');
+    if(!canvas) return;
+    var ctx = canvas.getContext('2d');
+    var dpr = window.devicePixelRatio || 1;
+    var rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.scale(dpr, dpr);
+    
+    var w = rect.width;
+    var h = rect.height;
+    
+    var hist = stock.hist;
+    var maxP = 0, minP = Infinity;
+    hist.forEach(function(p) {
+      if(p > maxP) maxP = p;
+      if(p < minP) minP = p;
+    });
+    if(boughtPrice) { 
+      if(boughtPrice > maxP) maxP = boughtPrice;
+      if(boughtPrice < minP) minP = boughtPrice;
+    }
+    
+    var pad = 20;
+    var usableH = h - pad*2;
+    var usableW = w - pad*2;
+    
+    function pToY(p) {
+      return pad + usableH - ((p - minP) / (maxP - minP || 1)) * usableH;
+    }
+
+    ctx.strokeStyle = 'rgba(0,0,0,0.05)';
+    ctx.lineWidth = 1;
+    for(var i=0; i<=4; i++) {
+      var y = pad + (usableH / 4) * i;
+      ctx.beginPath(); ctx.moveTo(pad, y); ctx.lineTo(w-pad, y); ctx.stroke();
+    }
+
+    var candleW = usableW / hist.length;
+    var bodyW = Math.max(2, candleW * 0.6);
+    
+    hist.forEach(function(closePrice, i) {
+      var openPrice = i > 0 ? hist[i-1] : closePrice;
+      var isUp = closePrice >= openPrice;
+      var x = pad + i * candleW + candleW / 2;
+      
+      ctx.strokeStyle = isUp ? '#00a854' : '#e63946'; 
+      ctx.fillStyle = isUp ? '#00a854' : '#e63946';
+      
+      var high = Math.max(openPrice, closePrice) * 1.002;
+      var low = Math.min(openPrice, closePrice) * 0.998;
+      
+      ctx.beginPath();
+      ctx.moveTo(x, pToY(high));
+      ctx.lineTo(x, pToY(low));
+      ctx.stroke();
+      
+      var yO = pToY(openPrice);
+      var yC = pToY(closePrice);
+      var bodyTop = Math.min(yO, yC);
+      var bodyH = Math.max(1, Math.abs(yO - yC));
+      
+      ctx.fillRect(x - bodyW/2, bodyTop, bodyW, bodyH);
+    });
+
+    if (boughtPrice) {
+      var buyY = pToY(boughtPrice);
+      ctx.beginPath();
+      ctx.strokeStyle = '#000'; 
+      ctx.lineWidth = 2;
+      ctx.moveTo(pad, buyY);
+      ctx.lineTo(w - pad, buyY);
+      ctx.stroke();
+      
+      ctx.fillStyle = '#000';
+      ctx.fillRect(pad, buyY - 20, 70, 16);
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 10px sans-serif';
+      ctx.fillText('КУПЛЕНО', pad + 5, buyY - 8);
     }
   }
   // Обработчик кнопки "Акции" из меню кристаллов
