@@ -2717,13 +2717,38 @@ window.addEventListener('load', function() {
   // ЭКРАН АКЦИЙ (APPLE STOCKS STYLE)
   // ==========================================
   var stocksData = [
-    { sym: 'BTC', name: 'Bitcoin', price: 64000, prev: 63500, color: '#f7931a' },
-    { sym: 'ETH', name: 'Ethereum', price: 3100, prev: 3080, color: '#627eea' },
-    { sym: 'SOL', name: 'Solana', price: 145, prev: 148, color: '#14f195' },
-    { sym: 'AAPL', name: 'Apple Inc.', price: 175, prev: 174, color: '#000000' },
-    { sym: 'TSLA', name: 'Tesla', price: 180, prev: 185, color: '#e82127' }
+    { sym: 'BTC', name: 'Bitcoin', price: 64000, hist: [], color: '#f7931a' },
+    { sym: 'ETH', name: 'Ethereum', price: 3100, hist: [], color: '#627eea' },
+    { sym: 'SOL', name: 'Solana', price: 145, hist: [], color: '#14f195' },
+    { sym: 'AAPL', name: 'Apple Inc.', price: 175, hist: [], color: '#000000' },
+    { sym: 'TSLA', name: 'Tesla', price: 180, hist: [], color: '#e82127' }
   ];
 
+  stocksData.forEach(function(s) {
+    for(var i=0; i<40; i++) {
+      s.hist.push(s.price * (1 + (Math.random() - 0.5) * 0.02));
+    }
+  });
+
+  setInterval(function() {
+    stocksData.forEach(function(s) {
+      var change = (Math.random() - 0.5) * 0.02;
+      s.price = s.price * (1 + change);
+      if(s.price < 0.01) s.price = 0.01; 
+      s.hist.push(s.price);
+      if(s.hist.length > 40) s.hist.shift();
+    });
+    
+    if(window.currentOpenStock) {
+      var el = document.getElementById('detailPrice');
+      if(el) el.innerText = '$' + window.currentOpenStock.price.toFixed(2);
+      if(window.drawStockChartFunc) window.drawStockChartFunc();
+    }
+    var ss = document.getElementById('myStocksScreen');
+    if(ss && ss.style.display === 'flex') {
+      renderStocksList();
+    }
+  }, 3000);
   // Создаем экран
   if (!document.getElementById('myStocksScreen')) {
     var stocksScreen = document.createElement('div');
