@@ -2717,221 +2717,61 @@ window.addEventListener('load', function() {
   // ЭКРАН АКЦИЙ (APPLE STOCKS STYLE)
   // ==========================================
   var stocksData = [
-    { sym: 'BTC', name: 'Bitcoin', price: 64000, hist: [], color: '#f7931a' },
-    { sym: 'ETH', name: 'Ethereum', price: 3100, hist: [], color: '#627eea' },
-    { sym: 'SOL', name: 'Solana', price: 145, hist: [], color: '#14f195' },
-    { sym: 'AAPL', name: 'Apple Inc.', price: 175, hist: [], color: '#000000' },
-    { sym: 'TSLA', name: 'Tesla', price: 180, hist: [], color: '#e82127' }
+    { sym: 'BTC', name: 'Bitcoin', basePrice: 64000, price: 64000, hist: [], color: '#f7931a' },
+    { sym: 'ETH', name: 'Ethereum', basePrice: 3100, price: 3100, hist: [], color: '#627eea' },
+    { sym: 'SOL', name: 'Solana', basePrice: 145, price: 145, hist: [], color: '#14f195' },
+    { sym: 'AAPL', name: 'Apple Inc.', basePrice: 175, price: 175, hist: [], color: '#000000' },
+    { sym: 'TSLA', name: 'Tesla', basePrice: 180, price: 180, hist: [], color: '#e82127' }
   ];
 
-  stocksData.forEach(function(s) {
-    for(var i=0; i<40; i++) {
-      s.hist.push(s.price * (1 + (Math.random() - 0.5) * 0.02));
+  // Функция, которая высчитывает цену от текущего времени (работает даже если ты офлайн)
+  function getDynamicPrice(basePrice, seed) {
+    var t = Date.now() / 1000;
+    var wave1 = Math.sin(t / 3600 + seed) * 0.02;
+    var wave2 = Math.sin(t / 600 + seed * 2) * 0.01;
+    var wave3 = Math.sin(t / 30 + seed * 3) * 0.002;
+    var wave4 = Math.sin(t / 2 + seed * 4) * 0.001;
+    return basePrice * (1 + wave1 + wave2 + wave3 + wave4);
+  }
+
+  // Инициализация истории графиков
+  stocksData.forEach(function(s, idx) {
+    var seed = idx * 7;
+    s.price = getDynamicPrice(s.basePrice, seed);
+    for(var i=39; i>=0; i--) {
+      var pastT = Date.now() - i * 30000;
+      var t = pastT / 1000;
+      var wave1 = Math.sin(t / 3600 + seed) * 0.02;
+      var wave2 = Math.sin(t / 600 + seed * 2) * 0.01;
+      var wave3 = Math.sin(t / 30 + seed * 3) * 0.002;
+      var wave4 = Math.sin(t / 2 + seed * 4) * 0.001;
+      s.hist.push(s.basePrice * (1 + wave1 + wave2 + wave3 + wave4));
     }
   });
 
+  // Таймер обновления цен каждые 2 секунды
   setInterval(function() {
-    stocksData.forEach(function(s) {
-      var change = (Math.random() - 0.5) * 0.02;
-      s.price = s.price * (1 + change);
-      if(s.price < 0.01) s.price = 0.01; 
+    stocksData.forEach(function(s, idx) {
+      s.price = getDynamicPrice(s.basePrice, idx * 7);
       s.hist.push(s.price);
       if(s.hist.length > 40) s.hist.shift();
     });
     
     if(window.currentOpenStock) {
-      var el = document.getElementById('detailPrice');
-      if(el) el.innerText = '$' + window.currentOpenStock.price.toFixed(2);
+      var updatedStock = stocksData.find(function(x) { return x.sym === window.currentOpenStock.sym; });
+      if(updatedStock) {
+        window.currentOpenStock.price = updatedStock.price;
+        window.currentOpenStock.hist = updatedStock.hist;
+        var el = document.getElementById('detailPrice');
+        if(el) el.innerText = '$' + updatedStock.price.toFixed(2);
+      }
       if(window.drawStockChartFunc) window.drawStockChartFunc();
     }
     var ss = document.getElementById('myStocksScreen');
     if(ss && ss.style.display === 'flex') {
       renderStocksList();
     }
-  }, 3000);
-  // Создаем экран
-  if (!document.getElementById('myStocksScreen')) {
-    var stocksScreen = document.createElement('div');
-    stocksScreen.id = 'myStocksScreen';
-    stocksScreen.style.cssText = 'position:fixed;inset:0;z-index:99998;background:#0a0a14;display:none;flex-direction:column;';
-    stocksScreen.innerHTML = `
-      <div style="display:flex;align-items:center;padding:14px;border-bottom:1px solid #222;background:#000;">
-        <button id="stocksBackBtn" style="background:none;border:none;color:#fff;font-size:16px;cursor:pointer;">◀ Назад</button>
-        <div style="flex:1;text-align:center;color:#fff;font-weight:bold;font-size:18px;">📈 Биржа</div>
-        <div style="color:#25f4ee;font-weight:bold;" id="stocksCrystals">💎 0</div>
-      </div>
-      <div style="padding:10px;background:#111;">
-        <input type="text" id="stocksSearch" placeholder="Поиск (BTC, AAPL...)" style="width:100%;box-sizing:border-box;padding:10px;border-radius:10px;border:none;background:#222;color:#fff;outline:none;">
-      </div>
-      <div id="stocksList" style="flex:1;overflow-y:auto;padding:10px;background:#0a0a14;"></div>
-    `;
-    document.body.appendChild(stocksScreen);
-  }
-
-  // Обновляем баланс в акциях
-  function updateStocksBalance() {
-    var el = document.getElementById('stocksCrystals');
-    if(el && window.S) el.innerText = '💎 ' + S.crystals.toLocaleString('ru-RU');
-  }
-
-  // Рисуем список
-  function renderStocksList(filter = '') {
-    var list = document.getElementById('stocksList');
-    list.innerHTML = '';
-    stocksData.forEach(function(item) {
-      if (filter && !item.sym.toLowerCase().includes(filter.toLowerCase()) && !item.name.toLowerCase().includes(filter.toLowerCase())) return;
-      
-      var div = document.createElement('div');
-      var pct = ((item.price - item.prev) / item.prev * 100).toFixed(2);
-      var isUp = pct >= 0;
-      
-      div.style.cssText = 'display:flex;justify-content:space-between;align-items:center;padding:15px;border-bottom:1px solid #222;cursor:pointer;';
-      div.innerHTML = `
-        <div style="display:flex;align-items:center;gap:10px;">
-          <div style="width:40px;height:40px;background:${item.color};border-radius:50%;display:flex;justify-content:center;align-items:center;color:#fff;font-weight:bold;">${item.sym[0]}</div>
-          <div>
-            <div style="color:#fff;font-weight:bold;font-size:16px;">${item.sym}</div>
-            <div style="color:#888;font-size:12px;">${item.name}</div>
-          </div>
-        </div>
-        <div style="text-align:right;">
-          <div style="color:#fff;font-weight:bold;">$${item.price.toFixed(2)}</div>
-          <div style="color:${isUp ? '#8cff8c' : '#ff5c5c'};font-size:12px;">${isUp ? '+' : ''}${pct}%</div>
-        </div>
-      `;
-      div.onclick = function() { openStockDetail(item); };
-      list.appendChild(div);
-    });
-  }
-
-  // Поиск
-  document.getElementById('stocksSearch').oninput = function(e) {
-    renderStocksList(e.target.value);
-  };
-
-  // Открыть Акцию (Безопасная версия)
-  function openStockDetail(stock) {
-    var detail = document.createElement('div');
-    detail.id = 'myStockDetail';
-    detail.style.cssText = 'position:fixed;inset:0;z-index:99999;background:#0a0a14;display:flex;flex-direction:column;color:#fff;';
-    
-    var holdings = JSON.parse(localStorage.getItem('my_holdings') || '{}');
-    var boughtPrice = holdings[stock.sym] ? parseFloat(holdings[stock.sym].buyPrice) : null;
-
-    var candles = [];
-    var currP = stock.price;
-    for(var i=0; i<40; i++){
-      var open = currP + (Math.random()-0.5)*currP*0.01;
-      var close = open + (Math.random()-0.5)*currP*0.01;
-      var high = Math.max(open, close) + Math.random()*currP*0.005;
-      var low = Math.min(open, close) - Math.random()*currP*0.005;
-      candles.push({o: open, h: high, l: low, c: close});
-      currP = close;
-    }
-
-    var html = '<div style="padding:15px; background:#111; border-bottom:1px solid #222;">';
-    html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">';
-    html += '<button id="detailBackBtn" style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer;">←</button>';
-    html += '<div style="font-size:18px;font-weight:bold;">' + stock.sym + 'USDT</div>';
-    html += '<div style="width:20px;"></div></div>';
-    html += '<div style="font-size:28px;font-weight:bold;color:' + (stock.prev > stock.price ? '#ff5c5c' : '#25f4ee') + ';" id="detailPrice">$' + stock.price.toFixed(2) + '</div>';
-    html += '<div style="display:flex;justify-content:space-between;font-size:12px;color:#888;margin-top:10px;">';
-    html += '<div>Макс 24ч: <span style="color:#fff;">$' + (stock.price*1.02).toFixed(2) + '</span></div>';
-    html += '<div>Мин 24ч: <span style="color:#fff;">$' + (stock.price*0.98).toFixed(2) + '</span></div>';
-    html += '</div></div>';
-
-    html += '<div style="flex:1;position:relative;background:#0a0a14;" id="chartContainer">';
-    html += '<canvas id="stockChart" style="width:100%;height:100%;"></canvas></div>';
-
-    html += '<div style="padding:15px; background:#111; border-top:1px solid #222;">';
-    html += '<div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:10px;">';
-    html += '<div style="color:#888;">Сумма (USDT):</div>';
-    html += '<div style="font-weight:bold;">' + (stock.price * 100).toLocaleString() + ' USDT</div></div>';
-    
-    html += '<div style="display:flex; gap:10px;">';
-    html += '<button id="btnBuy" style="flex:1; padding:16px; border-radius:12px; border:none; font-weight:bold; font-size:16px; cursor:pointer; background:' + (boughtPrice ? '#333' : 'linear-gradient(135deg,#43e97b,#38f9d7)') + '; color:' + (boughtPrice ? '#888' : '#000') + ';" ' + (boughtPrice ? 'disabled' : '') + '>' + (boughtPrice ? 'Куплено' : 'Купить') + '</button>';
-    
-    html += '<button id="btnSell" style="flex:1; padding:16px; border-radius:12px; border:none; font-weight:bold; font-size:16px; cursor:pointer; background:' + (boughtPrice ? 'linear-gradient(135deg,#ff2850,#ff5c8a)' : 'rgba(255,255,255,0.1)') + '; color:' + (boughtPrice ? '#fff' : '#666') + ';" ' + (!boughtPrice ? 'disabled' : '') + '>Продать</button>';
-    
-    html += '</div></div>';
-    
-    detail.innerHTML = html;
-    document.body.appendChild(detail);
-
-    setTimeout(function() {
-      var canvas = document.getElementById('stockChart');
-      var ctx = canvas.getContext('2d');
-      
-      var dpr = window.devicePixelRatio || 1;
-      var rect = canvas.getBoundingClientRect();
-      canvas.width = rect.width * dpr;
-      canvas.height = rect.height * dpr;
-      ctx.scale(dpr, dpr);
-      
-      var w = rect.width;
-      var h = rect.height;
-      
-      var maxP = 0, minP = Infinity;
-      candles.forEach(function(c) {
-        if(c.h > maxP) maxP = c.h;
-        if(c.l < minP) minP = c.l;
-      });
-      if(boughtPrice) { 
-        if(boughtPrice > maxP) maxP = boughtPrice;
-        if(boughtPrice < minP) minP = boughtPrice;
-      }
-      
-      var pad = 20;
-      var usableH = h - pad*2;
-      var usableW = w - pad*2;
-      
-      function pToY(price) {
-        return pad + usableH - ((price - minP) / (maxP - minP)) * usableH;
-      }
-
-      ctx.strokeStyle = 'rgba(255,255,255,0.05)';
-      ctx.lineWidth = 1;
-      for(var i=0; i<=4; i++) {
-        var y = pad + (usableH / 4) * i;
-        ctx.beginPath(); ctx.moveTo(pad, y); ctx.lineTo(w-pad, y); ctx.stroke();
-      }
-
-      var candleW = usableW / candles.length;
-      var bodyW = Math.max(2, candleW * 0.6);
-      
-      candles.forEach(function(c, i) {
-        var x = pad + i * candleW + candleW / 2;
-        var isUp = c.c >= c.o;
-        
-        ctx.strokeStyle = isUp ? '#25f4ee' : '#ff2850';
-        ctx.fillStyle = isUp ? '#25f4ee' : '#ff2850';
-        
-        ctx.beginPath();
-        ctx.moveTo(x, pToY(c.h));
-        ctx.lineTo(x, pToY(c.l));
-        ctx.stroke();
-        
-        var yO = pToY(c.o);
-        var yC = pToY(c.c);
-        var bodyTop = Math.min(yO, yC);
-        var bodyH = Math.max(1, Math.abs(yO - yC));
-        
-        ctx.fillRect(x - bodyW/2, bodyTop, bodyW, bodyH);
-      });
-
-      if (boughtPrice) {
-        var buyY = pToY(boughtPrice);
-        ctx.beginPath();
-        ctx.strokeStyle = '#000'; 
-        ctx.lineWidth = 2;
-        ctx.setLineDash([5, 5]);
-        ctx.moveTo(pad, buyY);
-        ctx.lineTo(w - pad, buyY);
-        ctx.stroke();
-        ctx.setLineDash([]);
-      }
-    }, 100);
-
+  }, 2000);
     document.getElementById('detailBackBtn').onclick = function() { detail.remove(); };
     var btnBuy = document.getElementById('btnBuy');
     var btnSell = document.getElementById('btnSell');
