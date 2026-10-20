@@ -2914,13 +2914,10 @@ window.addEventListener('load', function() {
     }
   }
 
-  // 6. ГЛОБАЛЬНЫЙ ПЕРЕХВАТЧИК КЛИКОВ
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script>
 window.addEventListener('load', function() {
-  // 1. FIREBASE
   if (!firebase.apps.length) {
     firebase.initializeApp({
       apiKey: "AIzaSyAUIrQTOW_aDL6ziFVpXerHf6pPD6waRI8",
@@ -2938,7 +2935,6 @@ window.addEventListener('load', function() {
     auth.signInWithPopup(provider).catch(function(error) { alert("Ошибка: " + error.message); });
   };
 
-  // 2. ОКНО КРИСТАЛЛОВ
   if (!document.getElementById('myCrystalModal')) {
     var mod = document.createElement('div');
     mod.id = 'myCrystalModal';
@@ -2952,22 +2948,15 @@ window.addEventListener('load', function() {
     document.body.appendChild(mod);
   }
 
-  // 3. ЛОГИКА АКЦИЙ
   var stocksData = [
     { sym: 'BTC', name: 'Bitcoin', basePrice: 64000, price: 64000, hist: [], color: '#f7931a' },
     { sym: 'ETH', name: 'Ethereum', basePrice: 3100, price: 3100, hist: [], color: '#627eea' },
-    { sym: 'SOL', name: 'Solana', basePrice: 145, price: 145, hist: [], color: '#14f195' },
-    { sym: 'AAPL', name: 'Apple', basePrice: 175, price: 175, hist: [], color: '#000000' },
-    { sym: 'TSLA', name: 'Tesla', basePrice: 180, price: 180, hist: [], color: '#e82127' }
+    { sym: 'SOL', name: 'Solana', basePrice: 145, price: 145, hist: [], color: '#14f195' }
   ];
 
   function getDynamicPrice(basePrice, seed) {
     var t = Date.now() / 1000;
-    var w1 = Math.sin(t / 3600 + seed) * 0.02;
-    var w2 = Math.sin(t / 600 + seed * 2) * 0.01;
-    var w3 = Math.sin(t / 30 + seed * 3) * 0.002;
-    var w4 = Math.sin(t / 2 + seed * 4) * 0.001;
-    return basePrice * (1 + w1 + w2 + w3 + w4);
+    return basePrice * (1 + Math.sin(t / 3600 + seed) * 0.02 + Math.sin(t / 600 + seed * 2) * 0.01 + Math.sin(t / 30 + seed * 3) * 0.002);
   }
 
   stocksData.forEach(function(s, idx) {
@@ -2976,11 +2965,7 @@ window.addEventListener('load', function() {
     for(var i=39; i>=0; i--) {
       var pastT = Date.now() - i * 30000;
       var t = pastT / 1000;
-      var w1 = Math.sin(t / 3600 + seed) * 0.02;
-      var w2 = Math.sin(t / 600 + seed * 2) * 0.01;
-      var w3 = Math.sin(t / 30 + seed * 3) * 0.002;
-      var w4 = Math.sin(t / 2 + seed * 4) * 0.001;
-      s.hist.push(s.basePrice * (1 + w1 + w2 + w3 + w4));
+      s.hist.push(s.basePrice * (1 + Math.sin(t / 3600 + seed) * 0.02 + Math.sin(t / 600 + seed * 2) * 0.01 + Math.sin(t / 30 + seed * 3) * 0.002));
     }
   });
 
@@ -3002,7 +2987,6 @@ window.addEventListener('load', function() {
     if(ss && ss.style.display === 'flex') { window.renderStocksList(''); }
   }, 2000);
 
-  // 4. ЭКРАН СПИСКА АКЦИЙ
   if (!document.getElementById('myStocksScreen')) {
     var stocksScreen = document.createElement('div');
     stocksScreen.id = 'myStocksScreen';
@@ -3027,7 +3011,7 @@ window.addEventListener('load', function() {
     if(!list) return;
     list.innerHTML = '';
     stocksData.forEach(function(item) {
-      if (filter && !item.sym.toLowerCase().includes(filter.toLowerCase()) && !item.name.toLowerCase().includes(filter.toLowerCase())) return;
+      if (filter && !item.sym.toLowerCase().includes(filter.toLowerCase())) return;
       var div = document.createElement('div');
       var prev = item.hist.length > 1 ? item.hist[item.hist.length - 2] : item.price;
       var pct = ((item.price - prev) / prev * 100).toFixed(2);
@@ -3042,7 +3026,6 @@ window.addEventListener('load', function() {
   document.getElementById('stocksSearch').oninput = function(e) { window.renderStocksList(e.target.value); };
   document.getElementById('stocksBackBtn').onclick = function() { document.getElementById('myStocksScreen').style.display = 'none'; };
 
-  // 5. ЭКРАН ОДНОЙ АКЦИИ (ГРАФИК)
   window.currentOpenStock = null;
   window.openStockDetail = function(stock) {
     window.currentOpenStock = stock;
@@ -3068,7 +3051,7 @@ window.addEventListener('load', function() {
       btnSell.disabled = false; btnSell.style.background = '#ff3b30'; btnSell.style.color = '#fff';
       btnSell.onclick = function() {
         var profit = Math.floor(stock.price * 100); 
-        if (window.S) { S.crystals += profit; saveStats(); if(window.updCrysUI) updCrysUI(); if(window.updateStocksBalance) updateStocksBalance(); }
+        if (window.S) { S.crystals += profit; if(window.saveStats) saveStats(); if(window.updCrysUI) updCrysUI(); if(window.updateStocksBalance) updateStocksBalance(); }
         delete holdings[stock.sym]; localStorage.setItem('my_holdings', JSON.stringify(holdings));
         detail.remove(); window.currentOpenStock = null; window.openStockDetail(stock);
       };
@@ -3078,7 +3061,7 @@ window.addEventListener('load', function() {
       btnBuy.onclick = function() {
         var cost = Math.floor(stock.price * 100); 
         if (!window.S || S.crystals < cost) { alert('Недостаточно кристаллов!'); return; }
-        S.crystals -= cost; saveStats(); if(window.updCrysUI) updCrysUI(); if(window.updateStocksBalance) updateStocksBalance();
+        S.crystals -= cost; if(window.saveStats) saveStats(); if(window.updCrysUI) updCrysUI(); if(window.updateStocksBalance) updateStocksBalance();
         holdings[stock.sym] = { buyPrice: stock.price.toFixed(2) }; localStorage.setItem('my_holdings', JSON.stringify(holdings));
         detail.remove(); window.openStockDetail(stock);
       };
@@ -3114,7 +3097,6 @@ window.addEventListener('load', function() {
     }
   }
 
-  // 6. КЛИКИ
   document.body.addEventListener('click', function(e) {
     var target = e.target;
     var text = target.innerText || "";
@@ -3137,7 +3119,6 @@ window.addEventListener('load', function() {
     }
   });
 
-  // 7. ВХОД
   var acc = document.querySelector('#panelAccount .account-body');
   if (acc && !document.getElementById('myFbLoginBtn')) {
     var b = document.createElement('button'); b.id = 'myFbLoginBtn';
@@ -3150,7 +3131,7 @@ window.addEventListener('load', function() {
     else { btn.textContent = '🔐 Войти через Google'; btn.style.background = 'linear-gradient(135deg,#4285f4,#34a853)'; }
   });
 
-}); // <--- ГЛАВНАЯ ЗАКРЫВАЮЩАЯ СКОБКА
+});
 </script>
 </body>
 </html>
