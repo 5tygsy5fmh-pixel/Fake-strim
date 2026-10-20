@@ -2915,15 +2915,218 @@ window.addEventListener('load', function() {
   }
 
   // 6. ГЛОБАЛЬНЫЙ ПЕРЕХВАТЧИК КЛИКОВ
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script>
+window.addEventListener('load', function() {
+  // 1. FIREBASE
+  if (!firebase.apps.length) {
+    firebase.initializeApp({
+      apiKey: "AIzaSyAUIrQTOW_aDL6ziFVpXerHf6pPD6waRI8",
+      authDomain: "fake-strim.firebaseapp.com",
+      projectId: "fake-strim",
+      storageBucket: "fake-strim.firebasestorage.app",
+      messagingSenderId: "838988558430",
+      appId: "1:838988558430:web:579a441e92556fb4d384cf"
+    });
+  }
+  var auth = firebase.auth();
+  var provider = new firebase.auth.GoogleAuthProvider();
+
+  window.fbLogin = function() {
+    auth.signInWithPopup(provider).catch(function(error) { alert("Ошибка: " + error.message); });
+  };
+
+  // 2. ОКНО КРИСТАЛЛОВ
+  if (!document.getElementById('myCrystalModal')) {
+    var mod = document.createElement('div');
+    mod.id = 'myCrystalModal';
+    mod.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.9);display:none;align-items:center;justify-content:center;padding:20px;';
+    mod.innerHTML = '<div style="background:#1a1a2e;border-radius:20px;padding:22px;width:100%;max-width:360px;display:flex;flex-direction:column;gap:12px">' +
+      '<h3 style="font-size:18px;text-align:center;margin-bottom:8px;color:#fff">💎 Кристаллы</h3>' +
+      '<button id="myCasinoBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-size:15px;font-weight:800;background:linear-gradient(135deg,#ff2850,#ff5c8a)">🎰 Казино</button>' +
+      '<button id="myStocksBtn" style="padding:18px;border-radius:14px;border:none;color:#000;font-size:15px;font-weight:800;background:linear-gradient(135deg,#43e97b,#38f9d7)">📈 Акции</button>' +
+      '<button id="myVotesBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-size:15px;font-weight:800;background:linear-gradient(135deg,#8b5cf6,#c88cff)">🗳️ Голосования</button>' +
+      '<button id="myCloseBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-size:15px;font-weight:800;background:rgba(255,255,255,.1)">Закрыть</button></div>';
+    document.body.appendChild(mod);
+  }
+
+  // 3. ЛОГИКА АКЦИЙ
+  var stocksData = [
+    { sym: 'BTC', name: 'Bitcoin', basePrice: 64000, price: 64000, hist: [], color: '#f7931a' },
+    { sym: 'ETH', name: 'Ethereum', basePrice: 3100, price: 3100, hist: [], color: '#627eea' },
+    { sym: 'SOL', name: 'Solana', basePrice: 145, price: 145, hist: [], color: '#14f195' },
+    { sym: 'AAPL', name: 'Apple', basePrice: 175, price: 175, hist: [], color: '#000000' },
+    { sym: 'TSLA', name: 'Tesla', basePrice: 180, price: 180, hist: [], color: '#e82127' }
+  ];
+
+  function getDynamicPrice(basePrice, seed) {
+    var t = Date.now() / 1000;
+    var w1 = Math.sin(t / 3600 + seed) * 0.02;
+    var w2 = Math.sin(t / 600 + seed * 2) * 0.01;
+    var w3 = Math.sin(t / 30 + seed * 3) * 0.002;
+    var w4 = Math.sin(t / 2 + seed * 4) * 0.001;
+    return basePrice * (1 + w1 + w2 + w3 + w4);
+  }
+
+  stocksData.forEach(function(s, idx) {
+    var seed = idx * 7;
+    s.price = getDynamicPrice(s.basePrice, seed);
+    for(var i=39; i>=0; i--) {
+      var pastT = Date.now() - i * 30000;
+      var t = pastT / 1000;
+      var w1 = Math.sin(t / 3600 + seed) * 0.02;
+      var w2 = Math.sin(t / 600 + seed * 2) * 0.01;
+      var w3 = Math.sin(t / 30 + seed * 3) * 0.002;
+      var w4 = Math.sin(t / 2 + seed * 4) * 0.001;
+      s.hist.push(s.basePrice * (1 + w1 + w2 + w3 + w4));
+    }
+  });
+
+  setInterval(function() {
+    stocksData.forEach(function(s, idx) {
+      s.price = getDynamicPrice(s.basePrice, idx * 7);
+      s.hist.push(s.price);
+      if(s.hist.length > 40) s.hist.shift();
+    });
+    if(window.currentOpenStock) {
+      var updatedStock = stocksData.find(function(x) { return x.sym === window.currentOpenStock.sym; });
+      if(updatedStock) {
+        window.currentOpenStock.price = updatedStock.price;
+        window.currentOpenStock.hist = updatedStock.hist;
+      }
+      if(window.updateDetailUI) window.updateDetailUI();
+    }
+    var ss = document.getElementById('myStocksScreen');
+    if(ss && ss.style.display === 'flex') { window.renderStocksList(''); }
+  }, 2000);
+
+  // 4. ЭКРАН СПИСКА АКЦИЙ
+  if (!document.getElementById('myStocksScreen')) {
+    var stocksScreen = document.createElement('div');
+    stocksScreen.id = 'myStocksScreen';
+    stocksScreen.style.cssText = 'position:fixed;inset:0;z-index:99998;background:#0a0a14;display:none;flex-direction:column;';
+    stocksScreen.innerHTML = '<div style="display:flex;align-items:center;padding:14px;border-bottom:1px solid #222;background:#000;">' +
+      '<button id="stocksBackBtn" style="background:none;border:none;color:#fff;font-size:16px;cursor:pointer;">◀ Назад</button>' +
+      '<div style="flex:1;text-align:center;color:#fff;font-weight:bold;font-size:18px;">📈 Биржа</div>' +
+      '<div style="color:#25f4ee;font-weight:bold;" id="stocksCrystals">💎 0</div></div>' +
+      '<div style="padding:10px;background:#111;"><input type="text" id="stocksSearch" placeholder="Поиск..." style="width:100%;box-sizing:border-box;padding:10px;border-radius:10px;border:none;background:#222;color:#fff;outline:none;"></div>' +
+      '<div id="stocksList" style="flex:1;overflow-y:auto;padding:10px;background:#0a0a14;"></div>';
+    document.body.appendChild(stocksScreen);
+  }
+
+  window.updateStocksBalance = function() {
+    var el = document.getElementById('stocksCrystals');
+    if(el && window.S) el.innerText = '💎 ' + S.crystals.toLocaleString('ru-RU');
+  };
+
+  window.renderStocksList = function(filter) {
+    filter = filter || '';
+    var list = document.getElementById('stocksList');
+    if(!list) return;
+    list.innerHTML = '';
+    stocksData.forEach(function(item) {
+      if (filter && !item.sym.toLowerCase().includes(filter.toLowerCase()) && !item.name.toLowerCase().includes(filter.toLowerCase())) return;
+      var div = document.createElement('div');
+      var prev = item.hist.length > 1 ? item.hist[item.hist.length - 2] : item.price;
+      var pct = ((item.price - prev) / prev * 100).toFixed(2);
+      var isUp = pct >= 0;
+      div.style.cssText = 'display:flex;justify-content:space-between;align-items:center;padding:15px;border-bottom:1px solid #222;cursor:pointer;';
+      div.innerHTML = '<div style="display:flex;align-items:center;gap:10px;"><div style="width:40px;height:40px;background:' + item.color + ';border-radius:50%;display:flex;justify-content:center;align-items:center;color:#fff;font-weight:bold;">' + item.sym[0] + '</div><div><div style="color:#fff;font-weight:bold;font-size:16px;">' + item.sym + '</div><div style="color:#888;font-size:12px;">' + item.name + '</div></div></div><div style="text-align:right;"><div style="color:#fff;font-weight:bold;">$' + item.price.toFixed(2) + '</div><div style="color:' + (isUp ? '#8cff8c' : '#ff5c5c') + ';font-size:12px;">' + (isUp ? '+' : '') + pct + '%</div></div>';
+      div.onclick = function() { window.openStockDetail(item); };
+      list.appendChild(div);
+    });
+  };
+
+  document.getElementById('stocksSearch').oninput = function(e) { window.renderStocksList(e.target.value); };
+  document.getElementById('stocksBackBtn').onclick = function() { document.getElementById('myStocksScreen').style.display = 'none'; };
+
+  // 5. ЭКРАН ОДНОЙ АКЦИИ (ГРАФИК)
+  window.currentOpenStock = null;
+  window.openStockDetail = function(stock) {
+    window.currentOpenStock = stock;
+    var detail = document.createElement('div');
+    detail.id = 'myStockDetail';
+    detail.style.cssText = 'position:fixed;inset:0;z-index:99999;background:#ffffff;display:flex;flex-direction:column;color:#000;';
+    
+    var holdings = JSON.parse(localStorage.getItem('my_holdings') || '{}');
+    var boughtPrice = holdings[stock.sym] ? parseFloat(holdings[stock.sym].buyPrice) : null;
+
+    var h = '<div style="padding:15px; background:#f8f9fa; border-bottom:1px solid #e0e0e0;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;"><button id="detailBackBtn" style="background:none;border:none;color:#000;font-size:20px;cursor:pointer;">←</button><div style="font-size:18px;font-weight:bold;color:#000;">' + stock.sym + 'USDT</div><div style="width:20px;"></div></div><div style="font-size:28px;font-weight:bold;color:#000;" id="detailPrice">$' + stock.price.toFixed(2) + '</div></div>';
+    h += '<div style="flex:1;position:relative;background:#ffffff;" id="chartContainer"><canvas id="stockChart" style="width:100%;height:100%;"></canvas></div>';
+    h += '<div style="padding:15px; background:#f8f9fa; border-top:1px solid #e0e0e0;"><div style="display:flex; gap:10px;"><button id="btnBuy" style="flex:1; padding:16px; border-radius:12px; border:none; font-weight:bold; font-size:16px; cursor:pointer;">Купить</button><button id="btnSell" style="flex:1; padding:16px; border-radius:12px; border:none; font-weight:bold; font-size:16px; cursor:pointer;">Продать</button></div></div>';
+    
+    detail.innerHTML = h;
+    document.body.appendChild(detail);
+
+    var btnBuy = document.getElementById('btnBuy');
+    var btnSell = document.getElementById('btnSell');
+
+    if (boughtPrice) {
+      btnBuy.disabled = true; btnBuy.style.background = '#e0e0e0'; btnBuy.style.color = '#999';
+      btnSell.disabled = false; btnSell.style.background = '#ff3b30'; btnSell.style.color = '#fff';
+      btnSell.onclick = function() {
+        var profit = Math.floor(stock.price * 100); 
+        if (window.S) { S.crystals += profit; saveStats(); if(window.updCrysUI) updCrysUI(); if(window.updateStocksBalance) updateStocksBalance(); }
+        delete holdings[stock.sym]; localStorage.setItem('my_holdings', JSON.stringify(holdings));
+        detail.remove(); window.currentOpenStock = null; window.openStockDetail(stock);
+      };
+    } else {
+      btnBuy.disabled = false; btnBuy.style.background = '#34c759'; btnBuy.style.color = '#fff';
+      btnSell.disabled = true; btnSell.style.background = '#e0e0e0'; btnSell.style.color = '#999';
+      btnBuy.onclick = function() {
+        var cost = Math.floor(stock.price * 100); 
+        if (!window.S || S.crystals < cost) { alert('Недостаточно кристаллов!'); return; }
+        S.crystals -= cost; saveStats(); if(window.updCrysUI) updCrysUI(); if(window.updateStocksBalance) updateStocksBalance();
+        holdings[stock.sym] = { buyPrice: stock.price.toFixed(2) }; localStorage.setItem('my_holdings', JSON.stringify(holdings));
+        detail.remove(); window.openStockDetail(stock);
+      };
+    }
+
+    document.getElementById('detailBackBtn').onclick = function() { detail.remove(); window.currentOpenStock = null; };
+    window.drawStockChartFunc = function() { drawStockChart(stock, boughtPrice); };
+    setTimeout(window.drawStockChartFunc, 100);
+  };
+
+  function drawStockChart(stock, boughtPrice) {
+    var canvas = document.getElementById('stockChart'); if(!canvas) return;
+    var ctx = canvas.getContext('2d'); var dpr = window.devicePixelRatio || 1; var rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * dpr; canvas.height = rect.height * dpr; ctx.scale(dpr, dpr);
+    var w = rect.width, h = rect.height, hist = stock.hist;
+    var maxP = 0, minP = Infinity;
+    hist.forEach(function(p) { if(p > maxP) maxP = p; if(p < minP) minP = p; });
+    if(boughtPrice) { if(boughtPrice > maxP) maxP = boughtPrice; if(boughtPrice < minP) minP = boughtPrice; }
+    var pad = 20, usableH = h - pad*2, usableW = w - pad*2;
+    function pToY(p) { return pad + usableH - ((p - minP) / (maxP - minP || 1)) * usableH; }
+    ctx.clearRect(0, 0, w, h); ctx.strokeStyle = 'rgba(0,0,0,0.05)'; ctx.lineWidth = 1;
+    for(var i=0; i<=4; i++) { var y = pad + (usableH / 4) * i; ctx.beginPath(); ctx.moveTo(pad, y); ctx.lineTo(w-pad, y); ctx.stroke(); }
+    var candleW = usableW / hist.length, bodyW = Math.max(2, candleW * 0.6);
+    hist.forEach(function(closePrice, i) {
+      var openPrice = i > 0 ? hist[i-1] : closePrice; var isUp = closePrice >= openPrice; var x = pad + i * candleW + candleW / 2;
+      ctx.strokeStyle = isUp ? '#00a854' : '#e63946'; ctx.fillStyle = isUp ? '#00a854' : '#e63946';
+      ctx.beginPath(); ctx.moveTo(x, pToY(Math.max(openPrice, closePrice) * 1.002)); ctx.lineTo(x, pToY(Math.min(openPrice, closePrice) * 0.998)); ctx.stroke();
+      ctx.fillRect(x - bodyW/2, Math.min(pToY(openPrice), pToY(closePrice)), bodyW, Math.max(1, Math.abs(pToY(openPrice) - pToY(closePrice))));
+    });
+    if (boughtPrice) {
+      var buyY = pToY(boughtPrice); ctx.beginPath(); ctx.strokeStyle = '#000'; ctx.lineWidth = 2; ctx.moveTo(pad, buyY); ctx.lineTo(w - pad, buyY); ctx.stroke();
+      ctx.fillStyle = '#000'; ctx.fillRect(pad, buyY - 20, 70, 16); ctx.fillStyle = '#fff'; ctx.font = 'bold 10px sans-serif'; ctx.fillText('КУПЛЕНО', pad + 5, buyY - 8);
+    }
+  }
+
+  // 6. КЛИКИ
   document.body.addEventListener('click', function(e) {
-    var target = e.target; var text = target.innerText || "";
+    var target = e.target;
+    var text = target.innerText || "";
     if (target.tagName === 'SPAN' || target.tagName === 'SVG' || target.tagName === 'PATH') { text = target.parentElement.innerText || ""; }
+
     if (text.includes('Казино') || text.includes('Кристаллы')) {
       if (target.closest('.menu-btn') || (target.parentElement && target.parentElement.closest('.menu-btn'))) {
         var cm = document.getElementById('myCrystalModal'); if(cm) cm.style.display = 'flex';
       }
     }
-    if (text.includes('Войти через Google') || text.includes('Выйти')) { if (auth.currentUser) { auth.signOut(); } else { window.fbLogin(); } }
+    if (text.includes('Войти через Google') || text.includes('Выйти')) {
+      if (auth.currentUser) { auth.signOut(); } else { window.fbLogin(); }
+    }
     if (target.id === 'myCloseBtn') { document.getElementById('myCrystalModal').style.display = 'none'; }
     if (target.id === 'myCasinoBtn') { document.getElementById('myCrystalModal').style.display = 'none'; if (window.openCasino) window.openCasino(); }
     if (target.id === 'myStocksBtn') {
@@ -2933,14 +3136,13 @@ window.addEventListener('load', function() {
     }
   });
 
-  // 7. КНОПКА ВХОДА
+  // 7. ВХОД
   var acc = document.querySelector('#panelAccount .account-body');
   if (acc && !document.getElementById('myFbLoginBtn')) {
     var b = document.createElement('button'); b.id = 'myFbLoginBtn';
     b.style.cssText = 'display:block;width:100%;padding:14px;margin:10px 0 20px 0;border-radius:12px;border:none;color:#fff;font-size:15px;font-weight:700;background:linear-gradient(135deg,#4285f4,#34a853);';
     b.innerText = '🔐 Войти через Google'; acc.insertBefore(b, acc.firstChild);
   }
-
   auth.onAuthStateChanged(function(user) {
     var btn = document.getElementById('myFbLoginBtn'); if (!btn) return;
     if (user) { btn.textContent = '🚪 Выйти (' + (user.displayName || '') + ')'; btn.style.background = '#333'; }
