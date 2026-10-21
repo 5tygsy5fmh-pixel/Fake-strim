@@ -2649,7 +2649,7 @@ console.log('grand-cat PATCH v7 OK');
 <script>
 window.addEventListener('load', function() {
   // ==========================================
-  // 1. FIREBASE И АВТОРИЗАЦИЯ
+  // 1. FIREBASE И АВТОРИЗАЦИЯ (ИСПРАВЛЕНА)
   // ==========================================
   if (!firebase.apps.length) {
     firebase.initializeApp({
@@ -2664,19 +2664,26 @@ window.addEventListener('load', function() {
   var auth = firebase.auth();
   var provider = new firebase.auth.GoogleAuthProvider();
 
+  // Исправление пустого экрана: используем Redirect вместо Popup
   window.fbLogin = function() {
-    auth.signInWithPopup(provider).catch(function(error) {
-      // Игнорируем ошибку, если окно было закрыто пользователем или произошел конфликт
-      if (error.code === 'auth/cancelled-popup-request' || error.code === 'auth/popup-closed-by-user') {
-        console.log("Вход отменен пользователем.");
-        return;
-      }
+    auth.signInWithRedirect(provider).catch(function(error) {
       alert("Ошибка входа: " + error.message);
     });
   };
 
+  // Обработка возврата после Redirect
+  auth.getRedirectResult().then(function(result) {
+    if (result.user) {
+      console.log("Успешный вход: ", result.user.displayName);
+    }
+  }).catch(function(error) {
+    if (error.code !== 'auth/cancelled-popup-request') {
+      console.log("Ошибка Redirect: ", error.message);
+    }
+  });
+
   // ==========================================
-  // 2. ОКНО КРИСТАЛЛОВ (ГЛАВНОЕ МЕНЮ)
+  // 2. ОКНО КРИСТАЛЛОВ
   // ==========================================
   if (!document.getElementById('myCrystalModal')) {
     var mod = document.createElement('div');
@@ -2693,7 +2700,7 @@ window.addEventListener('load', function() {
   }
 
   // ==========================================
-  // 3. МОДУЛЬ АКЦИЙ (С РЕАЛЬНЫМ КУРСОМ)
+  // 3. МОДУЛЬ АКЦИЙ (БИРЖА)
   // ==========================================
   var stocksData = [
     { sym: 'BTC', name: 'Bitcoin', basePrice: 64000, price: 64000, hist: [], color: '#f7931a' },
@@ -2703,43 +2710,24 @@ window.addEventListener('load', function() {
     { sym: 'TSLA', name: 'Tesla', basePrice: 180, price: 180, hist: [], color: '#e82127' }
   ];
 
-  // Загружаем локальные акции, созданные тобой
   var customStocks = JSON.parse(localStorage.getItem('my_custom_stocks') || '[]');
   customStocks.forEach(function(cs) { stocksData.push(cs); });
-
-  // Функция получения реального курса (используем API CoinGecko)
-  async function fetchRealPrices() {
-    try {
-      let response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana&vs_currencies=usd');
-      let data = await response.json();
-      stocksData.forEach(function(s) {
-        if (s.sym === 'BTC' && data.bitcoin) s.basePrice = data.bitcoin.usd;
-        if (s.sym === 'ETH' && data.ethereum) s.basePrice = data.ethereum.usd;
-        if (s.sym === 'SOL' && data.solana) s.basePrice = data.solana.usd;
-      });
-    } catch(e) { console.log("Ошибка загрузки курса:", e); }
-  }
 
   function getDynamicPrice(basePrice, seed) {
     var t = Date.now() / 1000;
     return basePrice * (1 + Math.sin(t / 3600 + seed) * 0.02 + Math.sin(t / 600 + seed * 2) * 0.01 + Math.sin(t / 30 + seed * 3) * 0.002);
   }
 
-  // Инициализация графиков
-  function initStocks() {
-    stocksData.forEach(function(s, idx) {
-      var seed = idx * 7 + (s.sym.charCodeAt(0) || 0);
-      s.price = getDynamicPrice(s.basePrice, seed);
-      for(var i=39; i>=0; i--) {
-        var pastT = Date.now() - i * 30000;
-        var t = pastT / 1000;
-        s.hist.push(s.basePrice * (1 + Math.sin(t / 3600 + seed) * 0.02 + Math.sin(t / 600 + seed * 2) * 0.01 + Math.sin(t / 30 + seed * 3) * 0.002));
-      }
-    });
-  }
-  fetchRealPrices().then(initStocks);
+  stocksData.forEach(function(s, idx) {
+    var seed = idx * 7 + (s.sym.charCodeAt(0) || 0);
+    s.price = getDynamicPrice(s.basePrice, seed);
+    for(var i=39; i>=0; i--) {
+      var pastT = Date.now() - i * 30000;
+      var t = pastT / 1000;
+      s.hist.push(s.basePrice * (1 + Math.sin(t / 3600 + seed) * 0.02 + Math.sin(t / 600 + seed * 2) * 0.01 + Math.sin(t / 30 + seed * 3) * 0.002));
+    }
+  });
 
-  // Обновляем график каждые 2 секунды
   setInterval(function() {
     stocksData.forEach(function(s, idx) {
       s.price = getDynamicPrice(s.basePrice, idx * 7 + (s.sym.charCodeAt(0) || 0));
@@ -2758,15 +2746,14 @@ window.addEventListener('load', function() {
     if(ss && ss.style.display === 'flex') { window.renderStocksList(''); }
   }, 2000);
 
-  // Создаем экран биржи
   if (!document.getElementById('myStocksScreen')) {
     var stocksScreen = document.createElement('div');
     stocksScreen.id = 'myStocksScreen';
     stocksScreen.style.cssText = 'position:fixed;inset:0;z-index:99998;background:#0a0a14;display:none;flex-direction:column;';
     stocksScreen.innerHTML = '<div style="display:flex;align-items:center;padding:14px;border-bottom:1px solid #222;background:#000;">' +
-      '<button id="stocksBackBtn" style="background:none;border:none;color:#fff;font-size:16px;cursor:pointer;">◀ Назад</button>' +
+      '<button id="stocksBackBtn" style="background:none;border:none;color:#fff;font-size:16px;cursor:pointer;width:60px;text-align:left;">◀ Назад</button>' +
       '<div style="flex:1;text-align:center;color:#fff;font-weight:bold;font-size:18px;">📈 Биржа</div>' +
-      '<div style="color:#25f4ee;font-weight:bold;" id="stocksCrystals">💎 0</div></div>' +
+      '<div style="color:#25f4ee;font-weight:bold;width:60px;text-align:right;" id="stocksCrystals">💎 0</div></div>' +
       '<div style="padding:10px;background:#111;display:flex;gap:10px;">' +
         '<input type="text" id="stocksSearch" placeholder="Поиск..." style="flex:1;box-sizing:border-box;padding:10px;border-radius:10px;border:none;background:#222;color:#fff;outline:none;">' +
         '<button id="createStockBtn" style="background:#34c759;color:#fff;border:none;padding:0 15px;border-radius:10px;font-weight:bold;font-size:14px;cursor:pointer;">+ Создать</button>' +
@@ -2775,7 +2762,6 @@ window.addEventListener('load', function() {
     document.body.appendChild(stocksScreen);
   }
 
-  // Функция создания СВОЕЙ акции
   window.createCustomStock = function() {
     var name = prompt('Введите название акции:');
     if (!name || name.trim() === '') return;
@@ -2802,7 +2788,6 @@ window.addEventListener('load', function() {
   };
   document.getElementById('createStockBtn').onclick = window.createCustomStock;
 
-  // Отрисовка списка акций
   window.updateStocksBalance = function() {
     var el = document.getElementById('stocksCrystals');
     if(el && window.S) el.innerText = '💎 ' + S.crystals.toLocaleString('ru-RU');
@@ -2901,37 +2886,19 @@ window.addEventListener('load', function() {
   }
 
   // ==========================================
-  // 4. МОДУЛЬ ГОЛОСОВАНИЙ (С РЕАЛЬНЫМ API)
+  // 4. МОДУЛЬ ГОЛОСОВАНИЙ
   // ==========================================
-  var voteQuestions = [];
-
-  // Функция загрузки реальных вопросов с Jupiter Prediction API
-  async function fetchVotes() {
-    try {
-      let res = await fetch('https://api.jup.ag/prediction/v1/events?filter=trending&includeMarkets=true&start=0&end=5');
-      let json = await res.json();
-      voteQuestions = json.data.map(function(ev, i) {
-        let m = ev.markets[0]; // Берем первый рынок из события
-        return {
-          id: 'jup_' + ev.eventId,
-          question: ev.metadata.title,
-          yesPrice: Math.floor(m.pricing.buyYesPriceUsd / 10000) * 100, // Конвертируем цену в кристаллы (примерно)
-          noPrice: Math.floor(m.pricing.buyNoPriceUsd / 10000) * 100,
-          resolveTime: Date.now() + (24 * 60 * 60 * 1000), // Резолв через 24 часа
-          actualAnswer: m.status === 'open' ? null : 'yes' // Если рынок закрыт, можно парсить результат (упрощенно)
-        };
-      });
-      if(window.renderVotesList) window.renderVotesList();
-    } catch(e) { console.log("Ошибка загрузки голосований:", e); }
-  }
-  fetchVotes();
+  var voteQuestions = [
+    { id: 'q1', question: 'Нападёт ли сегодня Германия на Францию?', yesPrice: 10000, noPrice: 50000, resolveTime: Date.now() + (2 * 60 * 1000), actualAnswer: 'no' },
+    { id: 'q2', question: 'Выиграет ли Bitcoin гонку до конца месяца?', yesPrice: 25000, noPrice: 15000, resolveTime: Date.now() + (24 * 60 * 60 * 1000), actualAnswer: 'yes' }
+  ];
 
   if (!document.getElementById('myVotesScreen')) {
     var votesScreen = document.createElement('div');
     votesScreen.id = 'myVotesScreen';
     votesScreen.style.cssText = 'position:fixed;inset:0;z-index:99998;background:#0a0a14;display:none;flex-direction:column;';
     votesScreen.innerHTML = '<div style="display:flex;align-items:center;padding:14px;border-bottom:1px solid #222;background:#000;">' +
-      '<button id="votesBackBtn" style="background:none;border:none;color:#fff;font-size:16px;cursor:pointer;">◀ Назад</button>' +
+      '<button id="votesBackBtn" style="background:none;border:none;color:#fff;font-size:16px;cursor:pointer;width:60px;text-align:left;">◀ Назад</button>' +
       '<div style="flex:1;text-align:center;color:#fff;font-weight:bold;font-size:18px;">🗳️ Голосования</div>' +
       '<div style="color:#25f4ee;font-weight:bold;width:60px;text-align:right;" id="votesCrystals">💎 0</div></div>' +
       '<div id="votesList" style="flex:1;overflow-y:auto;padding:15px;display:flex;flex-direction:column;gap:15px;"></div>';
@@ -2951,15 +2918,9 @@ window.addEventListener('load', function() {
     var myVotes = JSON.parse(localStorage.getItem('my_votes') || '{}');
     var now = Date.now();
 
-    if (voteQuestions.length === 0) {
-      list.innerHTML = '<div style="color:#888; text-align:center; margin-top:50px;">Загрузка вопросов с сервера...</div>';
-      return;
-    }
-
     voteQuestions.forEach(function(q) {
       var card = document.createElement('div');
       card.style.cssText = 'background:#1a1a2e;border-radius:16px;padding:15px;display:flex;flex-direction:column;gap:12px;';
-      
       var title = document.createElement('div');
       title.style.cssText = 'color:#fff;font-size:16px;font-weight:bold;line-height:1.3;';
       title.innerText = q.question;
@@ -2985,7 +2946,6 @@ window.addEventListener('load', function() {
       } else {
         var btnWrap = document.createElement('div');
         btnWrap.style.cssText = 'display:flex;gap:10px;';
-
         var btnYes = document.createElement('button');
         btnYes.style.cssText = 'flex:1;padding:12px;border-radius:10px;border:none;color:#fff;font-weight:bold;font-size:14px;cursor:pointer;background:linear-gradient(135deg,#43e97b,#38f9d7);';
         btnYes.innerHTML = 'Да<br><span style="font-size:12px;font-weight:normal;color:#000">💎 ' + q.yesPrice.toLocaleString('ru-RU') + '</span>';
@@ -2996,14 +2956,9 @@ window.addEventListener('load', function() {
         btnNo.innerHTML = 'Нет<br><span style="font-size:12px;font-weight:normal;color:#fff">💎 ' + q.noPrice.toLocaleString('ru-RU') + '</span>';
         btnNo.onclick = function() { window.castVote(q.id, 'no', q.noPrice); };
 
-        if (timeLeft <= 0) {
-          btnYes.disabled = true; btnYes.style.opacity = '0.5';
-          btnNo.disabled = true; btnNo.style.opacity = '0.5';
-        }
+        if (timeLeft <= 0) { btnYes.disabled = true; btnYes.style.opacity = '0.5'; btnNo.disabled = true; btnNo.style.opacity = '0.5'; }
 
-        btnWrap.appendChild(btnYes);
-        btnWrap.appendChild(btnNo);
-        card.appendChild(btnWrap);
+        btnWrap.appendChild(btnYes); btnWrap.appendChild(btnNo); card.appendChild(btnWrap);
       }
       list.appendChild(card);
     });
@@ -3012,55 +2967,46 @@ window.addEventListener('load', function() {
   window.castVote = function(qId, choice, price) {
     var myVotes = JSON.parse(localStorage.getItem('my_votes') || '{}');
     if (myVotes[qId]) return; 
-
-    if (!window.S || S.crystals < price) {
-      alert('Недостаточно кристаллов для этого ответа!');
-      return;
-    }
+    if (!window.S || S.crystals < price) { alert('Недостаточно кристаллов!'); return; }
 
     S.crystals -= price;
     if (window.saveStats) saveStats();
     if (window.updCrysUI) updCrysUI();
     if (window.updateVotesBalance) updateVotesBalance();
 
-    myVotes[qId] = { choice: choice, price: price, time: Date.now() };
+    myVotes[qId] = choice;
     localStorage.setItem('my_votes', JSON.stringify(myVotes));
-
     window.renderVotesList();
   };
 
-  document.getElementById('votesBackBtn').onclick = function() {
-    document.getElementById('myVotesScreen').style.display = 'none';
-  };
-
-  setInterval(function() {
-    var vs = document.getElementById('myVotesScreen');
-    if(vs && vs.style.display === 'flex') { window.renderVotesList(); }
-  }, 5000);
+  document.getElementById('votesBackBtn').onclick = function() { document.getElementById('myVotesScreen').style.display = 'none'; };
 
   // ==========================================
-  // 5. МОДУЛЬ РЕКЛАМЫ
+  // 5. МОДУЛЬ РЕКЛАМЫ (С ВЫБОРОМ ФОТО)
   // ==========================================
-  var adsData = JSON.parse(localStorage.getItem('my_ads') || '[]');
+  
+  // Создаем скрытый инпут для выбора файла с телефона
+  if (!document.getElementById('adImageInput')) {
+    var fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.id = 'adImageInput';
+    fileInput.accept = 'image/*'; // Разрешает галерею, файлы и камеру
+    fileInput.style.display = 'none';
+    document.body.appendChild(fileInput);
+  }
 
-  // Экран рекламы
   if (!document.getElementById('myAdsScreen')) {
     var adsScreen = document.createElement('div');
     adsScreen.id = 'myAdsScreen';
     adsScreen.style.cssText = 'position:fixed;inset:0;z-index:99998;background:#0a0a14;display:none;flex-direction:column;';
+    // ИСПРАВЛЕНА ШАПКА: Убрано количество кристаллов, надпись по центру
     adsScreen.innerHTML = '<div style="display:flex;align-items:center;padding:14px;border-bottom:1px solid #222;background:#000;">' +
-      '<button id="adsBackBtn" style="background:none;border:none;color:#fff;font-size:16px;cursor:pointer;">◀ Назад</button>' +
+      '<button id="adsBackBtn" style="background:none;border:none;color:#fff;font-size:16px;cursor:pointer;width:60px;text-align:left;">◀ Назад</button>' +
       '<div style="flex:1;text-align:center;color:#fff;font-weight:bold;font-size:18px;">📺 Реклама</div>' +
-      '<div style="color:#25f4ee;font-weight:bold;" id="adsCrystals">💎 0</div>' +
-      '<button id="createAdBtn" style="background:#34c759;color:#fff;border:none;width:36px;height:36px;border-radius:50%;font-size:20px;font-weight:bold;margin-left:10px;cursor:pointer;">+</button></div>' +
+      '<button id="createAdBtn" style="background:#34c759;color:#fff;border:none;width:36px;height:36px;border-radius:50%;font-size:20px;font-weight:bold;cursor:pointer;display:flex;align-items:center;justify-content:center;">+</button></div>' +
       '<div id="adsList" style="flex:1;overflow-y:auto;padding:15px;display:flex;flex-wrap:wrap;gap:15px;align-content:flex-start;"></div>';
     document.body.appendChild(adsScreen);
   }
-
-  window.updateAdsBalance = function() {
-    var el = document.getElementById('adsCrystals');
-    if(el && window.S) el.innerText = '💎 ' + S.crystals.toLocaleString('ru-RU');
-  };
 
   window.renderAdsList = function() {
     var list = document.getElementById('adsList');
@@ -3085,14 +3031,12 @@ window.addEventListener('load', function() {
       reward.style.cssText = 'position:absolute; bottom:0; left:0; right:0; background:rgba(0,0,0,0.8); color:#fff; text-align:center; padding:5px; font-size:12px; font-weight:bold;';
       reward.innerText = '💎 ' + ad.reward.toLocaleString('ru-RU');
 
-      card.appendChild(img);
-      card.appendChild(reward);
+      card.appendChild(img); card.appendChild(reward);
       card.onclick = function() { window.watchAd(ad); };
       list.appendChild(card);
     });
   };
 
-  // Функция просмотра рекламы
   window.watchAd = function(ad) {
     var modal = document.createElement('div');
     modal.id = 'watchAdModal';
@@ -3110,78 +3054,108 @@ window.addEventListener('load', function() {
       if(timeLeft <= 0) {
         clearInterval(timer);
         modal.remove();
-        
-        // Начисляем награду
         if (window.S) {
           S.crystals += ad.reward;
           if(window.saveStats) saveStats();
           if(window.updCrysUI) updCrysUI();
-          if(window.updateAdsBalance) updateAdsBalance();
           alert('Ты получил ' + ad.reward + ' кристаллов за просмотр!');
         }
       }
     }, 1000);
   };
 
-  // Функция создания рекламы (упрощенная, без реальной загрузки файлов)
-  window.createAd = function() {
-    var imgUrl = prompt('Введи URL картинки для рекламы (например, ссылка на картинку из интернета):');
-    if (!imgUrl) return;
-    
-    var rewardStr = prompt('Выбери награду за просмотр: 100, 1000 или 10000');
-    var reward = parseInt(rewardStr);
-    if (![100, 1000, 10000].includes(reward)) {
-      alert('Неверная награда. Введи 100, 1000 или 10000.');
-      return;
-    }
+  // Сжатие фото перед сохранением (чтобы не забить память телефона)
+  function resizeImage(base64Str, maxWidth = 500, maxHeight = 500) {
+    return new Promise((resolve) => {
+      let img = new Image();
+      img.src = base64Str;
+      img.onload = () => {
+        let canvas = document.createElement('canvas');
+        let width = img.width; let height = img.height;
+        if (width > height) {
+          if (width > maxWidth) { height *= maxWidth / width; width = maxWidth; }
+        } else {
+          if (height > maxHeight) { width *= maxHeight / height; height = maxHeight; }
+        }
+        canvas.width = width; canvas.height = height;
+        let ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', 0.7));
+      };
+    });
+  }
 
-    var cost = reward * 1000; // Стоимость создания
-    if (!window.S || S.crystals < cost) {
-      alert('Недостаточно кристаллов для создания! Нужно ' + cost.toLocaleString('ru-RU'));
-      return;
-    }
+  // Обработка выбора фото
+  document.getElementById('adImageInput').onchange = function(e) {
+    var file = e.target.files[0];
+    if (!file) return;
 
-    S.crystals -= cost;
-    if(window.saveStats) saveStats();
-    if(window.updCrysUI) updCrysUI();
-    if(window.updateAdsBalance) updateAdsBalance();
+    var reader = new FileReader();
+    reader.onload = function(event) {
+      // Сжимаем фото
+      resizeImage(event.target.result).then(function(compressedBase64) {
+        
+        var rewardStr = prompt('Выбери награду за просмотр:\n1. 100 кристаллов (Стоимость: 100 000)\n2. 1000 кристаллов (Стоимость: 1 000 000)\n3. 10000 кристаллов (Стоимость: 10 000 000)\n\nВведи 100, 1000 или 10000:');
+        var reward = parseInt(rewardStr);
+        
+        if (![100, 1000, 10000].includes(reward)) {
+          if (rewardStr !== null) alert('Неверная награда. Создание отменено.');
+          return;
+        }
 
-    var newAd = { id: 'ad_' + Date.now(), image: imgUrl, reward: reward };
-    var myAds = JSON.parse(localStorage.getItem('my_ads') || '[]');
-    myAds.push(newAd);
-    localStorage.setItem('my_ads', JSON.stringify(myAds));
-    
-    window.renderAdsList();
-    alert('Реклама создана! С тебя списано ' + cost.toLocaleString('ru-RU') + ' кристаллов.');
+        var cost = reward * 1000;
+        if (!window.S || S.crystals < cost) {
+          alert('Недостаточно кристаллов для создания! Нужно ' + cost.toLocaleString('ru-RU'));
+          return;
+        }
+
+        S.crystals -= cost;
+        if(window.saveStats) saveStats();
+        if(window.updCrysUI) updCrysUI();
+
+        var newAd = { id: 'ad_' + Date.now(), image: compressedBase64, reward: reward };
+        var myAds = JSON.parse(localStorage.getItem('my_ads') || '[]');
+        myAds.push(newAd);
+        localStorage.setItem('my_ads', JSON.stringify(myAds));
+        
+        window.renderAdsList();
+        alert('Реклама создана! С тебя списано ' + cost.toLocaleString('ru-RU') + ' кристаллов.');
+      });
+    };
+    reader.readAsDataURL(file);
+    e.target.value = ''; // Очищаем инпут для следующего раза
   };
-  document.getElementById('createAdBtn').onclick = window.createAd;
+
+  document.getElementById('createAdBtn').onclick = function() {
+    document.getElementById('adImageInput').click(); // Открываем выбор фото
+  };
   document.getElementById('adsBackBtn').onclick = function() { document.getElementById('myAdsScreen').style.display = 'none'; };
 
   // ==========================================
-  // 6. ОЧИСТКА ФЕЙКОВЫХ СТРИМОВ НА ГЛАВНОЙ
+  // 6. ОЧИСТКА ГЛАВНОЙ СТРАНИЦЫ ОТ ФЕЙКОВ
   // ==========================================
-  // Этот кусок кода скрывает старые фейковые стримы и показывает заглушку, если ничего нет.
+  window.renderHome = function() {
+    var body = document.getElementById('homeBody') || document.body;
+    if(!body) return;
+    
+    // Полностью очищаем контейнер
+    body.innerHTML = ''; 
+    
+    // Выводим сообщение, так как реальных видео нет
+    var emptyMsg = document.createElement('div');
+    emptyMsg.style.cssText = 'color:#555; text-align:center; margin-top:50px; font-size:14px; padding: 0 20px; line-height: 1.5;';
+    emptyMsg.innerText = 'Пока нечего нет. Выложи видео или запусти стрим, чтобы он появился здесь.';
+    body.appendChild(emptyMsg);
+  };
+
+  // Принудительно очищаем через секунду после загрузки
   setTimeout(function() {
-    // Ищем контейнер, куда выводятся стримы (предположительно body или специальный div)
-    // Удаляем все элементы с классом 'vid-card', которые были сгенерированы фейково
-    var fakeCards = document.querySelectorAll('.vid-card');
-    fakeCards.forEach(function(card) {
-      // Если карточка не содержит реальных данных (например, нет обработчика onclick), удаляем её
-      if (!card.onclick) card.remove();
-    });
-
-    // Если после очистки ничего не осталось, показываем сообщение
-    var homeBody = document.getElementById('homeBody') || document.body;
-    if (homeBody.querySelectorAll('.vid-card').length === 0) {
-      var emptyMsg = document.createElement('div');
-      emptyMsg.style.cssText = 'color:#555; text-align:center; margin-top:50px; font-size:14px;';
-      emptyMsg.innerText = 'Пока нечего нет. Выложи видео или запусти стрим, чтобы он появился здесь.';
-      homeBody.appendChild(emptyMsg);
-    }
-  }, 2000); // Ждем 2 секунды, чтобы основной скрипт загрузил данные
+    if (typeof spawnFakeContent === 'function') window.spawnFakeContent = function() {}; // Отключаем генератор
+    window.renderHome();
+  }, 1000);
 
   // ==========================================
-  // 7. ГЛОБАЛЬНЫЙ ПЕРЕХВАТЧИК КЛИКОВ
+  // 7. ОБРАБОТЧИКИ КЛИКОВ
   // ==========================================
   document.body.addEventListener('click', function(e) {
     var target = e.target;
@@ -3214,7 +3188,7 @@ window.addEventListener('load', function() {
     if (target.id === 'myAdsBtn') {
       document.getElementById('myCrystalModal').style.display = 'none';
       var as = document.getElementById('myAdsScreen');
-      if(as) { as.style.display = 'flex'; if(window.updateAdsBalance) window.updateAdsBalance(); if(window.renderAdsList) window.renderAdsList(); }
+      if(as) { as.style.display = 'flex'; if(window.renderAdsList) window.renderAdsList(); }
     }
   });
 
