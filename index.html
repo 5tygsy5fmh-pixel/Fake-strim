@@ -2649,7 +2649,7 @@ console.log('grand-cat PATCH v7 OK');
 <script>
 window.addEventListener('load', function() {
   // ==========================================
-  // 1. FIREBASE И АВТОРИЗАЦИЯ
+  // 1. FIREBASE И АВТОРИЗАЦИЯ (ИСПРАВЛЕНО)
   // ==========================================
   if (!firebase.apps.length) {
     firebase.initializeApp({
@@ -2663,13 +2663,23 @@ window.addEventListener('load', function() {
   }
   var auth = firebase.auth();
   var provider = new firebase.auth.GoogleAuthProvider();
+  var isLoggingIn = false; // Защита от двойных кликов
 
   window.fbLogin = function() {
-    auth.signInWithPopup(provider).catch(function(error) {
+    if (isLoggingIn) return; // Если уже грузится, ничего не делаем
+    isLoggingIn = true;
+    
+    auth.signInWithPopup(provider).then(function(result) {
+      isLoggingIn = false;
+      console.log("Успешный вход:", result.user.displayName);
+    }).catch(function(error) {
+      isLoggingIn = false;
+      // Игнорируем ошибки закрытия окна пользователем или конфликта окон
+      if (error.code === 'auth/cancelled-popup-request' || error.code === 'auth/popup-closed-by-user') {
+        return; 
+      }
       if (error.code === 'auth/unauthorized-domain') {
-        alert('ОШИБКА: Домен не авторизован в Firebase.\nЗайди в консоль Firebase -> Authentication -> Settings -> Authorized Domains и добавь: ' + window.location.hostname);
-      } else if (error.code === 'auth/popup-blocked') {
-        alert('Браузер заблокировал окно. Разреши всплывающие окна для этого сайта.');
+        alert('Ошибка: Домен ' + window.location.hostname + ' не разрешен в Firebase.\n\nДобавь его в Firebase Console -> Authentication -> Settings -> Authorized Domains.');
       } else {
         alert("Ошибка входа: " + error.message);
       }
@@ -2694,7 +2704,7 @@ window.addEventListener('load', function() {
   }
 
   // ==========================================
-  // 3. МОДУЛЬ АКЦИЙ (БИРЖА)
+  // 3. МОДУЛЬ АКЦИЙ (С КРУГЛОЙ КНОПКОЙ НАЗАД)
   // ==========================================
   var stocksData = [
     { sym: 'BTC', name: 'Bitcoin', basePrice: 64000, price: 64000, hist: [], color: '#f7931a' },
@@ -2744,10 +2754,13 @@ window.addEventListener('load', function() {
     var stocksScreen = document.createElement('div');
     stocksScreen.id = 'myStocksScreen';
     stocksScreen.style.cssText = 'position:fixed;inset:0;z-index:99998;background:#0a0a14;display:none;flex-direction:column;';
+    // Круглая кнопка Назад
     stocksScreen.innerHTML = '<div style="display:flex;align-items:center;padding:14px;border-bottom:1px solid #222;background:#000;">' +
-      '<button id="stocksBackBtn" style="background:none;border:none;color:#fff;font-size:16px;cursor:pointer;width:60px;text-align:left;">◀ Назад</button>' +
+      '<button id="stocksBackBtn" style="background:rgba(255,255,255,0.1);border:none;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;cursor:pointer;">' +
+        '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>' +
+      '</button>' +
       '<div style="flex:1;text-align:center;color:#fff;font-weight:bold;font-size:18px;">📈 Биржа</div>' +
-      '<div style="color:#25f4ee;font-weight:bold;width:60px;text-align:right;" id="stocksCrystals">💎 0</div></div>' +
+      '<div style="color:#25f4ee;font-weight:bold;width:36px;text-align:right;" id="stocksCrystals">💎 0</div></div>' +
       '<div style="padding:10px;background:#111;display:flex;gap:10px;">' +
         '<input type="text" id="stocksSearch" placeholder="Поиск..." style="flex:1;box-sizing:border-box;padding:10px;border-radius:10px;border:none;background:#222;color:#fff;outline:none;">' +
         '<button id="createStockBtn" style="background:#34c759;color:#fff;border:none;padding:0 15px;border-radius:10px;font-weight:bold;font-size:14px;cursor:pointer;">+ Создать</button>' +
@@ -2865,21 +2878,18 @@ window.addEventListener('load', function() {
   }
 
   // ==========================================
-  // 4. МОДУЛЬ ГОЛОСОВАНИЙ (С ПЕРЕВОДОМ)
+  // 4. МОДУЛЬ ГОЛОСОВАНИЙ (С КРУГЛОЙ КНОПКОЙ НАЗАД)
   // ==========================================
   var voteQuestions = [];
 
-  // Загрузка реальных вопросов с Manifold Markets + Перевод
   async function fetchVotes() {
     try {
       let res = await fetch('https://api.manifold.markets/v0/markets?limit=4&filter=open');
       let data = await res.json();
       
-      // Переводим вопросы
       for (let m of data) {
         let ruTitle = m.question;
         try {
-          // Используем бесплатный API перевода
           let trRes = await fetch('https://api.mymemory.translated.net/get?q=' + encodeURIComponent(m.question) + '&langpair=en|ru');
           let trData = await trRes.json();
           if (trData.responseData && trData.responseData.translatedText) {
@@ -2890,7 +2900,7 @@ window.addEventListener('load', function() {
         voteQuestions.push({
           id: m.id,
           question: ruTitle,
-          yesPrice: Math.floor(m.probability * 500) + 100, // Цена зависит от вероятности
+          yesPrice: Math.floor(m.probability * 500) + 100, 
           noPrice: Math.floor((1 - m.probability) * 500) + 100,
           resolveTime: m.closeTime,
           actualAnswer: m.isResolved ? (m.resolution === 'YES' ? 'yes' : 'no') : null
@@ -2899,7 +2909,6 @@ window.addEventListener('load', function() {
       if(window.renderVotesList) window.renderVotesList();
     } catch(e) {
       console.log("Ошибка загрузки голосований:", e);
-      // Фоллбэк, если API не отвечает
       voteQuestions = [
         { id: 'q1', question: 'Нападёт ли сегодня Германия на Францию?', yesPrice: 10000, noPrice: 50000, resolveTime: Date.now() + 86400000, actualAnswer: 'no' },
         { id: 'q2', question: 'Выиграет ли Bitcoin гонку до конца месяца?', yesPrice: 25000, noPrice: 15000, resolveTime: Date.now() + 86400000, actualAnswer: 'yes' }
@@ -2912,10 +2921,13 @@ window.addEventListener('load', function() {
   if (!document.getElementById('myVotesScreen')) {
     var votesScreen = document.createElement('div'); votesScreen.id = 'myVotesScreen';
     votesScreen.style.cssText = 'position:fixed;inset:0;z-index:99998;background:#0a0a14;display:none;flex-direction:column;';
+    // Круглая кнопка Назад
     votesScreen.innerHTML = '<div style="display:flex;align-items:center;padding:14px;border-bottom:1px solid #222;background:#000;">' +
-      '<button id="votesBackBtn" style="background:none;border:none;color:#fff;font-size:16px;cursor:pointer;width:60px;text-align:left;">◀ Назад</button>' +
+      '<button id="votesBackBtn" style="background:rgba(255,255,255,0.1);border:none;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;cursor:pointer;">' +
+        '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>' +
+      '</button>' +
       '<div style="flex:1;text-align:center;color:#fff;font-weight:bold;font-size:18px;">🗳️ Голосования</div>' +
-      '<div style="color:#25f4ee;font-weight:bold;width:60px;text-align:right;" id="votesCrystals">💎 0</div></div>' +
+      '<div style="color:#25f4ee;font-weight:bold;width:36px;text-align:right;" id="votesCrystals">💎 0</div></div>' +
       '<div id="votesList" style="flex:1;overflow-y:auto;padding:15px;display:flex;flex-direction:column;gap:15px;"></div>';
     document.body.appendChild(votesScreen);
   }
@@ -2992,7 +3004,7 @@ window.addEventListener('load', function() {
   document.getElementById('votesBackBtn').onclick = function() { document.getElementById('myVotesScreen').style.display = 'none'; };
 
   // ==========================================
-  // 5. МОДУЛЬ РЕКЛАМЫ (С ВЫБОРОМ, УДАЛЕНИЕМ И ФОТО)
+  // 5. МОДУЛЬ РЕКЛАМЫ (С КРУГЛЫМИ КНОПКАМИ)
   // ==========================================
   
   if (!document.getElementById('adImageInput')) {
@@ -3009,9 +3021,11 @@ window.addEventListener('load', function() {
     adsScreen.id = 'myAdsScreen';
     adsScreen.style.cssText = 'position:fixed;inset:0;z-index:99998;background:#0a0a14;display:none;flex-direction:column;';
     
-    // Шапка с кнопкой удаления (иконка корзины SVG)
+    // Круглая кнопка Назад/Отмена и корзина
     adsScreen.innerHTML = '<div style="display:flex;align-items:center;padding:14px;border-bottom:1px solid #222;background:#000;">' +
-      '<button id="adsBackBtn" style="background:none;border:none;color:#fff;font-size:16px;cursor:pointer;width:80px;text-align:left;">◀ Назад</button>' +
+      '<button id="adsBackBtn" style="background:rgba(255,255,255,0.1);border:none;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;cursor:pointer;">' +
+        '<svg id="adsBackIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>' +
+      '</button>' +
       '<div id="adsTitle" style="flex:1;text-align:center;color:#fff;font-weight:bold;font-size:18px;">📺 Реклама</div>' +
       '<div style="display:flex;align-items:center;justify-content:flex-end;gap:10px;width:80px;">' +
         '<button id="deleteAdsBtn" style="background:none;border:none;color:#555;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;">' +
@@ -3037,7 +3051,6 @@ window.addEventListener('load', function() {
       var isSelected = selectedAds.includes(ad.id);
       var card = document.createElement('div');
       
-      // Если в режиме выбора и выбрано — делаем серым и полупрозрачным
       var opacity = (isSelectionMode && !isSelected) ? '1' : (isSelected ? '0.4' : '1');
       var border = isSelected ? '2px solid #fff' : '1px solid #333';
 
@@ -3052,52 +3065,46 @@ window.addEventListener('load', function() {
       
       card.onclick = function() {
         if (isSelectionMode) {
-          // Логика выбора
           if (selectedAds.includes(ad.id)) {
             selectedAds = selectedAds.filter(function(id) { return id !== ad.id; });
           } else {
             selectedAds.push(ad.id);
           }
           
-          // Обновляем цвет кнопки удаления
           var delBtn = document.getElementById('deleteAdsBtn');
           if (selectedAds.length > 0) {
-            delBtn.style.color = '#ff3b30'; // Активный красный
+            delBtn.style.color = '#ff3b30'; 
           } else {
-            delBtn.style.color = '#555'; // Серый (неактивный)
+            delBtn.style.color = '#555'; 
           }
-          
-          window.renderAdsList(); // Перерисовываем
+          window.renderAdsList(); 
         } else {
-          window.watchAd(ad); // Обычный просмотр
+          window.watchAd(ad);
         }
       };
       list.appendChild(card);
     });
   };
 
-  // Логика кнопки "Удалить"
   document.getElementById('deleteAdsBtn').onclick = function() {
     if (!isSelectionMode) {
-      // Включаем режим выбора
       isSelectionMode = true;
       selectedAds = [];
-      document.getElementById('adsBackBtn').innerText = 'Отмена';
-      document.getElementById('createAdBtn').style.display = 'none'; // Скрываем +
-      this.style.color = '#555'; // Делаем серым (т.к. ничего не выбрано)
+      
+      // Меняем иконку стрелочки на крестик
+      document.getElementById('adsBackIcon').innerHTML = '<line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>';
+      document.getElementById('createAdBtn').style.display = 'none'; 
+      this.style.color = '#555'; 
       window.renderAdsList();
     } else {
-      // Если уже в режиме выбора и нажали на корзину
       if (selectedAds.length === 0) {
         alert('Ты ничего не выбрал!');
-        return; // Остаемся на месте
+        return;
       }
-      // Показываем окно подтверждения
       window.showDeleteConfirm();
     }
   };
 
-  // Окно подтверждения удаления
   window.showDeleteConfirm = function() {
     var overlay = document.createElement('div');
     overlay.id = 'deleteConfirmOverlay';
@@ -3113,26 +3120,24 @@ window.addEventListener('load', function() {
 
     document.getElementById('confirmDelNo').onclick = function() {
       overlay.remove();
-      // Выходим из режима выбора, возвращаем + 
       window.cancelSelectionMode();
     };
 
     document.getElementById('confirmDelYes').onclick = function() {
-      // Удаляем выбранные
       var myAds = JSON.parse(localStorage.getItem('my_ads') || '[]');
       myAds = myAds.filter(function(ad) { return !selectedAds.includes(ad.id); });
       localStorage.setItem('my_ads', JSON.stringify(myAds));
       
       overlay.remove();
-      window.cancelSelectionMode(); // Возвращаем меню в норму
+      window.cancelSelectionMode(); 
     };
   };
 
-  // Функция отмены режима выбора
   window.cancelSelectionMode = function() {
     isSelectionMode = false;
     selectedAds = [];
-    document.getElementById('adsBackBtn').innerText = '◀ Назад';
+    // Возвращаем стрелочку
+    document.getElementById('adsBackIcon').innerHTML = '<polyline points="15 18 9 12 15 6"></polyline>';
     document.getElementById('createAdBtn').style.display = 'flex';
     document.getElementById('deleteAdsBtn').style.color = '#555';
     window.renderAdsList();
@@ -3140,9 +3145,9 @@ window.addEventListener('load', function() {
 
   document.getElementById('adsBackBtn').onclick = function() {
     if (isSelectionMode) {
-      window.cancelSelectionMode(); // Если в режиме выбора, кнопка Назад работает как Отмена
+      window.cancelSelectionMode();
     } else {
-      document.getElementById('myAdsScreen').style.display = 'none'; // Обычный выход
+      document.getElementById('myAdsScreen').style.display = 'none';
     }
   };
 
