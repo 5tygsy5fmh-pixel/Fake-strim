@@ -2665,7 +2665,14 @@ window.addEventListener('load', function() {
   var provider = new firebase.auth.GoogleAuthProvider();
 
   window.fbLogin = function() {
-    auth.signInWithPopup(provider).catch(function(error) { alert("Ошибка: " + error.message); });
+    auth.signInWithPopup(provider).catch(function(error) {
+      // Игнорируем ошибку, если окно было закрыто пользователем или произошел конфликт
+      if (error.code === 'auth/cancelled-popup-request' || error.code === 'auth/popup-closed-by-user') {
+        console.log("Вход отменен пользователем.");
+        return;
+      }
+      alert("Ошибка входа: " + error.message);
+    });
   };
 
   // ==========================================
@@ -2680,12 +2687,13 @@ window.addEventListener('load', function() {
       '<button id="myCasinoBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-size:15px;font-weight:800;background:linear-gradient(135deg,#ff2850,#ff5c8a)">🎰 Казино</button>' +
       '<button id="myStocksBtn" style="padding:18px;border-radius:14px;border:none;color:#000;font-size:15px;font-weight:800;background:linear-gradient(135deg,#43e97b,#38f9d7)">📈 Акции</button>' +
       '<button id="myVotesBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-size:15px;font-weight:800;background:linear-gradient(135deg,#8b5cf6,#c88cff)">🗳️ Голосования</button>' +
+      '<button id="myAdsBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-size:15px;font-weight:800;background:linear-gradient(135deg,#f59e0b,#fbbf24)">📺 Реклама</button>' +
       '<button id="myCloseBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-size:15px;font-weight:800;background:rgba(255,255,255,.1)">Закрыть</button></div>';
     document.body.appendChild(mod);
   }
 
   // ==========================================
-  // 3. МОДУЛЬ АКЦИЙ (БИРЖА)
+  // 3. МОДУЛЬ АКЦИЙ (С РЕАЛЬНЫМ КУРСОМ)
   // ==========================================
   var stocksData = [
     { sym: 'BTC', name: 'Bitcoin', basePrice: 64000, price: 64000, hist: [], color: '#f7931a' },
@@ -2695,25 +2703,43 @@ window.addEventListener('load', function() {
     { sym: 'TSLA', name: 'Tesla', basePrice: 180, price: 180, hist: [], color: '#e82127' }
   ];
 
-  // Загружаем созданные пользователем акции
+  // Загружаем локальные акции, созданные тобой
   var customStocks = JSON.parse(localStorage.getItem('my_custom_stocks') || '[]');
   customStocks.forEach(function(cs) { stocksData.push(cs); });
+
+  // Функция получения реального курса (используем API CoinGecko)
+  async function fetchRealPrices() {
+    try {
+      let response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana&vs_currencies=usd');
+      let data = await response.json();
+      stocksData.forEach(function(s) {
+        if (s.sym === 'BTC' && data.bitcoin) s.basePrice = data.bitcoin.usd;
+        if (s.sym === 'ETH' && data.ethereum) s.basePrice = data.ethereum.usd;
+        if (s.sym === 'SOL' && data.solana) s.basePrice = data.solana.usd;
+      });
+    } catch(e) { console.log("Ошибка загрузки курса:", e); }
+  }
 
   function getDynamicPrice(basePrice, seed) {
     var t = Date.now() / 1000;
     return basePrice * (1 + Math.sin(t / 3600 + seed) * 0.02 + Math.sin(t / 600 + seed * 2) * 0.01 + Math.sin(t / 30 + seed * 3) * 0.002);
   }
 
-  stocksData.forEach(function(s, idx) {
-    var seed = idx * 7 + (s.sym.charCodeAt(0) || 0);
-    s.price = getDynamicPrice(s.basePrice, seed);
-    for(var i=39; i>=0; i--) {
-      var pastT = Date.now() - i * 30000;
-      var t = pastT / 1000;
-      s.hist.push(s.basePrice * (1 + Math.sin(t / 3600 + seed) * 0.02 + Math.sin(t / 600 + seed * 2) * 0.01 + Math.sin(t / 30 + seed * 3) * 0.002));
-    }
-  });
+  // Инициализация графиков
+  function initStocks() {
+    stocksData.forEach(function(s, idx) {
+      var seed = idx * 7 + (s.sym.charCodeAt(0) || 0);
+      s.price = getDynamicPrice(s.basePrice, seed);
+      for(var i=39; i>=0; i--) {
+        var pastT = Date.now() - i * 30000;
+        var t = pastT / 1000;
+        s.hist.push(s.basePrice * (1 + Math.sin(t / 3600 + seed) * 0.02 + Math.sin(t / 600 + seed * 2) * 0.01 + Math.sin(t / 30 + seed * 3) * 0.002));
+      }
+    });
+  }
+  fetchRealPrices().then(initStocks);
 
+  // Обновляем график каждые 2 секунды
   setInterval(function() {
     stocksData.forEach(function(s, idx) {
       s.price = getDynamicPrice(s.basePrice, idx * 7 + (s.sym.charCodeAt(0) || 0));
@@ -2749,47 +2775,34 @@ window.addEventListener('load', function() {
     document.body.appendChild(stocksScreen);
   }
 
-  // Функция создания своей акции
+  // Функция создания СВОЕЙ акции
   window.createCustomStock = function() {
-    var name = prompt('Введите название акции (например, SpaceX):');
+    var name = prompt('Введите название акции:');
     if (!name || name.trim() === '') return;
     name = name.trim();
-    
-    // Генерируем тикер (первые 4 буквы)
     var sym = name.substring(0, 4).toUpperCase();
-    
-    // Проверка, нет ли уже такой
     if (stocksData.find(function(s) { return s.sym === sym; })) {
       alert('Акция с таким тикером уже существует!');
       return;
     }
-
-    var basePrice = Math.floor(Math.random() * 900) + 100; // Цена от 100 до 1000
+    var basePrice = Math.floor(Math.random() * 900) + 100;
     var newStock = {
-      sym: sym,
-      name: name,
-      basePrice: basePrice,
-      price: basePrice,
-      hist: [],
-      color: '#' + Math.floor(Math.random()*16777215).toString(16) // Случайный цвет
+      sym: sym, name: name, basePrice: basePrice, price: basePrice, hist: [], color: '#' + Math.floor(Math.random()*16777215).toString(16)
     };
-
-    // Заполняем историю цен для графика
     var seed = Math.random() * 100;
     for(var i=39; i>=0; i--) {
       var t = (Date.now() - i * 30000) / 1000;
       newStock.hist.push(basePrice * (1 + Math.sin(t / 3600 + seed) * 0.02 + Math.sin(t / 600 + seed * 2) * 0.01 + Math.sin(t / 30 + seed * 3) * 0.002));
     }
-
     stocksData.push(newStock);
     customStocks.push(newStock);
     localStorage.setItem('my_custom_stocks', JSON.stringify(customStocks));
-
-    window.renderStocksList(''); // Обновляем список
+    window.renderStocksList('');
     alert('Акция ' + sym + ' успешно создана!');
   };
   document.getElementById('createStockBtn').onclick = window.createCustomStock;
 
+  // Отрисовка списка акций
   window.updateStocksBalance = function() {
     var el = document.getElementById('stocksCrystals');
     if(el && window.S) el.innerText = '💎 ' + S.crystals.toLocaleString('ru-RU');
@@ -2888,12 +2901,30 @@ window.addEventListener('load', function() {
   }
 
   // ==========================================
-  // 4. МОДУЛЬ ГОЛОСОВАНИЙ (PREDICTION MARKET)
+  // 4. МОДУЛЬ ГОЛОСОВАНИЙ (С РЕАЛЬНЫМ API)
   // ==========================================
-  var voteQuestions = [
-    { id: 'q1', question: 'Нападёт ли сегодня Германия на Францию?', yesPrice: 10000, noPrice: 50000, resolveTime: Date.now() + (2 * 60 * 1000), actualAnswer: 'no' },
-    { id: 'q2', question: 'Выиграет ли Bitcoin гонку до конца месяца?', yesPrice: 25000, noPrice: 15000, resolveTime: Date.now() + (24 * 60 * 60 * 1000), actualAnswer: 'yes' }
-  ];
+  var voteQuestions = [];
+
+  // Функция загрузки реальных вопросов с Jupiter Prediction API
+  async function fetchVotes() {
+    try {
+      let res = await fetch('https://api.jup.ag/prediction/v1/events?filter=trending&includeMarkets=true&start=0&end=5');
+      let json = await res.json();
+      voteQuestions = json.data.map(function(ev, i) {
+        let m = ev.markets[0]; // Берем первый рынок из события
+        return {
+          id: 'jup_' + ev.eventId,
+          question: ev.metadata.title,
+          yesPrice: Math.floor(m.pricing.buyYesPriceUsd / 10000) * 100, // Конвертируем цену в кристаллы (примерно)
+          noPrice: Math.floor(m.pricing.buyNoPriceUsd / 10000) * 100,
+          resolveTime: Date.now() + (24 * 60 * 60 * 1000), // Резолв через 24 часа
+          actualAnswer: m.status === 'open' ? null : 'yes' // Если рынок закрыт, можно парсить результат (упрощенно)
+        };
+      });
+      if(window.renderVotesList) window.renderVotesList();
+    } catch(e) { console.log("Ошибка загрузки голосований:", e); }
+  }
+  fetchVotes();
 
   if (!document.getElementById('myVotesScreen')) {
     var votesScreen = document.createElement('div');
@@ -2919,6 +2950,11 @@ window.addEventListener('load', function() {
     
     var myVotes = JSON.parse(localStorage.getItem('my_votes') || '{}');
     var now = Date.now();
+
+    if (voteQuestions.length === 0) {
+      list.innerHTML = '<div style="color:#888; text-align:center; margin-top:50px;">Загрузка вопросов с сервера...</div>';
+      return;
+    }
 
     voteQuestions.forEach(function(q) {
       var card = document.createElement('div');
@@ -2987,7 +3023,7 @@ window.addEventListener('load', function() {
     if (window.updCrysUI) updCrysUI();
     if (window.updateVotesBalance) updateVotesBalance();
 
-    myVotes[qId] = choice;
+    myVotes[qId] = { choice: choice, price: price, time: Date.now() };
     localStorage.setItem('my_votes', JSON.stringify(myVotes));
 
     window.renderVotesList();
@@ -2997,14 +3033,155 @@ window.addEventListener('load', function() {
     document.getElementById('myVotesScreen').style.display = 'none';
   };
 
-  // Таймер обновления голосований (чтобы результат показывался сам)
   setInterval(function() {
     var vs = document.getElementById('myVotesScreen');
     if(vs && vs.style.display === 'flex') { window.renderVotesList(); }
   }, 5000);
 
   // ==========================================
-  // 5. ГЛОБАЛЬНЫЙ ПЕРЕХВАТЧИК КЛИКОВ И ВХОДА
+  // 5. МОДУЛЬ РЕКЛАМЫ
+  // ==========================================
+  var adsData = JSON.parse(localStorage.getItem('my_ads') || '[]');
+
+  // Экран рекламы
+  if (!document.getElementById('myAdsScreen')) {
+    var adsScreen = document.createElement('div');
+    adsScreen.id = 'myAdsScreen';
+    adsScreen.style.cssText = 'position:fixed;inset:0;z-index:99998;background:#0a0a14;display:none;flex-direction:column;';
+    adsScreen.innerHTML = '<div style="display:flex;align-items:center;padding:14px;border-bottom:1px solid #222;background:#000;">' +
+      '<button id="adsBackBtn" style="background:none;border:none;color:#fff;font-size:16px;cursor:pointer;">◀ Назад</button>' +
+      '<div style="flex:1;text-align:center;color:#fff;font-weight:bold;font-size:18px;">📺 Реклама</div>' +
+      '<div style="color:#25f4ee;font-weight:bold;" id="adsCrystals">💎 0</div>' +
+      '<button id="createAdBtn" style="background:#34c759;color:#fff;border:none;width:36px;height:36px;border-radius:50%;font-size:20px;font-weight:bold;margin-left:10px;cursor:pointer;">+</button></div>' +
+      '<div id="adsList" style="flex:1;overflow-y:auto;padding:15px;display:flex;flex-wrap:wrap;gap:15px;align-content:flex-start;"></div>';
+    document.body.appendChild(adsScreen);
+  }
+
+  window.updateAdsBalance = function() {
+    var el = document.getElementById('adsCrystals');
+    if(el && window.S) el.innerText = '💎 ' + S.crystals.toLocaleString('ru-RU');
+  };
+
+  window.renderAdsList = function() {
+    var list = document.getElementById('adsList');
+    if(!list) return;
+    list.innerHTML = '';
+    
+    var myAds = JSON.parse(localStorage.getItem('my_ads') || '[]');
+    if (myAds.length === 0) {
+      list.innerHTML = '<div style="color:#888; text-align:center; width:100%; margin-top:50px;">Пока нет рекламы. Создай свою!</div>';
+      return;
+    }
+
+    myAds.forEach(function(ad) {
+      var card = document.createElement('div');
+      card.style.cssText = 'width:140px; height:140px; background:#222; border-radius:12px; overflow:hidden; position:relative; cursor:pointer; border:1px solid #333;';
+      
+      var img = document.createElement('img');
+      img.src = ad.image;
+      img.style.cssText = 'width:100%; height:100%; object-fit:cover;';
+      
+      var reward = document.createElement('div');
+      reward.style.cssText = 'position:absolute; bottom:0; left:0; right:0; background:rgba(0,0,0,0.8); color:#fff; text-align:center; padding:5px; font-size:12px; font-weight:bold;';
+      reward.innerText = '💎 ' + ad.reward.toLocaleString('ru-RU');
+
+      card.appendChild(img);
+      card.appendChild(reward);
+      card.onclick = function() { window.watchAd(ad); };
+      list.appendChild(card);
+    });
+  };
+
+  // Функция просмотра рекламы
+  window.watchAd = function(ad) {
+    var modal = document.createElement('div');
+    modal.id = 'watchAdModal';
+    modal.style.cssText = 'position:fixed;inset:0;z-index:100000;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;';
+    modal.innerHTML = '<img src="' + ad.image + '" style="max-width:100%; max-height:70%; object-fit:contain;">' +
+      '<div id="adTimer" style="color:#fff; font-size:24px; margin-top:20px; font-weight:bold;">5</div>' +
+      '<div style="color:#888; margin-top:10px;">Просмотр рекламы...</div>';
+    document.body.appendChild(modal);
+
+    var timeLeft = 5;
+    var timer = setInterval(function() {
+      timeLeft--;
+      var el = document.getElementById('adTimer');
+      if(el) el.innerText = timeLeft;
+      if(timeLeft <= 0) {
+        clearInterval(timer);
+        modal.remove();
+        
+        // Начисляем награду
+        if (window.S) {
+          S.crystals += ad.reward;
+          if(window.saveStats) saveStats();
+          if(window.updCrysUI) updCrysUI();
+          if(window.updateAdsBalance) updateAdsBalance();
+          alert('Ты получил ' + ad.reward + ' кристаллов за просмотр!');
+        }
+      }
+    }, 1000);
+  };
+
+  // Функция создания рекламы (упрощенная, без реальной загрузки файлов)
+  window.createAd = function() {
+    var imgUrl = prompt('Введи URL картинки для рекламы (например, ссылка на картинку из интернета):');
+    if (!imgUrl) return;
+    
+    var rewardStr = prompt('Выбери награду за просмотр: 100, 1000 или 10000');
+    var reward = parseInt(rewardStr);
+    if (![100, 1000, 10000].includes(reward)) {
+      alert('Неверная награда. Введи 100, 1000 или 10000.');
+      return;
+    }
+
+    var cost = reward * 1000; // Стоимость создания
+    if (!window.S || S.crystals < cost) {
+      alert('Недостаточно кристаллов для создания! Нужно ' + cost.toLocaleString('ru-RU'));
+      return;
+    }
+
+    S.crystals -= cost;
+    if(window.saveStats) saveStats();
+    if(window.updCrysUI) updCrysUI();
+    if(window.updateAdsBalance) updateAdsBalance();
+
+    var newAd = { id: 'ad_' + Date.now(), image: imgUrl, reward: reward };
+    var myAds = JSON.parse(localStorage.getItem('my_ads') || '[]');
+    myAds.push(newAd);
+    localStorage.setItem('my_ads', JSON.stringify(myAds));
+    
+    window.renderAdsList();
+    alert('Реклама создана! С тебя списано ' + cost.toLocaleString('ru-RU') + ' кристаллов.');
+  };
+  document.getElementById('createAdBtn').onclick = window.createAd;
+  document.getElementById('adsBackBtn').onclick = function() { document.getElementById('myAdsScreen').style.display = 'none'; };
+
+  // ==========================================
+  // 6. ОЧИСТКА ФЕЙКОВЫХ СТРИМОВ НА ГЛАВНОЙ
+  // ==========================================
+  // Этот кусок кода скрывает старые фейковые стримы и показывает заглушку, если ничего нет.
+  setTimeout(function() {
+    // Ищем контейнер, куда выводятся стримы (предположительно body или специальный div)
+    // Удаляем все элементы с классом 'vid-card', которые были сгенерированы фейково
+    var fakeCards = document.querySelectorAll('.vid-card');
+    fakeCards.forEach(function(card) {
+      // Если карточка не содержит реальных данных (например, нет обработчика onclick), удаляем её
+      if (!card.onclick) card.remove();
+    });
+
+    // Если после очистки ничего не осталось, показываем сообщение
+    var homeBody = document.getElementById('homeBody') || document.body;
+    if (homeBody.querySelectorAll('.vid-card').length === 0) {
+      var emptyMsg = document.createElement('div');
+      emptyMsg.style.cssText = 'color:#555; text-align:center; margin-top:50px; font-size:14px;';
+      emptyMsg.innerText = 'Пока нечего нет. Выложи видео или запусти стрим, чтобы он появился здесь.';
+      homeBody.appendChild(emptyMsg);
+    }
+  }, 2000); // Ждем 2 секунды, чтобы основной скрипт загрузил данные
+
+  // ==========================================
+  // 7. ГЛОБАЛЬНЫЙ ПЕРЕХВАТЧИК КЛИКОВ
   // ==========================================
   document.body.addEventListener('click', function(e) {
     var target = e.target;
@@ -3022,18 +3199,22 @@ window.addEventListener('load', function() {
     if (target.id === 'myCloseBtn') { document.getElementById('myCrystalModal').style.display = 'none'; }
     if (target.id === 'myCasinoBtn') { document.getElementById('myCrystalModal').style.display = 'none'; if (window.openCasino) window.openCasino(); }
     
-    // Открытие Биржи
     if (target.id === 'myStocksBtn') {
       document.getElementById('myCrystalModal').style.display = 'none';
       var ss = document.getElementById('myStocksScreen');
       if(ss) { ss.style.display = 'flex'; if(window.updateStocksBalance) window.updateStocksBalance(); if(window.renderStocksList) window.renderStocksList(''); }
     }
     
-    // Открытие Голосований
     if (target.id === 'myVotesBtn') {
       document.getElementById('myCrystalModal').style.display = 'none';
       var vs = document.getElementById('myVotesScreen');
       if(vs) { vs.style.display = 'flex'; if(window.updateVotesBalance) window.updateVotesBalance(); if(window.renderVotesList) window.renderVotesList(); }
+    }
+
+    if (target.id === 'myAdsBtn') {
+      document.getElementById('myCrystalModal').style.display = 'none';
+      var as = document.getElementById('myAdsScreen');
+      if(as) { as.style.display = 'flex'; if(window.updateAdsBalance) window.updateAdsBalance(); if(window.renderAdsList) window.renderAdsList(); }
     }
   });
 
