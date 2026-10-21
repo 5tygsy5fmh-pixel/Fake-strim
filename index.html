@@ -2646,10 +2646,11 @@ console.log('grand-cat PATCH v7 OK');
 </script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script>
 window.addEventListener('load', function() {
   // ==========================================
-  // 1. FIREBASE И АВТОРИЗАЦИЯ (ИСПРАВЛЕНО)
+  // 1. FIREBASE И FIRESTORE
   // ==========================================
   if (!firebase.apps.length) {
     firebase.initializeApp({
@@ -2662,27 +2663,21 @@ window.addEventListener('load', function() {
     });
   }
   var auth = firebase.auth();
+  var db = firebase.firestore(); // Подключение к базе данных
   var provider = new firebase.auth.GoogleAuthProvider();
-  var isLoggingIn = false; // Защита от двойных кликов
+  var isLoggingIn = false;
 
   window.fbLogin = function() {
-    if (isLoggingIn) return; // Если уже грузится, ничего не делаем
+    if (isLoggingIn) return;
     isLoggingIn = true;
-    
     auth.signInWithPopup(provider).then(function(result) {
       isLoggingIn = false;
-      console.log("Успешный вход:", result.user.displayName);
     }).catch(function(error) {
       isLoggingIn = false;
-      // Игнорируем ошибки закрытия окна пользователем или конфликта окон
-      if (error.code === 'auth/cancelled-popup-request' || error.code === 'auth/popup-closed-by-user') {
-        return; 
-      }
+      if (error.code === 'auth/cancelled-popup-request' || error.code === 'auth/popup-closed-by-user') return; 
       if (error.code === 'auth/unauthorized-domain') {
         alert('Ошибка: Домен ' + window.location.hostname + ' не разрешен в Firebase.\n\nДобавь его в Firebase Console -> Authentication -> Settings -> Authorized Domains.');
-      } else {
-        alert("Ошибка входа: " + error.message);
-      }
+      } else { alert("Ошибка входа: " + error.message); }
     });
   };
 
@@ -2704,7 +2699,7 @@ window.addEventListener('load', function() {
   }
 
   // ==========================================
-  // 3. МОДУЛЬ АКЦИЙ (С КРУГЛОЙ КНОПКОЙ НАЗАД)
+  // 3. МОДУЛЬ АКЦИЙ (БИРЖА)
   // ==========================================
   var stocksData = [
     { sym: 'BTC', name: 'Bitcoin', basePrice: 64000, price: 64000, hist: [], color: '#f7931a' },
@@ -2754,11 +2749,8 @@ window.addEventListener('load', function() {
     var stocksScreen = document.createElement('div');
     stocksScreen.id = 'myStocksScreen';
     stocksScreen.style.cssText = 'position:fixed;inset:0;z-index:99998;background:#0a0a14;display:none;flex-direction:column;';
-    // Круглая кнопка Назад
     stocksScreen.innerHTML = '<div style="display:flex;align-items:center;padding:14px;border-bottom:1px solid #222;background:#000;">' +
-      '<button id="stocksBackBtn" style="background:rgba(255,255,255,0.1);border:none;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;cursor:pointer;">' +
-        '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>' +
-      '</button>' +
+      '<button id="stocksBackBtn" style="background:rgba(255,255,255,0.1);border:none;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;cursor:pointer;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>' +
       '<div style="flex:1;text-align:center;color:#fff;font-weight:bold;font-size:18px;">📈 Биржа</div>' +
       '<div style="color:#25f4ee;font-weight:bold;width:36px;text-align:right;" id="stocksCrystals">💎 0</div></div>' +
       '<div style="padding:10px;background:#111;display:flex;gap:10px;">' +
@@ -2772,19 +2764,12 @@ window.addEventListener('load', function() {
   window.createCustomStock = function() {
     var name = prompt('Введите название акции:');
     if (!name || name.trim() === '') return;
-    name = name.trim();
-    var sym = name.substring(0, 4).toUpperCase();
-    if (stocksData.find(function(s) { return s.sym === sym; })) {
-      alert('Акция с таким тикером уже существует!');
-      return;
-    }
+    name = name.trim(); var sym = name.substring(0, 4).toUpperCase();
+    if (stocksData.find(function(s) { return s.sym === sym; })) { alert('Акция с таким тикером уже существует!'); return; }
     var basePrice = Math.floor(Math.random() * 900) + 100;
     var newStock = { sym: sym, name: name, basePrice: basePrice, price: basePrice, hist: [], color: '#' + Math.floor(Math.random()*16777215).toString(16) };
     var seed = Math.random() * 100;
-    for(var i=39; i>=0; i--) {
-      var t = (Date.now() - i * 30000) / 1000;
-      newStock.hist.push(basePrice * (1 + Math.sin(t / 3600 + seed) * 0.02 + Math.sin(t / 600 + seed * 2) * 0.01 + Math.sin(t / 30 + seed * 3) * 0.002));
-    }
+    for(var i=39; i>=0; i--) { var t = (Date.now() - i * 30000) / 1000; newStock.hist.push(basePrice * (1 + Math.sin(t / 3600 + seed) * 0.02 + Math.sin(t / 600 + seed * 2) * 0.01 + Math.sin(t / 30 + seed * 3) * 0.002)); }
     stocksData.push(newStock); customStocks.push(newStock);
     localStorage.setItem('my_custom_stocks', JSON.stringify(customStocks));
     window.renderStocksList(''); alert('Акция ' + sym + ' создана!');
@@ -2878,7 +2863,7 @@ window.addEventListener('load', function() {
   }
 
   // ==========================================
-  // 4. МОДУЛЬ ГОЛОСОВАНИЙ (С КРУГЛОЙ КНОПКОЙ НАЗАД)
+  // 4. МОДУЛЬ ГОЛОСОВАНИЙ
   // ==========================================
   var voteQuestions = [];
 
@@ -2886,29 +2871,20 @@ window.addEventListener('load', function() {
     try {
       let res = await fetch('https://api.manifold.markets/v0/markets?limit=4&filter=open');
       let data = await res.json();
-      
       for (let m of data) {
         let ruTitle = m.question;
         try {
           let trRes = await fetch('https://api.mymemory.translated.net/get?q=' + encodeURIComponent(m.question) + '&langpair=en|ru');
           let trData = await trRes.json();
-          if (trData.responseData && trData.responseData.translatedText) {
-            ruTitle = trData.responseData.translatedText;
-          }
-        } catch(e) { console.log('Ошибка перевода:', e); }
-
+          if (trData.responseData && trData.responseData.translatedText) ruTitle = trData.responseData.translatedText;
+        } catch(e) {}
         voteQuestions.push({
-          id: m.id,
-          question: ruTitle,
-          yesPrice: Math.floor(m.probability * 500) + 100, 
-          noPrice: Math.floor((1 - m.probability) * 500) + 100,
-          resolveTime: m.closeTime,
-          actualAnswer: m.isResolved ? (m.resolution === 'YES' ? 'yes' : 'no') : null
+          id: m.id, question: ruTitle, yesPrice: Math.floor(m.probability * 500) + 100, noPrice: Math.floor((1 - m.probability) * 500) + 100,
+          resolveTime: m.closeTime, actualAnswer: m.isResolved ? (m.resolution === 'YES' ? 'yes' : 'no') : null
         });
       }
       if(window.renderVotesList) window.renderVotesList();
     } catch(e) {
-      console.log("Ошибка загрузки голосований:", e);
       voteQuestions = [
         { id: 'q1', question: 'Нападёт ли сегодня Германия на Францию?', yesPrice: 10000, noPrice: 50000, resolveTime: Date.now() + 86400000, actualAnswer: 'no' },
         { id: 'q2', question: 'Выиграет ли Bitcoin гонку до конца месяца?', yesPrice: 25000, noPrice: 15000, resolveTime: Date.now() + 86400000, actualAnswer: 'yes' }
@@ -2921,11 +2897,8 @@ window.addEventListener('load', function() {
   if (!document.getElementById('myVotesScreen')) {
     var votesScreen = document.createElement('div'); votesScreen.id = 'myVotesScreen';
     votesScreen.style.cssText = 'position:fixed;inset:0;z-index:99998;background:#0a0a14;display:none;flex-direction:column;';
-    // Круглая кнопка Назад
     votesScreen.innerHTML = '<div style="display:flex;align-items:center;padding:14px;border-bottom:1px solid #222;background:#000;">' +
-      '<button id="votesBackBtn" style="background:rgba(255,255,255,0.1);border:none;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;cursor:pointer;">' +
-        '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>' +
-      '</button>' +
+      '<button id="votesBackBtn" style="background:rgba(255,255,255,0.1);border:none;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;cursor:pointer;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>' +
       '<div style="flex:1;text-align:center;color:#fff;font-weight:bold;font-size:18px;">🗳️ Голосования</div>' +
       '<div style="color:#25f4ee;font-weight:bold;width:36px;text-align:right;" id="votesCrystals">💎 0</div></div>' +
       '<div id="votesList" style="flex:1;overflow-y:auto;padding:15px;display:flex;flex-direction:column;gap:15px;"></div>';
@@ -2939,49 +2912,25 @@ window.addEventListener('load', function() {
 
   window.renderVotesList = function() {
     var list = document.getElementById('votesList'); if (!list) return;
-    list.innerHTML = '';
-    var myVotes = JSON.parse(localStorage.getItem('my_votes') || '{}');
-    var now = Date.now();
-
-    if (voteQuestions.length === 0) {
-      list.innerHTML = '<div style="color:#888; text-align:center; margin-top:50px;">Загрузка вопросов и перевод...</div>';
-      return;
-    }
-
+    list.innerHTML = ''; var myVotes = JSON.parse(localStorage.getItem('my_votes') || '{}'); var now = Date.now();
+    if (voteQuestions.length === 0) { list.innerHTML = '<div style="color:#888; text-align:center; margin-top:50px;">Загрузка вопросов и перевод...</div>'; return; }
     voteQuestions.forEach(function(q) {
-      var card = document.createElement('div');
-      card.style.cssText = 'background:#1a1a2e;border-radius:16px;padding:15px;display:flex;flex-direction:column;gap:12px;';
-      var title = document.createElement('div');
-      title.style.cssText = 'color:#fff;font-size:16px;font-weight:bold;line-height:1.3;';
-      title.innerText = q.question; card.appendChild(title);
+      var card = document.createElement('div'); card.style.cssText = 'background:#1a1a2e;border-radius:16px;padding:15px;display:flex;flex-direction:column;gap:12px;';
+      var title = document.createElement('div'); title.style.cssText = 'color:#fff;font-size:16px;font-weight:bold;line-height:1.3;'; title.innerText = q.question; card.appendChild(title);
       var userVote = myVotes[q.id]; var timeLeft = q.resolveTime - now;
-
       if (userVote) {
         if (timeLeft > 0) {
-          var waitText = document.createElement('div');
-          waitText.style.cssText = 'color:#8cff8c;font-size:14px;text-align:center;background:rgba(140,255,140,0.1);padding:10px;border-radius:8px;';
-          var hoursLeft = Math.ceil(timeLeft / (1000 * 60 * 60));
-          waitText.innerText = '⏳ Ты проголосовал "' + (userVote === 'yes' ? 'Да' : 'Нет') + '". Результат через ' + (hoursLeft > 0 ? hoursLeft + ' ч.' : 'пару минут');
-          card.appendChild(waitText);
+          var waitText = document.createElement('div'); waitText.style.cssText = 'color:#8cff8c;font-size:14px;text-align:center;background:rgba(140,255,140,0.1);padding:10px;border-radius:8px;';
+          var hoursLeft = Math.ceil(timeLeft / (1000 * 60 * 60)); waitText.innerText = '⏳ Ты проголосовал "' + (userVote === 'yes' ? 'Да' : 'Нет') + '". Результат через ' + (hoursLeft > 0 ? hoursLeft + ' ч.' : 'пару минут'); card.appendChild(waitText);
         } else {
-          var isWin = (userVote === q.actualAnswer);
-          var resultText = document.createElement('div');
+          var isWin = (userVote === q.actualAnswer); var resultText = document.createElement('div');
           resultText.style.cssText = 'color:' + (isWin ? '#8cff8c' : '#ff5c5c') + ';font-size:15px;text-align:center;background:' + (isWin ? 'rgba(140,255,140,0.1)' : 'rgba(255,92,92,0.1)') + ';padding:10px;border-radius:8px;font-weight:bold;';
-          resultText.innerText = isWin ? '🎉 Ты угадал! Правильный ответ: ' + (q.actualAnswer === 'yes' ? 'Да' : 'Нет') : '😢 Ты не угадал. Правильный ответ: ' + (q.actualAnswer === 'yes' ? 'Да' : 'Нет');
-          card.appendChild(resultText);
+          resultText.innerText = isWin ? '🎉 Ты угадал! Правильный ответ: ' + (q.actualAnswer === 'yes' ? 'Да' : 'Нет') : '😢 Ты не угадал. Правильный ответ: ' + (q.actualAnswer === 'yes' ? 'Да' : 'Нет'); card.appendChild(resultText);
         }
       } else {
         var btnWrap = document.createElement('div'); btnWrap.style.cssText = 'display:flex;gap:10px;';
-        var btnYes = document.createElement('button');
-        btnYes.style.cssText = 'flex:1;padding:12px;border-radius:10px;border:none;color:#fff;font-weight:bold;font-size:14px;cursor:pointer;background:linear-gradient(135deg,#43e97b,#38f9d7);';
-        btnYes.innerHTML = 'Да<br><span style="font-size:12px;font-weight:normal;color:#000">💎 ' + q.yesPrice.toLocaleString('ru-RU') + '</span>';
-        btnYes.onclick = function() { window.castVote(q.id, 'yes', q.yesPrice); };
-
-        var btnNo = document.createElement('button');
-        btnNo.style.cssText = 'flex:1;padding:12px;border-radius:10px;border:none;color:#fff;font-weight:bold;font-size:14px;cursor:pointer;background:linear-gradient(135deg,#ff2850,#ff5c8a);';
-        btnNo.innerHTML = 'Нет<br><span style="font-size:12px;font-weight:normal;color:#fff">💎 ' + q.noPrice.toLocaleString('ru-RU') + '</span>';
-        btnNo.onclick = function() { window.castVote(q.id, 'no', q.noPrice); };
-
+        var btnYes = document.createElement('button'); btnYes.style.cssText = 'flex:1;padding:12px;border-radius:10px;border:none;color:#fff;font-weight:bold;font-size:14px;cursor:pointer;background:linear-gradient(135deg,#43e97b,#38f9d7);'; btnYes.innerHTML = 'Да<br><span style="font-size:12px;font-weight:normal;color:#000">💎 ' + q.yesPrice.toLocaleString('ru-RU') + '</span>'; btnYes.onclick = function() { window.castVote(q.id, 'yes', q.yesPrice); };
+        var btnNo = document.createElement('button'); btnNo.style.cssText = 'flex:1;padding:12px;border-radius:10px;border:none;color:#fff;font-weight:bold;font-size:14px;cursor:pointer;background:linear-gradient(135deg,#ff2850,#ff5c8a);'; btnNo.innerHTML = 'Нет<br><span style="font-size:12px;font-weight:normal;color:#fff">💎 ' + q.noPrice.toLocaleString('ru-RU') + '</span>'; btnNo.onclick = function() { window.castVote(q.id, 'no', q.noPrice); };
         if (timeLeft <= 0) { btnYes.disabled = true; btnYes.style.opacity = '0.5'; btnNo.disabled = true; btnNo.style.opacity = '0.5'; }
         btnWrap.appendChild(btnYes); btnWrap.appendChild(btnNo); card.appendChild(btnWrap);
       }
@@ -2990,23 +2939,17 @@ window.addEventListener('load', function() {
   };
 
   window.castVote = function(qId, choice, price) {
-    var myVotes = JSON.parse(localStorage.getItem('my_votes') || '{}');
-    if (myVotes[qId]) return; 
+    var myVotes = JSON.parse(localStorage.getItem('my_votes') || '{}'); if (myVotes[qId]) return; 
     if (!window.S || S.crystals < price) { alert('Недостаточно кристаллов!'); return; }
-    S.crystals -= price;
-    if (window.saveStats) saveStats();
-    if (window.updCrysUI) updCrysUI();
-    if (window.updateVotesBalance) updateVotesBalance();
-    myVotes[qId] = choice; localStorage.setItem('my_votes', JSON.stringify(myVotes));
-    window.renderVotesList();
+    S.crystals -= price; if (window.saveStats) saveStats(); if (window.updCrysUI) updCrysUI(); if (window.updateVotesBalance) updateVotesBalance();
+    myVotes[qId] = choice; localStorage.setItem('my_votes', JSON.stringify(myVotes)); window.renderVotesList();
   };
 
   document.getElementById('votesBackBtn').onclick = function() { document.getElementById('myVotesScreen').style.display = 'none'; };
 
   // ==========================================
-  // 5. МОДУЛЬ РЕКЛАМЫ (С КРУГЛЫМИ КНОПКАМИ)
+  // 5. МОДУЛЬ РЕКЛАМЫ (FIRESTORE)
   // ==========================================
-  
   if (!document.getElementById('adImageInput')) {
     var fileInput = document.createElement('input');
     fileInput.type = 'file'; fileInput.id = 'adImageInput'; fileInput.accept = 'image/*'; fileInput.style.display = 'none';
@@ -3015,13 +2958,21 @@ window.addEventListener('load', function() {
 
   var isSelectionMode = false;
   var selectedAds = [];
+  var publicAds = []; 
+
+  // Слушаем изменения в базе данных
+  db.collection('public_ads').onSnapshot(function(snapshot) {
+    publicAds = [];
+    snapshot.forEach(function(doc) {
+      var ad = doc.data(); ad.id = doc.id; publicAds.push(ad);
+    });
+    if (window.renderAdsList) window.renderAdsList();
+  });
 
   if (!document.getElementById('myAdsScreen')) {
     var adsScreen = document.createElement('div');
     adsScreen.id = 'myAdsScreen';
     adsScreen.style.cssText = 'position:fixed;inset:0;z-index:99998;background:#0a0a14;display:none;flex-direction:column;';
-    
-    // Круглая кнопка Назад/Отмена и корзина
     adsScreen.innerHTML = '<div style="display:flex;align-items:center;padding:14px;border-bottom:1px solid #222;background:#000;">' +
       '<button id="adsBackBtn" style="background:rgba(255,255,255,0.1);border:none;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;cursor:pointer;">' +
         '<svg id="adsBackIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>' +
@@ -3040,47 +2991,32 @@ window.addEventListener('load', function() {
   window.renderAdsList = function() {
     var list = document.getElementById('adsList'); if(!list) return;
     list.innerHTML = '';
-    var myAds = JSON.parse(localStorage.getItem('my_ads') || '[]');
-    
-    if (myAds.length === 0) {
-      list.innerHTML = '<div style="color:#888; text-align:center; width:100%; margin-top:50px;">Пока нет рекламы. Создай свою!</div>';
-      return;
-    }
+    if (publicAds.length === 0) { list.innerHTML = '<div style="color:#888; text-align:center; width:100%; margin-top:50px;">Пока нет рекламы. Создай свою!</div>'; return; }
+    var currentUser = auth.currentUser;
 
-    myAds.forEach(function(ad) {
+    publicAds.forEach(function(ad) {
       var isSelected = selectedAds.includes(ad.id);
+      var isMine = currentUser && ad.authorId === currentUser.uid; 
       var card = document.createElement('div');
-      
       var opacity = (isSelectionMode && !isSelected) ? '1' : (isSelected ? '0.4' : '1');
+      if (isSelectionMode && !isMine) opacity = '0.3';
       var border = isSelected ? '2px solid #fff' : '1px solid #333';
-
       card.style.cssText = 'width:140px; height:140px; background:#222; border-radius:12px; overflow:hidden; position:relative; cursor:pointer; border:' + border + '; opacity:' + opacity + '; transition: 0.2s;';
-      
       var img = document.createElement('img'); img.src = ad.image; img.style.cssText = 'width:100%; height:100%; object-fit:cover;';
       var reward = document.createElement('div');
       reward.style.cssText = 'position:absolute; bottom:0; left:0; right:0; background:rgba(0,0,0,0.8); color:#fff; text-align:center; padding:5px; font-size:12px; font-weight:bold;';
       reward.innerText = '💎 ' + ad.reward.toLocaleString('ru-RU');
-
       card.appendChild(img); card.appendChild(reward);
       
       card.onclick = function() {
         if (isSelectionMode) {
-          if (selectedAds.includes(ad.id)) {
-            selectedAds = selectedAds.filter(function(id) { return id !== ad.id; });
-          } else {
-            selectedAds.push(ad.id);
-          }
-          
+          if (!isMine) return; 
+          if (selectedAds.includes(ad.id)) { selectedAds = selectedAds.filter(function(id) { return id !== ad.id; }); } 
+          else { selectedAds.push(ad.id); }
           var delBtn = document.getElementById('deleteAdsBtn');
-          if (selectedAds.length > 0) {
-            delBtn.style.color = '#ff3b30'; 
-          } else {
-            delBtn.style.color = '#555'; 
-          }
+          if (selectedAds.length > 0) delBtn.style.color = '#ff3b30'; else delBtn.style.color = '#555'; 
           window.renderAdsList(); 
-        } else {
-          window.watchAd(ad);
-        }
+        } else { window.watchAd(ad); }
       };
       list.appendChild(card);
     });
@@ -3088,55 +3024,35 @@ window.addEventListener('load', function() {
 
   document.getElementById('deleteAdsBtn').onclick = function() {
     if (!isSelectionMode) {
-      isSelectionMode = true;
-      selectedAds = [];
-      
-      // Меняем иконку стрелочки на крестик
+      isSelectionMode = true; selectedAds = [];
       document.getElementById('adsBackIcon').innerHTML = '<line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>';
       document.getElementById('createAdBtn').style.display = 'none'; 
-      this.style.color = '#555'; 
-      window.renderAdsList();
+      this.style.color = '#555'; window.renderAdsList();
     } else {
-      if (selectedAds.length === 0) {
-        alert('Ты ничего не выбрал!');
-        return;
-      }
+      if (selectedAds.length === 0) { alert('Ты ничего не выбрал!'); return; }
       window.showDeleteConfirm();
     }
   };
 
   window.showDeleteConfirm = function() {
-    var overlay = document.createElement('div');
-    overlay.id = 'deleteConfirmOverlay';
+    var overlay = document.createElement('div'); overlay.id = 'deleteConfirmOverlay';
     overlay.style.cssText = 'position:fixed;inset:0;z-index:100001;background:rgba(0,0,0,0.8);display:flex;align-items:center;justify-content:center;padding:20px;';
     overlay.innerHTML = '<div style="background:#1a1a2e;border-radius:16px;padding:22px;width:100%;max-width:300px;text-align:center;">' +
       '<h3 style="color:#fff;margin-bottom:20px;font-size:18px;">Точно?</h3>' +
       '<div style="display:flex;gap:10px;">' +
         '<button id="confirmDelYes" style="flex:1;padding:14px;border-radius:10px;border:none;color:#fff;font-weight:bold;font-size:15px;background:#ff3b30;cursor:pointer;">Да</button>' +
         '<button id="confirmDelNo" style="flex:1;padding:14px;border-radius:10px;border:none;color:#fff;font-weight:bold;font-size:15px;background:rgba(255,255,255,0.2);cursor:pointer;">Нет</button>' +
-      '</div>' +
-    '</div>';
+      '</div></div>';
     document.body.appendChild(overlay);
-
-    document.getElementById('confirmDelNo').onclick = function() {
-      overlay.remove();
-      window.cancelSelectionMode();
-    };
-
+    document.getElementById('confirmDelNo').onclick = function() { overlay.remove(); window.cancelSelectionMode(); };
     document.getElementById('confirmDelYes').onclick = function() {
-      var myAds = JSON.parse(localStorage.getItem('my_ads') || '[]');
-      myAds = myAds.filter(function(ad) { return !selectedAds.includes(ad.id); });
-      localStorage.setItem('my_ads', JSON.stringify(myAds));
-      
-      overlay.remove();
-      window.cancelSelectionMode(); 
+      selectedAds.forEach(function(adId) { db.collection('public_ads').doc(adId).delete().catch(function(error) { console.error("Ошибка удаления: ", error); }); });
+      overlay.remove(); window.cancelSelectionMode(); 
     };
   };
 
   window.cancelSelectionMode = function() {
-    isSelectionMode = false;
-    selectedAds = [];
-    // Возвращаем стрелочку
+    isSelectionMode = false; selectedAds = [];
     document.getElementById('adsBackIcon').innerHTML = '<polyline points="15 18 9 12 15 6"></polyline>';
     document.getElementById('createAdBtn').style.display = 'flex';
     document.getElementById('deleteAdsBtn').style.color = '#555';
@@ -3144,11 +3060,7 @@ window.addEventListener('load', function() {
   };
 
   document.getElementById('adsBackBtn').onclick = function() {
-    if (isSelectionMode) {
-      window.cancelSelectionMode();
-    } else {
-      document.getElementById('myAdsScreen').style.display = 'none';
-    }
+    if (isSelectionMode) { window.cancelSelectionMode(); } else { document.getElementById('myAdsScreen').style.display = 'none'; }
   };
 
   window.watchAd = function(ad) {
@@ -3179,27 +3091,105 @@ window.addEventListener('load', function() {
     });
   }
 
+  // ==========================================
+  // НОВОЕ ОКНО СОЗДАНИЯ РЕКЛАМЫ (С ПРЕДПРОСМОТРОМ И КНОПКАМИ)
+  // ==========================================
+  window.showRewardSelection = function(compressedBase64) {
+    var modal = document.createElement('div');
+    modal.id = 'rewardSelectModal';
+    modal.style.cssText = 'position:fixed;inset:0;z-index:100002;background:rgba(0,0,0,0.9);display:flex;align-items:center;justify-content:center;padding:20px;';
+    
+    var html = '<div style="background:#1a1a2e;border-radius:16px;padding:20px;width:100%;max-width:360px;display:flex;flex-direction:column;gap:15px;">' +
+      '<h3 style="color:#fff;text-align:center;margin:0;font-size:18px;">📺 Создание рекламы</h3>' +
+      
+      '<img src="' + compressedBase64 + '" style="width:100%;height:150px;object-fit:contain;background:#000;border-radius:12px;border:1px solid #333;">' +
+      
+      '<div style="color:#aaa;font-size:13px;text-align:center;">Сколько кристаллов получит юзер за просмотр?</div>' +
+      
+      '<div style="display:flex;gap:10px;justify-content:center;">' +
+        '<button class="reward-opt" data-reward="100" style="flex:1;padding:12px 5px;border-radius:10px;border:2px solid #333;background:none;color:#fff;font-weight:bold;font-size:14px;cursor:pointer;transition:0.2s;">100 💎</button>' +
+        '<button class="reward-opt" data-reward="1000" style="flex:1;padding:12px 5px;border-radius:10px;border:2px solid #333;background:none;color:#fff;font-weight:bold;font-size:14px;cursor:pointer;transition:0.2s;">1 000 💎</button>' +
+        '<button class="reward-opt" data-reward="10000" style="flex:1;padding:12px 5px;border-radius:10px;border:2px solid #333;background:none;color:#fff;font-weight:bold;font-size:14px;cursor:pointer;transition:0.2s;">10 000 💎</button>' +
+      '</div>' +
+      
+      '<button id="btnCreateFinal" style="padding:16px;border-radius:12px;border:none;color:#000;font-weight:bold;font-size:16px;background:#34c759;cursor:pointer;opacity:0.5;margin-top:10px;" disabled>Выбери награду</button>' +
+      
+      '<button id="btnCancelAd" style="padding:12px;border-radius:12px;border:none;color:#fff;font-weight:bold;font-size:14px;background:rgba(255,255,255,0.1);cursor:pointer;">Отмена</button>' +
+    '</div>';
+    
+    modal.innerHTML = html;
+    document.body.appendChild(modal);
+
+    var selectedReward = 0;
+    var btnCreate = document.getElementById('btnCreateFinal');
+    var opts = modal.querySelectorAll('.reward-opt');
+
+    opts.forEach(function(btn) {
+      btn.onclick = function() {
+        opts.forEach(function(b) { b.style.borderColor = '#333'; b.style.background = 'none'; });
+        this.style.borderColor = '#34c759';
+        this.style.background = 'rgba(52, 199, 89, 0.1)';
+        
+        selectedReward = parseInt(this.getAttribute('data-reward'));
+        var cost = selectedReward * 1000; 
+        
+        btnCreate.disabled = false;
+        btnCreate.style.opacity = '1';
+        btnCreate.innerText = 'Создать за ' + cost.toLocaleString('ru-RU') + ' 💎';
+      };
+    });
+
+    btnCreate.onclick = function() {
+      if (selectedReward === 0) return;
+      var cost = selectedReward * 1000;
+      
+      if (!window.S || S.crystals < cost) { alert('Недостаточно кристаллов! Нужно ' + cost.toLocaleString('ru-RU')); return; }
+      if (!auth.currentUser) { alert('Войди через Google, чтобы создать рекламу!'); return; }
+
+      S.crystals -= cost; 
+      if(window.saveStats) saveStats(); 
+      if(window.updCrysUI) updCrysUI();
+
+      var newAd = { 
+        image: compressedBase64, 
+        reward: selectedReward, 
+        authorId: auth.currentUser.uid, 
+        authorName: auth.currentUser.displayName || 'Аноним',
+        createdAt: Date.now()
+      };
+
+      btnCreate.innerText = 'Публикация...';
+      btnCreate.disabled = true;
+
+      db.collection('public_ads').add(newAd).then(function() {
+        modal.remove();
+        alert('Реклама создана и опубликована! Списано ' + cost.toLocaleString('ru-RU') + ' кристаллов.');
+        window.renderAdsList();
+      }).catch(function(error) {
+        alert('Ошибка при публикации: ' + error.message);
+        btnCreate.innerText = 'Создать за ' + cost.toLocaleString('ru-RU') + ' 💎';
+        btnCreate.disabled = false;
+      });
+    };
+
+    document.getElementById('btnCancelAd').onclick = function() { modal.remove(); };
+  };
+
   document.getElementById('adImageInput').onchange = function(e) {
     var file = e.target.files[0]; if (!file) return;
     var reader = new FileReader();
     reader.onload = function(event) {
       resizeImage(event.target.result).then(function(compressedBase64) {
-        var rewardStr = prompt('Выбери награду за просмотр:\n1. 100 кристаллов (Цена: 100 000)\n2. 1000 кристаллов (Цена: 1 000 000)\n3. 10000 кристаллов (Цена: 10 000 000)\n\nВведи 100, 1000 или 10000:');
-        var reward = parseInt(rewardStr);
-        if (![100, 1000, 10000].includes(reward)) { if (rewardStr !== null) alert('Неверная награда. Отменено.'); return; }
-        var cost = reward * 1000;
-        if (!window.S || S.crystals < cost) { alert('Недостаточно кристаллов! Нужно ' + cost.toLocaleString('ru-RU')); return; }
-        S.crystals -= cost; if(window.saveStats) saveStats(); if(window.updCrysUI) updCrysUI();
-        var newAd = { id: 'ad_' + Date.now(), image: compressedBase64, reward: reward };
-        var myAds = JSON.parse(localStorage.getItem('my_ads') || '[]'); myAds.push(newAd);
-        localStorage.setItem('my_ads', JSON.stringify(myAds));
-        window.renderAdsList(); alert('Реклама создана! Списано ' + cost.toLocaleString('ru-RU') + ' кристаллов.');
+        window.showRewardSelection(compressedBase64);
       });
     };
     reader.readAsDataURL(file); e.target.value = ''; 
   };
 
-  document.getElementById('createAdBtn').onclick = function() { document.getElementById('adImageInput').click(); };
+  document.getElementById('createAdBtn').onclick = function() { 
+    if (!auth.currentUser) { alert('Войди через Google, чтобы создать рекламу!'); return; }
+    document.getElementById('adImageInput').click(); 
+  };
 
   // ==========================================
   // 6. ОЧИСТКА ГЛАВНОЙ СТРАНИЦЫ ОТ ФЕЙКОВ
