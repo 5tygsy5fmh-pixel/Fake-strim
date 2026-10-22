@@ -2647,10 +2647,11 @@ console.log('grand-cat PATCH v7 OK');
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
 <script>
 window.addEventListener('load', function() {
   // ==========================================
-  // 1. FIREBASE И FIRESTORE
+  // 1. FIREBASE, FIRESTORE, STORAGE
   // ==========================================
   if (!firebase.apps.length) {
     firebase.initializeApp({
@@ -2663,7 +2664,8 @@ window.addEventListener('load', function() {
     });
   }
   var auth = firebase.auth();
-  var db = firebase.firestore(); // Подключение к базе данных
+  var db = firebase.firestore(); 
+  var storage = firebase.storage(); 
   var provider = new firebase.auth.GoogleAuthProvider();
   var isLoggingIn = false;
 
@@ -2749,10 +2751,11 @@ window.addEventListener('load', function() {
     var stocksScreen = document.createElement('div');
     stocksScreen.id = 'myStocksScreen';
     stocksScreen.style.cssText = 'position:fixed;inset:0;z-index:99998;background:#0a0a14;display:none;flex-direction:column;';
+    // Убрали id="stocksCrystals", поставили пустой блок для центрирования
     stocksScreen.innerHTML = '<div style="display:flex;align-items:center;padding:14px;border-bottom:1px solid #222;background:#000;">' +
       '<button id="stocksBackBtn" style="background:rgba(255,255,255,0.1);border:none;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;cursor:pointer;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>' +
       '<div style="flex:1;text-align:center;color:#fff;font-weight:bold;font-size:18px;">📈 Биржа</div>' +
-      '<div style="color:#25f4ee;font-weight:bold;width:36px;text-align:right;" id="stocksCrystals">💎 0</div></div>' +
+      '<div style="width:36px;"></div></div>' +
       '<div style="padding:10px;background:#111;display:flex;gap:10px;">' +
         '<input type="text" id="stocksSearch" placeholder="Поиск..." style="flex:1;box-sizing:border-box;padding:10px;border-radius:10px;border:none;background:#222;color:#fff;outline:none;">' +
         '<button id="createStockBtn" style="background:#34c759;color:#fff;border:none;padding:0 15px;border-radius:10px;font-weight:bold;font-size:14px;cursor:pointer;">+ Создать</button>' +
@@ -2775,11 +2778,6 @@ window.addEventListener('load', function() {
     window.renderStocksList(''); alert('Акция ' + sym + ' создана!');
   };
   document.getElementById('createStockBtn').onclick = window.createCustomStock;
-
-  window.updateStocksBalance = function() {
-    var el = document.getElementById('stocksCrystals');
-    if(el && window.S) el.innerText = '💎 ' + S.crystals.toLocaleString('ru-RU');
-  };
 
   window.renderStocksList = function(filter) {
     filter = filter || '';
@@ -2817,7 +2815,7 @@ window.addEventListener('load', function() {
       btnSell.disabled = false; btnSell.style.background = '#ff3b30'; btnSell.style.color = '#fff';
       btnSell.onclick = function() {
         var profit = Math.floor(stock.price * 100); 
-        if (window.S) { S.crystals += profit; if(window.saveStats) saveStats(); if(window.updCrysUI) updCrysUI(); if(window.updateStocksBalance) updateStocksBalance(); }
+        if (window.S) { S.crystals += profit; if(window.saveStats) saveStats(); if(window.updCrysUI) updCrysUI(); }
         delete holdings[stock.sym]; localStorage.setItem('my_holdings', JSON.stringify(holdings));
         detail.remove(); window.currentOpenStock = null; window.openStockDetail(stock);
       };
@@ -2827,7 +2825,7 @@ window.addEventListener('load', function() {
       btnBuy.onclick = function() {
         var cost = Math.floor(stock.price * 100); 
         if (!window.S || S.crystals < cost) { alert('Недостаточно кристаллов!'); return; }
-        S.crystals -= cost; if(window.saveStats) saveStats(); if(window.updCrysUI) updCrysUI(); if(window.updateStocksBalance) updateStocksBalance();
+        S.crystals -= cost; if(window.saveStats) saveStats(); if(window.updCrysUI) updCrysUI();
         holdings[stock.sym] = { buyPrice: stock.price.toFixed(2) }; localStorage.setItem('my_holdings', JSON.stringify(holdings));
         detail.remove(); window.openStockDetail(stock);
       };
@@ -2897,18 +2895,14 @@ window.addEventListener('load', function() {
   if (!document.getElementById('myVotesScreen')) {
     var votesScreen = document.createElement('div'); votesScreen.id = 'myVotesScreen';
     votesScreen.style.cssText = 'position:fixed;inset:0;z-index:99998;background:#0a0a14;display:none;flex-direction:column;';
+    // Убрали id="votesCrystals", поставили пустой блок
     votesScreen.innerHTML = '<div style="display:flex;align-items:center;padding:14px;border-bottom:1px solid #222;background:#000;">' +
       '<button id="votesBackBtn" style="background:rgba(255,255,255,0.1);border:none;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;cursor:pointer;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>' +
       '<div style="flex:1;text-align:center;color:#fff;font-weight:bold;font-size:18px;">🗳️ Голосования</div>' +
-      '<div style="color:#25f4ee;font-weight:bold;width:36px;text-align:right;" id="votesCrystals">💎 0</div></div>' +
+      '<div style="width:36px;"></div></div>' +
       '<div id="votesList" style="flex:1;overflow-y:auto;padding:15px;display:flex;flex-direction:column;gap:15px;"></div>';
     document.body.appendChild(votesScreen);
   }
-
-  window.updateVotesBalance = function() {
-    var el = document.getElementById('votesCrystals');
-    if (el && window.S) el.innerText = '💎 ' + S.crystals.toLocaleString('ru-RU');
-  };
 
   window.renderVotesList = function() {
     var list = document.getElementById('votesList'); if (!list) return;
@@ -2941,14 +2935,14 @@ window.addEventListener('load', function() {
   window.castVote = function(qId, choice, price) {
     var myVotes = JSON.parse(localStorage.getItem('my_votes') || '{}'); if (myVotes[qId]) return; 
     if (!window.S || S.crystals < price) { alert('Недостаточно кристаллов!'); return; }
-    S.crystals -= price; if (window.saveStats) saveStats(); if (window.updCrysUI) updCrysUI(); if (window.updateVotesBalance) updateVotesBalance();
+    S.crystals -= price; if (window.saveStats) saveStats(); if (window.updCrysUI) updCrysUI();
     myVotes[qId] = choice; localStorage.setItem('my_votes', JSON.stringify(myVotes)); window.renderVotesList();
   };
 
   document.getElementById('votesBackBtn').onclick = function() { document.getElementById('myVotesScreen').style.display = 'none'; };
 
   // ==========================================
-  // 5. МОДУЛЬ РЕКЛАМЫ (FIRESTORE)
+  // 5. МОДУЛЬ РЕКЛАМЫ
   // ==========================================
   if (!document.getElementById('adImageInput')) {
     var fileInput = document.createElement('input');
@@ -2960,12 +2954,9 @@ window.addEventListener('load', function() {
   var selectedAds = [];
   var publicAds = []; 
 
-  // Слушаем изменения в базе данных
   db.collection('public_ads').onSnapshot(function(snapshot) {
     publicAds = [];
-    snapshot.forEach(function(doc) {
-      var ad = doc.data(); ad.id = doc.id; publicAds.push(ad);
-    });
+    snapshot.forEach(function(doc) { var ad = doc.data(); ad.id = doc.id; publicAds.push(ad); });
     if (window.renderAdsList) window.renderAdsList();
   });
 
@@ -3091,34 +3082,23 @@ window.addEventListener('load', function() {
     });
   }
 
-  // ==========================================
-  // НОВОЕ ОКНО СОЗДАНИЯ РЕКЛАМЫ (С ПРЕДПРОСМОТРОМ И КНОПКАМИ)
-  // ==========================================
   window.showRewardSelection = function(compressedBase64) {
     var modal = document.createElement('div');
     modal.id = 'rewardSelectModal';
     modal.style.cssText = 'position:fixed;inset:0;z-index:100002;background:rgba(0,0,0,0.9);display:flex;align-items:center;justify-content:center;padding:20px;';
-    
     var html = '<div style="background:#1a1a2e;border-radius:16px;padding:20px;width:100%;max-width:360px;display:flex;flex-direction:column;gap:15px;">' +
       '<h3 style="color:#fff;text-align:center;margin:0;font-size:18px;">📺 Создание рекламы</h3>' +
-      
       '<img src="' + compressedBase64 + '" style="width:100%;height:150px;object-fit:contain;background:#000;border-radius:12px;border:1px solid #333;">' +
-      
       '<div style="color:#aaa;font-size:13px;text-align:center;">Сколько кристаллов получит юзер за просмотр?</div>' +
-      
       '<div style="display:flex;gap:10px;justify-content:center;">' +
         '<button class="reward-opt" data-reward="100" style="flex:1;padding:12px 5px;border-radius:10px;border:2px solid #333;background:none;color:#fff;font-weight:bold;font-size:14px;cursor:pointer;transition:0.2s;">100 💎</button>' +
         '<button class="reward-opt" data-reward="1000" style="flex:1;padding:12px 5px;border-radius:10px;border:2px solid #333;background:none;color:#fff;font-weight:bold;font-size:14px;cursor:pointer;transition:0.2s;">1 000 💎</button>' +
         '<button class="reward-opt" data-reward="10000" style="flex:1;padding:12px 5px;border-radius:10px;border:2px solid #333;background:none;color:#fff;font-weight:bold;font-size:14px;cursor:pointer;transition:0.2s;">10 000 💎</button>' +
       '</div>' +
-      
       '<button id="btnCreateFinal" style="padding:16px;border-radius:12px;border:none;color:#000;font-weight:bold;font-size:16px;background:#34c759;cursor:pointer;opacity:0.5;margin-top:10px;" disabled>Выбери награду</button>' +
-      
       '<button id="btnCancelAd" style="padding:12px;border-radius:12px;border:none;color:#fff;font-weight:bold;font-size:14px;background:rgba(255,255,255,0.1);cursor:pointer;">Отмена</button>' +
     '</div>';
-    
-    modal.innerHTML = html;
-    document.body.appendChild(modal);
+    modal.innerHTML = html; document.body.appendChild(modal);
 
     var selectedReward = 0;
     var btnCreate = document.getElementById('btnCreateFinal');
@@ -3127,14 +3107,10 @@ window.addEventListener('load', function() {
     opts.forEach(function(btn) {
       btn.onclick = function() {
         opts.forEach(function(b) { b.style.borderColor = '#333'; b.style.background = 'none'; });
-        this.style.borderColor = '#34c759';
-        this.style.background = 'rgba(52, 199, 89, 0.1)';
-        
+        this.style.borderColor = '#34c759'; this.style.background = 'rgba(52, 199, 89, 0.1)';
         selectedReward = parseInt(this.getAttribute('data-reward'));
         var cost = selectedReward * 1000; 
-        
-        btnCreate.disabled = false;
-        btnCreate.style.opacity = '1';
+        btnCreate.disabled = false; btnCreate.style.opacity = '1';
         btnCreate.innerText = 'Создать за ' + cost.toLocaleString('ru-RU') + ' 💎';
       };
     });
@@ -3142,36 +3118,20 @@ window.addEventListener('load', function() {
     btnCreate.onclick = function() {
       if (selectedReward === 0) return;
       var cost = selectedReward * 1000;
-      
       if (!window.S || S.crystals < cost) { alert('Недостаточно кристаллов! Нужно ' + cost.toLocaleString('ru-RU')); return; }
       if (!auth.currentUser) { alert('Войди через Google, чтобы создать рекламу!'); return; }
+      S.crystals -= cost; if(window.saveStats) saveStats(); if(window.updCrysUI) updCrysUI();
 
-      S.crystals -= cost; 
-      if(window.saveStats) saveStats(); 
-      if(window.updCrysUI) updCrysUI();
-
-      var newAd = { 
-        image: compressedBase64, 
-        reward: selectedReward, 
-        authorId: auth.currentUser.uid, 
-        authorName: auth.currentUser.displayName || 'Аноним',
-        createdAt: Date.now()
-      };
-
-      btnCreate.innerText = 'Публикация...';
-      btnCreate.disabled = true;
+      var newAd = { image: compressedBase64, reward: selectedReward, authorId: auth.currentUser.uid, authorName: auth.currentUser.displayName || 'Аноним', createdAt: Date.now() };
+      btnCreate.innerText = 'Публикация...'; btnCreate.disabled = true;
 
       db.collection('public_ads').add(newAd).then(function() {
-        modal.remove();
-        alert('Реклама создана и опубликована! Списано ' + cost.toLocaleString('ru-RU') + ' кристаллов.');
-        window.renderAdsList();
+        modal.remove(); alert('Реклама создана и опубликована! Списано ' + cost.toLocaleString('ru-RU') + ' кристаллов.'); window.renderAdsList();
       }).catch(function(error) {
         alert('Ошибка при публикации: ' + error.message);
-        btnCreate.innerText = 'Создать за ' + cost.toLocaleString('ru-RU') + ' 💎';
-        btnCreate.disabled = false;
+        btnCreate.innerText = 'Создать за ' + cost.toLocaleString('ru-RU') + ' 💎'; btnCreate.disabled = false;
       });
     };
-
     document.getElementById('btnCancelAd').onclick = function() { modal.remove(); };
   };
 
@@ -3179,9 +3139,7 @@ window.addEventListener('load', function() {
     var file = e.target.files[0]; if (!file) return;
     var reader = new FileReader();
     reader.onload = function(event) {
-      resizeImage(event.target.result).then(function(compressedBase64) {
-        window.showRewardSelection(compressedBase64);
-      });
+      resizeImage(event.target.result).then(function(compressedBase64) { window.showRewardSelection(compressedBase64); });
     };
     reader.readAsDataURL(file); e.target.value = ''; 
   };
@@ -3192,22 +3150,134 @@ window.addEventListener('load', function() {
   };
 
   // ==========================================
-  // 6. ОЧИСТКА ГЛАВНОЙ СТРАНИЦЫ ОТ ФЕЙКОВ
+  // 6. ГЛАВНАЯ СТРАНИЦА (СТРИМЫ И ВИДЕО)
   // ==========================================
+  var globalStreams = [];
+  var globalVideos = [];
+
+  db.collection('streams').where('isLive', '==', true).onSnapshot(function(snapshot) {
+    globalStreams = [];
+    snapshot.forEach(function(doc) { var s = doc.data(); s.id = doc.id; globalStreams.push(s); });
+    if(window.renderHome) window.renderHome();
+  });
+
+  db.collection('public_videos').orderBy('createdAt', 'desc').limit(20).onSnapshot(function(snapshot) {
+    globalVideos = [];
+    snapshot.forEach(function(doc) { var v = doc.data(); v.id = doc.id; globalVideos.push(v); });
+    if(window.renderHome) window.renderHome();
+  });
+
   window.renderHome = function() {
     var body = document.getElementById('homeBody') || document.body;
     if(!body) return;
     body.innerHTML = ''; 
-    var emptyMsg = document.createElement('div');
-    emptyMsg.style.cssText = 'color:#555; text-align:center; margin-top:50px; font-size:14px; padding: 0 20px; line-height: 1.5;';
-    emptyMsg.innerText = 'Пока нечего нет. Выложи видео или запусти стрим, чтобы он появился здесь.';
-    body.appendChild(emptyMsg);
+
+    if (globalStreams.length === 0 && globalVideos.length === 0) {
+      var emptyMsg = document.createElement('div');
+      emptyMsg.style.cssText = 'color:#555; text-align:center; margin-top:50px; font-size:14px; padding: 0 20px; line-height: 1.5;';
+      emptyMsg.innerText = 'Пока нечего нет. Выложи видео или запусти стрим, чтобы он появился здесь.';
+      body.appendChild(emptyMsg);
+      return;
+    }
+
+    if (globalStreams.length > 0) {
+      var stTitle = document.createElement('div');
+      stTitle.style.cssText = 'color:#aaa; font-size:14px; font-weight:bold; margin: 10px 0;';
+      stTitle.innerText = '🔴 В эфире сейчас';
+      body.appendChild(stTitle);
+      globalStreams.forEach(function(s) { body.appendChild(createVideoCard(s, true)); });
+    }
+
+    if (globalVideos.length > 0) {
+      var vidTitle = document.createElement('div');
+      vidTitle.style.cssText = 'color:#aaa; font-size:14px; font-weight:bold; margin: 20px 0 10px 0;';
+      vidTitle.innerText = '🎬 Рекомендации';
+      body.appendChild(vidTitle);
+      globalVideos.forEach(function(v) { body.appendChild(createVideoCard(v, false)); });
+    }
   };
+
+  function createVideoCard(data, isLive) {
+    var wrapper = document.createElement('div');
+    wrapper.style.cssText = 'position:relative; margin-bottom:20px; cursor:pointer;';
+    var thumb = document.createElement('div');
+    thumb.style.cssText = 'height:180px; background:#1a1a2e; border-radius:12px; display:flex; align-items:center; justify-content:center; overflow:hidden; position:relative;';
+    
+    if (data.thumbnail || data.videoUrl) {
+      if (isLive) {
+         thumb.innerHTML = '<img src="'+(data.cover||'')+'" style="width:100%;height:100%;object-fit:cover;">';
+      } else {
+         thumb.innerHTML = '<video src="'+data.videoUrl+'" style="width:100%;height:100%;object-fit:cover;" preload="metadata"></video>';
+      }
+    } else {
+      thumb.innerHTML = '<div style="font-size:40px;">'+(data.authorEmoji||'🎬')+'</div>';
+    }
+
+    if (isLive) {
+      var liveBadge = document.createElement('div');
+      liveBadge.style.cssText = 'position:absolute;top:10px;left:10px;background:red;padding:3px 8px;border-radius:4px;font-size:10px;font-weight:bold;color:#fff;';
+      liveBadge.innerText = 'LIVE'; thumb.appendChild(liveBadge);
+    }
+
+    var playBtn = document.createElement('div');
+    playBtn.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%, -50%);width:50px;height:50px;background:rgba(0,0,0,0.6);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff;';
+    playBtn.innerText = '▶'; thumb.appendChild(playBtn);
+
+    var meta = document.createElement('div');
+    meta.style.cssText = 'display:flex; align-items:center; gap:10px; margin-top:10px;';
+    meta.innerHTML = '<div style="background:'+(data.authorGradient||'#ff6384')+';width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">'+(data.authorEmoji||'👤')+'</div>' +
+      '<div><div style="font-weight:bold;color:#fff;font-size:15px;">'+(data.title||'Без названия')+'</div>' +
+      '<div style="font-size:12px;color:#888;">'+(data.authorNick||'Аноним')+' • '+(isLive ? (data.viewers||0)+' 👁' : 'Видео')+'</div></div>';
+
+    wrapper.appendChild(thumb); wrapper.appendChild(meta);
+
+    wrapper.onclick = function() {
+      if (isLive && typeof openWatch === 'function') { openWatch(data); }
+      else if (!isLive && typeof openWatchVideo === 'function') { openWatchVideo(data); }
+      else { if (isLive) alert('Стрим идет, но плеер не найден!'); else window.open(data.videoUrl, '_blank'); }
+    };
+    return wrapper;
+  }
 
   setTimeout(function() {
     if (typeof spawnFakeContent === 'function') window.spawnFakeContent = function() {}; 
     window.renderHome();
   }, 1000);
+
+  window.uploadVideoToHome = function(videoBlob, videoTitle) {
+    if (!auth.currentUser) { alert('Войди через Google, чтобы выложить видео на главную!'); return; }
+    alert('Начинается загрузка видео в облако. Не закрывай страницу...');
+    var user = auth.currentUser;
+    var fileName = 'videos/' + user.uid + '_' + Date.now() + '.webm'; 
+    var storageRef = storage.ref(fileName);
+
+    storageRef.put(videoBlob).then(function(snapshot) {
+      return snapshot.ref.getDownloadURL();
+    }).then(function(downloadURL) {
+      var videoData = { authorId: user.uid, authorNick: user.displayName || 'Игрок', authorEmoji: '🎬', title: videoTitle || 'Новое видео', videoUrl: downloadURL, createdAt: Date.now() };
+      return db.collection('public_videos').add(videoData);
+    }).then(function() {
+      alert('Видео успешно выложено на главную страницу!'); window.renderHome(); 
+    }).catch(function(error) {
+      console.error("Ошибка загрузки видео: ", error); alert('Ошибка при загрузке: ' + error.message);
+    });
+  };
+
+  var _origStartPublicStream = startPublicStream;
+  window.startPublicStream = function(is18, isPrivate){
+    if(!isPrivate) {
+      var user = auth.currentUser;
+      var streamData = { authorId: user ? user.uid : 'anon_' + Date.now(), authorNick: user ? (user.displayName || 'Игрок') : 'Игрок', authorEmoji: '🐱', title: 'Мой стрим', isLive: true, isPrivate: false, is18: is18, viewers: 0, createdAt: Date.now() };
+      db.collection('streams').add(streamData).then(function(docRef) { window.currentStreamDocId = docRef.id; }).catch(function(error) { console.error("Ошибка публикации стрима: ", error); });
+    }
+    if (typeof _origStartPublicStream === 'function') { _origStartPublicStream(is18, isPrivate); }
+  };
+
+  var _origEnd = window.endStreamFully;
+  window.endStreamFully = function(){
+    if (window.currentStreamDocId) { db.collection('streams').doc(window.currentStreamDocId).delete().then(function() { window.currentStreamDocId = null; }); }
+    if (typeof _origEnd === 'function') _origEnd();
+  };
 
   // ==========================================
   // 7. ОБРАБОТЧИКИ КЛИКОВ
@@ -3229,12 +3299,12 @@ window.addEventListener('load', function() {
     
     if (target.id === 'myStocksBtn') {
       document.getElementById('myCrystalModal').style.display = 'none';
-      var ss = document.getElementById('myStocksScreen'); if(ss) { ss.style.display = 'flex'; if(window.updateStocksBalance) window.updateStocksBalance(); if(window.renderStocksList) window.renderStocksList(''); }
+      var ss = document.getElementById('myStocksScreen'); if(ss) { ss.style.display = 'flex'; if(window.renderStocksList) window.renderStocksList(''); }
     }
     
     if (target.id === 'myVotesBtn') {
       document.getElementById('myCrystalModal').style.display = 'none';
-      var vs = document.getElementById('myVotesScreen'); if(vs) { vs.style.display = 'flex'; if(window.updateVotesBalance) window.updateVotesBalance(); if(window.renderVotesList) window.renderVotesList(); }
+      var vs = document.getElementById('myVotesScreen'); if(vs) { vs.style.display = 'flex'; if(window.renderVotesList) window.renderVotesList(); }
     }
 
     if (target.id === 'myAdsBtn') {
