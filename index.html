@@ -2729,7 +2729,7 @@ window.addEventListener('load', function() {
   document.getElementById('adsBackBtn').onclick = function() { document.getElementById('myAdsScreen').style.display = 'none'; };
 
   // ==========================================
-  // 5. ГЛАВНАЯ СТРАНИЦА (ВИДЕО И СТРИМЫ)
+  // 5. ГЛАВНАЯ СТРАНИЦА
   // ==========================================
   var globalStreams = [];
   var globalVideos = [];
@@ -2791,7 +2791,7 @@ window.addEventListener('load', function() {
   };
 
   // ==========================================
-  // 6. ПРОСМОТР ВИДЕО (ЛАЙКИ, КОММЕНТЫ)
+  // 6. ПРОСМОТР ВИДЕО
   // ==========================================
   window.openVideoViewer = function(video) {
     var viewer = document.createElement('div');
@@ -2987,60 +2987,82 @@ window.addEventListener('load', function() {
   };
 
   // ==========================================
-  // 9. ИНЪЕКЦИЯ КНОПКИ ПИП В ИНТЕРФЕЙС ИГРЫ (ЖЕСТКО)
+  // 9. ВСТРАИВАНИЕ КНОПКИ ПИП В ПАНЕЛЬ УПРАВЛЕНИЯ (ПОД СМАЙЛИК)
   // ==========================================
   setInterval(function() {
-    // Проверяем, открыт ли экран стримера по наличию слова "30.0K" или "REC"
-    var isStreamUIOpen = document.body.innerText.includes('30.0K') || document.body.innerText.includes('REC');
+    // Проверяем, открыт ли стрим
+    var isStreamUIOpen = document.body.innerText.includes('REC');
 
-    if (isStreamUIOpen && !document.getElementById('gamePipButton')) {
-        var pipBtn = document.createElement('div');
-        pipBtn.id = 'gamePipButton';
-        // Жестко позиционируем справа, на уровне кнопки поворота камеры
-        pipBtn.style.cssText = 'position: fixed; right: 15px; top: 33%; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 2147483647;';
+    // Если стрим открыт, ищем панель с кнопками (где кнопка микрофона/смайлик)
+    if (isStreamUIOpen && !document.getElementById('inlinePipBtn')) {
         
-        // Иконка ПиП (два прямоугольника)
-        pipBtn.innerHTML = `
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="white">
-               <path d="M19 11h-8v6h8v-6zm4 8V4.98C23 3.88 22.1 3 21 3H3c-1.1 0-2 .88-2 1.98V19c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2zm-2 .02H3V4.97h18v14.05z"/>
-            </svg>
-        `;
-        document.body.appendChild(pipBtn);
+        // Ищем контейнер с кнопками по правому краю (там где иконки)
+        var containers = document.querySelectorAll('div');
+        var rightToolbar = null;
 
-        // Логика запуска записи экрана
-        pipBtn.onclick = function() {
-            if (navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia) {
-                navigator.mediaDevices.getDisplayMedia({ video: true }).then(function(stream) {
-                    var pipWindow = document.createElement('div');
-                    pipWindow.id = 'gamePipWindow';
-                    pipWindow.style.cssText = 'position:fixed; top:20px; left:20px; width:200px; height:300px; background:#000; z-index:2147483647; border:2px solid #ff2850; border-radius:12px; display:flex; flex-direction:column; overflow:hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.5);';
-                    
-                    pipWindow.innerHTML = `
-                        <div style="background:#222; color:#fff; padding:8px; font-size:12px; display:flex; justify-content:space-between;">
-                            <span>Вы в эфире</span>
-                            <button id="stopPipBtn" style="background:red; color:#fff; border:none; border-radius:4px; padding:2px 8px; cursor:pointer;">Стоп</button>
-                        </div>
-                        <video id="pipVideoEl" autoplay muted style="flex:1; object-fit:cover; width:100%;"></video>
-                    `;
-                    document.body.appendChild(pipWindow);
-                    document.getElementById('pipVideoEl').srcObject = stream;
-
-                    document.getElementById('stopPipBtn').onclick = function() {
-                        stream.getTracks().forEach(track => track.stop());
-                        pipWindow.remove();
-                    };
-                }).catch(function(err) {
-                    alert("Ошибка: браузер не разрешил запись экрана. (На iPhone это не работает).");
-                });
-            } else {
-                alert("Твой браузер не поддерживает ПиП (getDisplayMedia).");
+        for (var i = 0; i < containers.length; i++) {
+            var el = containers[i];
+            // Ищем блок, в котором лежит несколько svg (микрофон, камера, смайл)
+            if (el.querySelectorAll('svg').length >= 2 && el.getBoundingClientRect().left > window.innerWidth / 2) {
+                rightToolbar = el;
+                break;
             }
-        };
+        }
+
+        if (rightToolbar) {
+            // Создаем кнопку ПиП
+            var pipBtn = document.createElement('div');
+            pipBtn.id = 'inlinePipBtn';
+            
+            // Стилизуем её как остальные кнопки в панели (без position: fixed!)
+            pipBtn.style.cssText = 'width: 45px; height: 45px; margin-top: 20px; display: flex; align-items: center; justify-content: center; cursor: pointer;';
+            
+            // Иконка ПиП
+            pipBtn.innerHTML = `
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect>
+                    <rect x="12" y="12" width="8" height="6" fill="white"></rect>
+                </svg>
+            `;
+
+            // Вставляем кнопку В КОНЕЦ панели (под смайлик)
+            rightToolbar.appendChild(pipBtn);
+
+            // Логика запуска записи экрана
+            pipBtn.onclick = function() {
+                if (navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia) {
+                    navigator.mediaDevices.getDisplayMedia({ video: true }).then(function(stream) {
+                        var pipWindow = document.createElement('div');
+                        pipWindow.id = 'gamePipWindow';
+                        pipWindow.style.cssText = 'position:fixed; top:20px; left:20px; width:200px; height:300px; background:#000; z-index:10000; border:2px solid #ff2850; border-radius:12px; display:flex; flex-direction:column; overflow:hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.5);';
+                        
+                        pipWindow.innerHTML = `
+                            <div style="background:#222; color:#fff; padding:8px; font-size:12px; display:flex; justify-content:space-between;">
+                                <span>Вы в эфире</span>
+                                <button id="stopPipBtn" style="background:red; color:#fff; border:none; border-radius:4px; padding:2px 8px; cursor:pointer;">Стоп</button>
+                            </div>
+                            <video id="pipVideoEl" autoplay muted style="flex:1; object-fit:cover; width:100%;"></video>
+                        `;
+                        document.body.appendChild(pipWindow);
+                        document.getElementById('pipVideoEl').srcObject = stream;
+
+                        document.getElementById('stopPipBtn').onclick = function() {
+                            stream.getTracks().forEach(track => track.stop());
+                            pipWindow.remove();
+                        };
+                    }).catch(function(err) {
+                        alert("Ошибка: браузер не разрешил запись экрана.");
+                    });
+                } else {
+                    alert("Твой браузер не поддерживает ПиП.");
+                }
+            };
+        }
     }
 
     // Если стрим закрыт, удаляем кнопку и окошко
     if (!isStreamUIOpen) {
-        var btn = document.getElementById('gamePipButton');
+        var btn = document.getElementById('inlinePipBtn');
         if (btn) btn.remove();
         var pipWin = document.getElementById('gamePipWindow');
         if (pipWin) pipWin.remove();
