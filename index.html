@@ -3178,5 +3178,77 @@ setInterval(function() {
     }
 }, 1000); // Проверяем каждую секунду
 </script>
+<script>
+// Скрипт, который жестко добавляет кнопку ПиП в интерфейс стрима
+const pipObserver = new MutationObserver(function(mutations) {
+    // Проверяем, открыт ли экран стрима (ищем метки LIVE и REC)
+    const isLive = Array.from(document.querySelectorAll('div, span')).some(el => el.innerText === 'LIVE');
+    const isRec = Array.from(document.querySelectorAll('div, span')).some(el => el.innerText === 'REC');
+
+    if (isLive && isRec && !document.getElementById('myHardcodedPipBtn')) {
+        // Создаем кнопку ПиП
+        const pipBtn = document.createElement('div');
+        pipBtn.id = 'myHardcodedPipBtn';
+        
+        // Позиционируем ее СПРАВА, прямо под кнопкой переворота камеры (примерно 30% от верха)
+        pipBtn.style.cssText = 'position: fixed; right: 15px; top: 33%; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 999999; background: rgba(0,0,0,0.3); border-radius: 50%;';
+        
+        // Иконка ПиП (два прямоугольника)
+        pipBtn.innerHTML = `
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="white">
+               <path d="M19 11h-8v6h8v-6zm4 8V4.98C23 3.88 22.1 3 21 3H3c-1.1 0-2 .88-2 1.98V19c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2zm-2 .02H3V4.97h18v14.05z"/>
+            </svg>
+        `;
+
+        document.body.appendChild(pipBtn);
+
+        // Логика работы при нажатии
+        pipBtn.onclick = function() {
+            if (navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia) {
+                navigator.mediaDevices.getDisplayMedia({ video: true }).then(function(stream) {
+                    
+                    // Создаем маленькое окошко (ПиП)
+                    const pipWindow = document.createElement('div');
+                    pipWindow.id = 'myPipWindow';
+                    pipWindow.style.cssText = 'position:fixed; top:20px; left:20px; width:220px; height:320px; background:#000; z-index:9999999; border:2px solid #ff2850; border-radius:12px; display:flex; flex-direction:column; overflow:hidden; box-shadow: 0 0 20px rgba(0,0,0,0.8);';
+                    
+                    pipWindow.innerHTML = `
+                        <div style="background:#222; color:#fff; padding:8px; font-size:12px; display:flex; justify-content:space-between; font-family:sans-serif;">
+                            <span>Вы в эфире (ПиП)</span>
+                            <button id="stopPipBtn" style="background:red; color:#fff; border:none; border-radius:4px; padding:2px 8px; cursor:pointer;">Стоп</button>
+                        </div>
+                        <video id="pipVideoEl" autoplay muted style="flex:1; object-fit:cover; width:100%;"></video>
+                    `;
+                    document.body.appendChild(pipWindow);
+                    
+                    // Включаем видеопоток
+                    document.getElementById('pipVideoEl').srcObject = stream;
+
+                    // Кнопка остановки
+                    document.getElementById('stopPipBtn').onclick = function() {
+                        stream.getTracks().forEach(track => track.stop());
+                        pipWindow.remove();
+                    };
+                }).catch(function(err) {
+                    alert("Ты отменил запись экрана или браузер заблокировал её.");
+                });
+            } else {
+                alert("Твой браузер не поддерживает запись экрана (getDisplayMedia).");
+            }
+        };
+    }
+
+    // Если стрим закрыли, удаляем кнопку и окошко
+    if (!isLive && !isRec) {
+        const btn = document.getElementById('myHardcodedPipBtn');
+        if (btn) btn.remove();
+        const pipWin = document.getElementById('myPipWindow');
+        if (pipWin) pipWin.remove();
+    }
+});
+
+// Запускаем слежку за изменениями на экране
+pipObserver.observe(document.body, { childList: true, subtree: true });
+</script>
 </body>
 </html>
