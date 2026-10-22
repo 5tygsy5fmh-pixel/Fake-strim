@@ -2650,9 +2650,7 @@ console.log('grand-cat PATCH v7 OK');
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
 <script>
 window.addEventListener('load', function() {
-  // ==========================================
   // 1. FIREBASE
-  // ==========================================
   if (!firebase.apps.length) {
     firebase.initializeApp({
       apiKey: "AIzaSyAUIrQTOW_aDL6ziFVpXerHf6pPD6waRI8",
@@ -2679,9 +2677,7 @@ window.addEventListener('load', function() {
     });
   };
 
-  // ==========================================
   // 2. ОКНО КРИСТАЛЛОВ
-  // ==========================================
   if (!document.getElementById('myCrystalModal')) {
     var mod = document.createElement('div');
     mod.id = 'myCrystalModal';
@@ -2696,9 +2692,7 @@ window.addEventListener('load', function() {
     document.body.appendChild(mod);
   }
 
-  // ==========================================
   // 3. ГОЛОСОВАНИЯ
-  // ==========================================
   if (!document.getElementById('myVotesScreen')) {
     var votesScreen = document.createElement('div'); votesScreen.id = 'myVotesScreen';
     votesScreen.style.cssText = 'position:fixed;inset:0;z-index:99998;background:#0a0a14;display:none;flex-direction:column;';
@@ -2710,9 +2704,7 @@ window.addEventListener('load', function() {
   }
   document.getElementById('votesBackBtn').onclick = function() { document.getElementById('myVotesScreen').style.display = 'none'; };
 
-  // ==========================================
   // 4. РЕКЛАМА
-  // ==========================================
   if (!document.getElementById('myAdsScreen')) {
     var adsScreen = document.createElement('div'); adsScreen.id = 'myAdsScreen';
     adsScreen.style.cssText = 'position:fixed;inset:0;z-index:99998;background:#0a0a14;display:none;flex-direction:column;';
@@ -2728,9 +2720,7 @@ window.addEventListener('load', function() {
   }
   document.getElementById('adsBackBtn').onclick = function() { document.getElementById('myAdsScreen').style.display = 'none'; };
 
-  // ==========================================
   // 5. ГЛАВНАЯ (СТРИМЫ И ВИДЕО ВМЕСТЕ)
-  // ==========================================
   var globalStreams = [];
   var globalVideos = [];
 
@@ -2794,13 +2784,10 @@ window.addEventListener('load', function() {
     });
   };
 
-  // ==========================================
-  // 6. ПРОСМОТР ВИДЕО (ЛАЙКИ, КОММЕНТЫ)
-  // ==========================================
+  // 6. ПРОСМОТР ВИДЕО
   window.openVideoViewer = function(video) {
     var viewer = document.createElement('div');
     viewer.style.cssText = 'position:fixed;inset:0;z-index:100000;background:#000;display:flex;flex-direction:column;';
-    
     viewer.innerHTML = `
       <div style="display:flex; justify-content:space-between; padding:15px; background:#111; z-index:10;">
         <button id="closeVideoViewer" style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer;">✕</button>
@@ -2859,20 +2846,30 @@ window.addEventListener('load', function() {
       commentsRef.add({ author: auth.currentUser.displayName || 'Игрок', text: text, createdAt: Date.now() });
       document.getElementById('videoCommentInput').value = '';
     };
-
-    document.getElementById('saveVideoBtn').onclick = function() { alert('Видео сохранено!'); };
   };
 
-  // ==========================================
-  // 7. МЕНЮ СТРИМА (ЧАТ + ДОНАТЫ)
-  // ==========================================
+  // 7. МЕНЮ СТРИМА (С КНОПКОЙ ПИП)
   window.openStreamViewer = function(stream) {
     var viewer = document.createElement('div');
     viewer.style.cssText = 'position:fixed;inset:0;z-index:100000;background:#000;display:flex;flex-direction:column;';
     
+    // Проверяем, является ли текущий юзер автором стрима
+    var isMyStream = auth.currentUser && stream.authorId === auth.currentUser.uid;
+    var pipButtonHTML = isMyStream ? `
+      <button id="pipBtn" style="background:none; border:none; cursor:pointer; padding:5px;">
+        <!-- Твоя иконка ПиП (2 прямоугольника) -->
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="white">
+           <path d="M19 11h-8v6h8v-6zm4 8V4.98C23 3.88 22.1 3 21 3H3c-1.1 0-2 .88-2 1.98V19c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2zm-2 .02H3V4.97h18v14.05z"/>
+        </svg>
+      </button>
+    ` : '';
+
     viewer.innerHTML = `
       <div style="display:flex; justify-content:space-between; padding:15px; background:#111; align-items:center;">
-        <button id="closeStreamViewer" style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer;">✕</button>
+        <div style="display:flex; align-items:center;">
+          <button id="closeStreamViewer" style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer;">✕</button>
+          ${pipButtonHTML}
+        </div>
         <div style="color:#fff; font-weight:bold;">${stream.title}</div>
         <div style="color:#fff; font-size:12px;">👁 ${stream.viewers||0}</div>
       </div>
@@ -2901,6 +2898,36 @@ window.addEventListener('load', function() {
     document.body.appendChild(viewer);
 
     document.getElementById('closeStreamViewer').onclick = function() { viewer.remove(); };
+
+    // Логика кнопки ПиП
+    if (isMyStream) {
+      document.getElementById('pipBtn').onclick = function() {
+        navigator.mediaDevices.getDisplayMedia({ video: true }).then(function(screenStream) {
+          var pip = document.createElement('div');
+          pip.id = 'streamerPip';
+          pip.style.cssText = 'position:fixed; top:10px; left:10px; width:200px; height:300px; background:#000; z-index:999999; border:2px solid #ff2850; border-radius:12px; display:flex; flex-direction:column; overflow:hidden;';
+          pip.innerHTML = `
+            <div style="background:#111; color:#fff; padding:5px; font-size:10px; display:flex; justify-content:space-between;">
+               <span>Вы в эфире</span>
+               <button id="stopStreamBtn" style="background:red; color:#fff; border:none; border-radius:4px; cursor:pointer;">Стоп</button>
+            </div>
+            <video id="pipVideo" autoplay muted style="flex:1; object-fit:cover; width:100%;"></video>
+            <div id="pipChat" style="height:80px; background:#0a0a14; overflow-y:auto; padding:5px; font-size:10px; color:#fff;"></div>
+          `;
+          document.body.appendChild(pip);
+          document.getElementById('pipVideo').srcObject = screenStream;
+
+          document.getElementById('stopStreamBtn').onclick = function() {
+              screenStream.getTracks().forEach(track => track.stop());
+              pip.remove();
+          };
+          // Закрываем меню просмотра, оставляя только ПиП
+          viewer.remove();
+        }).catch(function(err) {
+          alert("Не удалось начать запись экрана.");
+        });
+      };
+    }
 
     var chatRef = db.collection('streams').doc(stream.id).collection('messages');
     chatRef.orderBy('createdAt', 'asc').onSnapshot(function(snap) {
@@ -2964,15 +2991,11 @@ window.addEventListener('load', function() {
     };
   };
 
-  // ==========================================
-  // 8. ЗАПУСК СТРИМА (ИСПОЛЬЗУЕМ ИГРОВОЙ НИКНЕЙМ)
-  // ==========================================
+  // 8. ЗАПУСК СТРИМА
   var _origStartPublicStream = startPublicStream;
   window.startPublicStream = function(is18, isPrivate){
     var user = auth.currentUser;
     if(!isPrivate && user) {
-      
-      // БЕРЕМ ТВОЙ НИК ИЗ ИГРЫ (S.nick)
       var myGameNick = (window.S && S.nick) ? S.nick : 'Игрок_' + Math.floor(Math.random()*1000);
       var myGameAvatar = (window.S && S.avatar) ? S.avatar : 'https://via.placeholder.com/150'; 
 
@@ -2986,39 +3009,12 @@ window.addEventListener('load', function() {
       
       db.collection('streams').add(streamData).then(function(docRef) {
         window.currentStreamDocId = docRef.id;
-        // Запускаем ПиП
-        navigator.mediaDevices.getDisplayMedia({ video: true }).then(function(stream) {
-          window.currentScreenStream = stream;
-          var pip = document.createElement('div');
-          pip.id = 'streamerPip';
-          pip.style.cssText = 'position:fixed; top:10px; left:10px; width:200px; height:300px; background:#000; z-index:999999; border:2px solid #ff2850; border-radius:12px; display:flex; flex-direction:column; overflow:hidden;';
-          pip.innerHTML = `
-            <div style="background:#111; color:#fff; padding:5px; font-size:10px; display:flex; justify-content:space-between;">
-               <span>Вы в эфире</span>
-               <button id="stopStreamBtn" style="background:red; color:#fff; border:none; border-radius:4px; cursor:pointer;">Стоп</button>
-            </div>
-            <video id="pipVideo" autoplay muted style="flex:1; object-fit:cover; width:100%;"></video>
-            <div id="pipChat" style="height:80px; background:#0a0a14; overflow-y:auto; padding:5px; font-size:10px; color:#fff;"></div>
-          `;
-          document.body.appendChild(pip);
-          document.getElementById('pipVideo').srcObject = stream;
-
-          document.getElementById('stopStreamBtn').onclick = function() {
-              stream.getTracks().forEach(track => track.stop());
-              pip.remove();
-              db.collection('streams').doc(window.currentStreamDocId).delete();
-          };
-        }).catch(function(err) {
-          alert("Не удалось начать запись экрана.");
-        });
       }).catch(function(error) { console.error("Ошибка: ", error); });
     }
     if (typeof _origStartPublicStream === 'function') { _origStartPublicStream(is18, isPrivate); }
   };
 
-  // ==========================================
   // 9. ОБРАБОТЧИКИ КЛИКОВ МЕНЮ
-  // ==========================================
   document.body.addEventListener('click', function(e) {
     var target = e.target; var text = target.innerText || "";
     if (target.tagName === 'SPAN' || target.tagName === 'SVG' || target.tagName === 'PATH') { text = target.parentElement.innerText || ""; }
@@ -3038,7 +3034,6 @@ window.addEventListener('load', function() {
     if (target.id === 'myAdsBtn') { document.getElementById('myCrystalModal').style.display = 'none'; document.getElementById('myAdsScreen').style.display = 'flex'; }
   });
 
-  // Кнопка входа
   var acc = document.querySelector('#panelAccount .account-body');
   if (acc && !document.getElementById('myFbLoginBtn')) {
     var b = document.createElement('button'); b.id = 'myFbLoginBtn';
@@ -3051,7 +3046,6 @@ window.addEventListener('load', function() {
     else { btn.textContent = '🔐 Войти через Google'; btn.style.background = 'linear-gradient(135deg,#4285f4,#34a853)'; }
   });
 
-  // Запуск
   setTimeout(function() { window.renderHome(); }, 1000);
 
 });
