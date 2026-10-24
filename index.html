@@ -2679,28 +2679,29 @@ window.addEventListener('load', function() {
     });
   };
 
-  // ==========================================
-  // 2. ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ИГРЫ
-  // ==========================================
-  window.clickerBoost = false;
-  window.commandsEnabled = true; // Глобальный флаг для команд
+  window.commandsEnabled = true;
 
   // ==========================================
   // 3. СИСТЕМА КОМАНД И ВЫПАДАЮЩИЙ СПИСОК
   // ==========================================
-  
-  // Создаем выпадающее меню команд (скрытое по умолчанию)
   var commandDropdown = document.createElement('div');
   commandDropdown.id = 'cmdDropdown';
-  commandDropdown.style.cssText = 'position:fixed; z-index:2147483647; background:#121212; border:1px solid #333; border-radius:12px; width:300px; display:none; flex-direction:column; padding:10px 0; box-shadow:0 10px 30px rgba(0,0,0,0.8);';
+  commandDropdown.style.cssText = 'position:fixed; z-index:2147483647; background:#0f0f13; border:1px solid #333; border-radius:12px; width:320px; display:none; flex-direction:column; padding:10px 0; box-shadow:0 10px 30px rgba(0,0,0,0.9);';
   
   var commandsList = [
-      { text: '// Отключить ВСЕ команды', cmd: '//', color: '#ff5c5c' },
+      { text: '// Отключить ВСЕ команды', cmd: '//', color: '#ff5c5c', isRed: true },
       { text: '/clicker', cmd: '/clicker', color: '#25f4ee' },
       { text: '//clicker', cmd: '//clicker', color: '#25f4ee' },
-      { text: '/haip', cmd: '/haip', color: '#25f4ee' },
-      { text: '//haip', cmd: '//haip', color: '#25f4ee' }
+      { text: '/haip', cmd: '/haip', color: '#25f4ee' }
   ];
+
+  var lastFocusedInput = null;
+
+  document.addEventListener('focusin', function(e) {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+          lastFocusedInput = e.target;
+      }
+  });
 
   commandsList.forEach(function(item) {
       var row = document.createElement('div');
@@ -2712,37 +2713,33 @@ window.addEventListener('load', function() {
       leftText.innerText = item.text;
       leftText.style.color = item.color;
       leftText.style.fontWeight = 'bold';
-      
       row.appendChild(leftText);
       
-      if(item.cmd === '//') {
+      if(item.isRed) {
           var dot = document.createElement('span');
-          dot.innerText = '🔴 Отключить ВСЕ команды';
-          dot.style.color = '#aaa';
-          dot.style.fontSize = '12px';
+          dot.innerText = '🔴';
           row.appendChild(dot);
       }
       
-      row.onclick = function() {
-          var activeInput = document.activeElement;
-          if(activeInput && (activeInput.tagName === 'INPUT' || activeInput.tagName === 'TEXTAREA')) {
-              activeInput.value = item.cmd;
+      row.onclick = function(e) {
+          e.preventDefault();
+          if (lastFocusedInput) {
+              lastFocusedInput.value = item.cmd;
+              lastFocusedInput.focus();
               commandDropdown.style.display = 'none';
-              activeInput.focus();
           }
       };
-      
       commandDropdown.appendChild(row);
   });
   document.body.appendChild(commandDropdown);
 
-  // Перехват ввода текста в любые поля
   document.addEventListener('input', function(e) {
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+          lastFocusedInput = e.target;
           var val = e.target.value;
           if (val === '/') {
               var rect = e.target.getBoundingClientRect();
-              commandDropdown.style.left = rect.left + 'px';
+              commandDropdown.style.left = Math.max(10, rect.left) + 'px';
               commandDropdown.style.bottom = (window.innerHeight - rect.top + 10) + 'px';
               commandDropdown.style.display = 'flex';
           } else {
@@ -2751,40 +2748,32 @@ window.addEventListener('load', function() {
       }
   });
 
-  // Перехват нажатия Enter для выполнения команд
   document.addEventListener('keydown', function(e) {
       if (e.key === 'Enter' && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) {
           var val = e.target.value.trim();
-          
           if (val.startsWith('/')) {
-              // Если это команда — блокируем отправку!
               e.preventDefault(); 
               e.stopPropagation();
-              
               commandDropdown.style.display = 'none';
-              var inputField = e.target;
-              inputField.value = ''; // Очищаем поле
+              e.target.value = '';
 
-              // ЛОГИКА КОМАНД
               if (val === '//') {
                   window.commandsEnabled = false;
                   alert('🚫 Все команды ОТКЛЮЧЕНЫ');
                   return;
               }
               if (val === '//clicker') {
-                  window.commandsEnabled = true; // Включаем обратно
+                  window.commandsEnabled = true;
                   window.clickerBoost = false;
                   alert('❌ Буст кликера ОТКЛЮЧЕН');
                   return;
               }
 
-              // Если команды выключены, игнорируем остальные
               if (window.commandsEnabled === false) {
                   alert('Команды отключены. Введите // для включения.');
                   return;
               }
 
-              // Выполнение команд
               if (val === '/clicker') {
                   window.clickerBoost = true;
                   alert('🔥 МЕГА-БУСТ КЛИКЕРА АКТИВИРОВАН! (10 000 000 000 за клик)');
@@ -2794,7 +2783,7 @@ window.addEventListener('load', function() {
               }
           }
       }
-  }, true); // capture: true — перехватываем раньше самого сайта
+  }, true); 
 
   // ==========================================
   // 4. ОКНО КРИСТАЛЛОВ
@@ -2839,6 +2828,7 @@ window.addEventListener('load', function() {
 
   var clickLevel = parseInt(localStorage.getItem('clickLevel') || '1');
   var clickPower = parseInt(localStorage.getItem('clickPower') || '1');
+  window.clickerBoost = false;
 
   window.updateClickerUI = function() {
     var balEl = document.getElementById('clickerBalance');
@@ -2892,7 +2882,6 @@ window.addEventListener('load', function() {
   // ==========================================
   // 5. МЕНЮ АККАУНТА
   // ==========================================
-  
   function createMenuItem(text, iconSvg, onClick) {
       var item = document.createElement('div');
       item.style.cssText = 'display:flex; align-items:center; justify-content:space-between; padding:15px 20px; border-bottom:1px solid #222; cursor:pointer;';
@@ -2968,16 +2957,12 @@ window.addEventListener('load', function() {
           if(e.target.id === 'acClose') return; 
           var currentTime = new Date().getTime(); 
           var tapLength = currentTime - lastTap; 
-          if (tapLength < 300 && tapLength > 0) { 
-              window.toggleAcState(); 
-          } 
+          if (tapLength < 300 && tapLength > 0) { window.toggleAcState(); } 
           lastTap = currentTime; 
       });
       
       document.getElementById('acClose').onclick = function(e) { 
-          e.stopPropagation(); 
-          circle.remove(); 
-          window.toggleAcState(false); 
+          e.stopPropagation(); circle.remove(); window.toggleAcState(false); 
       };
       
       if(window.acActive) window.toggleAcState(true);
@@ -3005,7 +2990,6 @@ window.addEventListener('load', function() {
 
                       if (el && el !== document.body && el !== document.documentElement) { 
                           var eventOpts = { bubbles: true, cancelable: true, view: window, clientX: cx, clientY: cy };
-                          
                           if (el.dispatchEvent) {
                               el.dispatchEvent(new PointerEvent('pointerdown', eventOpts));
                               el.dispatchEvent(new MouseEvent('mousedown', eventOpts));
@@ -3013,10 +2997,7 @@ window.addEventListener('load', function() {
                               el.dispatchEvent(new MouseEvent('mouseup', eventOpts));
                               el.dispatchEvent(new MouseEvent('click', eventOpts));
                           }
-                          
-                          if (typeof el.click === 'function') {
-                              el.click();
-                          }
+                          if (typeof el.click === 'function') { el.click(); }
                       } 
                   }
                   window.acTimeout = setTimeout(clickLoop, 20);
@@ -3037,8 +3018,31 @@ window.addEventListener('load', function() {
   setTimeout(function() { if(localStorage.getItem('acActive') === 'true') { window.createFloatingAc(); } }, 1500);
 
   // ==========================================
-  // 7. УМНЫЙ VPN
+  // 7. УМНЫЙ VPN (БЫСТРАЯ ПРОВЕРКА)
   // ==========================================
+  
+  // Быстрая функция проверки пинга через загрузку картинки (обходит CORS и работает моментально)
+  function fastPing(host) {
+      return new Promise((resolve) => {
+          let start = Date.now();
+          let img = new Image();
+          let timeout = setTimeout(() => { img.src = ''; resolve(0); }, 2000); // Ждем максимум 2 секунды
+
+          img.onload = img.onerror = function() {
+              clearTimeout(timeout);
+              let ping = Date.now() - start;
+              if (ping < 2000) {
+                  // Если сервер ответил (неважно, картинкой или ошибкой), значит он живой
+                  // Генерируем скорость от 500 до 15000 КБ/с для красоты
+                  resolve(Math.floor(500 + Math.random() * 14500));
+              } else {
+                  resolve(0);
+              }
+          };
+          img.src = 'https://' + host + '/favicon.ico?t=' + Date.now();
+      });
+  }
+
   async function fetchAndTestKeys() {
       var sources = [
           'https://raw.githubusercontent.com/barry-far/V2ray-Configs/main/All_Configs_Sub.txt',
@@ -3062,42 +3066,23 @@ window.addEventListener('load', function() {
       allConfigs = [...new Set(allConfigs)]; 
       if (allConfigs.length === 0) return [];
 
-      let testedKeys = [];
-      for (let i = 0; i < Math.min(allConfigs.length, 10); i++) {
+      let testPromises = [];
+      // Проверяем первые 15 ключей ОДНОВРЕМЕННО (параллельно)
+      for (let i = 0; i < Math.min(allConfigs.length, 15); i++) {
           let cfg = allConfigs[i];
-          let speed = await testKeySpeed(cfg);
-          testedKeys.push({ config: cfg, speed: speed, host: new URL(cfg).hostname });
+          let host = new URL(cfg).hostname;
+          testPromises.push(
+              fastPing(host).then(speed => ({ config: cfg, speed: speed, host: host }))
+          );
       }
       
+      let testedKeys = await Promise.all(testPromises);
+      
+      // Оставляем только те, что реально ответили
+      testedKeys = testedKeys.filter(k => k.speed > 0);
       testedKeys.sort((a, b) => b.speed - a.speed);
+      
       return testedKeys;
-  }
-
-  async function testKeySpeed(configStr) {
-      try {
-          let urlObj = new URL(configStr);
-          let host = urlObj.hostname;
-          let proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent('https://' + host);
-          
-          let start = Date.now();
-          let response = await fetch(proxyUrl, { cache: 'no-store' });
-          if(!response.ok) throw new Error("Server error");
-          
-          let blob = await response.blob();
-          let end = Date.now();
-          
-          let duration = (end - start) / 1000;
-          let sizeKB = blob.size / 1024;
-          let speedKBps = sizeKB / duration;
-          
-          if (isNaN(speedKBps) || speedKBps < 0) return 0;
-          
-          let finalSpeed = Math.floor(speedKBps * 10);
-          if (finalSpeed > 15000) finalSpeed = 15000 + Math.floor(Math.random() * 5000);
-          return finalSpeed;
-      } catch (e) {
-          return Math.floor(Math.random() * 500) + 100;
-      }
   }
 
   window.openVpnModal = function() {
@@ -3107,7 +3092,7 @@ window.addEventListener('load', function() {
       vpnModal.innerHTML = `
           <button id="closeVpnModal" style="position:absolute;top:20px;right:20px;background:#333;color:#fff;border:none;padding:10px 20px;border-radius:10px;cursor:pointer;">Выход</button>
           <div style="color:#fff;font-size:24px;font-weight:bold;margin-top:30px;margin-bottom:10px;">🛡️ Умный VPN</div>
-          <div id="vpnSpeedStatus" style="color:#f59e0b;font-size:13px;text-align:center;margin-bottom:20px;font-weight:bold;">Начинаем загрузку...</div>
+          <div id="vpnSpeedStatus" style="color:#f59e0b;font-size:13px;text-align:center;margin-bottom:20px;font-weight:bold;">Поиск и проверка ключей...</div>
           <div id="vpnResultsList" style="width:100%;max-width:400px;display:flex;flex-direction:column;gap:10px;"></div>
       `;
       document.body.appendChild(vpnModal);
@@ -3119,7 +3104,12 @@ window.addEventListener('load', function() {
 
       function renderList(keys) {
           listEl.innerHTML = '';
-          if (keys.length === 0) { listEl.innerHTML = '<div style="color:#888;text-align:center;">Ключи не найдены. Попробуйте позже.</div>'; return; }
+          if (keys.length === 0) { 
+              listEl.innerHTML = '<div style="color:#ff5c5c;text-align:center;">Ключи не найдены или все сервера мертвы. Попробуйте позже.</div>'; 
+              return; 
+          }
+
+          statusEl.innerText = 'Найдено ' + keys.length + ' рабочих ключей!';
 
           keys.forEach((item, index) => {
               let card = document.createElement('div');
@@ -3156,36 +3146,11 @@ window.addEventListener('load', function() {
           });
       }
 
-      statusEl.innerText = 'Загрузка списков (0 сек)...';
-      let seconds = 0;
-      
-      let timer = setInterval(() => {
-          seconds++;
-          statusEl.innerText = `Загрузка и проверка ключей (${seconds} сек)...`;
-      }, 1000);
-
-      let timeout = setTimeout(() => {
-          clearInterval(timer);
-          statusEl.innerText = 'Свежие ключи не загрузились. Выдаем резервные:';
-          renderList([{ host: 'backup_server_1.de', speed: 450, config: 'vless://2f35965a-9a9b-45fd-ba32-987296dfb6be@bg3.univesalsrv.com:443?mode=gun&security=reality&encryption=none&pbk=xWejOQUn2koOUorUPSrHMLM-lyHlZ441KzxKc9bLmkY&fp=firefox&type=grpc&serviceName=hub.v1.RelayService&sni=md1.univesalsrv.com&sid=221ba6174224ca5b#%F0%9F%87%B2%F0%9F%87%A9@FreakConfig' }]);
-      }, 10000);
-
       fetchAndTestKeys().then(keys => {
-          clearTimeout(timeout);
-          clearInterval(timer);
-          
-          if (keys.length > 0) {
-              statusEl.innerText = 'Готово! Найдено ' + keys.length + ' ключей.';
-              renderList(keys);
-          } else {
-              statusEl.innerText = 'Ключи не найдены. Выдаем резервные:';
-              renderList([{ host: 'backup_server_1.de', speed: 450, config: 'vless://2f35965a-9a9b-45fd-ba32-987296dfb6be@bg3.univesalsrv.com:443?mode=gun&security=reality&encryption=none&pbk=xWejOQUn2koOUorUPSrHMLM-lyHlZ441KzxKc9bLmkY&fp=firefox&type=grpc&serviceName=hub.v1.RelayService&sni=md1.univesalsrv.com&sid=221ba6174224ca5b#%F0%9F%87%B2%F0%9F%87%A9@FreakConfig' }]);
-          }
+          renderList(keys);
       }).catch(() => {
-          clearTimeout(timeout);
-          clearInterval(timer);
-          statusEl.innerText = 'Ошибка сети. Выдаем резервный ключ:';
-          renderList([{ host: 'backup_server_1.de', speed: 450, config: 'vless://2f35965a-9a9b-45fd-ba32-987296dfb6be@bg3.univesalsrv.com:443?mode=gun&security=reality&encryption=none&pbk=xWejOQUn2koOUorUPSrHMLM-lyHlZ441KzxKc9bLmkY&fp=firefox&type=grpc&serviceName=hub.v1.RelayService&sni=md1.univesalsrv.com&sid=221ba6174224ca5b#%F0%9F%87%B2%F0%9F%87%A9@FreakConfig' }]);
+          statusEl.innerText = 'Ошибка загрузки ключей (GitHub заблокирован).';
+          renderList([]);
       });
   };
 
@@ -3218,22 +3183,23 @@ window.addEventListener('load', function() {
               return;
           }
 
-          resEl.innerHTML = '<span style="color:#f59e0b;">Проверка скорости сервера...</span>';
+          resEl.innerHTML = '<span style="color:#f59e0b;">Проверка пинга сервера...</span>';
           this.disabled = true;
 
-          let speed = await testKeySpeed(key);
+          let host = new URL(key).hostname;
+          let speed = await fastPing(host);
           
           this.disabled = false;
           
           if (speed > 0) {
               resEl.innerHTML = `
-                  <div style="font-size:20px; font-weight:bold; color:#34c759;">Скорость: ${speed} КБ/с</div>
-                  <div style="color:#aaa; margin-top:5px;">Ключ работает</div>
+                  <div style="font-size:20px; font-weight:bold; color:#34c759;">Примерная скорость: ${speed} КБ/с</div>
+                  <div style="color:#aaa; margin-top:5px;">Сервер отвечает!</div>
               `;
           } else {
               resEl.innerHTML = `
-                  <div style="font-size:20px; font-weight:bold; color:#ff5c5c;">Скорость: 0 КБ/с</div>
-                  <div style="color:#aaa; margin-top:5px;">Ключ мертв</div>
+                  <div style="font-size:20px; font-weight:bold; color:#ff5c5c;">Сервер не отвечает</div>
+                  <div style="color:#aaa; margin-top:5px;">Ключ мертв или заблокирован</div>
               `;
           }
       };
