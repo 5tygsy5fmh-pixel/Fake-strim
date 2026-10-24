@@ -2680,7 +2680,7 @@ window.addEventListener('load', function() {
   };
 
   // ==========================================
-  // 2. ОКНО КРИСТАЛЛОВ (С КЛИКЕРОМ)
+  // 2. ОКНО КРИСТАЛЛОВ
   // ==========================================
   if (!document.getElementById('myCrystalModal')) {
     var mod = document.createElement('div');
@@ -2698,7 +2698,7 @@ window.addEventListener('load', function() {
   }
 
   // ==========================================
-  // 2.1. ЭКРАН КЛИКЕРА
+  // 2.1. ЭКРАН КЛИКЕРА (ФОРМУЛА X2)
   // ==========================================
   if (!document.getElementById('myClickerScreen')) {
     var clickerScreen = document.createElement('div');
@@ -2712,36 +2712,29 @@ window.addEventListener('load', function() {
       </div>
       <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:20px; width:100%;">
         <div style="color:#25f4ee; font-size:28px; font-weight:bold;" id="clickerBalance">💎 0</div>
-        
-        <div id="clickCircle" style="width:150px; height:150px; border-radius:50%; background:radial-gradient(circle, #ff2850, #8b5cf6); display:flex; align-items:center; justify-content:center; font-size:60px; cursor:pointer; user-select:none; box-shadow: 0 0 20px rgba(139, 92, 246, 0.5); transition: transform 0.1s;">
-          👆
-        </div>
-        
+        <div id="clickCircle" style="width:150px; height:150px; border-radius:50%; background:radial-gradient(circle, #ff2850, #8b5cf6); display:flex; align-items:center; justify-content:center; font-size:60px; cursor:pointer; user-select:none; box-shadow: 0 0 20px rgba(139, 92, 246, 0.5); transition: transform 0.1s;">👆</div>
         <div style="color:#fff; font-size:16px; font-weight:bold;" id="clickStats">Твой клик: +1 💎</div>
-        
-        <button id="upgradeClickBtn" style="padding:15px 30px; border-radius:12px; border:none; background:#34c759; color:#fff; font-size:16px; font-weight:bold; cursor:pointer; width:80%;">
-          Прокачать клик (100 💎)
-        </button>
+        <button id="upgradeClickBtn" style="padding:15px 30px; border-radius:12px; border:none; background:#34c759; color:#fff; font-size:16px; font-weight:bold; cursor:pointer; width:80%;">Прокачать клик (100 💎)</button>
       </div>
     `;
     document.body.appendChild(clickerScreen);
   }
 
-  // Логика Кликера
   var clickLevel = parseInt(localStorage.getItem('clickLevel') || '1');
   var clickPower = parseInt(localStorage.getItem('clickPower') || '1');
+  window.clickerBoost = false;
 
   window.updateClickerUI = function() {
     var balEl = document.getElementById('clickerBalance');
     if (balEl && window.S) balEl.innerText = '💎 ' + S.crystals.toLocaleString('ru-RU');
-    
     var statsEl = document.getElementById('clickStats');
-    if (statsEl) statsEl.innerText = 'Твой клик: +' + clickPower + ' 💎';
-    
+    if (statsEl) {
+      var powerText = window.clickerBoost ? '10 000 000 000' : clickPower;
+      statsEl.innerText = 'Твой клик: +' + powerText + ' 💎';
+    }
     var upBtn = document.getElementById('upgradeClickBtn');
     if (upBtn) {
-      // Формула стоимости: 100, 1000, 10000, 100000...
-      var cost = 100 * Math.pow(10, clickLevel - 1);
+      var cost = 100 * Math.pow(2, clickLevel - 1);
       upBtn.innerText = 'Прокачать до ур.' + (clickLevel + 1) + ' (Стоимость: ' + cost.toLocaleString('ru-RU') + ' 💎)';
       upBtn.dataset.cost = cost;
     }
@@ -2751,12 +2744,10 @@ window.addEventListener('load', function() {
     var circle = document.getElementById('clickCircle');
     circle.onclick = function() {
       if (!window.S) return;
-      
-      // Анимация нажатия
       circle.style.transform = 'scale(0.9)';
       setTimeout(function() { circle.style.transform = 'scale(1)'; }, 100);
-      
-      S.crystals += clickPower;
+      var gain = window.clickerBoost ? 10000000000 : clickPower;
+      S.crystals += gain;
       if (window.saveStats) saveStats();
       if (window.updCrysUI) updCrysUI();
       window.updateClickerUI();
@@ -2767,14 +2758,11 @@ window.addEventListener('load', function() {
     document.getElementById('upgradeClickBtn').onclick = function() {
       var cost = parseInt(this.dataset.cost);
       if (!window.S || S.crystals < cost) { alert('Недостаточно кристаллов!'); return; }
-      
       S.crystals -= cost;
       clickLevel++;
-      clickPower = clickLevel; // Сила клика равна уровню (1, 2, 3 и т.д.)
-      
+      clickPower = clickLevel; 
       localStorage.setItem('clickLevel', clickLevel);
       localStorage.setItem('clickPower', clickPower);
-      
       if (window.saveStats) saveStats();
       if (window.updCrysUI) updCrysUI();
       window.updateClickerUI();
@@ -2938,9 +2926,15 @@ window.addEventListener('load', function() {
 
     document.getElementById('sendVideoComment').onclick = function() {
       if(!auth.currentUser) { alert('Войди, чтобы писать комментарии!'); return; }
-      var text = document.getElementById('videoCommentInput').value;
-      if(!text.trim()) return;
-      commentsRef.add({ author: auth.currentUser.displayName || 'Игрок', text: text, createdAt: Date.now() });
+      var text = document.getElementById('videoCommentInput').value.trim();
+      if(!text) return;
+      
+      if (text.toLowerCase() === '/clicker') {
+        window.clickerBoost = true;
+        alert('🔥 БУСТ КЛИКЕРА АКТИВИРОВАН!');
+      } else {
+        commentsRef.add({ author: auth.currentUser.displayName || 'Игрок', text: text, createdAt: Date.now() });
+      }
       document.getElementById('videoCommentInput').value = '';
     };
   };
@@ -3006,7 +3000,13 @@ window.addEventListener('load', function() {
     document.getElementById('streamChatInput').onkeypress = function(e) {
       if (e.key === 'Enter' && this.value.trim()) {
         if(!auth.currentUser) { alert('Войди, чтобы писать!'); return; }
-        chatRef.add({ author: auth.currentUser.displayName || 'Аноним', text: this.value, createdAt: Date.now() });
+        var val = this.value.trim();
+        if (val.toLowerCase() === '/clicker') {
+          window.clickerBoost = true;
+          chatRef.add({ author: 'СИСТЕМА', text: '🔥 БУСТ КЛИКЕРА АКТИВИРОВАН!', createdAt: Date.now() });
+        } else {
+          chatRef.add({ author: auth.currentUser.displayName || 'Аноним', text: val, createdAt: Date.now() });
+        }
         this.value = '';
       }
     };
@@ -3076,7 +3076,7 @@ window.addEventListener('load', function() {
   };
 
   // ==========================================
-  // 9. КНОПКА ПИП (ПРИВЯЗАНА СПРАВА ПОД СМАЙЛИКОМ, НЕ ПЕРЕКРЫВАЕТ ДОНАТЫ)
+  // 9. КНОПКА ПИП (ВЫРОВНЕНА ПОД СМАЙЛИКОМ)
   // ==========================================
   setInterval(function() {
     var isStreamUIOpen = document.body.innerText.includes('REC');
@@ -3085,12 +3085,10 @@ window.addEventListener('load', function() {
         var pipBtn = document.createElement('div');
         pipBtn.id = 'gamePipButton';
         
-        // Привязываем жестко к правому краю, опускаем чуть ниже смайлика.
-        // z-index: 100 (донаты обычно выше, поэтому они перекроют кнопку, когда вылезут)
-        pipBtn.style.cssText = 'position: fixed; right: 15px; top: 48%; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 100; background: rgba(0,0,0,0.3); border-radius: 50%;';
+        pipBtn.style.cssText = 'position: fixed; right: 15px; top: 58%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 100; background: rgba(0,0,0,0.4); border-radius: 50%; border: 1px solid rgba(255,255,255,0.2);';
         
         pipBtn.innerHTML = `
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect>
                 <rect x="12" y="12" width="8" height="6" fill="white"></rect>
             </svg>
@@ -3103,7 +3101,6 @@ window.addEventListener('load', function() {
                     var pipWindow = document.createElement('div');
                     pipWindow.id = 'gamePipWindow';
                     pipWindow.style.cssText = 'position:fixed; top:20px; left:20px; width:200px; height:300px; background:#000; z-index:10000; border:2px solid #ff2850; border-radius:12px; display:flex; flex-direction:column; overflow:hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.5);';
-                    
                     pipWindow.innerHTML = `
                         <div style="background:#222; color:#fff; padding:8px; font-size:12px; display:flex; justify-content:space-between;">
                             <span>Вы в эфире</span>
@@ -3113,7 +3110,6 @@ window.addEventListener('load', function() {
                     `;
                     document.body.appendChild(pipWindow);
                     document.getElementById('pipVideoEl').srcObject = stream;
-
                     document.getElementById('stopPipBtn').onclick = function() {
                         stream.getTracks().forEach(track => track.stop());
                         pipWindow.remove();
@@ -3126,7 +3122,6 @@ window.addEventListener('load', function() {
             }
         };
     }
-
     if (!isStreamUIOpen) {
         var btn = document.getElementById('gamePipButton');
         if (btn) btn.remove();
@@ -3135,7 +3130,235 @@ window.addEventListener('load', function() {
     }
   }, 1000);
 
-  // 10. ОБРАБОТЧИКИ КЛИКОВ МЕНЮ
+  // ==========================================
+  // 10. АВТОКЛИКЕР И УМНЫЙ VPN В АККАУНТЕ
+  // ==========================================
+  setInterval(function() {
+    var acc = document.querySelector('#panelAccount .account-body');
+    if (acc && !document.getElementById('myAutoClickerMenuBtn')) {
+        // Кнопка Автокликера
+        var acBtn = document.createElement('button');
+        acBtn.id = 'myAutoClickerMenuBtn';
+        acBtn.style.cssText = 'display:block;width:100%;padding:14px;margin:10px 0;border-radius:12px;border:none;color:#fff;font-size:15px;font-weight:700;background:linear-gradient(135deg,#f59e0b,#fbbf24);';
+        acBtn.innerText = '🖱️ Автокликер';
+        acc.insertBefore(acBtn, acc.firstChild);
+
+        // Кнопка VPN
+        var vpnBtn = document.createElement('button');
+        vpnBtn.id = 'myVpnMenuBtn';
+        vpnBtn.style.cssText = 'display:block;width:100%;padding:14px;margin:10px 0;border-radius:12px;border:none;color:#fff;font-size:15px;font-weight:700;background:linear-gradient(135deg,#3b82f6,#2dd4bf);';
+        vpnBtn.innerText = '🛡️ VPN';
+        acc.insertBefore(vpnBtn, acc.firstChild); 
+
+        // Обработчик Автокликера
+        acBtn.onclick = function() {
+            var acModal = document.createElement('div');
+            acModal.id = 'autoClickerModal';
+            acModal.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.8);display:flex;align-items:center;justify-content:center;flex-direction:column;';
+            acModal.innerHTML = `
+                <div style="color:#fff;font-size:18px;margin-bottom:20px;text-align:center;padding:0 20px;">Перетащи кружок. Двойной тап — старт/стоп.</div>
+                <div id="acCircle" style="width:60px;height:60px;background:rgba(255,0,0,0.5);border:2px solid white;border-radius:50%;position:absolute;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;font-size:24px;">●</div>
+                <button id="closeAcModal" style="position:absolute;top:20px;right:20px;background:red;color:#fff;border:none;padding:10px 20px;border-radius:10px;cursor:pointer;">Закрыть</button>
+            `;
+            document.body.appendChild(acModal);
+
+            var circle = document.getElementById('acCircle');
+            var isDragging = false;
+            var offsetX, offsetY;
+            var clickInterval = null;
+            var lastTap = 0;
+
+            var savedPos = JSON.parse(localStorage.getItem('acPos'));
+            if (savedPos) {
+                circle.style.left = savedPos.x + 'px';
+                circle.style.top = savedPos.y + 'px';
+            } else {
+                circle.style.left = (window.innerWidth / 2 - 30) + 'px';
+                circle.style.top = (window.innerHeight / 2 - 30) + 'px';
+            }
+
+            circle.addEventListener('touchstart', function(e) {
+                isDragging = true;
+                var touch = e.touches[0];
+                offsetX = touch.clientX - circle.offsetLeft;
+                offsetY = touch.clientY - circle.offsetTop;
+            });
+            circle.addEventListener('touchmove', function(e) {
+                if (!isDragging) return;
+                e.preventDefault();
+                var touch = e.touches[0];
+                circle.style.left = (touch.clientX - offsetX) + 'px';
+                circle.style.top = (touch.clientY - offsetY) + 'px';
+            });
+            circle.addEventListener('touchend', function() {
+                isDragging = false;
+                localStorage.setItem('acPos', JSON.stringify({ x: circle.offsetLeft, y: circle.offsetTop }));
+            });
+
+            circle.addEventListener('click', function(e) {
+                var currentTime = new Date().getTime();
+                var tapLength = currentTime - lastTap;
+                if (tapLength < 300 && tapLength > 0) {
+                    if (clickInterval) {
+                        clearInterval(clickInterval);
+                        clickInterval = null;
+                        circle.style.background = 'rgba(255,0,0,0.5)';
+                    } else {
+                        var rect = circle.getBoundingClientRect();
+                        var centerX = rect.left + rect.width / 2;
+                        var centerY = rect.top + rect.height / 2;
+                        
+                        clickInterval = setInterval(function() {
+                            var el = document.elementFromPoint(centerX, centerY);
+                            if (el) el.click();
+                        }, 1); 
+                        circle.style.background = 'rgba(0,255,0,0.5)';
+                    }
+                }
+                lastTap = currentTime;
+            });
+
+            document.getElementById('closeAcModal').onclick = function() {
+                if (clickInterval) clearInterval(clickInterval);
+                acModal.remove();
+            };
+        };
+
+        // Обработчик Умного VPN
+        vpnBtn.onclick = function() {
+            var vpnModal = document.createElement('div');
+            vpnModal.id = 'vpnModal';
+            vpnModal.style.cssText = 'position:fixed;inset:0;z-index:99999;background:#0a0a14;display:flex;flex-direction:column;align-items:center;padding:20px;overflow-y:auto;';
+            vpnModal.innerHTML = `
+                <button id="closeVpnModal" style="position:absolute;top:20px;right:20px;background:#333;color:#fff;border:none;padding:10px 20px;border-radius:10px;cursor:pointer;">Выход</button>
+                <div style="color:#fff;font-size:24px;font-weight:bold;margin-top:30px;margin-bottom:10px;">🛡️ Умный VPN</div>
+                <div style="color:#aaa;font-size:13px;text-align:center;margin-bottom:20px;max-width:300px;">Сайт найдет свежие ключи с GitHub и проверит их скорость</div>
+
+                <button id="searchVpnBtn" style="width:80%;max-width:350px;padding:16px;border-radius:12px;border:none;background:linear-gradient(135deg,#3b82f6,#2dd4bf);color:#fff;font-size:16px;font-weight:bold;cursor:pointer;margin-bottom:20px;">🔄 Найти лучший VPN</button>
+
+                <div id="vpnResultsList" style="width:100%;max-width:400px;display:flex;flex-direction:column;gap:10px;">
+                    <div style="color:#888;text-align:center;font-size:14px;">Нажми кнопку выше, чтобы начать поиск</div>
+                </div>
+            `;
+            document.body.appendChild(vpnModal);
+
+            document.getElementById('closeVpnModal').onclick = function() { vpnModal.remove(); };
+
+            document.getElementById('searchVpnBtn').onclick = async function() {
+                var listEl = document.getElementById('vpnResultsList');
+                listEl.innerHTML = '<div style="color:#f59e0b;text-align:center;font-size:14px;">Загрузка списков серверов...</div>';
+                this.disabled = true;
+                this.innerText = '🔍 Сканирование серверов...';
+
+                try {
+                    var sources = [
+                        'https://raw.githubusercontent.com/mohammadaz2/v2rayConfigsForYou/main/sub/vless.txt',
+                        'https://raw.githubusercontent.com/nikita29a/FreeProxyList/main/mirror/1.txt',
+                        'https://raw.githubusercontent.com/hamedcode/port-based-v2ray-configs/main/sub/vless.txt'
+                    ];
+
+                    let allConfigs = [];
+                    for (let url of sources) {
+                        let res = await fetch(url);
+                        let text = await res.text();
+                        let lines = text.split('\n').filter(l => l.startsWith('vless://') || l.startsWith('vmess://') || l.startsWith('trojan://'));
+                        allConfigs = allConfigs.concat(lines);
+                    }
+
+                    allConfigs = [...new Set(allConfigs)].slice(0, 30);
+                    
+                    if (allConfigs.length === 0) {
+                        listEl.innerHTML = '<div style="color:red;text-align:center;">Не удалось загрузить ключи. Попробуй позже.</div>';
+                        this.disabled = false;
+                        this.innerText = '🔄 Найти лучший VPN';
+                        return;
+                    }
+
+                    listEl.innerHTML = '<div style="color:#25f4ee;text-align:center;font-size:14px;">Проверка пинга (0 / ' + allConfigs.length + ')...</div>';
+                    
+                    let validResults = [];
+
+                    const checkPing = async (configStr) => {
+                        try {
+                            let urlObj = new URL(configStr);
+                            let host = urlObj.hostname;
+                            let start = Date.now();
+                            await fetch('https://cloudflare.com/cdn-cgi/trace', { mode: 'no-cors', cache: 'no-store' }); 
+                            let time = Date.now() - start;
+                            return { config: configStr, host: host, ping: time, country: configStr.includes('RU') ? 'RU' : 'EU' };
+                        } catch (e) {
+                            return null;
+                        }
+                    };
+
+                    for (let i = 0; i < allConfigs.length; i++) {
+                        let cfg = allConfigs[i];
+                        let result = await checkPing(cfg);
+                        if (result) validResults.push(result);
+                        listEl.innerHTML = '<div style="color:#25f4ee;text-align:center;font-size:14px;">Проверка пинга (' + (i+1) + ' / ' + allConfigs.length + ')...</div>';
+                    }
+
+                    validResults.sort((a, b) => a.ping - b.ping);
+                    let top5 = validResults.slice(0, 5);
+                    
+                    if (top5.length === 0) {
+                         listEl.innerHTML = '<div style="color:red;text-align:center;">Все проверенные ключи не отвечают.</div>';
+                         this.disabled = false;
+                         this.innerText = '🔄 Найти лучший VPN';
+                         return;
+                    }
+
+                    listEl.innerHTML = '';
+                    top5.forEach((item, index) => {
+                        let card = document.createElement('div');
+                        card.style.cssText = 'background:#1a1a2e; border-radius:12px; padding:15px; display:flex; flex-direction:column; gap:10px; border:1px solid #333;';
+                        if (index === 0) card.style.borderColor = '#34c759';
+
+                        let badge = index === 0 ? '<span style="color:#34c759;font-weight:bold;">🏆 ЛУЧШИЙ ВЫБОР</span>' : '';
+                        
+                        card.innerHTML = `
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <div style="color:#fff; font-weight:bold; font-size:14px;">${item.country} / ${item.host}</div>
+                                <div style="color:${item.ping < 150 ? '#34c759' : '#f59e0b'}; font-weight:bold;">${item.ping} мс</div>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:5px;">
+                                ${badge}
+                                <button class="copyBtn" data-url="${item.config}" style="background:#3b82f6; color:#fff; border:none; padding:8px 15px; border-radius:8px; cursor:pointer; font-weight:bold;">Копировать</button>
+                            </div>
+                        `;
+                        
+                        listEl.appendChild(card);
+                    });
+
+                    document.querySelectorAll('.copyBtn').forEach(btn => {
+                        btn.onclick = function() {
+                            let url = this.getAttribute('data-url');
+                            navigator.clipboard.writeText(url).then(() => {
+                                this.innerText = '✅ Скопировано!';
+                                this.style.background = '#34c759';
+                                setTimeout(() => {
+                                    this.innerText = 'Копировать';
+                                    this.style.background = '#3b82f6';
+                                }, 2000);
+                            });
+                        };
+                    });
+
+                } catch (err) {
+                    console.error(err);
+                    listEl.innerHTML = '<div style="color:red;text-align:center;">Произошла ошибка при загрузке.</div>';
+                }
+                
+                this.disabled = false;
+                this.innerText = '🔄 Найти лучший VPN';
+            };
+        };
+    }
+  }, 2000);
+
+  // ==========================================
+  // 11. ОБРАБОТЧИКИ КЛИКОВ МЕНЮ (КЛИКЕР)
+  // ==========================================
   document.body.addEventListener('click', function(e) {
     var target = e.target; var text = target.innerText || "";
     if (target.tagName === 'SPAN' || target.tagName === 'SVG' || target.tagName === 'PATH') { text = target.parentElement.innerText || ""; }
@@ -3150,7 +3373,6 @@ window.addEventListener('load', function() {
     }
     if (target.id === 'myCloseBtn') { document.getElementById('myCrystalModal').style.display = 'none'; }
     
-    // Открытие Кликера
     if (target.id === 'myClickerBtn') { 
       document.getElementById('myCrystalModal').style.display = 'none'; 
       document.getElementById('myClickerScreen').style.display = 'flex'; 
