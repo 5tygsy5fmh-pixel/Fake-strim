@@ -2680,7 +2680,7 @@ window.addEventListener('load', function() {
   };
 
   // ==========================================
-  // 2. ОКНО КРИСТАЛЛОВ
+  // 2. ОКНО КРИСТАЛЛОВ (С КЛИКЕРОМ)
   // ==========================================
   if (!document.getElementById('myCrystalModal')) {
     var mod = document.createElement('div');
@@ -2688,12 +2688,101 @@ window.addEventListener('load', function() {
     mod.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.9);display:none;align-items:center;justify-content:center;padding:20px;';
     mod.innerHTML = '<div style="background:#1a1a2e;border-radius:20px;padding:22px;width:100%;max-width:360px;display:flex;flex-direction:column;gap:12px">' +
       '<h3 style="font-size:18px;text-align:center;margin-bottom:8px;color:#fff">💎 Кристаллы</h3>' +
+      '<button id="myClickerBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-weight:800;background:linear-gradient(135deg,#3b82f6,#2dd4bf)">🎯 Кликер</button>' +
       '<button id="myCasinoBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-weight:800;background:linear-gradient(135deg,#ff2850,#ff5c8a)">🎰 Казино</button>' +
       '<button id="myStocksBtn" style="padding:18px;border-radius:14px;border:none;color:#000;font-weight:800;background:linear-gradient(135deg,#43e97b,#38f9d7)">📈 Акции</button>' +
       '<button id="myVotesBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-weight:800;background:linear-gradient(135deg,#8b5cf6,#c88cff)">🗳️ Голосования</button>' +
       '<button id="myAdsBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-weight:800;background:linear-gradient(135deg,#f59e0b,#fbbf24)">📺 Реклама</button>' +
       '<button id="myCloseBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-weight:800;background:rgba(255,255,255,.1)">Закрыть</button></div>';
     document.body.appendChild(mod);
+  }
+
+  // ==========================================
+  // 2.1. ЭКРАН КЛИКЕРА
+  // ==========================================
+  if (!document.getElementById('myClickerScreen')) {
+    var clickerScreen = document.createElement('div');
+    clickerScreen.id = 'myClickerScreen';
+    clickerScreen.style.cssText = 'position:fixed;inset:0;z-index:99998;background:#0a0a14;display:none;flex-direction:column;align-items:center;';
+    clickerScreen.innerHTML = `
+      <div style="display:flex;width:100%;align-items:center;padding:14px;border-bottom:1px solid #222;background:#000;">
+        <button id="clickerBackBtn" style="background:rgba(255,255,255,0.1);border:none;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;cursor:pointer;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+        <div style="flex:1;text-align:center;color:#fff;font-weight:bold;font-size:18px;">🎯 Кликер</div>
+        <div style="width:36px;"></div>
+      </div>
+      <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:20px; width:100%;">
+        <div style="color:#25f4ee; font-size:28px; font-weight:bold;" id="clickerBalance">💎 0</div>
+        
+        <div id="clickCircle" style="width:150px; height:150px; border-radius:50%; background:radial-gradient(circle, #ff2850, #8b5cf6); display:flex; align-items:center; justify-content:center; font-size:60px; cursor:pointer; user-select:none; box-shadow: 0 0 20px rgba(139, 92, 246, 0.5); transition: transform 0.1s;">
+          👆
+        </div>
+        
+        <div style="color:#fff; font-size:16px; font-weight:bold;" id="clickStats">Твой клик: +1 💎</div>
+        
+        <button id="upgradeClickBtn" style="padding:15px 30px; border-radius:12px; border:none; background:#34c759; color:#fff; font-size:16px; font-weight:bold; cursor:pointer; width:80%;">
+          Прокачать клик (100 💎)
+        </button>
+      </div>
+    `;
+    document.body.appendChild(clickerScreen);
+  }
+
+  // Логика Кликера
+  var clickLevel = parseInt(localStorage.getItem('clickLevel') || '1');
+  var clickPower = parseInt(localStorage.getItem('clickPower') || '1');
+
+  window.updateClickerUI = function() {
+    var balEl = document.getElementById('clickerBalance');
+    if (balEl && window.S) balEl.innerText = '💎 ' + S.crystals.toLocaleString('ru-RU');
+    
+    var statsEl = document.getElementById('clickStats');
+    if (statsEl) statsEl.innerText = 'Твой клик: +' + clickPower + ' 💎';
+    
+    var upBtn = document.getElementById('upgradeClickBtn');
+    if (upBtn) {
+      // Формула стоимости: 100, 1000, 10000, 100000...
+      var cost = 100 * Math.pow(10, clickLevel - 1);
+      upBtn.innerText = 'Прокачать до ур.' + (clickLevel + 1) + ' (Стоимость: ' + cost.toLocaleString('ru-RU') + ' 💎)';
+      upBtn.dataset.cost = cost;
+    }
+  };
+
+  if (document.getElementById('clickCircle')) {
+    var circle = document.getElementById('clickCircle');
+    circle.onclick = function() {
+      if (!window.S) return;
+      
+      // Анимация нажатия
+      circle.style.transform = 'scale(0.9)';
+      setTimeout(function() { circle.style.transform = 'scale(1)'; }, 100);
+      
+      S.crystals += clickPower;
+      if (window.saveStats) saveStats();
+      if (window.updCrysUI) updCrysUI();
+      window.updateClickerUI();
+    };
+  }
+
+  if (document.getElementById('upgradeClickBtn')) {
+    document.getElementById('upgradeClickBtn').onclick = function() {
+      var cost = parseInt(this.dataset.cost);
+      if (!window.S || S.crystals < cost) { alert('Недостаточно кристаллов!'); return; }
+      
+      S.crystals -= cost;
+      clickLevel++;
+      clickPower = clickLevel; // Сила клика равна уровню (1, 2, 3 и т.д.)
+      
+      localStorage.setItem('clickLevel', clickLevel);
+      localStorage.setItem('clickPower', clickPower);
+      
+      if (window.saveStats) saveStats();
+      if (window.updCrysUI) updCrysUI();
+      window.updateClickerUI();
+    };
+  }
+
+  if (document.getElementById('clickerBackBtn')) {
+    document.getElementById('clickerBackBtn').onclick = function() { document.getElementById('myClickerScreen').style.display = 'none'; };
   }
 
   // ==========================================
@@ -2987,82 +3076,59 @@ window.addEventListener('load', function() {
   };
 
   // ==========================================
-  // 9. ВСТРАИВАНИЕ КНОПКИ ПИП В ПАНЕЛЬ УПРАВЛЕНИЯ (ПОД СМАЙЛИК)
+  // 9. КНОПКА ПИП (ПРИВЯЗАНА СПРАВА ПОД СМАЙЛИКОМ, НЕ ПЕРЕКРЫВАЕТ ДОНАТЫ)
   // ==========================================
   setInterval(function() {
-    // Проверяем, открыт ли стрим
     var isStreamUIOpen = document.body.innerText.includes('REC');
 
-    // Если стрим открыт, ищем панель с кнопками (где кнопка микрофона/смайлик)
-    if (isStreamUIOpen && !document.getElementById('inlinePipBtn')) {
+    if (isStreamUIOpen && !document.getElementById('gamePipButton')) {
+        var pipBtn = document.createElement('div');
+        pipBtn.id = 'gamePipButton';
         
-        // Ищем контейнер с кнопками по правому краю (там где иконки)
-        var containers = document.querySelectorAll('div');
-        var rightToolbar = null;
+        // Привязываем жестко к правому краю, опускаем чуть ниже смайлика.
+        // z-index: 100 (донаты обычно выше, поэтому они перекроют кнопку, когда вылезут)
+        pipBtn.style.cssText = 'position: fixed; right: 15px; top: 48%; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 100; background: rgba(0,0,0,0.3); border-radius: 50%;';
+        
+        pipBtn.innerHTML = `
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect>
+                <rect x="12" y="12" width="8" height="6" fill="white"></rect>
+            </svg>
+        `;
+        document.body.appendChild(pipBtn);
 
-        for (var i = 0; i < containers.length; i++) {
-            var el = containers[i];
-            // Ищем блок, в котором лежит несколько svg (микрофон, камера, смайл)
-            if (el.querySelectorAll('svg').length >= 2 && el.getBoundingClientRect().left > window.innerWidth / 2) {
-                rightToolbar = el;
-                break;
+        pipBtn.onclick = function() {
+            if (navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia) {
+                navigator.mediaDevices.getDisplayMedia({ video: true }).then(function(stream) {
+                    var pipWindow = document.createElement('div');
+                    pipWindow.id = 'gamePipWindow';
+                    pipWindow.style.cssText = 'position:fixed; top:20px; left:20px; width:200px; height:300px; background:#000; z-index:10000; border:2px solid #ff2850; border-radius:12px; display:flex; flex-direction:column; overflow:hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.5);';
+                    
+                    pipWindow.innerHTML = `
+                        <div style="background:#222; color:#fff; padding:8px; font-size:12px; display:flex; justify-content:space-between;">
+                            <span>Вы в эфире</span>
+                            <button id="stopPipBtn" style="background:red; color:#fff; border:none; border-radius:4px; padding:2px 8px; cursor:pointer;">Стоп</button>
+                        </div>
+                        <video id="pipVideoEl" autoplay muted style="flex:1; object-fit:cover; width:100%;"></video>
+                    `;
+                    document.body.appendChild(pipWindow);
+                    document.getElementById('pipVideoEl').srcObject = stream;
+
+                    document.getElementById('stopPipBtn').onclick = function() {
+                        stream.getTracks().forEach(track => track.stop());
+                        pipWindow.remove();
+                    };
+                }).catch(function(err) {
+                    alert("Ошибка: браузер не разрешил запись экрана. (На iPhone это не работает).");
+                });
+            } else {
+                alert("Твой браузер не поддерживает ПиП.");
             }
-        }
-
-        if (rightToolbar) {
-            // Создаем кнопку ПиП
-            var pipBtn = document.createElement('div');
-            pipBtn.id = 'inlinePipBtn';
-            
-            // Стилизуем её как остальные кнопки в панели (без position: fixed!)
-            pipBtn.style.cssText = 'width: 45px; height: 45px; margin-top: 20px; display: flex; align-items: center; justify-content: center; cursor: pointer;';
-            
-            // Иконка ПиП
-            pipBtn.innerHTML = `
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect>
-                    <rect x="12" y="12" width="8" height="6" fill="white"></rect>
-                </svg>
-            `;
-
-            // Вставляем кнопку В КОНЕЦ панели (под смайлик)
-            rightToolbar.appendChild(pipBtn);
-
-            // Логика запуска записи экрана
-            pipBtn.onclick = function() {
-                if (navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia) {
-                    navigator.mediaDevices.getDisplayMedia({ video: true }).then(function(stream) {
-                        var pipWindow = document.createElement('div');
-                        pipWindow.id = 'gamePipWindow';
-                        pipWindow.style.cssText = 'position:fixed; top:20px; left:20px; width:200px; height:300px; background:#000; z-index:10000; border:2px solid #ff2850; border-radius:12px; display:flex; flex-direction:column; overflow:hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.5);';
-                        
-                        pipWindow.innerHTML = `
-                            <div style="background:#222; color:#fff; padding:8px; font-size:12px; display:flex; justify-content:space-between;">
-                                <span>Вы в эфире</span>
-                                <button id="stopPipBtn" style="background:red; color:#fff; border:none; border-radius:4px; padding:2px 8px; cursor:pointer;">Стоп</button>
-                            </div>
-                            <video id="pipVideoEl" autoplay muted style="flex:1; object-fit:cover; width:100%;"></video>
-                        `;
-                        document.body.appendChild(pipWindow);
-                        document.getElementById('pipVideoEl').srcObject = stream;
-
-                        document.getElementById('stopPipBtn').onclick = function() {
-                            stream.getTracks().forEach(track => track.stop());
-                            pipWindow.remove();
-                        };
-                    }).catch(function(err) {
-                        alert("Ошибка: браузер не разрешил запись экрана.");
-                    });
-                } else {
-                    alert("Твой браузер не поддерживает ПиП.");
-                }
-            };
-        }
+        };
     }
 
-    // Если стрим закрыт, удаляем кнопку и окошко
     if (!isStreamUIOpen) {
-        var btn = document.getElementById('inlinePipBtn');
+        var btn = document.getElementById('gamePipButton');
         if (btn) btn.remove();
         var pipWin = document.getElementById('gamePipWindow');
         if (pipWin) pipWin.remove();
@@ -3083,6 +3149,14 @@ window.addEventListener('load', function() {
       if (auth.currentUser) { auth.signOut(); } else { window.fbLogin(); }
     }
     if (target.id === 'myCloseBtn') { document.getElementById('myCrystalModal').style.display = 'none'; }
+    
+    // Открытие Кликера
+    if (target.id === 'myClickerBtn') { 
+      document.getElementById('myCrystalModal').style.display = 'none'; 
+      document.getElementById('myClickerScreen').style.display = 'flex'; 
+      window.updateClickerUI(); 
+    }
+    
     if (target.id === 'myCasinoBtn') { document.getElementById('myCrystalModal').style.display = 'none'; if (window.openCasino) window.openCasino(); }
     if (target.id === 'myStocksBtn') { document.getElementById('myCrystalModal').style.display = 'none'; alert('Акции в разработке'); }
     if (target.id === 'myVotesBtn') { document.getElementById('myCrystalModal').style.display = 'none'; document.getElementById('myVotesScreen').style.display = 'flex'; }
