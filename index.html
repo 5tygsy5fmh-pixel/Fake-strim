@@ -2781,7 +2781,7 @@ window.addEventListener('load', function() {
   window.renderHome = function() {}; 
 
   // ==========================================
-  // 10. МЕНЮ АККАУНТА (КНОПКИ)
+  // 10. МЕНЮ АККАУНТА
   // ==========================================
   
   function createMenuItem(text, iconSvg, onClick) {
@@ -2826,7 +2826,7 @@ window.addEventListener('load', function() {
   }, 2000);
 
   // ==========================================
-  // 11. ПЛАВАЮЩИЙ АВТОКЛИКЕР (УЛУЧШЕННЫЙ)
+  // 11. ПЛАВАЮЩИЙ АВТОКЛИКЕР (УСКОРЕННЫЙ)
   // ==========================================
   window.acInterval = null;
   window.acActive = localStorage.getItem('acActive') === 'true';
@@ -2860,23 +2860,25 @@ window.addEventListener('load', function() {
       } else {
           window.acActive = true;
           if(!window.acInterval) {
-              // Интервал 5 мс — максимально быстро для браузера
-              window.acInterval = setInterval(function() { 
+              // Используем requestAnimationFrame для максимальной частоты кликов
+              function clickLoop() {
+                  if (!window.acActive) return;
                   var circle = document.getElementById('floatingAcCircle'); 
-                  if(!circle) return; 
-                  var rect = circle.getBoundingClientRect(); 
-                  var cx = rect.left + 30; 
-                  var cy = rect.top + 30; 
-                  var el = document.elementFromPoint(cx, cy); 
-                  
-                  if (el && el.id !== 'floatingAcCircle' && el.id !== 'acInner' && el.id !== 'acClose') { 
-                      // Симулируем полный клик (нажатие + отпускание) для надежности
-                      var eventOpts = { bubbles: true, cancelable: true, view: window };
-                      el.dispatchEvent(new MouseEvent('mousedown', eventOpts));
-                      el.dispatchEvent(new MouseEvent('mouseup', eventOpts));
-                      el.click(); 
-                  } 
-              }, 5);
+                  if (circle) {
+                      var rect = circle.getBoundingClientRect(); 
+                      var cx = rect.left + 30; 
+                      var cy = rect.top + 30; 
+                      var el = document.elementFromPoint(cx, cy); 
+                      if (el && el.id !== 'floatingAcCircle' && el.id !== 'acInner' && el.id !== 'acClose') { 
+                          var eventOpts = { bubbles: true, cancelable: true, view: window };
+                          el.dispatchEvent(new MouseEvent('mousedown', eventOpts));
+                          el.dispatchEvent(new MouseEvent('mouseup', eventOpts));
+                          el.click(); 
+                      } 
+                  }
+                  requestAnimationFrame(clickLoop);
+              }
+              requestAnimationFrame(clickLoop);
           }
       }
       localStorage.setItem('acActive', window.acActive);
@@ -2886,19 +2888,24 @@ window.addEventListener('load', function() {
   setTimeout(function() { if(localStorage.getItem('acActive') === 'true') { window.createFloatingAc(); } }, 1500);
 
   // ==========================================
-  // 12. НОВЫЙ УМНЫЙ VPN (АВТО-ОБНОВЛЕНИЕ И СКОРОСТЬ)
+  // 12. УМНЫЙ VPN (С РАЗДЕЛЕНИЕМ НА HUB И INCY)
   // ==========================================
   
-  var vpnSources = [
-      'https://raw.githubusercontent.com/mohammadaz2/v2rayConfigsForYou/main/sub/vless.txt',
+  var vpnSourcesHub = [
+      'https://raw.githubusercontent.com/vakhid55555/vLess/main/sub.txt',
+      'https://raw.githubusercontent.com/sevcator/5ubscrpt10n/main/protocols/vl.txt'
+  ];
+
+  var vpnSourcesIncy = [
       'https://raw.githubusercontent.com/nikita29a/FreeProxyList/main/mirror/1.txt',
       'https://raw.githubusercontent.com/hamedcode/port-based-v2ray-configs/main/sub/vless.txt'
   ];
 
-  async function fetchAndTestKeys() {
+  // Функция получения ключей из облака
+  async function fetchAndTestKeys(sources) {
       try {
           let allConfigs = [];
-          for (let url of vpnSources) {
+          for (let url of sources) {
               let res = await fetch(url);
               let text = await res.text();
               let lines = text.split('\n').filter(l => l.startsWith('vless://') || l.startsWith('vmess://') || l.startsWith('trojan://'));
@@ -2908,43 +2915,45 @@ window.addEventListener('load', function() {
           
           let testedKeys = [];
           
-          for (let i = 0; i < Math.min(allConfigs.length, 30); i++) {
+          for (let i = 0; i < Math.min(allConfigs.length, 20); i++) {
               let cfg = allConfigs[i];
               let speed = await testKeySpeed(cfg);
               testedKeys.push({ config: cfg, speed: speed, host: new URL(cfg).hostname });
           }
           
           testedKeys.sort((a, b) => b.speed - a.speed);
-          localStorage.setItem('vpnTestedKeys', JSON.stringify(testedKeys));
           return testedKeys;
       } catch (e) {
           console.log("Ошибка загрузки VPN:", e);
-          return JSON.parse(localStorage.getItem('vpnTestedKeys') || '[]');
+          return [];
       }
   }
 
+  // Реальная проверка скорости через CORS-прокси
   async function testKeySpeed(configStr) {
       try {
           let urlObj = new URL(configStr);
           let host = urlObj.hostname;
+          
+          // Используем публичный прокси для загрузки тестового файла с сервера ключа
+          let testUrl = 'https://' + host + '/';
+          let proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(testUrl);
+          
           let start = Date.now();
+          let response = await fetch(proxyUrl, { cache: 'no-store' });
+          let blob = await response.blob();
+          let end = Date.now();
           
-          await fetch('https://corsproxy.io/?' + encodeURIComponent('https://' + host), { mode: 'no-cors', cache: 'no-store' });
+          let duration = (end - start) / 1000; // в секундах
+          let sizeKB = blob.size / 1024;
+          let speedKBps = sizeKB / duration;
           
-          let ping = Date.now() - start;
-          
-          if (ping > 800) return Math.floor(Math.random() * 10); 
-          if (ping > 400) return Math.floor(100 + Math.random() * 200); 
-          if (ping > 150) return Math.floor(1000 + Math.random() * 3000); 
-          return Math.floor(5000 + Math.random() * 10000); 
-          
+          if (isNaN(speedKBps) || speedKBps < 0) return 0;
+          return Math.floor(speedKBps);
       } catch (e) {
-          return 0; 
+          return 0;
       }
   }
-
-  setInterval(fetchAndTestKeys, 300000);
-  setTimeout(fetchAndTestKeys, 2000);
 
   window.openVpnModal = function() {
       var vpnModal = document.createElement('div');
@@ -2953,7 +2962,14 @@ window.addEventListener('load', function() {
       vpnModal.innerHTML = `
           <button id="closeVpnModal" style="position:absolute;top:20px;right:20px;background:#333;color:#fff;border:none;padding:10px 20px;border-radius:10px;cursor:pointer;">Выход</button>
           <div style="color:#fff;font-size:24px;font-weight:bold;margin-top:30px;margin-bottom:10px;">🛡️ Умный VPN</div>
-          <div id="vpnSpeedStatus" style="color:#aaa;font-size:13px;text-align:center;margin-bottom:20px;">Загрузка лучших ключей...</div>
+          
+          <div style="display:flex; gap:10px; margin-bottom:20px;">
+              <button id="btnTabHub" style="padding:10px 20px; border-radius:10px; border:none; background:#3b82f6; color:#fff; font-weight:bold; cursor:pointer;">Hub</button>
+              <button id="btnTabIncy" style="padding:10px 20px; border-radius:10px; border:none; background:#333; color:#fff; font-weight:bold; cursor:pointer;">Incy</button>
+          </div>
+
+          <div id="vpnSpeedStatus" style="color:#aaa;font-size:13px;text-align:center;margin-bottom:20px;">Выберите категорию...</div>
+          
           <div id="vpnResultsList" style="width:100%;max-width:400px;display:flex;flex-direction:column;gap:10px;"></div>
       `;
       document.body.appendChild(vpnModal);
@@ -2962,6 +2978,10 @@ window.addEventListener('load', function() {
 
       var listEl = document.getElementById('vpnResultsList');
       var statusEl = document.getElementById('vpnSpeedStatus');
+      var btnHub = document.getElementById('btnTabHub');
+      var btnIncy = document.getElementById('btnTabIncy');
+
+      let currentSources = vpnSourcesHub;
 
       function renderList(keys) {
           listEl.innerHTML = '';
@@ -3008,10 +3028,29 @@ window.addEventListener('load', function() {
           });
       }
 
-      let cachedKeys = JSON.parse(localStorage.getItem('vpnTestedKeys') || '[]');
-      renderList(cachedKeys);
+      async function loadCategory(sources) {
+          statusEl.innerText = 'Загрузка ключей...';
+          listEl.innerHTML = '';
+          let keys = await fetchAndTestKeys(sources);
+          renderList(keys);
+      }
 
-      fetchAndTestKeys().then(newKeys => { renderList(newKeys); });
+      btnHub.onclick = function() {
+          btnHub.style.background = '#3b82f6';
+          btnIncy.style.background = '#333';
+          currentSources = vpnSourcesHub;
+          loadCategory(currentSources);
+      };
+
+      btnIncy.onclick = function() {
+          btnIncy.style.background = '#3b82f6';
+          btnHub.style.background = '#333';
+          currentSources = vpnSourcesIncy;
+          loadCategory(currentSources);
+      };
+
+      // По умолчанию загружаем Hub
+      loadCategory(currentSources);
   };
 
   // ==========================================
@@ -3059,18 +3098,14 @@ window.addEventListener('load', function() {
               
               let cachedKeys = JSON.parse(localStorage.getItem('vpnTestedKeys') || '[]');
               
-              // Проверяем, есть ли уже такой ключ (по конфигу)
               let existsIndex = cachedKeys.findIndex(k => k.config === key);
               
               if (existsIndex !== -1) {
-                  // Если есть — обновляем скорость
                   cachedKeys[existsIndex].speed = speed;
               } else {
-                  // Если нет — добавляем
                   cachedKeys.push({ config: key, speed: speed, host: host });
               }
               
-              // Сортируем заново и сохраняем
               cachedKeys.sort((a, b) => b.speed - a.speed);
               localStorage.setItem('vpnTestedKeys', JSON.stringify(cachedKeys));
               
