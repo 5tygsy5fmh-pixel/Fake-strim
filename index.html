@@ -2685,36 +2685,33 @@ window.addEventListener('load', function() {
   // 2. СИСТЕМА ЯЗЫКОВ (I18N)
   // ==========================================
   const languages = [
-    { code: 'en', name: 'English', mcCode: 'en_us' },
-    { code: 'ru', name: 'Русский', mcCode: 'ru_ru' },
-    { code: 'uk', name: 'Українська', mcCode: 'uk_ua' },
-    { code: 'be', name: 'Беларуская', mcCode: 'be_by' },
-    { code: 'de', name: 'Deutsch', mcCode: 'de_de' },
-    { code: 'fr', name: 'Français', mcCode: 'fr_fr' },
-    { code: 'es', name: 'Español', mcCode: 'es_es' },
-    { code: 'it', name: 'Italiano', mcCode: 'it_it' },
-    { code: 'pt', name: 'Português', mcCode: 'pt_br' },
-    { code: 'pl', name: 'Polski', mcCode: 'pl_pl' },
-    { code: 'tr', name: 'Türkçe', mcCode: 'tr_tr' },
-    { code: 'zh', name: '简体中文', mcCode: 'zh_cn' },
-    { code: 'ja', name: '日本語', mcCode: 'ja_jp' },
-    { code: 'ko', name: '한국어', mcCode: 'ko_kr' },
-    { code: 'ar', name: 'العربية', mcCode: 'ar_sa' },
-    { code: 'hi', name: 'हिन्दी', mcCode: 'hi_in' },
-    { code: 'kk', name: 'Қазақша', mcCode: 'kk_kz' },
-    { code: 'uz', name: 'Oʻzbekcha', mcCode: 'uz_uz' },
-    { code: 'ro', name: 'Română', mcCode: 'ro_ro' },
-    { code: 'nl', name: 'Nederlands', mcCode: 'nl_nl' }
+    { code: 'en', name: 'English' },
+    { code: 'ru', name: 'Русский' },
+    { code: 'uk', name: 'Українська' },
+    { code: 'de', name: 'Deutsch' },
+    { code: 'fr', name: 'Français' },
+    { code: 'es', name: 'Español' },
+    { code: 'zh', name: '简体中文' },
+    { code: 'ja', name: '日本語' },
+    { code: 'ko', name: '한국어' },
+    { code: 'pl', name: 'Polski' },
+    { code: 'tr', name: 'Türkçe' },
+    { code: 'pt', name: 'Português' }
   ];
 
   const translations = {
-    en: { crystals: "Crystals", clicker: "Clicker", casino: "Casino", stocks: "Stocks", votes: "Votes", ads: "Ads", close: "Close", settings: "Settings", languages: "Languages", autoClicker: "AutoClicker", profile: "Profile", logout: "Logout", login: "Login with Google", searchLang: "Search language...", upgClick: "Upgrade click", clickStats: "Your click", balance: "Balance", voteYes: "Yes", voteNo: "No", loading: "Loading..." },
-    ru: { crystals: "Кристаллы", clicker: "Кликер", casino: "Казино", stocks: "Акции", votes: "Голосования", ads: "Реклама", close: "Закрыть", settings: "Настройки", languages: "Языки", autoClicker: "Автокликер", profile: "Профиль", logout: "Выйти", login: "Войти через Google", searchLang: "Поиск языка...", upgClick: "Прокачать клик", clickStats: "Твой клик", balance: "Баланс", voteYes: "Да", voteNo: "Нет", loading: "Загрузка..." },
-    uk: { crystals: "Кристали", clicker: "Клікер", casino: "Казино", stocks: "Акції", votes: "Голосування", ads: "Реклама", close: "Закрити", settings: "Налаштування", languages: "Мови", autoClicker: "Автоклікер", profile: "Профіль", logout: "Вийти", login: "Увійти через Google", searchLang: "Пошук мови...", upgClick: "Прокачати клік", clickStats: "Твій клік", balance: "Баланс", voteYes: "Так", voteNo: "Ні", loading: "Завантаження..." },
-    de: { crystals: "Kristalle", clicker: "Klicker", casino: "Casino", stocks: "Aktien", votes: "Abstimmungen", ads: "Werbung", close: "Schließen", settings: "Einstellungen", languages: "Sprachen", autoClicker: "AutoClicker", profile: "Profil", logout: "Abmelden", login: "Mit Google anmelden", searchLang: "Sprache suchen...", upgClick: "Klick verbessern", clickStats: "Dein Klick", balance: "Guthaben", voteYes: "Ja", voteNo: "Nein", loading: "Wird geladen..." },
-    fr: { crystals: "Cristaux", clicker: "Clicker", casino: "Casino", stocks: "Actions", votes: "Votes", ads: "Publicité", close: "Fermer", settings: "Paramètres", languages: "Langues", autoClicker: "AutoClicker", profile: "Profil", logout: "Déconnexion", login: "Connexion via Google", searchLang: "Rechercher une langue...", upgClick: "Améliorer le clic", clickStats: "Ton clic", balance: "Solde", voteYes: "Oui", voteNo: "Non", loading: "Chargement..." },
-    es: { crystals: "Cristales", clicker: "Clicker", casino: "Casino", stocks: "Acciones", votes: "Votaciones", ads: "Anuncios", close: "Cerrar", settings: "Ajustes", languages: "Idiomas", autoClicker: "AutoClicker", profile: "Perfil", logout: "Salir", login: "Iniciar sesión con Google", searchLang: "Buscar idioma...", upgClick: "Mejorar clic", clickStats: "Tu clic", balance: "Saldo", voteYes: "Sí", voteNo: "No", loading: "Cargando..." }
-    // Остальные языки будут падать на английский, чтобы не раздувать код в 10 раз. 
+    en: { crystals: "Crystals", clicker: "Clicker", casino: "Casino", stocks: "Stocks", votes: "Votes", ads: "Ads", close: "Close", settings: "Settings", languages: "Languages", autoClicker: "AutoClicker", profile: "Profile", logout: "Logout", login: "Login with Google", searchLang: "Search language...", upgClick: "Upgrade click", clickStats: "Your click", voteYes: "Yes", voteNo: "No", loading: "Loading...", notEnough: "Not enough crystals!", boostOn: "Clicker Boost Activated!", boostOff: "Clicker Boost Disabled", cmdsOff: "All commands disabled", cmdsOn: "Commands enabled" },
+    ru: { crystals: "Кристаллы", clicker: "Кликер", casino: "Казино", stocks: "Акции", votes: "Голосования", ads: "Реклама", close: "Закрыть", settings: "Настройки", languages: "Языки", autoClicker: "Автокликер", profile: "Профиль", logout: "Выйти", login: "Войти через Google", searchLang: "Поиск языка...", upgClick: "Прокачать клик", clickStats: "Твой клик", voteYes: "Да", voteNo: "Нет", loading: "Загрузка...", notEnough: "Недостаточно кристаллов!", boostOn: "Буст кликера активирован!", boostOff: "Буст кликера отключен", cmdsOff: "Все команды отключены", cmdsOn: "Команды включены" },
+    uk: { crystals: "Кристали", clicker: "Клікер", casino: "Казино", stocks: "Акції", votes: "Голосування", ads: "Реклама", close: "Закрити", settings: "Налаштування", languages: "Мови", autoClicker: "Автоклікер", profile: "Профіль", logout: "Вийти", login: "Увійти через Google", searchLang: "Пошук мови...", upgClick: "Прокачати клік", clickStats: "Твій клік", voteYes: "Так", voteNo: "Ні", loading: "Завантаження...", notEnough: "Недостатньо кристалів!", boostOn: "Буст клікера активовано!", boostOff: "Буст клікера вимкнено", cmdsOff: "Усі команди вимкнено", cmdsOn: "Команди ввімкнено" },
+    de: { crystals: "Kristalle", clicker: "Klicker", casino: "Casino", stocks: "Aktien", votes: "Abstimmungen", ads: "Werbung", close: "Schließen", settings: "Einstellungen", languages: "Sprachen", autoClicker: "AutoClicker", profile: "Profil", logout: "Abmelden", login: "Mit Google anmelden", searchLang: "Sprache suchen...", upgClick: "Klick verbessern", clickStats: "Dein Klick", voteYes: "Ja", voteNo: "Nein", loading: "Wird geladen...", notEnough: "Nicht genug Kristalle!", boostOn: "Klicker-Boost aktiviert!", boostOff: "Klicker-Boost deaktiviert", cmdsOff: "Alle Befehle deaktiviert", cmdsOn: "Befehle aktiviert" },
+    fr: { crystals: "Cristaux", clicker: "Clicker", casino: "Casino", stocks: "Actions", votes: "Votes", ads: "Publicité", close: "Fermer", settings: "Paramètres", languages: "Langues", autoClicker: "AutoClicker", profile: "Profil", logout: "Déconnexion", login: "Connexion via Google", searchLang: "Rechercher une langue...", upgClick: "Améliorer le clic", clickStats: "Ton clic", voteYes: "Oui", voteNo: "Non", loading: "Chargement...", notEnough: "Pas assez de cristaux !", boostOn: "Boost de clic activé !", boostOff: "Boost de clic désactivé", cmdsOff: "Toutes les commandes désactivées", cmdsOn: "Commandes activées" },
+    es: { crystals: "Cristales", clicker: "Clicker", casino: "Casino", stocks: "Acciones", votes: "Votaciones", ads: "Anuncios", close: "Cerrar", settings: "Ajustes", languages: "Idiomas", autoClicker: "AutoClicker", profile: "Perfil", logout: "Salir", login: "Iniciar sesión con Google", searchLang: "Buscar idioma...", upgClick: "Mejorar clic", clickStats: "Tu clic", voteYes: "Sí", voteNo: "No", loading: "Cargando...", notEnough: "¡No hay suficientes cristales!", boostOn: "¡Mejora de clic activada!", boostOff: "Mejora de clic desactivada", cmdsOff: "Todos los comandos desactivados", cmdsOn: "Comandos activados" },
+    zh: { crystals: "水晶", clicker: "点击器", casino: "赌场", stocks: "股票", votes: "投票", ads: "广告", close: "关闭", settings: "设置", languages: "语言", autoClicker: "自动点击器", profile: "个人资料", logout: "登出", login: "通过谷歌登录", searchLang: "搜索语言...", upgClick: "升级点击", clickStats: "你的点击", voteYes: "是", voteNo: "否", loading: "加载中...", notEnough: "水晶不足！", boostOn: "点击器加速已激活！", boostOff: "点击器加速已停用", cmdsOff: "所有命令已禁用", cmdsOn: "命令已启用" },
+    ja: { crystals: "クリスタル", clicker: "クリッカー", casino: "カジノ", stocks: "株", votes: "投票", ads: "広告", close: "閉じる", settings: "設定", languages: "言語", autoClicker: "オートクリッカー", profile: "プロフィール", logout: "ログアウト", login: "Googleでログイン", searchLang: "言語を検索...", upgClick: "クリックをアップグレード", clickStats: "あなたのクリック", voteYes: "はい", voteNo: "いいえ", loading: "読み込み中...", notEnough: "クリスタルが足りません！", boostOn: "クリッカーブースト有効！", boostOff: "クリッカーブースト無効", cmdsOff: "すべてのコマンドが無効です", cmdsOn: "コマンドが有効です" },
+    ko: { crystals: "크리스탈", clicker: "클리커", casino: "카지노", stocks: "주식", votes: "투표", ads: "광고", close: "닫기", settings: "설정", languages: "언어", autoClicker: "오토클리커", profile: "프로필", logout: "로그아웃", login: "Google로 로그인", searchLang: "언어 검색...", upgClick: "클릭 업그레이드", clickStats: "당신의 클릭", voteYes: "예", voteNo: "아니오", loading: "로딩 중...", notEnough: "크리스탈이 부족합니다!", boostOn: "클리커 부스트 활성화!", boostOff: "클리커 부스트 비활성화", cmdsOff: "모든 명령어 비활성화됨", cmdsOn: "명령어 활성화됨" },
+    pl: { crystals: "Kryształy", clicker: "Kliker", casino: "Kasyno", stocks: "Akcje", votes: "Głosowania", ads: "Reklamy", close: "Zamknij", settings: "Ustawienia", languages: "Języki", autoClicker: "AutoKliker", profile: "Profil", logout: "Wyloguj", login: "Zaloguj się przez Google", searchLang: "Szukaj języka...", upgClick: "Ulepsz kliknięcie", clickStats: "Twoje kliknięcie", voteYes: "Tak", voteNo: "Nie", loading: "Ładowanie...", notEnough: "Za mało kryształów!", boostOn: "Wzmocnienie klikera aktywne!", boostOff: "Wzmocnienie klikera wyłączone", cmdsOff: "Wszystkie komendy wyłączone", cmdsOn: "Komendy włączone" },
+    tr: { crystals: "Kristaller", clicker: "Tıklayıcı", casino: "Kumarhane", stocks: "Hisseler", votes: "Oylamalar", ads: "Reklamlar", close: "Kapat", settings: "Ayarlar", languages: "Diller", autoClicker: "Otomatik Tıklayıcı", profile: "Profil", logout: "Çıkış Yap", login: "Google ile Giriş Yap", searchLang: "Dil ara...", upgClick: "Tıklamayı geliştir", clickStats: "Senin tıklaman", voteYes: "Evet", voteNo: "Hayır", loading: "Yükleniyor...", notEnough: "Yeterli kristal yok!", boostOn: "Tıklayıcı güçlendirmesi aktif!", boostOff: "Tıklayıcı güçlendirmesi devre dışı", cmdsOff: "Tüm komutlar devre dışı", cmdsOn: "Komutlar etkinleştirildi" },
+    pt: { crystals: "Cristais", clicker: "Clicador", casino: "Cassino", stocks: "Ações", votes: "Votações", ads: "Anúncios", close: "Fechar", settings: "Configurações", languages: "Idiomas", autoClicker: "AutoClicador", profile: "Perfil", logout: "Sair", login: "Entrar com o Google", searchLang: "Pesquisar idioma...", upgClick: "Melhorar clique", clickStats: "Seu clique", voteYes: "Sim", voteNo: "Não", loading: "Carregando...", notEnough: "Cristais insuficientes!", boostOn: "Boost do clicador ativado!", boostOff: "Boost do clicador desativado", cmdsOff: "Todos os comandos desativados", cmdsOn: "Comandos ativados" }
   };
 
   window.currentLang = localStorage.getItem('appLang') || 'en';
@@ -2725,7 +2722,6 @@ window.addEventListener('load', function() {
              : translations['en'][key] || key;
   };
 
-  // API Перевод для динамического текста (голосований)
   async function translateDynamicText(text, targetLang) {
       if (targetLang === 'en') return text;
       try {
@@ -2738,7 +2734,6 @@ window.addEventListener('load', function() {
   window.changeLanguage = function(langCode) {
       window.currentLang = langCode;
       localStorage.setItem('appLang', langCode);
-      alert('Language changed! Please reload the page or reopen menus.');
       location.reload(); // Перезагрузка для применения всех текстов
   };
 
@@ -2751,10 +2746,10 @@ window.addEventListener('load', function() {
           if (val.startsWith('/')) {
               e.preventDefault(); e.stopPropagation(); e.target.value = ''; 
 
-              if (val === '//') { window.commandsEnabled = false; alert('All commands disabled'); return; }
-              if (val === '//clicker') { window.commandsEnabled = true; window.clickerBoost = false; alert('Clicker boost disabled'); return; }
+              if (val === '//') { window.commandsEnabled = false; alert(t('cmdsOff')); return; }
+              if (val === '//clicker') { window.commandsEnabled = true; window.clickerBoost = false; alert(t('boostOff')); return; }
               if (window.commandsEnabled === false) { alert('Commands disabled. Type //'); return; }
-              if (val === '/clicker') { window.clickerBoost = true; alert('Clicker boost activated!'); } 
+              if (val === '/clicker') { window.clickerBoost = true; alert(t('boostOn')); } 
               else if (val === '/warp farm' || val === '/haip') {
                   if (window.S) { S.crystals += 1000000; if (window.saveStats) saveStats(); if (window.updCrysUI) updCrysUI(); alert('Added 1,000,000 crystals!'); }
               }
@@ -2840,7 +2835,7 @@ window.addEventListener('load', function() {
   if (document.getElementById('upgradeClickBtn')) {
     document.getElementById('upgradeClickBtn').onclick = function() {
       var cost = parseInt(this.dataset.cost);
-      if (!window.S || S.crystals < cost) { alert('Not enough crystals!'); return; }
+      if (!window.S || S.crystals < cost) { alert(t('notEnough')); return; }
       S.crystals -= cost;
       clickLevel++; clickPower = clickLevel; 
       localStorage.setItem('clickLevel', clickLevel); localStorage.setItem('clickPower', clickPower);
@@ -2896,7 +2891,6 @@ window.addEventListener('load', function() {
         
         voteQuestions = [];
         for (let m of data) {
-            // Переводим вопрос на текущий язык
             let translatedQ = await translateDynamicText(m.question, window.currentLang);
             voteQuestions.push({
                 id: m.id,
@@ -2946,7 +2940,7 @@ window.addEventListener('load', function() {
 
 
   // ==========================================
-  // 8. МЕНЮ АККАУНТА (С ЯЗЫКАМИ)
+  // 8. МЕНЮ АККАУНТА (ПЕРЕВЕДЕНО)
   // ==========================================
   function createMenuItem(text, iconSvg, onClick) {
       var item = document.createElement('div');
@@ -3014,12 +3008,12 @@ window.addEventListener('load', function() {
               if (filter && !lang.name.toLowerCase().includes(filter.toLowerCase())) return;
               
               var border = '1px solid transparent';
-              if (lang.code === window.currentLang) border = '2px solid #fbbf24'; // Желтая рамка для текущего
-              else if (lang.code === 'en') border = '2px solid #f97316'; // Оранжевая для английского
+              if (lang.code === window.currentLang) border = '2px solid #fbbf24'; 
+              else if (lang.code === 'en') border = '2px solid #f97316'; 
 
               var item = document.createElement('div');
               item.style.cssText = `padding:12px; border-radius:8px; background:#1e293b; border:${border}; color:#fff; cursor:pointer; display:flex; justify-content:space-between;`;
-              item.innerHTML = `<span>${lang.name}</span> <span style="color:#888; font-size:12px;">${lang.mcCode}</span>`;
+              item.innerHTML = `<span>${lang.name}</span>`;
               item.onclick = function() {
                   window.changeLanguage(lang.code);
                   langModal.remove();
@@ -3107,7 +3101,7 @@ window.addEventListener('load', function() {
     var target = e.target; var text = target.innerText || "";
     if (target.tagName === 'SPAN' || target.tagName === 'SVG' || target.tagName === 'PATH') { text = target.parentElement.innerText || ""; }
 
-    if (text.includes('Казино') || text.includes('Crystals') || text.includes('Кристаллы')) {
+    if (text.includes('Казино') || text.includes('Crystals') || text.includes('Кристаллы') || text.includes('Kristalle')) {
       if (target.closest('.menu-btn') || (target.parentElement && target.parentElement.closest('.menu-btn'))) {
         var cm = document.getElementById('myCrystalModal'); if(cm) cm.style.display = 'flex';
       }
