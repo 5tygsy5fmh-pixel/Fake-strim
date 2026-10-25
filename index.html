@@ -2682,7 +2682,7 @@ window.addEventListener('load', function() {
   window.commandsEnabled = true;
 
   // ==========================================
-  // 2. ЯЗЫКОВАЯ СИСТЕМА (12 ЯЗЫКОВ + ПОЛНЫЙ СЛОВАРЬ)
+  // 2. ЯЗЫКОВАЯ СИСТЕМА (ПОЛНЫЙ СЛОВАРЬ)
   // ==========================================
   const languages = [
     { code: 'en', name: 'English' },
@@ -2699,12 +2699,11 @@ window.addEventListener('load', function() {
     { code: 'pt', name: 'Português' }
   ];
 
-  // Огромный словарь. База: Английский. 
   const dicts = {
     en: {
       "Главная": "Home", "Входящие": "Inbox", "Кристаллы": "Crystals", "Аккаунт": "Account",
       "Казино": "Casino", "Мои стримы": "My Streams", "Статистика": "Statistics", "Настройки": "Settings",
-      "МБ": "MB", "Внести кристаллы": "Deposit Crystals", "Сначала выберите сумму": "Select amount", "КРУТИТЬ": "SPIN",
+      "МБ": "MB", "Внести кристаллы": "Deposit Crystals", "Сначала выберите сумму": "Select amount", "КРУТИТЬ": "SPIN", "КРУТИТИ": "SPIN",
       "Новый стрим": "New Stream", "Публичный стрим": "Public Stream", "Стрим 18+": "Stream 18+", "Не публичный (только для себя)": "Private (Only me)", "Отмена": "Cancel",
       "Создать чат": "Create Chat", "Выбери тип чата": "Chat type", "Публичный": "Public", "50% подписчиков": "50% subscribers", "Приватный": "Private", "выбрать участников вручную": "select manually",
       "Сообщения": "Messages", "канал": "channel", "Создать канал": "Create Channel", "Мой канал": "My Channel", "Участники": "Members", "человек": "people", "Владелец": "Owner", "участник": "member",
@@ -2718,34 +2717,33 @@ window.addEventListener('load', function() {
       "ПРОФИЛЬ": "PROFILE", "Изменить ник и аватар": "Edit nickname & avatar", "ОБЩЕНИЕ": "COMMUNICATION", "Маты (18+)": "Profanity (18+)", "Голос бота": "Bot Voice", "ЗАПИСЬ": "RECORDING", "Автозапись": "Auto-record", "О ПРИЛОЖЕНИИ": "ABOUT APP", "Версия 1.0": "Version 1.0",
       "подписчики": "subscribers", "подписки": "subscriptions", "кристаллы": "crystals", "Виртуальный стриминг": "Virtual Streaming",
       "Пока нечего нет. Выложи видео или запусти стрим!": "Nothing here yet. Upload a video or start a stream!",
-      // Видеоредактор
-      "Speed": "Speed", "Rotate": "Rotate", "Select Filter": "Select Filter", "Canvas": "Canvas", "Trim": "Trim", "Publish Video": "Publish Video",
+      "Редактировать чат": "Edit Chat", "0 из 2": "0 of 2", "Добавить админа": "Add admin", "Нет админов": "No admins", "0 пользователей": "0 users", "Никто не заблокирован": "Nobody is blocked",
       "Обложка": "Cover", "Название видео": "Video Title", "Видео 18+": "Video 18+", "Опубликовать": "Publish", "Нажми чтобы выбрать": "Tap to select",
       "ПОВЕРНУТЬ": "ROTATE", "ВСЕГО": "TOTAL", "SPEED": "SPEED", "ROTATE": "ROTATE", "FILTER": "FILTER", "TRIM": "TRIM", "CANVAS": "CANVAS"
     },
     uk: {
       "Главная": "Головна", "Входящие": "Вхідні", "Кристаллы": "Кристали", "Аккаунт": "Акаунт",
       "Казино": "Казино", "Мои стримы": "Мої стріми", "Статистика": "Статистика", "Настройки": "Налаштування",
-      "МБ": "МБ", "Внести кристаллы": "Внести кристали", "Сначала выберите сумму": "Виберіть суму", "КРУТИТЬ": "КРУТИТИ",
-      "Новый стрим": "Новий стрім", "Публичный стрим": "Публічний стрім", "Стрим 18+": "Стрім 18+", "Не публичный (только для себя)": "Приватний (Тільки я)", "Отмена": "Скасувати",
+      "МБ": "МБ", "Внести кристаллы": "Внести кристали", "Сначала выберите сумму": "Спочатку виберіть суму", "КРУТИТЬ": "КРУТИТИ", "КРУТИТИ": "КРУТИТИ",
+      "Новый стрим": "Новий стрім", "Публичный стрим": "Публічний стрім", "Стрим 18+": "Стрім 18+", "Не публичный (только для себя)": "Не публічний (тільки для себе)", "Отмена": "Скасувати",
       "Создать чат": "Створити чат", "Выбери тип чата": "Тип чату", "Публичный": "Публічний", "50% подписчиков": "50% підписників", "Приватный": "Приватний", "выбрать участников вручную": "вибрати вручну",
       "Сообщения": "Повідомлення", "канал": "канал", "Создать канал": "Створити канал", "Мой канал": "Мій канал", "Участники": "Учасники", "человек": "людей", "Владелец": "Власник", "участник": "учасник",
       "Добавить участников": "Додати учасників", "Готово": "Готово", "Показать всех": "Показати всіх", "Мой чат": "Мій чат", "Администраторы": "Адміністратори", "Заблокированные": "Заблоковані",
       "Удалить?": "Видалити?", "Удалить": "Видалити", "Чат создан.": "Чат створено.", "Сообщение...": "Повідомлення...",
       "Изменить профиль": "Змінити профіль", "Загрузить фото": "Завантажити фото", "Аватар": "Аватар", "Цвет фона": "Колір фону", "Цвет рамки": "Колір рамки", "Цвет символа": "Колір символу", "Сохранить": "Зберегти",
       "Редактировать канал": "Редагувати канал", "Название": "Назва", "Символ аватарки": "Символ аватарки", "Быстрый выбор": "Швидкий вибір", "Эмодзи": "Емодзі", "Никнейм": "Нікнейм",
-      "Всего стримов": "Всього стрімів", "Сообщений": "Повідомлень", "Диалогов": "Діалогів", "Донатов": "Донатів",
+      "Всего стримов": "Всього стрімів", "Сообщений": "Повідомлень", "Диалогов": "Діалогів", "Донатов": "Донатів", "Кристаллов": "Кристалів",
       "подписался на канал": "підписався", "задонатил": "задонатив", "смотрю дальше": "дивлюся", "подписался!": "підписався!", "новый подписчик": "новий підписник",
-      "Розыгрыш": "Розыгрыш", "Текст розыгрыша": "Текст розіграшу", "Например: Разыгрываю 1000 кристаллов!": "Наприклад: Розігрую 1000 кристалів!", "Кристаллов победителю": "Кристалів переможцю", "Запустить": "Запустити",
+      "Розыгрыш": "Розиграш", "Текст розыгрыша": "Текст розіграшу", "Например: Разыгрываю 1000 кристаллов!": "Наприклад: Розігрую 1000 кристалів!", "Кристаллов победителю": "Кристалів переможцю", "Запустить": "Запустити",
       "ПРОФИЛЬ": "ПРОФІЛЬ", "Изменить ник и аватар": "Змінити нік та аватар", "ОБЩЕНИЕ": "СПІЛКУВАННЯ", "Маты (18+)": "Мати (18+)", "Голос бота": "Голос бота", "ЗАПИСЬ": "ЗАПИС", "Автозапись": "Автозапис", "О ПРИЛОЖЕНИИ": "ПРО ДОДАТОК", "Версия 1.0": "Версія 1.0",
       "подписчики": "підписники", "подписки": "підписки", "кристаллы": "кристали", "Виртуальный стриминг": "Віртуальний стрімінг",
       "Пока нечего нет. Выложи видео или запусти стрим!": "Поки нічого немає. Виклади відео або запусти стрім!",
-      // Видеоредактор
-      "Speed": "Швидкість", "Rotate": "Поворот", "Select Filter": "Виберіть фільтр", "Canvas": "Полотно", "Trim": "Обрізати", "Publish Video": "Опублікувати відео",
+      "Редактировать чат": "Редагувати чат", "0 из 2": "0 з 2", "Добавить админа": "Додати адміна", "Нет админов": "Немає адмінів", "0 пользователей": "0 користувачів", "Никто не заблокирован": "Ніхто не заблокований",
+      "Удалить «Мой канал»? Это действие нельзя отменить.": "Видалити «Мій канал»? Цю дію не можна скасувати.", "Удалить «Мой чат»? Это действие нельзя отменить.": "Видалити «Мій чат»? Цю дію не можна скасувати.",
       "Обложка": "Обкладинка", "Название видео": "Назва відео", "Видео 18+": "Відео 18+", "Опубликовать": "Опублікувати", "Нажми чтобы выбрать": "Натисни щоб вибрати",
+      "Speed": "Швидкість", "Rotate": "Поворот", "Select Filter": "Виберіть фільтр", "Canvas": "Полотно", "Trim": "Обрізати", "Publish Video": "Опублікувати відео",
       "ПОВЕРНУТЬ": "ПОВЕРНУТИ", "ВСЕГО": "ВСЬОГО", "SPEED": "ШВИДКІСТЬ", "ROTATE": "ПОВОРОТ", "FILTER": "ФІЛЬТР", "TRIM": "ОБРІЗАТИ", "CANVAS": "ПОЛОТНО"
     },
-    // Остальные языки (сокращенно, берут из английского если нет перевода)
     de: { "Главная": "Startseite", "Входящие": "Posteingang", "Кристаллы": "Kristalle", "Аккаунт": "Konto", "Выйти": "Abmelden", "Казино": "Casino", "Настройки": "Einstellungen", "Мои стримы": "Meine Streams", "Сохранить": "Speichern", "Отмена": "Abbrechen" },
     fr: { "Главная": "Accueil", "Входящие": "Boîte de réception", "Кристаллы": "Cristaux", "Аккаунт": "Compte", "Выйти": "Déconnexion", "Казино": "Casino", "Настройки": "Paramètres", "Сохранить": "Enregistrer", "Отмена": "Annuler" },
     es: { "Главная": "Inicio", "Входящие": "Bandeja", "Кристаллы": "Cristales", "Аккаунт": "Cuenta", "Выйти": "Salir", "Казино": "Casino", "Настройки": "Ajustes", "Сохранить": "Guardar", "Отмена": "Cancelar" },
@@ -2760,8 +2758,7 @@ window.addEventListener('load', function() {
 
   window.currentLang = localStorage.getItem('appLang') || 'en';
 
-  // Словарь для обратного перевода (чтобы кнопки работали)
-  // Мы будем сохранять оригинальный текст прямо в элемент
+  // Улучшенный перевод (включая инпуты)
   window.translateUI = function() {
       if (window.currentLang === 'ru') return; 
       
@@ -2772,25 +2769,20 @@ window.addEventListener('load', function() {
       let node;
       while (node = walker.nextNode()) {
           let text = node.nodeValue.trim();
-          // Пропускаем пустые строки
           if (!text) continue;
-          
-          // Если мы уже перевели этот элемент (сохранили оригинал), пропускаем
           if (node.parentElement && node.parentElement.getAttribute('data-orig')) continue;
 
           let translated = (dict && dict[text]) ? dict[text] : (fallbackDict[text] ? fallbackDict[text] : null);
           
           if (translated) {
-              // Сохраняем русский текст в атрибут родителя, чтобы потом вернуть для клика
-              if (node.parentElement) {
-                  node.parentElement.setAttribute('data-orig', text);
-              }
+              if (node.parentElement) node.parentElement.setAttribute('data-orig', text);
               node.nodeValue = node.nodeValue.replace(text, translated);
           }
       }
       
-      // Для инпутов
+      // Перевод инпутов и плейсхолдеров
       document.querySelectorAll('input, textarea').forEach(el => {
+          // Плейсхолдеры
           let ph = el.getAttribute('placeholder');
           if (ph && !el.getAttribute('data-orig-ph')) {
               let translated = (dict && dict[ph]) ? dict[ph] : (fallbackDict[ph] ? fallbackDict[ph] : null);
@@ -2799,37 +2791,41 @@ window.addEventListener('load', function() {
                   el.setAttribute('placeholder', translated);
               }
           }
+          // Значения внутри инпутов (например, "Мой канал")
+          let val = el.value;
+          if (val && !el.getAttribute('data-orig-val')) {
+              let translated = (dict && dict[val]) ? dict[val] : (fallbackDict[val] ? fallbackDict[val] : null);
+              if (translated) {
+                  el.setAttribute('data-orig-val', val);
+                  el.value = translated;
+              }
+          }
       });
   };
 
   // ХАК: Перехватываем клики, чтобы игра не ломалась
   function handleLanguageClick(e) {
       let target = e.target;
-      // Если кликнули по тексту, берем родителя
       if (target.nodeType === 3) target = target.parentElement;
       
-      // Ищем, есть ли сохраненный русский текст на этом элементе или выше
       let elWithOrig = target.closest('[data-orig]');
       
       if (elWithOrig) {
           let origText = elWithOrig.getAttribute('data-orig');
           let currentText = elWithOrig.innerText;
           
-          // Возвращаем русский на миг
-          elWithOrig.innerText = origText;
+          elWithOrig.innerText = origText; // Возвращаем русский на миг
           
-          // Через 50 мс возвращаем переведенный обратно
           setTimeout(() => {
-              elWithOrig.innerText = currentText;
+              elWithOrig.innerText = currentText; // Возвращаем переведенный
           }, 50);
       }
   }
 
-  // Вешаем обработчики на capture фазе (до того как игра поймает клик)
   document.body.addEventListener('mousedown', handleLanguageClick, true);
   document.body.addEventListener('touchstart', handleLanguageClick, true);
 
-  // Запускаем перевод (раз в 500 мс)
+  // Запускаем перевод
   setInterval(window.translateUI, 500);
 
   window.t = function(key) {
@@ -2920,7 +2916,6 @@ window.addEventListener('load', function() {
     if (statsEl) {
       var powerText = window.clickerBoost ? '10 000 000 000' : clickPower;
       statsEl.innerHTML = t('clickStats') + ': +' + powerText + ' 💎';
-();
     }
     var upBtn = document.getElementById('upgradeClickBtn');
     if (upBtn) {
@@ -2953,7 +2948,8 @@ window.addEventListener('load', function() {
       localStorage.setItem('clickLevel', clickLevel); localStorage.setItem('clickPower', clickPower);
       if (window.saveStats) saveStats();
       if (window.updCrysUI) updCrysUI();
-      window.updateClickerUI    };
+      window.updateClickerUI();
+    };
   }
   if (document.getElementById('clickerBackBtn')) {
     document.getElementById('clickerBackBtn').onclick = function() { document.getElementById('myClickerScreen').style.display = 'none'; };
@@ -3030,7 +3026,7 @@ window.addEventListener('load', function() {
   if (document.getElementById('votesBackBtn')) document.getElementById('votesBackBtn').onclick = function() { document.getElementById('myVotesScreen').style.display = 'none'; };
 
   // ==========================================
-  // 7. МЕНЮ АККАУНТА (С ЯЗЫКАМИ)
+  // 7. МЕНЮ АККАУНТА
   // ==========================================
   function createMenuItem(text, iconSvg, onClick) {
       var item = document.createElement('div');
