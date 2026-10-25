@@ -2682,7 +2682,7 @@ window.addEventListener('load', function() {
   window.commandsEnabled = true;
 
   // ==========================================
-  // 2. СИСТЕМА ЯЗЫКОВ И СЛОВАРЬ ПЕРЕВОДА
+  // 2. ЯЗЫКОВАЯ СИСТЕМА (12 ЯЗЫКОВ + ПОЛНЫЙ СЛОВАРЬ)
   // ==========================================
   const languages = [
     { code: 'en', name: 'English' },
@@ -2699,75 +2699,138 @@ window.addEventListener('load', function() {
     { code: 'pt', name: 'Português' }
   ];
 
-  // Словарь для перевода
-  const uiTranslationDict = {
-    'en': {
-      // Навигация
+  // Огромный словарь. База: Английский. 
+  const dicts = {
+    en: {
       "Главная": "Home", "Входящие": "Inbox", "Кристаллы": "Crystals", "Аккаунт": "Account",
-      "Головна": "Home", "Вхідні": "Inbox", "Кристали": "Crystals", "Акаунт": "Account",
-      // Профиль
-      "Выйти": "Logout", "Войти": "Login", "Войти через Google": "Login with Google",
-      "подписчики": "subscribers", "подписки": "subscriptions", "кристаллы": "crystals", "crystals": "crystals", "subscribers": "subscribers",
-      "Мови": "Languages", "Казино": "Casino", "Мои стримы": "My Streams", "Статистика": "Statistics", "Настройки": "Settings", "Налаштування": "Settings",
-      "Виртуальный стриминг": "Virtual Streaming",
-      // Казино
-      "Внести кристаллы": "Deposit Crystals", "Сначала выберите сумму": "First select an amount", "КРУТИТЬ": "SPIN",
-      "First select an amount": "First select an amount", "x2": "x2", "x5": "x5", "x10": "x10", "x15": "x15", "x20": "x20", "x25": "x25", "x50": "x50",
-      // Настройки
-      "ПРОФИЛЬ": "PROFILE", "Изменить ник и аватар": "Change nickname & avatar", "ОБЩЕНИЕ": "COMMUNICATION", "Маты (18+)": "Profanity (18+)", "Голос бота": "Bot Voice", "ЗАПИСЬ": "RECORDING", "Автозапись": "Auto-record", "О ПРИЛОЖЕНИИ": "ABOUT APP", "Версия 1.0": "Version 1.0",
-      // Сообщения / Чаты
-      "Messages": "Messages", "My Channel": "My Channel", "channel": "channel", "подписался на канал": "subscribed to channel", "My Chat": "My Chat", "Chat created.": "Chat created.",
-      "Создать канал": "Create Channel", "Создать чат": "Create Chat", "Мой канал": "My Channel", "Мой чат": "My Chat", "МБ": "MB"
+      "Казино": "Casino", "Мои стримы": "My Streams", "Статистика": "Statistics", "Настройки": "Settings",
+      "МБ": "MB", "Внести кристаллы": "Deposit Crystals", "Сначала выберите сумму": "Select amount", "КРУТИТЬ": "SPIN",
+      "Новый стрим": "New Stream", "Публичный стрим": "Public Stream", "Стрим 18+": "Stream 18+", "Не публичный (только для себя)": "Private (Only me)", "Отмена": "Cancel",
+      "Создать чат": "Create Chat", "Выбери тип чата": "Chat type", "Публичный": "Public", "50% подписчиков": "50% subscribers", "Приватный": "Private", "выбрать участников вручную": "select manually",
+      "Сообщения": "Messages", "канал": "channel", "Создать канал": "Create Channel", "Мой канал": "My Channel", "Участники": "Members", "человек": "people", "Владелец": "Owner", "участник": "member",
+      "Добавить участников": "Add Members", "Готово": "Done", "Показать всех": "Show all", "Мой чат": "My Chat", "Администраторы": "Admins", "Заблокированные": "Blocked",
+      "Удалить?": "Delete?", "Удалить": "Delete", "Чат создан.": "Chat created.", "Сообщение...": "Message...",
+      "Изменить профиль": "Edit Profile", "Загрузить фото": "Upload Photo", "Аватар": "Avatar", "Цвет фона": "Bg Color", "Цвет рамки": "Border Color", "Цвет символа": "Symbol Color", "Сохранить": "Save",
+      "Редактировать канал": "Edit Channel", "Название": "Title", "Символ аватарки": "Avatar Symbol", "Быстрый выбор": "Quick Select", "Эмодзи": "Emoji", "Никнейм": "Nickname",
+      "Всего стримов": "Total Streams", "Сообщений": "Messages", "Диалогов": "Dialogs", "Донатов": "Donations",
+      "подписался на канал": "subscribed", "задонатил": "donated", "смотрю дальше": "watching", "подписался!": "subscribed!", "новый подписчик": "new sub",
+      "Розыгрыш": "Giveaway", "Текст розыгрыша": "Giveaway Text", "Например: Разыгрываю 1000 кристаллов!": "Example: Giveaway 1000 crystals!", "Кристаллов победителю": "Crystals to winner", "Запустить": "Start",
+      "ПРОФИЛЬ": "PROFILE", "Изменить ник и аватар": "Edit nickname & avatar", "ОБЩЕНИЕ": "COMMUNICATION", "Маты (18+)": "Profanity (18+)", "Голос бота": "Bot Voice", "ЗАПИСЬ": "RECORDING", "Автозапись": "Auto-record", "О ПРИЛОЖЕНИИ": "ABOUT APP", "Версия 1.0": "Version 1.0",
+      "подписчики": "subscribers", "подписки": "subscriptions", "кристаллы": "crystals", "Виртуальный стриминг": "Virtual Streaming",
+      "Пока нечего нет. Выложи видео или запусти стрим!": "Nothing here yet. Upload a video or start a stream!",
+      // Видеоредактор
+      "Speed": "Speed", "Rotate": "Rotate", "Select Filter": "Select Filter", "Canvas": "Canvas", "Trim": "Trim", "Publish Video": "Publish Video",
+      "Обложка": "Cover", "Название видео": "Video Title", "Видео 18+": "Video 18+", "Опубликовать": "Publish", "Нажми чтобы выбрать": "Tap to select",
+      "ПОВЕРНУТЬ": "ROTATE", "ВСЕГО": "TOTAL", "SPEED": "SPEED", "ROTATE": "ROTATE", "FILTER": "FILTER", "TRIM": "TRIM", "CANVAS": "CANVAS"
     },
-    'uk': {
-      // Навигация
+    uk: {
       "Главная": "Головна", "Входящие": "Вхідні", "Кристаллы": "Кристали", "Аккаунт": "Акаунт",
-      "Home": "Головна", "Inbox": "Вхідні", "Crystals": "Кристали", "Account": "Акаунт",
-      // Профиль
-      "Выйти": "Вийти", "Войти": "Увійти", "Войти через Google": "Увійти через Google", "Logout": "Вийти", "Login": "Увійти",
-      "подписчики": "підписники", "подписки": "підписки", "кристаллы": "кристали", "crystals": "кристали", "subscribers": "підписники",
-      "Мови": "Мови", "Казино": "Казино", "Casino": "Казино", "Мои стримы": "Мої стріми", "My Streams": "Мої стріми", "Статистика": "Статистика", "Statistics": "Статистика", "Настройки": "Налаштування", "Settings": "Налаштування",
-      "Виртуальный стриминг": "Віртуальний стрімінг",
-      // Казино
-      "Внести кристаллы": "Внести кристали", "Сначала выберите сумму": "Спочатку виберіть суму", "КРУТИТЬ": "КРУТИТИ", "First select an amount": "Спочатку виберіть суму",
-      // Настройки
+      "Казино": "Казино", "Мои стримы": "Мої стріми", "Статистика": "Статистика", "Настройки": "Налаштування",
+      "МБ": "МБ", "Внести кристаллы": "Внести кристали", "Сначала выберите сумму": "Виберіть суму", "КРУТИТЬ": "КРУТИТИ",
+      "Новый стрим": "Новий стрім", "Публичный стрим": "Публічний стрім", "Стрим 18+": "Стрім 18+", "Не публичный (только для себя)": "Приватний (Тільки я)", "Отмена": "Скасувати",
+      "Создать чат": "Створити чат", "Выбери тип чата": "Тип чату", "Публичный": "Публічний", "50% подписчиков": "50% підписників", "Приватный": "Приватний", "выбрать участников вручную": "вибрати вручну",
+      "Сообщения": "Повідомлення", "канал": "канал", "Создать канал": "Створити канал", "Мой канал": "Мій канал", "Участники": "Учасники", "человек": "людей", "Владелец": "Власник", "участник": "учасник",
+      "Добавить участников": "Додати учасників", "Готово": "Готово", "Показать всех": "Показати всіх", "Мой чат": "Мій чат", "Администраторы": "Адміністратори", "Заблокированные": "Заблоковані",
+      "Удалить?": "Видалити?", "Удалить": "Видалити", "Чат создан.": "Чат створено.", "Сообщение...": "Повідомлення...",
+      "Изменить профиль": "Змінити профіль", "Загрузить фото": "Завантажити фото", "Аватар": "Аватар", "Цвет фона": "Колір фону", "Цвет рамки": "Колір рамки", "Цвет символа": "Колір символу", "Сохранить": "Зберегти",
+      "Редактировать канал": "Редагувати канал", "Название": "Назва", "Символ аватарки": "Символ аватарки", "Быстрый выбор": "Швидкий вибір", "Эмодзи": "Емодзі", "Никнейм": "Нікнейм",
+      "Всего стримов": "Всього стрімів", "Сообщений": "Повідомлень", "Диалогов": "Діалогів", "Донатов": "Донатів",
+      "подписался на канал": "підписався", "задонатил": "задонатив", "смотрю дальше": "дивлюся", "подписался!": "підписався!", "новый подписчик": "новий підписник",
+      "Розыгрыш": "Розыгрыш", "Текст розыгрыша": "Текст розіграшу", "Например: Разыгрываю 1000 кристаллов!": "Наприклад: Розігрую 1000 кристалів!", "Кристаллов победителю": "Кристалів переможцю", "Запустить": "Запустити",
       "ПРОФИЛЬ": "ПРОФІЛЬ", "Изменить ник и аватар": "Змінити нік та аватар", "ОБЩЕНИЕ": "СПІЛКУВАННЯ", "Маты (18+)": "Мати (18+)", "Голос бота": "Голос бота", "ЗАПИСЬ": "ЗАПИС", "Автозапись": "Автозапис", "О ПРИЛОЖЕНИИ": "ПРО ДОДАТОК", "Версия 1.0": "Версія 1.0",
-      // Сообщения / Чаты
-      "Messages": "Повідомлення", "My Channel": "Мій канал", "channel": "канал", "подписался на канал": "підписався на канал", "My Chat": "Мій чат", "Chat created.": "Чат створено.",
-      "Создать канал": "Створити канал", "Создать чат": "Створити чат", "Мой канал": "Мій канал", "Мой чат": "Мій чат", "МБ": "МБ"
+      "подписчики": "підписники", "подписки": "підписки", "кристаллы": "кристали", "Виртуальный стриминг": "Віртуальний стрімінг",
+      "Пока нечего нет. Выложи видео или запусти стрим!": "Поки нічого немає. Виклади відео або запусти стрім!",
+      // Видеоредактор
+      "Speed": "Швидкість", "Rotate": "Поворот", "Select Filter": "Виберіть фільтр", "Canvas": "Полотно", "Trim": "Обрізати", "Publish Video": "Опублікувати відео",
+      "Обложка": "Обкладинка", "Название видео": "Назва відео", "Видео 18+": "Відео 18+", "Опубликовать": "Опублікувати", "Нажми чтобы выбрать": "Натисни щоб вибрати",
+      "ПОВЕРНУТЬ": "ПОВЕРНУТИ", "ВСЕГО": "ВСЬОГО", "SPEED": "ШВИДКІСТЬ", "ROTATE": "ПОВОРОТ", "FILTER": "ФІЛЬТР", "TRIM": "ОБРІЗАТИ", "CANVAS": "ПОЛОТНО"
     },
-    // Остальные языки (упрощенно)
-    'de': { "Главная": "Startseite", "Входящие": "Posteingang", "Кристаллы": "Kristalle", "Аккаунт": "Konto", "Выйти": "Abmelden", "Казино": "Casino", "Настройки": "Einstellungen" },
-    'ru': {}, 'fr': {}, 'es': {}, 'zh': {}, 'ja': {}, 'ko': {}, 'pl': {}, 'tr': {}, 'pt': {}
+    // Остальные языки (сокращенно, берут из английского если нет перевода)
+    de: { "Главная": "Startseite", "Входящие": "Posteingang", "Кристаллы": "Kristalle", "Аккаунт": "Konto", "Выйти": "Abmelden", "Казино": "Casino", "Настройки": "Einstellungen", "Мои стримы": "Meine Streams", "Сохранить": "Speichern", "Отмена": "Abbrechen" },
+    fr: { "Главная": "Accueil", "Входящие": "Boîte de réception", "Кристаллы": "Cristaux", "Аккаунт": "Compte", "Выйти": "Déconnexion", "Казино": "Casino", "Настройки": "Paramètres", "Сохранить": "Enregistrer", "Отмена": "Annuler" },
+    es: { "Главная": "Inicio", "Входящие": "Bandeja", "Кристаллы": "Cristales", "Аккаунт": "Cuenta", "Выйти": "Salir", "Казино": "Casino", "Настройки": "Ajustes", "Сохранить": "Guardar", "Отмена": "Cancelar" },
+    zh: { "Главная": "首页", "Входящие": "收件箱", "Кристаллы": "水晶", "Аккаунт": "账户", "Выйти": "登出", "Казино": "赌场", "Настройки": "设置", "Сохранить": "保存", "Отмена": "取消" },
+    ja: { "Главная": "ホーム", "Входящие": "受信トレイ", "Кристаллы": "クリスタル", "Аккаунт": "アカウント", "Выйти": "ログアウト", "Казино": "カジノ", "Настройки": "設定", "Сохранить": "保存", "Отмена": "キャンセル" },
+    ko: { "Главная": "홈", "Входящие": "받은편지함", "Кристаллы": "크리스탈", "Аккаунт": "계정", "Выйти": "로그아웃", "Казино": "카지노", "Настройки": "설정", "Сохранить": "저장", "Отмена": "취소" },
+    pl: { "Главная": "Główna", "Входящие": "Odebrane", "Кристаллы": "Kryształy", "Аккаунт": "Konto", "Выйти": "Wyloguj", "Казино": "Kasyno", "Настройки": "Ustawienia", "Сохранить": "Zapisz", "Отмена": "Anuluj" },
+    tr: { "Главная": "Ana Sayfa", "Входящие": "Gelen Kutusu", "Кристаллы": "Kristaller", "Аккаунт": "Hesap", "Выйти": "Çıkış Yap", "Казино": "Kumarhane", "Настройки": "Ayarlar", "Сохранить": "Kaydet", "Отмена": "İptal" },
+    pt: { "Главная": "Início", "Входящие": "Caixa de entrada", "Кристаллы": "Cristais", "Аккаунт": "Conta", "Выйти": "Sair", "Казино": "Cassino", "Настройки": "Configurações", "Сохранить": "Salvar", "Отмена": "Cancelar" },
+    ru: {}
   };
 
   window.currentLang = localStorage.getItem('appLang') || 'en';
 
-  // Функция «умного» перевода
+  // Словарь для обратного перевода (чтобы кнопки работали)
+  // Мы будем сохранять оригинальный текст прямо в элемент
   window.translateUI = function() {
       if (window.currentLang === 'ru') return; 
       
-      const dict = uiTranslationDict[window.currentLang];
-      if (!dict) return;
-
+      let dict = dicts[window.currentLang];
+      let fallbackDict = dicts['en'];
+      
       const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
       let node;
       while (node = walker.nextNode()) {
           let text = node.nodeValue.trim();
-          // Переводим только если текст есть в словаре
-          if (dict[text]) {
-              node.nodeValue = node.nodeValue.replace(text, dict[text]);
+          // Пропускаем пустые строки
+          if (!text) continue;
+          
+          // Если мы уже перевели этот элемент (сохранили оригинал), пропускаем
+          if (node.parentElement && node.parentElement.getAttribute('data-orig')) continue;
+
+          let translated = (dict && dict[text]) ? dict[text] : (fallbackDict[text] ? fallbackDict[text] : null);
+          
+          if (translated) {
+              // Сохраняем русский текст в атрибут родителя, чтобы потом вернуть для клика
+              if (node.parentElement) {
+                  node.parentElement.setAttribute('data-orig', text);
+              }
+              node.nodeValue = node.nodeValue.replace(text, translated);
           }
       }
-
+      
+      // Для инпутов
       document.querySelectorAll('input, textarea').forEach(el => {
           let ph = el.getAttribute('placeholder');
-          if (ph && dict[ph]) el.setAttribute('placeholder', dict[ph]);
+          if (ph && !el.getAttribute('data-orig-ph')) {
+              let translated = (dict && dict[ph]) ? dict[ph] : (fallbackDict[ph] ? fallbackDict[ph] : null);
+              if (translated) {
+                  el.setAttribute('data-orig-ph', ph);
+                  el.setAttribute('placeholder', translated);
+              }
+          }
       });
   };
 
-  // Запускаем перевод ОЧЕНЬ часто (каждые 100 мс), чтобы ловить все изменения игры
-  setInterval(window.translateUI, 100);
+  // ХАК: Перехватываем клики, чтобы игра не ломалась
+  function handleLanguageClick(e) {
+      let target = e.target;
+      // Если кликнули по тексту, берем родителя
+      if (target.nodeType === 3) target = target.parentElement;
+      
+      // Ищем, есть ли сохраненный русский текст на этом элементе или выше
+      let elWithOrig = target.closest('[data-orig]');
+      
+      if (elWithOrig) {
+          let origText = elWithOrig.getAttribute('data-orig');
+          let currentText = elWithOrig.innerText;
+          
+          // Возвращаем русский на миг
+          elWithOrig.innerText = origText;
+          
+          // Через 50 мс возвращаем переведенный обратно
+          setTimeout(() => {
+              elWithOrig.innerText = currentText;
+          }, 50);
+      }
+  }
+
+  // Вешаем обработчики на capture фазе (до того как игра поймает клик)
+  document.body.addEventListener('mousedown', handleLanguageClick, true);
+  document.body.addEventListener('touchstart', handleLanguageClick, true);
+
+  // Запускаем перевод (раз в 500 мс)
+  setInterval(window.translateUI, 500);
 
   window.t = function(key) {
       const myDict = {
@@ -2775,7 +2838,8 @@ window.addEventListener('load', function() {
         ru: { crystals: "Кристаллы", clicker: "Кликер", casino: "Казино", stocks: "Акции", votes: "Голосования", ads: "Реклама", close: "Закрыть", settings: "Настройки", languages: "Языки", autoClicker: "Автокликер", profile: "Профиль", logout: "Выйти", login: "Войти через Google", searchLang: "Поиск языка...", upgClick: "Прокачать клик", clickStats: "Твой клик", voteYes: "Да", voteNo: "Нет", loading: "Загрузка...", notEnough: "Недостаточно кристаллов!", boostOn: "Буст кликера активирован!", boostOff: "Буст кликера отключен", cmdsOff: "Все команды отключены", cmdsOn: "Команды включены" },
         uk: { crystals: "Кристали", clicker: "Клікер", casino: "Казино", stocks: "Акції", votes: "Голосування", ads: "Реклама", close: "Закрити", settings: "Налаштування", languages: "Мови", autoClicker: "Автоклікер", profile: "Профіль", logout: "Вийти", login: "Увійти через Google", searchLang: "Пошук мови...", upgClick: "Прокачати клік", clickStats: "Твій клік", voteYes: "Так", voteNo: "Ні", loading: "Завантаження...", notEnough: "Недостатньо кристалів!", boostOn: "Буст клікера активовано!", boostOff: "Буст клікера вимкнено", cmdsOff: "Усі команди вимкнено", cmdsOn: "Команди ввімкнено" }
       };
-      return (myDict[window.currentLang] && myDict[window.currentLang][key]) ? myDict[window.currentLang][key] : myDict['en'][key] || key;
+      let lang = window.currentLang === 'ru' ? 'ru' : (window.currentLang === 'uk' ? 'uk' : 'en');
+      return (myDict[lang] && myDict[lang][key]) ? myDict[lang][key] : myDict['en'][key] || key;
   };
 
   window.changeLanguage = function(langCode) {
@@ -2783,15 +2847,6 @@ window.addEventListener('load', function() {
       localStorage.setItem('appLang', langCode);
       location.reload(); 
   };
-
-  async function translateDynamicText(text, targetLang) {
-      if (targetLang === 'en') return text;
-      try {
-          let res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|${targetLang}`);
-          let data = await res.json();
-          return data.responseData.translatedText || text;
-      } catch(e) { return text; }
-  }
 
   // ==========================================
   // 3. СИСТЕМА КОМАНД
@@ -2821,13 +2876,13 @@ window.addEventListener('load', function() {
     mod.id = 'myCrystalModal';
     mod.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.9);display:none;align-items:center;justify-content:center;padding:20px;';
     mod.innerHTML = `<div style="background:#1a1a2e;border-radius:20px;padding:22px;width:100%;max-width:360px;display:flex;flex-direction:column;gap:12px">
-      <h3 style="font-size:18px;text-align:center;margin-bottom:8px;color:#fff">💎 <span data-i18n="crystals">${t('crystals')}</span></h3>
-      <button id="myClickerBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-weight:800;background:linear-gradient(135deg,#3b82f6,#2dd4bf)">🎯 <span data-i18n="clicker">${t('clicker')}</span></button>
-      <button id="myCasinoBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-weight:800;background:linear-gradient(135deg,#ff2850,#ff5c8a)">🎰 <span data-i18n="casino">${t('casino')}</span></button>
-      <button id="myStocksBtn" style="padding:18px;border-radius:14px;border:none;color:#000;font-weight:800;background:linear-gradient(135deg,#43e97b,#38f9d7)">📈 <span data-i18n="stocks">${t('stocks')}</span></button>
-      <button id="myVotesBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-weight:800;background:linear-gradient(135deg,#8b5cf6,#c88cff)">🗳️ <span data-i18n="votes">${t('votes')}</span></button>
-      <button id="myAdsBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-weight:800;background:linear-gradient(135deg,#f59e0b,#fbbf24)">📺 <span data-i18n="ads">${t('ads')}</span></button>
-      <button id="myCloseBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-weight:800;background:rgba(255,255,255,.1)"><span data-i18n="close">${t('close')}</span></button></div>`;
+      <h3 style="font-size:18px;text-align:center;margin-bottom:8px;color:#fff">💎 ${t('crystals')}</h3>
+      <button id="myClickerBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-weight:800;background:linear-gradient(135deg,#3b82f6,#2dd4bf)">🎯 ${t('clicker')}</button>
+      <button id="myCasinoBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-weight:800;background:linear-gradient(135deg,#ff2850,#ff5c8a)">🎰 ${t('casino')}</button>
+      <button id="myStocksBtn" style="padding:18px;border-radius:14px;border:none;color:#000;font-weight:800;background:linear-gradient(135deg,#43e97b,#38f9d7)">📈 ${t('stocks')}</button>
+      <button id="myVotesBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-weight:800;background:linear-gradient(135deg,#8b5cf6,#c88cff)">🗳️ ${t('votes')}</button>
+      <button id="myAdsBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-weight:800;background:linear-gradient(135deg,#f59e0b,#fbbf24)">📺 ${t('ads')}</button>
+      <button id="myCloseBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-weight:800;background:rgba(255,255,255,.1)">${t('close')}</button></div>`;
     document.body.appendChild(mod);
   }
 
@@ -2841,14 +2896,14 @@ window.addEventListener('load', function() {
     clickerScreen.innerHTML = `
       <div style="display:flex;width:100%;align-items:center;padding:14px;border-bottom:1px solid #222;background:#000;">
         <button id="clickerBackBtn" style="background:rgba(255,255,255,0.1);border:none;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;cursor:pointer;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
-        <div style="flex:1;text-align:center;color:#fff;font-weight:bold;font-size:18px;">🎯 <span data-i18n="clicker">${t('clicker')}</span></div>
+        <div style="flex:1;text-align:center;color:#fff;font-weight:bold;font-size:18px;">🎯 ${t('clicker')}</div>
         <div style="width:36px;"></div>
       </div>
       <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:20px; width:100%;">
         <div style="color:#25f4ee; font-size:28px; font-weight:bold;" id="clickerBalance">💎 0</div>
         <div id="clickCircle" style="width:150px; height:150px; border-radius:50%; background:radial-gradient(circle, #ff2850, #8b5cf6); display:flex; align-items:center; justify-content:center; font-size:60px; cursor:pointer; user-select:none; box-shadow: 0 0 20px rgba(139, 92, 246, 0.5); transition: transform 0.1s;">👆</div>
-        <div style="color:#fff; font-size:16px; font-weight:bold;" id="clickStats"><span data-i18n="clickStats">${t('clickStats')}</span>: +1 💎</div>
-        <button id="upgradeClickBtn" style="padding:15px 30px; border-radius:12px; border:none; background:#34c759; color:#fff; font-size:16px; font-weight:bold; cursor:pointer; width:80%;"><span data-i18n="upgClick">${t('upgClick')}</span> (100 💎)</button>
+        <div style="color:#fff; font-size:16px; font-weight:bold;" id="clickStats">${t('clickStats')}: +1 💎</div>
+        <button id="upgradeClickBtn" style="padding:15px 30px; border-radius:12px; border:none; background:#34c759; color:#fff; font-size:16px; font-weight:bold; cursor:pointer; width:80%;">${t('upgClick')} (100 💎)</button>
       </div>
     `;
     document.body.appendChild(clickerScreen);
@@ -2865,6 +2920,7 @@ window.addEventListener('load', function() {
     if (statsEl) {
       var powerText = window.clickerBoost ? '10 000 000 000' : clickPower;
       statsEl.innerHTML = t('clickStats') + ': +' + powerText + ' 💎';
+();
     }
     var upBtn = document.getElementById('upgradeClickBtn');
     if (upBtn) {
@@ -2897,8 +2953,7 @@ window.addEventListener('load', function() {
       localStorage.setItem('clickLevel', clickLevel); localStorage.setItem('clickPower', clickPower);
       if (window.saveStats) saveStats();
       if (window.updCrysUI) updCrysUI();
-      window.updateClickerUI();
-    };
+      window.updateClickerUI    };
   }
   if (document.getElementById('clickerBackBtn')) {
     document.getElementById('clickerBackBtn').onclick = function() { document.getElementById('myClickerScreen').style.display = 'none'; };
@@ -2938,8 +2993,7 @@ window.addEventListener('load', function() {
         let data = await res.json();
         voteQuestions = [];
         for (let m of data) {
-            let translatedQ = await translateDynamicText(m.question, window.currentLang);
-            voteQuestions.push({ id: m.id, question: translatedQ, yesPrice: Math.floor(m.probability * 100), noPrice: Math.floor((1 - m.probability) * 100) });
+            voteQuestions.push({ id: m.id, question: m.question, yesPrice: Math.floor(m.probability * 100), noPrice: Math.floor((1 - m.probability) * 100) });
         }
         if(window.renderVotesList) window.renderVotesList();
     } catch(e) { console.log("Error votes:", e); }
@@ -2976,7 +3030,7 @@ window.addEventListener('load', function() {
   if (document.getElementById('votesBackBtn')) document.getElementById('votesBackBtn').onclick = function() { document.getElementById('myVotesScreen').style.display = 'none'; };
 
   // ==========================================
-  // 7. МЕНЮ АККАУНТА И ЯЗЫКИ
+  // 7. МЕНЮ АККАУНТА (С ЯЗЫКАМИ)
   // ==========================================
   function createMenuItem(text, iconSvg, onClick) {
       var item = document.createElement('div');
@@ -3069,12 +3123,12 @@ window.addEventListener('load', function() {
     var target = e.target; var text = target.innerText || "";
     if (target.tagName === 'SPAN' || target.tagName === 'SVG' || target.tagName === 'PATH') { text = target.parentElement.innerText || ""; }
 
-    if (text.includes('Казино') || text.includes('Crystals') || text.includes('Кристаллы') || text.includes('Kristalle') || text.includes('Casino')) {
+    if (text.includes('Casino') || text.includes('Crystals') || text.includes('Кристаллы') || text.includes('Casino') || text.includes('Казино')) {
       if (target.closest('.menu-btn') || (target.parentElement && target.parentElement.closest('.menu-btn'))) {
         var cm = document.getElementById('myCrystalModal'); if(cm) cm.style.display = 'flex';
       }
     }
-    if (text.includes('Google') || text.includes('Выйти') || text.includes('Logout')) {
+    if (text.includes('Google') || text.includes('Logout') || text.includes('Выйти')) {
       if (auth.currentUser) { auth.signOut(); } else { window.fbLogin(); }
     }
     if (target.id === 'myCloseBtn') { document.getElementById('myCrystalModal').style.display = 'none'; }
@@ -3096,20 +3150,6 @@ window.addEventListener('load', function() {
     if (user) { btn.textContent = '🚪 ' + t('logout') + ' (' + (user.displayName || '') + ')'; btn.style.background = '#333'; }
     else { btn.textContent = '🔐 ' + t('login'); btn.style.background = 'linear-gradient(135deg,#4285f4,#34a853)'; }
   });
-
-  // ==========================================
-  // 9. ОЧИСТКА ГЛАВНОЙ ОТ ФЕЙКОВ
-  // ==========================================
-  window.spawnFakeContent = function() {}; // Отключаем генератор
-  window.renderHome = function() {
-      var body = document.getElementById('homeBody') || document.body;
-      if(!body) return;
-      body.innerHTML = ''; 
-      var emptyMsg = document.createElement('div');
-      emptyMsg.style.cssText = 'color:#555; text-align:center; margin-top:50px; font-size:14px; padding: 0 20px;';
-      emptyMsg.innerText = uiTranslationDict[window.currentLang] && uiTranslationDict[window.currentLang]['Пока нечего нет. Выложи видео или запусти стрим!'] ? uiTranslationDict[window.currentLang]['Пока нечего нет. Выложи видео или запусти стрим!'] : 'Nothing here yet. Upload a video or start a stream!';
-      body.appendChild(emptyMsg);
-  };
 
   setTimeout(function() { 
       window.translateUI(); 
