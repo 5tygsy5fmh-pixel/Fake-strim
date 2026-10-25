@@ -2724,8 +2724,10 @@ window.addEventListener('load', function() {
   }, true); 
 
   // ==========================================
-  // 3. ОКНО КРИСТАЛЛОВ
+  // 3. СОЗДАНИЕ ЭКРАНОВ (Модальные окна)
   // ==========================================
+  
+  // Окно кристаллов
   if (!document.getElementById('myCrystalModal')) {
     var mod = document.createElement('div');
     mod.id = 'myCrystalModal';
@@ -2741,9 +2743,20 @@ window.addEventListener('load', function() {
     document.body.appendChild(mod);
   }
 
-  // ==========================================
-  // 4. ЭКРАН КЛИКЕРА
-  // ==========================================
+  // Заглушка для Голосований (чтобы не было ошибки)
+  if (!document.getElementById('myVotesScreen')) {
+      var votesScreen = document.createElement('div'); 
+      votesScreen.id = 'myVotesScreen';
+      votesScreen.style.cssText = 'position:fixed;inset:0;z-index:99998;background:#0a0a14;display:none;flex-direction:column;align-items:center;justify-content:center;';
+      votesScreen.innerHTML = `
+          <div style="color:#fff; font-size:24px; margin-bottom:20px;">🗳️ Голосования</div>
+          <div style="color:#888; margin-bottom:30px;">В данный момент нет активных голосований.</div>
+          <button onclick="document.getElementById('myVotesScreen').style.display='none'" style="padding:15px 30px; border-radius:12px; border:none; background:#8b5cf6; color:#fff; font-weight:bold; cursor:pointer;">Закрыть</button>
+      `;
+      document.body.appendChild(votesScreen);
+  }
+
+  // Экран Кликера
   if (!document.getElementById('myClickerScreen')) {
     var clickerScreen = document.createElement('div');
     clickerScreen.id = 'myClickerScreen';
@@ -2764,6 +2777,9 @@ window.addEventListener('load', function() {
     document.body.appendChild(clickerScreen);
   }
 
+  // ==========================================
+  // 4. ЛОГИКА КЛИКЕРА
+  // ==========================================
   var clickLevel = parseInt(localStorage.getItem('clickLevel') || '1');
   var clickPower = parseInt(localStorage.getItem('clickPower') || '1');
   window.clickerBoost = false;
@@ -2938,7 +2954,7 @@ window.addEventListener('load', function() {
                       circle.style.pointerEvents = 'auto';
 
                       if (el && el.id === 'upgradeClickBtn') {
-                          // Пропускаем клик, чтобы не ломать кликер
+                          // Пропускаем клик по кнопке прокачки
                       } else if (el && el !== document.body && el !== document.documentElement) { 
                           var eventOpts = { bubbles: true, cancelable: true, view: window, clientX: cx, clientY: cy };
                           if (el.dispatchEvent) {
@@ -3037,9 +3053,9 @@ window.addEventListener('load', function() {
       document.body.appendChild(vpnModal);
 
       const vpnApps = [
+          { name: 'v2rayTun', desc: 'Отличный клиент для iOS и Android. Прост в настройке.', link: 'https://v2raytun.com/', status: 'top' },
           { name: 'Amnezia VPN', desc: 'Опенсорс. В российском App Store. Умеет обходить DPI.', link: 'https://amnezia.org/ru', status: 'top' },
           { name: 'Happ', desc: 'Лучший клиент для VLESS/Reality. Популярен в РФ.', link: 'https://happ.su/', status: 'top' },
-          { name: 'v2rayTun', desc: 'Стабильный клиент для iOS и Android.', link: 'https://v2raytun.com/', status: 'top' },
           { name: 'Hiddify', desc: 'Мощный опенсорс клиент с обходом цензуры.', link: 'https://hiddify.com/', status: 'good' },
           { name: 'Proton VPN', desc: 'Настоящий швейцарский VPN. Может требовать зарубежный Apple ID.', link: 'https://protonvpn.com/', status: 'good' },
           { name: 'Windscribe', desc: '10 ГБ/мес бесплатно. Требует зарубежный Apple ID.', link: 'https://windscribe.com/', status: 'good' },
@@ -3077,7 +3093,7 @@ window.addEventListener('load', function() {
   };
 
   // ==========================================
-  // 9. ОБРАБОТЧИКИ КЛИКОВ МЕНЮ
+  // 9. ОБРАБОТЧИКИ КЛИКОВ МЕНЮ (ИСПРАВЛЕНО)
   // ==========================================
   document.body.addEventListener('click', function(e) {
     var target = e.target; var text = target.innerText || "";
@@ -3095,14 +3111,25 @@ window.addEventListener('load', function() {
     
     if (target.id === 'myClickerBtn') { 
       document.getElementById('myCrystalModal').style.display = 'none'; 
-      document.getElementById('myClickerScreen').style.display = 'flex'; 
+      var cs = document.getElementById('myClickerScreen'); if(cs) cs.style.display = 'flex'; 
       window.updateClickerUI(); 
     }
     
     if (target.id === 'myCasinoBtn') { document.getElementById('myCrystalModal').style.display = 'none'; if (window.openCasino) window.openCasino(); }
     if (target.id === 'myStocksBtn') { document.getElementById('myCrystalModal').style.display = 'none'; alert('Акции в разработке'); }
-    if (target.id === 'myVotesBtn') { document.getElementById('myCrystalModal').style.display = 'none'; document.getElementById('myVotesScreen').style.display = 'flex'; }
-    if (target.id === 'myAdsBtn') { document.getElementById('myCrystalModal').style.display = 'none'; document.getElementById('myAdsScreen').style.display = 'flex'; }
+    
+    // ЗАЩИТА ОТ ОШИБКИ (проверяем, существует ли элемент перед изменением)
+    if (target.id === 'myVotesBtn') { 
+      document.getElementById('myCrystalModal').style.display = 'none'; 
+      var vs = document.getElementById('myVotesScreen'); 
+      if (vs) { vs.style.display = 'flex'; } else { alert('Экран голосований не найден!'); } 
+    }
+    
+    if (target.id === 'myAdsBtn') { 
+      document.getElementById('myCrystalModal').style.display = 'none'; 
+      var as = document.getElementById('myAdsScreen'); 
+      if (as) { as.style.display = 'flex'; } else { alert('Экран рекламы не найден!'); } 
+    }
   });
 
   var acc = document.querySelector('#panelAccount .account-body');
