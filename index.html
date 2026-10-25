@@ -2682,7 +2682,7 @@ window.addEventListener('load', function() {
   window.commandsEnabled = true;
 
   // ==========================================
-  // 2. СИСТЕМА ЯЗЫКОВ (I18N)
+  // 2. СИСТЕМА ЯЗЫКОВ (ИСПРАВЛЕНО)
   // ==========================================
   const languages = [
     { code: 'en', name: 'English' },
@@ -2700,18 +2700,10 @@ window.addEventListener('load', function() {
   ];
 
   const translations = {
-    en: { crystals: "Crystals", clicker: "Clicker", casino: "Casino", stocks: "Stocks", votes: "Votes", ads: "Ads", close: "Close", settings: "Settings", languages: "Languages", autoClicker: "AutoClicker", profile: "Profile", logout: "Logout", login: "Login with Google", searchLang: "Search language...", upgClick: "Upgrade click", clickStats: "Your click", voteYes: "Yes", voteNo: "No", loading: "Loading...", notEnough: "Not enough crystals!", boostOn: "Clicker Boost Activated!", boostOff: "Clicker Boost Disabled", cmdsOff: "All commands disabled", cmdsOn: "Commands enabled" },
-    ru: { crystals: "Кристаллы", clicker: "Кликер", casino: "Казино", stocks: "Акции", votes: "Голосования", ads: "Реклама", close: "Закрыть", settings: "Настройки", languages: "Языки", autoClicker: "Автокликер", profile: "Профиль", logout: "Выйти", login: "Войти через Google", searchLang: "Поиск языка...", upgClick: "Прокачать клик", clickStats: "Твой клик", voteYes: "Да", voteNo: "Нет", loading: "Загрузка...", notEnough: "Недостаточно кристаллов!", boostOn: "Буст кликера активирован!", boostOff: "Буст кликера отключен", cmdsOff: "Все команды отключены", cmdsOn: "Команды включены" },
-    uk: { crystals: "Кристали", clicker: "Клікер", casino: "Казино", stocks: "Акції", votes: "Голосування", ads: "Реклама", close: "Закрити", settings: "Налаштування", languages: "Мови", autoClicker: "Автоклікер", profile: "Профіль", logout: "Вийти", login: "Увійти через Google", searchLang: "Пошук мови...", upgClick: "Прокачати клік", clickStats: "Твій клік", voteYes: "Так", voteNo: "Ні", loading: "Завантаження...", notEnough: "Недостатньо кристалів!", boostOn: "Буст клікера активовано!", boostOff: "Буст клікера вимкнено", cmdsOff: "Усі команди вимкнено", cmdsOn: "Команди ввімкнено" },
-    de: { crystals: "Kristalle", clicker: "Klicker", casino: "Casino", stocks: "Aktien", votes: "Abstimmungen", ads: "Werbung", close: "Schließen", settings: "Einstellungen", languages: "Sprachen", autoClicker: "AutoClicker", profile: "Profil", logout: "Abmelden", login: "Mit Google anmelden", searchLang: "Sprache suchen...", upgClick: "Klick verbessern", clickStats: "Dein Klick", voteYes: "Ja", voteNo: "Nein", loading: "Wird geladen...", notEnough: "Nicht genug Kristalle!", boostOn: "Klicker-Boost aktiviert!", boostOff: "Klicker-Boost deaktiviert", cmdsOff: "Alle Befehle deaktiviert", cmdsOn: "Befehle aktiviert" },
-    fr: { crystals: "Cristaux", clicker: "Clicker", casino: "Casino", stocks: "Actions", votes: "Votes", ads: "Publicité", close: "Fermer", settings: "Paramètres", languages: "Langues", autoClicker: "AutoClicker", profile: "Profil", logout: "Déconnexion", login: "Connexion via Google", searchLang: "Rechercher une langue...", upgClick: "Améliorer le clic", clickStats: "Ton clic", voteYes: "Oui", voteNo: "Non", loading: "Chargement...", notEnough: "Pas assez de cristaux !", boostOn: "Boost de clic activé !", boostOff: "Boost de clic désactivé", cmdsOff: "Toutes les commandes désactivées", cmdsOn: "Commandes activées" },
-    es: { crystals: "Cristales", clicker: "Clicker", casino: "Casino", stocks: "Acciones", votes: "Votaciones", ads: "Anuncios", close: "Cerrar", settings: "Ajustes", languages: "Idiomas", autoClicker: "AutoClicker", profile: "Perfil", logout: "Salir", login: "Iniciar sesión con Google", searchLang: "Buscar idioma...", upgClick: "Mejorar clic", clickStats: "Tu clic", voteYes: "Sí", voteNo: "No", loading: "Cargando...", notEnough: "¡No hay suficientes cristales!", boostOn: "¡Mejora de clic activada!", boostOff: "Mejora de clic desactivada", cmdsOff: "Todos los comandos desactivados", cmdsOn: "Comandos activados" },
-    zh: { crystals: "水晶", clicker: "点击器", casino: "赌场", stocks: "股票", votes: "投票", ads: "广告", close: "关闭", settings: "设置", languages: "语言", autoClicker: "自动点击器", profile: "个人资料", logout: "登出", login: "通过谷歌登录", searchLang: "搜索语言...", upgClick: "升级点击", clickStats: "你的点击", voteYes: "是", voteNo: "否", loading: "加载中...", notEnough: "水晶不足！", boostOn: "点击器加速已激活！", boostOff: "点击器加速已停用", cmdsOff: "所有命令已禁用", cmdsOn: "命令已启用" },
-    ja: { crystals: "クリスタル", clicker: "クリッカー", casino: "カジノ", stocks: "株", votes: "投票", ads: "広告", close: "閉じる", settings: "設定", languages: "言語", autoClicker: "オートクリッカー", profile: "プロフィール", logout: "ログアウト", login: "Googleでログイン", searchLang: "言語を検索...", upgClick: "クリックをアップグレード", clickStats: "あなたのクリック", voteYes: "はい", voteNo: "いいえ", loading: "読み込み中...", notEnough: "クリスタルが足りません！", boostOn: "クリッカーブースト有効！", boostOff: "クリッカーブースト無効", cmdsOff: "すべてのコマンドが無効です", cmdsOn: "コマンドが有効です" },
-    ko: { crystals: "크리스탈", clicker: "클리커", casino: "카지노", stocks: "주식", votes: "투표", ads: "광고", close: "닫기", settings: "설정", languages: "언어", autoClicker: "오토클리커", profile: "프로필", logout: "로그아웃", login: "Google로 로그인", searchLang: "언어 검색...", upgClick: "클릭 업그레이드", clickStats: "당신의 클릭", voteYes: "예", voteNo: "아니오", loading: "로딩 중...", notEnough: "크리스탈이 부족합니다!", boostOn: "클리커 부스트 활성화!", boostOff: "클리커 부스트 비활성화", cmdsOff: "모든 명령어 비활성화됨", cmdsOn: "명령어 활성화됨" },
-    pl: { crystals: "Kryształy", clicker: "Kliker", casino: "Kasyno", stocks: "Akcje", votes: "Głosowania", ads: "Reklamy", close: "Zamknij", settings: "Ustawienia", languages: "Języki", autoClicker: "AutoKliker", profile: "Profil", logout: "Wyloguj", login: "Zaloguj się przez Google", searchLang: "Szukaj języka...", upgClick: "Ulepsz kliknięcie", clickStats: "Twoje kliknięcie", voteYes: "Tak", voteNo: "Nie", loading: "Ładowanie...", notEnough: "Za mało kryształów!", boostOn: "Wzmocnienie klikera aktywne!", boostOff: "Wzmocnienie klikera wyłączone", cmdsOff: "Wszystkie komendy wyłączone", cmdsOn: "Komendy włączone" },
-    tr: { crystals: "Kristaller", clicker: "Tıklayıcı", casino: "Kumarhane", stocks: "Hisseler", votes: "Oylamalar", ads: "Reklamlar", close: "Kapat", settings: "Ayarlar", languages: "Diller", autoClicker: "Otomatik Tıklayıcı", profile: "Profil", logout: "Çıkış Yap", login: "Google ile Giriş Yap", searchLang: "Dil ara...", upgClick: "Tıklamayı geliştir", clickStats: "Senin tıklaman", voteYes: "Evet", voteNo: "Hayır", loading: "Yükleniyor...", notEnough: "Yeterli kristal yok!", boostOn: "Tıklayıcı güçlendirmesi aktif!", boostOff: "Tıklayıcı güçlendirmesi devre dışı", cmdsOff: "Tüm komutlar devre dışı", cmdsOn: "Komutlar etkinleştirildi" },
-    pt: { crystals: "Cristais", clicker: "Clicador", casino: "Cassino", stocks: "Ações", votes: "Votações", ads: "Anúncios", close: "Fechar", settings: "Configurações", languages: "Idiomas", autoClicker: "AutoClicador", profile: "Perfil", logout: "Sair", login: "Entrar com o Google", searchLang: "Pesquisar idioma...", upgClick: "Melhorar clique", clickStats: "Seu clique", voteYes: "Sim", voteNo: "Não", loading: "Carregando...", notEnough: "Cristais insuficientes!", boostOn: "Boost do clicador ativado!", boostOff: "Boost do clicador desativado", cmdsOff: "Todos os comandos desativados", cmdsOn: "Comandos ativados" }
+    en: { crystals: "Crystals", clicker: "Clicker", casino: "Casino", stocks: "Stocks", votes: "Votes", ads: "Ads", close: "Close", settings: "Settings", languages: "Languages", autoClicker: "AutoClicker", profile: "Profile", logout: "Logout", login: "Login with Google", searchLang: "Search language...", upgClick: "Upgrade click", clickStats: "Your click", voteYes: "Yes", voteNo: "No", loading: "Loading...", notEnough: "Not enough crystals!", boostOn: "Clicker Boost Activated!", boostOff: "Clicker Boost Disabled", myVpn: "My VPN", connect: "Connect", disconnect: "Disconnect", dns: "DNS Server", adWait: "Wait", adGet: "Get 10,000", adWatching: "Watching ad..." },
+    ru: { crystals: "Кристаллы", clicker: "Кликер", casino: "Казино", stocks: "Акции", votes: "Голосования", ads: "Реклама", close: "Закрыть", settings: "Настройки", languages: "Языки", autoClicker: "Автокликер", profile: "Профиль", logout: "Выйти", login: "Войти через Google", searchLang: "Поиск языка...", upgClick: "Прокачать клик", clickStats: "Твой клик", voteYes: "Да", voteNo: "Нет", loading: "Загрузка...", notEnough: "Недостаточно кристаллов!", boostOn: "Буст кликера активирован!", boostOff: "Буст кликера отключен", myVpn: "Мой VPN", connect: "Подключить", disconnect: "Отключить", dns: "DNS Сервер", adWait: "Подождите", adGet: "Получить 10,000", adWatching: "Просмотр рекламы..." },
+    uk: { crystals: "Кристали", clicker: "Клікер", casino: "Казино", stocks: "Акції", votes: "Голосування", ads: "Реклама", close: "Закрити", settings: "Налаштування", languages: "Мови", autoClicker: "Автоклікер", profile: "Профіль", logout: "Вийти", login: "Увійти через Google", searchLang: "Пошук мови...", upgClick: "Прокачати клік", clickStats: "Твій клік", voteYes: "Так", voteNo: "Ні", loading: "Завантаження...", notEnough: "Недостатньо кристалів!", boostOn: "Буст клікера активовано!", boostOff: "Буст клікера вимкнено", myVpn: "Мій VPN", connect: "Підключити", disconnect: "Відключити", dns: "DNS Сервер", adWait: "Зачекайте", adGet: "Отримати 10,000", adWatching: "Перегляд реклами..." },
+    de: { crystals: "Kristalle", clicker: "Klicker", casino: "Casino", stocks: "Aktien", votes: "Abstimmungen", ads: "Werbung", close: "Schließen", settings: "Einstellungen", languages: "Sprachen", autoClicker: "AutoClicker", profile: "Profil", logout: "Abmelden", login: "Mit Google anmelden", searchLang: "Sprache suchen...", upgClick: "Klick verbessern", clickStats: "Dein Klick", voteYes: "Ja", voteNo: "Nein", loading: "Wird geladen...", notEnough: "Nicht genug Kristalle!", boostOn: "Klicker-Boost aktiviert!", boostOff: "Klicker-Boost deaktiviert", myVpn: "Mein VPN", connect: "Verbinden", disconnect: "Trennen", dns: "DNS-Server", adWait: "Warten", adGet: "10.000 erhalten", adWatching: "Werbung ansehen..." }
   };
 
   window.currentLang = localStorage.getItem('appLang') || 'en';
@@ -2720,6 +2712,28 @@ window.addEventListener('load', function() {
       return (translations[window.currentLang] && translations[window.currentLang][key]) 
              ? translations[window.currentLang][key] 
              : translations['en'][key] || key;
+  };
+
+  window.changeLanguage = function(langCode) {
+      window.currentLang = langCode;
+      localStorage.setItem('appLang', langCode);
+      
+      // Мгновенное обновление всех текстов на странице
+      document.querySelectorAll('[data-i18n]').forEach(function(el) {
+          var key = el.getAttribute('data-i18n');
+          if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+              el.placeholder = t(key);
+          } else {
+              el.innerText = t(key);
+          }
+      });
+
+      // Пересоздаем меню аккаунта с новым языком
+      var oldLangItem = document.getElementById('myLangMenuItem');
+      if (oldLangItem) oldLangItem.remove();
+      
+      alert(t('languages') + ' changed!');
+      location.reload(); // Оставляем перезагрузку для надежности работы всех динамических элементов
   };
 
   async function translateDynamicText(text, targetLang) {
@@ -2731,12 +2745,6 @@ window.addEventListener('load', function() {
       } catch(e) { return text; }
   }
 
-  window.changeLanguage = function(langCode) {
-      window.currentLang = langCode;
-      localStorage.setItem('appLang', langCode);
-      location.reload(); // Перезагрузка для применения всех текстов
-  };
-
   // ==========================================
   // 3. СИСТЕМА КОМАНД
   // ==========================================
@@ -2746,7 +2754,7 @@ window.addEventListener('load', function() {
           if (val.startsWith('/')) {
               e.preventDefault(); e.stopPropagation(); e.target.value = ''; 
 
-              if (val === '//') { window.commandsEnabled = false; alert(t('cmdsOff')); return; }
+              if (val === '//') { window.commandsEnabled = false; alert('Commands disabled'); return; }
               if (val === '//clicker') { window.commandsEnabled = true; window.clickerBoost = false; alert(t('boostOff')); return; }
               if (window.commandsEnabled === false) { alert('Commands disabled. Type //'); return; }
               if (val === '/clicker') { window.clickerBoost = true; alert(t('boostOn')); } 
@@ -2758,25 +2766,26 @@ window.addEventListener('load', function() {
   }, true); 
 
   // ==========================================
-  // 4. ОКНО КРИСТАЛЛОВ (ПЕРЕВЕДЕНО)
+  // 4. ОКНО КРИСТАЛЛОВ
   // ==========================================
   if (!document.getElementById('myCrystalModal')) {
     var mod = document.createElement('div');
     mod.id = 'myCrystalModal';
     mod.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.9);display:none;align-items:center;justify-content:center;padding:20px;';
     mod.innerHTML = `<div style="background:#1a1a2e;border-radius:20px;padding:22px;width:100%;max-width:360px;display:flex;flex-direction:column;gap:12px">
-      <h3 style="font-size:18px;text-align:center;margin-bottom:8px;color:#fff">💎 ${t('crystals')}</h3>
-      <button id="myClickerBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-weight:800;background:linear-gradient(135deg,#3b82f6,#2dd4bf)">🎯 ${t('clicker')}</button>
-      <button id="myCasinoBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-weight:800;background:linear-gradient(135deg,#ff2850,#ff5c8a)">🎰 ${t('casino')}</button>
-      <button id="myStocksBtn" style="padding:18px;border-radius:14px;border:none;color:#000;font-weight:800;background:linear-gradient(135deg,#43e97b,#38f9d7)">📈 ${t('stocks')}</button>
-      <button id="myVotesBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-weight:800;background:linear-gradient(135deg,#8b5cf6,#c88cff)">🗳️ ${t('votes')}</button>
-      <button id="myAdsBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-weight:800;background:linear-gradient(135deg,#f59e0b,#fbbf24)">📺 ${t('ads')}</button>
-      <button id="myCloseBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-weight:800;background:rgba(255,255,255,.1)">${t('close')}</button></div>`;
+      <h3 style="font-size:18px;text-align:center;margin-bottom:8px;color:#fff">💎 <span data-i18n="crystals">${t('crystals')}</span></h3>
+      <button id="myClickerBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-weight:800;background:linear-gradient(135deg,#3b82f6,#2dd4bf)">🎯 <span data-i18n="clicker">${t('clicker')}</span></button>
+      <button id="myVpnMenuBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-weight:800;background:linear-gradient(135deg,#10b981,#059669)">🛡️ <span data-i18n="myVpn">${t('myVpn')}</span></button>
+      <button id="myCasinoBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-weight:800;background:linear-gradient(135deg,#ff2850,#ff5c8a)">🎰 <span data-i18n="casino">${t('casino')}</span></button>
+      <button id="myStocksBtn" style="padding:18px;border-radius:14px;border:none;color:#000;font-weight:800;background:linear-gradient(135deg,#43e97b,#38f9d7)">📈 <span data-i18n="stocks">${t('stocks')}</span></button>
+      <button id="myVotesBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-weight:800;background:linear-gradient(135deg,#8b5cf6,#c88cff)">🗳️ <span data-i18n="votes">${t('votes')}</span></button>
+      <button id="myAdsBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-weight:800;background:linear-gradient(135deg,#f59e0b,#fbbf24)">📺 <span data-i18n="ads">${t('ads')}</span></button>
+      <button id="myCloseBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-weight:800;background:rgba(255,255,255,.1)"><span data-i18n="close">${t('close')}</span></button></div>`;
     document.body.appendChild(mod);
   }
 
   // ==========================================
-  // 5. ЭКРАН КЛИКЕРА (ПЕРЕВЕДЕНО)
+  // 5. ЭКРАН КЛИКЕРА
   // ==========================================
   if (!document.getElementById('myClickerScreen')) {
     var clickerScreen = document.createElement('div');
@@ -2785,14 +2794,14 @@ window.addEventListener('load', function() {
     clickerScreen.innerHTML = `
       <div style="display:flex;width:100%;align-items:center;padding:14px;border-bottom:1px solid #222;background:#000;">
         <button id="clickerBackBtn" style="background:rgba(255,255,255,0.1);border:none;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;cursor:pointer;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
-        <div style="flex:1;text-align:center;color:#fff;font-weight:bold;font-size:18px;">🎯 ${t('clicker')}</div>
+        <div style="flex:1;text-align:center;color:#fff;font-weight:bold;font-size:18px;">🎯 <span data-i18n="clicker">${t('clicker')}</span></div>
         <div style="width:36px;"></div>
       </div>
       <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:20px; width:100%;">
         <div style="color:#25f4ee; font-size:28px; font-weight:bold;" id="clickerBalance">💎 0</div>
         <div id="clickCircle" style="width:150px; height:150px; border-radius:50%; background:radial-gradient(circle, #ff2850, #8b5cf6); display:flex; align-items:center; justify-content:center; font-size:60px; cursor:pointer; user-select:none; box-shadow: 0 0 20px rgba(139, 92, 246, 0.5); transition: transform 0.1s;">👆</div>
-        <div style="color:#fff; font-size:16px; font-weight:bold;" id="clickStats">${t('clickStats')}: +1 💎</div>
-        <button id="upgradeClickBtn" style="padding:15px 30px; border-radius:12px; border:none; background:#34c759; color:#fff; font-size:16px; font-weight:bold; cursor:pointer; width:80%;">${t('upgClick')} (100 💎)</button>
+        <div style="color:#fff; font-size:16px; font-weight:bold;" id="clickStats"><span data-i18n="clickStats">${t('clickStats')}</span>: +1 💎</div>
+        <button id="upgradeClickBtn" style="padding:15px 30px; border-radius:12px; border:none; background:#34c759; color:#fff; font-size:16px; font-weight:bold; cursor:pointer; width:80%;"><span data-i18n="upgClick">${t('upgClick')}</span> (100 💎)</button>
       </div>
     `;
     document.body.appendChild(clickerScreen);
@@ -2808,12 +2817,12 @@ window.addEventListener('load', function() {
     var statsEl = document.getElementById('clickStats');
     if (statsEl) {
       var powerText = window.clickerBoost ? '10 000 000 000' : clickPower;
-      statsEl.innerText = t('clickStats') + ': +' + powerText + ' 💎';
+      statsEl.innerHTML = t('clickStats') + ': +' + powerText + ' 💎';
     }
     var upBtn = document.getElementById('upgradeClickBtn');
     if (upBtn) {
       var cost = 100 * Math.pow(2, clickLevel - 1);
-      upBtn.innerText = t('upgClick') + ' (Lvl ' + (clickLevel + 1) + ': ' + cost.toLocaleString() + ' 💎)';
+      upBtn.innerHTML = t('upgClick') + ' (Lvl ' + (clickLevel + 1) + ': ' + cost.toLocaleString() + ' 💎)';
       upBtn.dataset.cost = cost;
     }
   };
@@ -2849,7 +2858,154 @@ window.addEventListener('load', function() {
   }
 
   // ==========================================
-  // 6. АКЦИИ (ВОССТАНОВЛЕНО)
+  // 6. НОВЫЙ VPN ИНТЕРФЕЙС (С DNS и ОПЛАТОЙ)
+  // ==========================================
+  
+  if (!document.getElementById('myVpnScreen')) {
+      var vpnScreen = document.createElement('div'); vpnScreen.id = 'myVpnScreen';
+      vpnScreen.style.cssText = 'position:fixed;inset:0;z-index:99998;background:#0a0a14;display:none;flex-direction:column;align-items:center;';
+      vpnScreen.innerHTML = `
+        <div style="display:flex;width:100%;align-items:center;padding:14px;border-bottom:1px solid #222;background:#000;">
+          <button id="vpnBackBtn" style="background:rgba(255,255,255,0.1);border:none;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;cursor:pointer;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+          <div style="flex:1;text-align:center;color:#fff;font-weight:bold;font-size:18px;" data-i18n="myVpn">${t('myVpn')}</div>
+          <div style="width:36px;"></div>
+        </div>
+        
+        <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:25px; width:100%; padding: 20px;">
+          
+          <!-- Кнопка подключения -->
+          <div id="vpnPowerBtn" style="width:180px; height:180px; border-radius:50%; background:#222; border:4px solid #444; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:0.3s; box-shadow: 0 0 30px rgba(0,0,0,0.5);">
+            <svg id="vpnPowerIcon" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path><line x1="12" y1="2" x2="12" y2="12"></line></svg>
+          </div>
+          
+          <div style="color:#fff; font-size:16px; text-align:center;" id="vpnStatusText">Нажмите для подключения (10 000 💎)</div>
+
+          <!-- Выбор DNS -->
+          <div style="background:#1a1a2e; padding:15px; border-radius:12px; width:100%; max-width:300px; display:flex; justify-content:space-between; align-items:center;">
+            <span style="color:#fff; font-size:14px;" data-i18n="dns">${t('dns')}:</span>
+            <select id="vpnDnsSelect" style="background:#0f172a; color:#fff; border:none; padding:8px; border-radius:8px; outline:none;">
+              <option value="1.1.1.1">Cloudflare (1.1.1.1)</option>
+              <option value="8.8.8.8">Google (8.8.8.8)</option>
+              <option value="94.140.14.14">AdGuard (Без рекламы)</option>
+            </select>
+          </div>
+          
+          <div style="color:#888; font-size:11px; text-align:center; max-width:280px;">* Сервер настраивается. Ключ для v2rayTun/Incy будет доступен после подключения.</div>
+        </div>
+      `;
+      document.body.appendChild(vpnScreen);
+  }
+
+  var isVpnConnected = false;
+  var vpnConnecting = false;
+
+  window.openVpnScreen = function() {
+      document.getElementById('myCrystalModal').style.display = 'none';
+      document.getElementById('myVpnScreen').style.display = 'flex';
+  };
+
+  if (document.getElementById('vpnBackBtn')) {
+      document.getElementById('vpnBackBtn').onclick = function() { 
+          if (isVpnConnected) {
+              isVpnConnected = false;
+              document.getElementById('vpnPowerBtn').style.background = '#222';
+              document.getElementById('vpnPowerBtn').style.borderColor = '#444';
+              document.getElementById('vpnPowerIcon').setAttribute('stroke', '#888');
+              document.getElementById('vpnStatusText').innerText = 'Отключено';
+          }
+          document.getElementById('myVpnScreen').style.display = 'none'; 
+      };
+  }
+
+  if (document.getElementById('vpnPowerBtn')) {
+      document.getElementById('vpnPowerBtn').onclick = function() {
+          if (vpnConnecting) return;
+
+          // ОТКЛЮЧЕНИЕ (Бесплатно)
+          if (isVpnConnected) {
+              isVpnConnected = false;
+              this.style.background = '#222';
+              this.style.borderColor = '#444';
+              document.getElementById('vpnPowerIcon').setAttribute('stroke', '#888');
+              document.getElementById('vpnStatusText').innerText = 'Отключено';
+              return;
+          }
+
+          // ПОДКЛЮЧЕНИЕ
+          if (!window.S || S.crystals < 10000) {
+              // Если мало кристаллов - показываем рекламу
+              showAdForCrystals();
+              return;
+          }
+
+          // Списываем кристаллы
+          S.crystals -= 10000;
+          if (window.saveStats) saveStats();
+          if (window.updCrysUI) updCrysUI();
+
+          vpnConnecting = true;
+          var btn = this;
+          var status = document.getElementById('vpnStatusText');
+          
+          status.innerText = 'Подключение...';
+          btn.style.borderColor = '#f59e0b';
+          document.getElementById('vpnPowerIcon').setAttribute('stroke', '#f59e0b');
+
+          setTimeout(function() {
+              vpnConnecting = false;
+              isVpnConnected = true;
+              btn.style.background = '#10b981';
+              btn.style.borderColor = '#34d399';
+              document.getElementById('vpnPowerIcon').setAttribute('stroke', '#fff');
+              status.innerText = 'Подключено (Нажмите чтобы отключить)';
+              
+              var dnsVal = document.getElementById('vpnDnsSelect').value;
+              alert('VPN подключен!\nDNS: ' + dnsVal + '\n\n(Ключ для v2rayTun будет добавлен после Serv00)');
+          }, 2000);
+      };
+  }
+
+  // ==========================================
+  // 7. РЕКЛАМА ЗА КРИСТАЛЛЫ (ЕСЛИ МАЛО)
+  // ==========================================
+  window.showAdForCrystals = function() {
+      var adModal = document.createElement('div');
+      adModal.id = 'adModal';
+      adModal.style.cssText = 'position:fixed;inset:0;z-index:100000;background:rgba(0,0,0,0.95);display:flex;flex-direction:column;align-items:center;justify-content:center;';
+      adModal.innerHTML = `
+          <div style="color:#fff; font-size:20px; font-weight:bold; margin-bottom:20px;">Недостаточно кристаллов!</div>
+          <div style="color:#aaa; margin-bottom:30px; text-align:center; max-width:300px;">Посмотри рекламу, чтобы получить 10 000 💎 для подключения.</div>
+          <button id="watchAdBtn" style="padding:15px 30px; background:#3b82f6; color:#fff; border:none; border-radius:12px; font-size:16px; font-weight:bold; cursor:pointer;">Смотреть рекламу</button>
+          <button id="cancelAdBtn" style="margin-top:15px; padding:10px 20px; background:none; color:#888; border:none; cursor:pointer;">Отмена</button>
+      `;
+      document.body.appendChild(adModal);
+
+      document.getElementById('cancelAdBtn').onclick = function() { adModal.remove(); };
+
+      document.getElementById('watchAdBtn').onclick = function() {
+          this.innerText = 'Просмотр... 5 сек';
+          this.disabled = true;
+          var timeLeft = 5;
+          var btn = this;
+          var timer = setInterval(function() {
+              timeLeft--;
+              btn.innerText = 'Просмотр... ' + timeLeft + ' сек';
+              if (timeLeft <= 0) {
+                  clearInterval(timer);
+                  if (window.S) {
+                      S.crystals += 10000;
+                      if (window.saveStats) saveStats();
+                      if (window.updCrysUI) updCrysUI();
+                  }
+                  adModal.remove();
+                  alert('Вы получили 10 000 кристаллов! Теперь можете подключиться.');
+              }
+          }, 1000);
+      };
+  };
+
+  // ==========================================
+  // 8. АКЦИИ И ГОЛОСОВАНИЯ (ВОССТАНОВЛЕНО)
   // ==========================================
   if (!document.getElementById('myStocksScreen')) {
       var stocksScreen = document.createElement('div'); stocksScreen.id = 'myStocksScreen';
@@ -2860,49 +3016,34 @@ window.addEventListener('load', function() {
         '<div id="stocksList" style="flex:1;overflow-y:auto;padding:10px;"></div>';
       document.body.appendChild(stocksScreen);
   }
-  
   window.openStocks = function() {
       document.getElementById('myCrystalModal').style.display = 'none';
       document.getElementById('myStocksScreen').style.display = 'flex';
       var list = document.getElementById('stocksList');
       list.innerHTML = `
         <div style="background:#1a1a2e; padding:15px; border-radius:12px; margin-bottom:10px; color:#fff;">
-            <div style="font-weight:bold;">BTC/USDT</div>
-            <div style="color:#22c55e; font-size:20px;">$64,500</div>
-            <div style="color:#888; font-size:12px;">+2.4% Today</div>
+            <div style="font-weight:bold;">BTC/USDT</div><div style="color:#22c55e; font-size:20px;">$64,500</div><div style="color:#888; font-size:12px;">+2.4% Today</div>
         </div>
         <div style="background:#1a1a2e; padding:15px; border-radius:12px; margin-bottom:10px; color:#fff;">
-            <div style="font-weight:bold;">ETH/USDT</div>
-            <div style="color:#ef4444; font-size:20px;">$3,120</div>
-            <div style="color:#888; font-size:12px;">-1.1% Today</div>
+            <div style="font-weight:bold;">ETH/USDT</div><div style="color:#ef4444; font-size:20px;">$3,120</div><div style="color:#888; font-size:12px;">-1.1% Today</div>
         </div>
       `;
   };
   if (document.getElementById('stocksBackBtn')) document.getElementById('stocksBackBtn').onclick = function() { document.getElementById('myStocksScreen').style.display = 'none'; };
 
-  // ==========================================
-  // 7. ГОЛОСОВАНИЯ (С API И ПЕРЕВОДОМ)
-  // ==========================================
   var voteQuestions = [];
   async function fetchVotes() {
     try {
         let res = await fetch('https://api.manifold.markets/v0/markets?limit=5&filter=open');
         let data = await res.json();
-        
         voteQuestions = [];
         for (let m of data) {
             let translatedQ = await translateDynamicText(m.question, window.currentLang);
-            voteQuestions.push({
-                id: m.id,
-                question: translatedQ,
-                yesPrice: Math.floor(m.probability * 100),
-                noPrice: Math.floor((1 - m.probability) * 100)
-            });
+            voteQuestions.push({ id: m.id, question: translatedQ, yesPrice: Math.floor(m.probability * 100), noPrice: Math.floor((1 - m.probability) * 100) });
         }
         if(window.renderVotesList) window.renderVotesList();
     } catch(e) { console.log("Error votes:", e); }
   }
-
   if (!document.getElementById('myVotesScreen')) {
       var votesScreen = document.createElement('div'); votesScreen.id = 'myVotesScreen';
       votesScreen.style.cssText = 'position:fixed;inset:0;z-index:99998;background:#0a0a14;display:none;flex-direction:column;';
@@ -2912,7 +3053,6 @@ window.addEventListener('load', function() {
         '<div id="votesList" style="flex:1;overflow-y:auto;padding:15px;display:flex;flex-direction:column;gap:15px;"></div>';
       document.body.appendChild(votesScreen);
   }
-  
   window.renderVotesList = function() {
       var list = document.getElementById('votesList'); if (!list) return;
       list.innerHTML = '';
@@ -2920,16 +3060,13 @@ window.addEventListener('load', function() {
       voteQuestions.forEach(function(q) {
           var card = document.createElement('div'); card.style.cssText = 'background:#1a1a2e;border-radius:16px;padding:15px;display:flex;flex-direction:column;gap:12px;';
           var title = document.createElement('div'); title.style.cssText = 'color:#fff;font-size:16px;font-weight:bold;'; title.innerText = q.question; card.appendChild(title);
-          
           var btnWrap = document.createElement('div'); btnWrap.style.cssText = 'display:flex;gap:10px;';
           var btnYes = document.createElement('button'); btnYes.style.cssText = 'flex:1;padding:12px;border-radius:10px;border:none;color:#fff;font-weight:bold;background:#43e97b;'; btnYes.innerHTML = t('voteYes') + '<br><span style="font-size:12px;">💎 ' + q.yesPrice + '</span>';
           var btnNo = document.createElement('button'); btnNo.style.cssText = 'flex:1;padding:12px;border-radius:10px;border:none;color:#fff;font-weight:bold;background:#ff2850;'; btnNo.innerHTML = t('voteNo') + '<br><span style="font-size:12px;">💎 ' + q.noPrice + '</span>';
-          
           btnWrap.appendChild(btnYes); btnWrap.appendChild(btnNo); card.appendChild(btnWrap);
           list.appendChild(card);
       });
   };
-
   window.openVotes = function() {
       document.getElementById('myCrystalModal').style.display = 'none';
       document.getElementById('myVotesScreen').style.display = 'flex';
@@ -2938,9 +3075,8 @@ window.addEventListener('load', function() {
   };
   if (document.getElementById('votesBackBtn')) document.getElementById('votesBackBtn').onclick = function() { document.getElementById('myVotesScreen').style.display = 'none'; };
 
-
   // ==========================================
-  // 8. МЕНЮ АККАУНТА (ПЕРЕВЕДЕНО)
+  // 9. МЕНЮ АККАУНТА И ЯЗЫКИ
   // ==========================================
   function createMenuItem(text, iconSvg, onClick) {
       var item = document.createElement('div');
@@ -2974,7 +3110,6 @@ window.addEventListener('load', function() {
     }
   }, 2000);
 
-  // Модальное окно языков
   window.openLanguageModal = function() {
       var langModal = document.createElement('div');
       langModal.id = 'langModal';
@@ -3028,80 +3163,13 @@ window.addEventListener('load', function() {
   };
 
   // ==========================================
-  // 9. АВТОКЛИКЕР
-  // ==========================================
-  window.acTimeout = null;
-  window.acActive = localStorage.getItem('acActive') === 'true';
-
-  const originalAlert = window.alert;
-  window.alert = function(message) {
-      if (window.acActive) { window.toggleAcState(false); originalAlert("⛔ AUTOCLICKER STOPPED:\n\n" + message); }
-      else { originalAlert(message); }
-  };
-
-  window.createFloatingAc = function() {
-      if(document.getElementById('floatingAcCircle')) return;
-      var circle = document.createElement('div');
-      circle.id = 'floatingAcCircle';
-      var savedPos = JSON.parse(localStorage.getItem('acPos')) || { x: window.innerWidth - 80, y: 100 };
-      circle.style.cssText = `position:fixed; z-index:2147483647; width:60px; height:60px; border-radius:50%; background:${window.acActive ? 'rgba(52,199,89,0.8)' : 'rgba(255,40,80,0.8)'}; border:2px solid white; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 10px rgba(0,0,0,0.5); touch-action:none; left:${savedPos.x}px; top:${savedPos.y}px;`;
-      circle.innerHTML = `<div id="acInner" style="width:100%; height:100%; border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-size:24px;">●</div><div id="acClose" style="position:absolute; top:-5px; right:-5px; width:20px; height:20px; background:#333; color:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; border:1px solid #fff; cursor:pointer;">✕</div>`;
-      document.body.appendChild(circle);
-      var isDragging = false; var offsetX, offsetY; var lastTap = 0;
-      
-      function startDrag(e) { if(e.target.id === 'acClose') return; isDragging = true; var evt = e.touches ? e.touches[0] : e; offsetX = evt.clientX - circle.offsetLeft; offsetY = evt.clientY - circle.offsetTop; }
-      function onDrag(e) { if (!isDragging) return; if(e.cancelable) e.preventDefault(); var evt = e.touches ? e.touches[0] : e; circle.style.left = (evt.clientX - offsetX) + 'px'; circle.style.top = (evt.clientY - offsetY) + 'px'; }
-      function endDrag() { if(!isDragging) return; isDragging = false; localStorage.setItem('acPos', JSON.stringify({ x: circle.offsetLeft, y: circle.offsetTop })); }
-      
-      circle.addEventListener('touchstart', startDrag, {passive: false}); circle.addEventListener('touchmove', onDrag, {passive: false}); circle.addEventListener('touchend', endDrag); circle.addEventListener('mousedown', startDrag); document.addEventListener('mousemove', onDrag); document.addEventListener('mouseup', endDrag);
-      circle.addEventListener('click', function(e) { if(e.target.id === 'acClose') return; var currentTime = new Date().getTime(); var tapLength = currentTime - lastTap; if (tapLength < 300 && tapLength > 0) { window.toggleAcState(); } lastTap = currentTime; });
-      document.getElementById('acClose').onclick = function(e) { e.stopPropagation(); circle.remove(); window.toggleAcState(false); };
-      if(window.acActive) window.toggleAcState(true);
-  };
-
-  window.toggleAcState = function(forceState) {
-      if(forceState === false) { window.acActive = false; if(window.acTimeout) clearTimeout(window.acTimeout); window.acTimeout = null; } 
-      else {
-          window.acActive = true;
-          if(!window.acTimeout) {
-              function clickLoop() {
-                  if (!window.acActive) return;
-                  var circle = document.getElementById('floatingAcCircle'); 
-                  if (circle) {
-                      var rect = circle.getBoundingClientRect(); var cx = rect.left + 30; var cy = rect.top + 30; 
-                      circle.style.pointerEvents = 'none'; var el = document.elementFromPoint(cx, cy); circle.style.pointerEvents = 'auto';
-                      if (el && el.id === 'upgradeClickBtn') {
-                          // skip
-                      } else if (el && el !== document.body && el !== document.documentElement) { 
-                          var eventOpts = { bubbles: true, cancelable: true, view: window, clientX: cx, clientY: cy };
-                          if (el.dispatchEvent) { el.dispatchEvent(new PointerEvent('pointerdown', eventOpts)); el.dispatchEvent(new MouseEvent('mousedown', eventOpts)); el.dispatchEvent(new PointerEvent('pointerup', eventOpts)); el.dispatchEvent(new MouseEvent('mouseup', eventOpts)); el.dispatchEvent(new MouseEvent('click', eventOpts)); }
-                          if (typeof el.click === 'function') { el.click(); }
-                      } 
-                  }
-                  window.acTimeout = setTimeout(clickLoop, 20);
-              }
-              clickLoop();
-          }
-      }
-      localStorage.setItem('acActive', window.acActive);
-      var circle = document.getElementById('floatingAcCircle'); if(circle) { circle.style.background = window.acActive ? 'rgba(52,199,89,0.8)' : 'rgba(255,40,80,0.8)'; }
-  };
-  
-  window.toggleFloatingAutoClicker = function() { 
-      var existing = document.getElementById('floatingAcCircle'); 
-      if(existing) { existing.remove(); window.toggleAcState(false); } 
-      else { window.createFloatingAc(); } 
-  };
-  setTimeout(function() { if(localStorage.getItem('acActive') === 'true') { window.createFloatingAc(); } }, 1500);
-
-  // ==========================================
   // 10. ОБРАБОТЧИКИ КЛИКОВ
   // ==========================================
   document.body.addEventListener('click', function(e) {
     var target = e.target; var text = target.innerText || "";
     if (target.tagName === 'SPAN' || target.tagName === 'SVG' || target.tagName === 'PATH') { text = target.parentElement.innerText || ""; }
 
-    if (text.includes('Казино') || text.includes('Crystals') || text.includes('Кристаллы') || text.includes('Kristalle')) {
+    if (text.includes('Казино') || text.includes('Crystals') || text.includes('Кристаллы') || text.includes('Kristalle') || text.includes('Casino')) {
       if (target.closest('.menu-btn') || (target.parentElement && target.parentElement.closest('.menu-btn'))) {
         var cm = document.getElementById('myCrystalModal'); if(cm) cm.style.display = 'flex';
       }
@@ -3111,6 +3179,7 @@ window.addEventListener('load', function() {
     }
     if (target.id === 'myCloseBtn') { document.getElementById('myCrystalModal').style.display = 'none'; }
     if (target.id === 'myClickerBtn') { document.getElementById('myCrystalModal').style.display = 'none'; document.getElementById('myClickerScreen').style.display = 'flex'; window.updateClickerUI(); }
+    if (target.id === 'myVpnMenuBtn') { window.openVpnScreen(); }
     if (target.id === 'myCasinoBtn') { document.getElementById('myCrystalModal').style.display = 'none'; if (window.openCasino) window.openCasino(); }
     if (target.id === 'myStocksBtn') { window.openStocks(); }
     if (target.id === 'myVotesBtn') { window.openVotes(); }
