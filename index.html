@@ -2688,117 +2688,54 @@ window.addEventListener('load', function() {
     { code: 'en', name: 'English' },
     { code: 'ru', name: 'Русский' },
     { code: 'uk', name: 'Українська' },
-    { code: 'de', name: 'Deutsch' }
+    { code: 'de', name: 'Deutsch' },
+    { code: 'fr', name: 'Français' },
+    { code: 'es', name: 'Español' },
+    { code: 'zh', name: '简体中文' },
+    { code: 'ja', name: '日本語' },
+    { code: 'ko', name: '한국어' },
+    { code: 'pl', name: 'Polski' },
+    { code: 'tr', name: 'Türkçe' },
+    { code: 'pt', name: 'Português' }
   ];
 
-  // ПОЛНЫЙ СЛОВАРЬ ДЛЯ ПЕРЕВОДА ВСЕХ ЭКРАНОВ
+  // Словарь для перевода интерфейса игры
   const uiTranslationDict = {
     'en': {
-      // Навигация
-      "Главная": "Home",
-      "Входящие": "Inbox",
-      "Кристаллы": "Crystals",
-      "Аккаунт": "Account",
-      "РЕКОМЕНДАЦИИ": "RECOMMENDATIONS",
-      
-      // Профиль и авторизация
-      "Выйти": "Logout",
-      "Войти": "Login",
-      "Войти через Google": "Login with Google",
-      "подписчики": "subscribers",
-      "подписки": "subscriptions",
-      "кристаллы": "crystals",
-      "Мови": "Languages",
-      "Казино": "Casino",
-      "Мои стримы": "My Streams",
-      "Статистика": "Statistics",
-      "Настройки": "Settings",
-      
-      // Мои стримы
-      "МБ": "MB",
-      
-      // Казино
-      "Внести кристаллы": "Deposit Crystals",
-      "Сначала выберите сумму": "First select an amount",
-      "Крутить": "SPIN",
-      
-      // Стримы и Чаты
-      "Новый стрим": "New Stream",
-      "Публичный стрим": "Public Stream",
-      "Стрим 18+": "Stream 18+",
-      "Не публичный (только для себя)": "Private (Only for me)",
-      "Отмена": "Cancel",
-      "Создать чат": "Create Chat",
-      "Выбери тип чата": "Choose chat type",
-      "Публичный": "Public",
-      "50% подписчиков": "50% of subscribers",
-      "Приватный": "Private",
-      "выбрать участников вручную": "select members manually",
-      "Сообщения": "Messages",
-      "канал": "channel",
-      "Создать канал": "Create Channel",
-      "Мой канал": "My Channel",
-      "Участники": "Members",
-      "человек": "people",
-      "Владелец": "Owner",
-      "участник": "member",
-      "Добавить участников": "Add Members",
-      "Готово": "Done",
-      "Показать всех": "Show all",
-      "Мой чат": "My Chat",
-      "Администраторы": "Admins",
-      "Заблокированные": "Blocked",
-      "Удалить?": "Delete?",
-      "Удалить": "Delete",
-      "Чат создан.": "Chat created.",
-      "Сообщение...": "Message...",
-      
-      // Настройки профиля
-      "Изменить профиль": "Edit Profile",
-      "Загрузить фото": "Upload Photo",
-      "Аватар": "Avatar",
-      "Цвет фона": "Background Color",
-      "Цвет рамки": "Border Color",
-      "Цвет символа": "Symbol Color",
-      "Сохранить": "Save",
-      "Редактировать канал": "Edit Channel",
-      "Название": "Title",
-      "Символ аватарки": "Avatar Symbol",
-      "Быстрый выбор": "Quick Select",
-      "Эмодзи": "Emoji",
-      "Никнейм": "Nickname",
-      
-      // Статистика
-      "Всего стримов": "Total Streams",
-      "Сообщений": "Messages",
-      "Диалогов": "Dialogs",
-      "Донатов": "Donations",
-
-      // Системные сообщения
-      "подписался на канал": "subscribed to channel",
-      "задонатил": "donated",
-      "смотрю дальше": "watching further",
-      "подписался!": "subscribed!",
-      "новый подписчик": "new subscriber",
-
-      // Розыгрыш
-      "Розыгрыш": "Giveaway",
-      "Текст розыгрыша": "Giveaway Text",
-      "Например: Разыгрываю 1000 кристаллов!": "Example: Giving away 1000 crystals!",
-      "Кристаллов победителю": "Crystals to winner",
-      "Запустить": "Start"
+      "Главная": "Home", "Входящие": "Inbox", "Кристаллы": "Crystals", "Аккаунт": "Account",
+      "Выйти": "Logout", "Войти": "Login", "Войти через Google": "Login with Google",
+      "подписчики": "subscribers", "подписки": "subscriptions", "кристаллы": "crystals",
+      "Мови": "Languages", "Казино": "Casino", "Мои стримы": "My Streams", "Статистика": "Statistics", "Настройки": "Settings",
+      "МБ": "MB", "Внести кристаллы": "Deposit Crystals", "Сначала выберите сумму": "First select an amount", "Крутить": "SPIN",
+      "Новый стрим": "New Stream", "Публичный стрим": "Public Stream", "Стрим 18+": "Stream 18+", "Не публичный (только для себя)": "Private (Only for me)", "Отмена": "Cancel",
+      "Создать чат": "Create Chat", "Выбери тип чата": "Choose chat type", "Публичный": "Public", "50% подписчиков": "50% of subscribers", "Приватный": "Private", "выбрать участников вручную": "select manually",
+      "Сообщения": "Messages", "канал": "channel", "Создать канал": "Create Channel", "Мой канал": "My Channel", "Участники": "Members", "человек": "people", "Владелец": "Owner", "участник": "member",
+      "Добавить участников": "Add Members", "Готово": "Done", "Показать всех": "Show all", "Мой чат": "My Chat", "Администраторы": "Admins", "Заблокированные": "Blocked",
+      "Удалить?": "Delete?", "Удалить": "Delete", "Чат создан.": "Chat created.", "Сообщение...": "Message...",
+      "Изменить профиль": "Edit Profile", "Загрузить фото": "Upload Photo", "Аватар": "Avatar", "Цвет фона": "Background Color", "Цвет рамки": "Border Color", "Цвет символа": "Symbol Color", "Сохранить": "Save",
+      "Редактировать канал": "Edit Channel", "Название": "Title", "Символ аватарки": "Avatar Symbol", "Быстрый выбор": "Quick Select", "Эмодзи": "Emoji", "Никнейм": "Nickname",
+      "Всего стримов": "Total Streams", "Сообщений": "Messages", "Диалогов": "Dialogs", "Донатов": "Donations",
+      "подписался на канал": "subscribed to channel", "задонатил": "donated", "смотрю дальше": "watching further", "подписался!": "subscribed!", "новый подписчик": "new subscriber",
+      "Розыгрыш": "Giveaway", "Текст розыгрыша": "Giveaway Text", "Например: Разыгрываю 1000 кристаллов!": "Example: Giveaway 1000 crystals!", "Кристаллов победителю": "Crystals to winner", "Запустить": "Start",
+      "Пока нечего нет. Выложи видео или запусти стрим!": "Nothing here yet. Upload a video or start a stream!"
     },
-    'ru': {}, 'uk': {}, 'de': {}
+    'uk': {
+      "Главная": "Головна", "Входящие": "Вхідні", "Кристаллы": "Кристали", "Аккаунт": "Акаунт", "Выйти": "Вийти", "Войти": "Увійти", "Мои стримы": "Мої стріми", "Настройки": "Налаштування", "Казино": "Казино", "Статистика": "Статистика"
+    },
+    'de': {
+      "Главная": "Startseite", "Входящие": "Posteingang", "Кристаллы": "Kristalle", "Аккаунт": "Konto", "Выйти": "Abmelden", "Войти": "Anmelden", "Мои стримы": "Meine Streams", "Настройки": "Einstellungen", "Казино": "Casino", "Статистика": "Statistiken"
+    },
+    // Остальные языки падают на английский для экономии места
+    'ru': {}, 'fr': {}, 'es': {}, 'zh': {}, 'ja': {}, 'ko': {}, 'pl': {}, 'tr': {}, 'pt': {}
   };
 
   window.currentLang = localStorage.getItem('appLang') || 'en';
 
-  // Функция «умного» перевода
+  // Функция «умного» перевода (работает по таймеру)
   window.translateUI = function() {
       if (window.currentLang === 'ru') return; 
       
-      const dict = uiTranslationDict[window.currentLang];
-      if (!dict || Object.keys(dict).length === 0) return;
+      const dict = uiTranslationDict[window.currentLang] || uiTranslationDict['en'];
 
       const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
       let node;
@@ -2806,22 +2743,21 @@ window.addEventListener('load', function() {
           let text = node.nodeValue.trim();
           if (dict[text]) {
               node.nodeValue = node.nodeValue.replace(text, dict[text]);
+          } else if (uiTranslationDict['en'][text] && !dict[text]) {
+              // Если нет перевода для языка, берем английский
+              node.nodeValue = node.nodeValue.replace(text, uiTranslationDict['en'][text]);
           }
       }
 
       document.querySelectorAll('input, textarea').forEach(el => {
           let ph = el.getAttribute('placeholder');
-          if (ph && dict[ph]) {
-              el.setAttribute('placeholder', dict[ph]);
-          }
+          if (ph && dict[ph]) el.setAttribute('placeholder', dict[ph]);
+          else if (ph && uiTranslationDict['en'][ph]) el.setAttribute('placeholder', uiTranslationDict['en'][ph]);
       });
   };
 
-  // Следим за появлением новых элементов и переводим их
-  const observer = new MutationObserver((mutations) => {
-      window.translateUI();
-  });
-  observer.observe(document.body, { childList: true, subtree: true });
+  // Запускаем перевод каждую секунду, чтобы ловить новые окна
+  setInterval(window.translateUI, 1000);
 
   window.t = function(key) {
       const myDict = {
@@ -2958,7 +2894,7 @@ window.addEventListener('load', function() {
   }
 
   // ==========================================
-  // 6. АКЦИИ И ГОЛОСОВАНИЯ (ВОССТАНОВЛЕНО)
+  // 6. АКЦИИ И ГОЛОСОВАНИЯ
   // ==========================================
   if (!document.getElementById('myStocksScreen')) {
       var stocksScreen = document.createElement('div'); stocksScreen.id = 'myStocksScreen';
@@ -3150,7 +3086,20 @@ window.addEventListener('load', function() {
     else { btn.textContent = '🔐 ' + t('login'); btn.style.background = 'linear-gradient(135deg,#4285f4,#34a853)'; }
   });
 
-  // Запускаем переводчик при загрузке
+  // ==========================================
+  // 9. ОЧИСТКА ГЛАВНОЙ ОТ ФЕЙКОВ (ВОЗВРАЩЕНО)
+  // ==========================================
+  window.spawnFakeContent = function() {}; // Отключаем генератор
+  window.renderHome = function() {
+      var body = document.getElementById('homeBody') || document.body;
+      if(!body) return;
+      body.innerHTML = ''; 
+      var emptyMsg = document.createElement('div');
+      emptyMsg.style.cssText = 'color:#555; text-align:center; margin-top:50px; font-size:14px; padding: 0 20px;';
+      emptyMsg.innerText = uiTranslationDict[window.currentLang] && uiTranslationDict[window.currentLang]['Пока нечего нет. Выложи видео или запусти стрим!'] ? uiTranslationDict[window.currentLang]['Пока нечего нет. Выложи видео или запусти стрим!'] : 'Nothing here yet. Upload a video or start a stream!';
+      body.appendChild(emptyMsg);
+  };
+
   setTimeout(function() { 
       window.translateUI(); 
       if(window.renderHome) window.renderHome(); 
