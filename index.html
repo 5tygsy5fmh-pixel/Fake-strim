@@ -3231,5 +3231,159 @@ window.addEventListener('load', function() {
 
 });
 </script>
+<!-- Кнопка для открытия списка VPN -->
+<button id="btnOpenVpnList" style="display:block; width:100%; padding:14px; margin:10px 0; border-radius:12px; border:none; color:#fff; font-size:15px; font-weight:700; background:linear-gradient(135deg,#10b981,#059669); cursor:pointer;">
+  🛡️ Бесплатные VPN (обход блокировок)
+</button>
+
+<!-- Модальное окно со списком -->
+<div id="vpnListModal" style="display:none; position:fixed; inset:0; z-index:100000; background:rgba(0,0,0,0.9); flex-direction:column; align-items:center; padding:20px; overflow-y:auto;">
+  <div style="width:100%; max-width:500px; background:#0f172a; border-radius:20px; padding:20px; border:1px solid #334155;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+      <h3 style="color:#fff; margin:0; font-size:18px;">🛡️ Бесплатные VPN (Топ)</h3>
+      <button id="closeVpnList" style="background:none; border:none; color:#fff; font-size:24px; cursor:pointer;">✕</button>
+    </div>
+    <p style="color:#94a3b8; font-size:12px; margin-bottom:15px; text-align:center;">
+      Ранжирование: обход блокировок (Reality) > отсутствие логов > скорость > без рекламы. Красная рамка — платные/с пробным периодом.
+    </p>
+    <div id="vpnListItems" style="display:flex; flex-direction:column; gap:12px;"></div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Данные о VPN (отсортированы по приоритету)
+  const vpnData = [
+    {
+      name: 'Nyx VPN',
+      desc: 'V2Ray/Reality. Без логов, без аккаунта. Лучший обход DPI.',
+      speed: '~ 6 500 КБ/с',
+      link: 'https://nyxvpn.com',
+      status: 'top' // Топ-3, зеленая/желтая рамка
+    },
+    {
+      name: 'RealVPN',
+      desc: 'VLESS Reality. Бесплатный уровень с безлимитом.',
+      speed: '~ 5 200 КБ/с',
+      link: 'https://realvpn.app',
+      status: 'top'
+    },
+    {
+      name: 'Proton VPN',
+      desc: 'Швейцария. Без логов, без рекламы. Аудит безопасности.',
+      speed: '~ 4 800 КБ/с',
+      link: 'https://protonvpn.com/free-vpn',
+      status: 'top'
+    },
+    {
+      name: 'Windscribe',
+      desc: '10 ГБ/мес бесплатно. Хорошая репутация.',
+      speed: '~ 3 500 КБ/с',
+      link: 'https://windscribe.com',
+      status: 'good' // Зеленая рамка
+    },
+    {
+      name: 'PrivadoVPN',
+      desc: 'Бесплатный тариф с лимитом. Без логов.',
+      speed: '~ 2 100 КБ/с',
+      link: 'https://privadovpn.com',
+      status: 'good'
+    },
+    {
+      name: 'Hide.me',
+      desc: 'Бесплатный тариф. Без рекламы, но с лимитом.',
+      speed: '~ 1 800 КБ/с',
+      link: 'https://hide.me',
+      status: 'good'
+    },
+    {
+      name: 'FRKN App',
+      desc: 'Заявлен как обход блокировок в РФ. Нет аудита.',
+      speed: '~ 1 200 КБ/с',
+      link: 'https://frkn.app',
+      status: 'warning' // Желтая/красная рамка
+    },
+    {
+      name: 'LagomVPN',
+      desc: 'Для РФ. Малоизвестен, нет данных о логах.',
+      speed: '~ 900 КБ/с',
+      link: 'https://lagomvpn.com',
+      status: 'warning'
+    },
+    {
+      name: 'ВПН МИР',
+      desc: 'Для РФ. Нет данных о политике логов.',
+      speed: '~ 700 КБ/с',
+      link: 'https://vpnmir.app',
+      status: 'warning'
+    },
+    {
+      name: 'NordVPN (Платный)',
+      desc: 'Только пробный период / возврат. Нет бесплатного тарифа.',
+      speed: '—',
+      link: 'https://nordvpn.com',
+      status: 'bad' // Красная рамка
+    },
+    {
+      name: 'ExpressVPN (Платный)',
+      desc: 'Только пробный период. Нет бесплатного тарифа.',
+      speed: '—',
+      link: 'https://expressvpn.com',
+      status: 'bad'
+    }
+  ];
+
+  const listContainer = document.getElementById('vpnListItems');
+
+  // Функция для отрисовки карточек
+  function renderVpnList() {
+    listContainer.innerHTML = '';
+    vpnData.forEach((vpn, index) => {
+      const card = document.createElement('div');
+      let borderColor = '#ef4444'; // Красный по умолчанию
+      let rankBadge = '';
+
+      if (vpn.status === 'top' && index < 3) {
+        borderColor = '#fbbf24'; // Желтый/золотой для топ-3
+        rankBadge = `<span style="background:#fbbf24; color:#000; font-weight:bold; padding:2px 8px; border-radius:6px; font-size:10px; margin-left:8px;">ТОП-${index + 1}</span>`;
+      } else if (vpn.status === 'top' || vpn.status === 'good') {
+        borderColor = '#22c55e'; // Зеленый
+      } else if (vpn.status === 'warning') {
+        borderColor = '#f59e0b'; // Оранжевый
+      } else {
+        borderColor = '#ef4444'; // Красный для платных
+      }
+
+      card.style.cssText = `background:#1e293b; border:2px solid ${borderColor}; border-radius:12px; padding:12px; display:flex; flex-direction:column; gap:6px;`;
+      
+      card.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div style="color:#fff; font-weight:bold; font-size:15px;">${vpn.name} ${rankBadge}</div>
+          <div style="color:${vpn.status === 'bad' ? '#ef4444' : '#34d399'}; font-weight:bold; font-size:12px;">${vpn.speed}</div>
+        </div>
+        <div style="color:#94a3b8; font-size:12px; line-height:1.3;">${vpn.desc}</div>
+        <div style="display:flex; justify-content:flex-end;">
+          <a href="${vpn.link}" target="_blank" style="text-decoration:none; background:#3b82f6; color:#fff; padding:6px 12px; border-radius:6px; font-size:12px; font-weight:bold;">Открыть</a>
+        </div>
+      `;
+      listContainer.appendChild(card);
+    });
+  }
+
+  // Открытие/закрытие
+  const modal = document.getElementById('vpnListModal');
+  document.getElementById('btnOpenVpnList').onclick = () => {
+    renderVpnList();
+    modal.style.display = 'flex';
+  };
+  document.getElementById('closeVpnList').onclick = () => {
+    modal.style.display = 'none';
+  };
+  // Закрытие по клику вне окна
+  window.onclick = (e) => {
+    if (e.target === modal) modal.style.display = 'none';
+  };
+});
+</script>
 </body>
 </html>
