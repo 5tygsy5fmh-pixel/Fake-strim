@@ -2682,58 +2682,159 @@ window.addEventListener('load', function() {
   window.commandsEnabled = true;
 
   // ==========================================
-  // 2. СИСТЕМА ЯЗЫКОВ (ИСПРАВЛЕНО)
+  // 2. СИСТЕМА ЯЗЫКОВ И СЛОВАРЬ ПЕРЕВОДА
   // ==========================================
   const languages = [
     { code: 'en', name: 'English' },
     { code: 'ru', name: 'Русский' },
     { code: 'uk', name: 'Українська' },
-    { code: 'de', name: 'Deutsch' },
-    { code: 'fr', name: 'Français' },
-    { code: 'es', name: 'Español' },
-    { code: 'zh', name: '简体中文' },
-    { code: 'ja', name: '日本語' },
-    { code: 'ko', name: '한국어' },
-    { code: 'pl', name: 'Polski' },
-    { code: 'tr', name: 'Türkçe' },
-    { code: 'pt', name: 'Português' }
+    { code: 'de', name: 'Deutsch' }
   ];
 
-  const translations = {
-    en: { crystals: "Crystals", clicker: "Clicker", casino: "Casino", stocks: "Stocks", votes: "Votes", ads: "Ads", close: "Close", settings: "Settings", languages: "Languages", autoClicker: "AutoClicker", profile: "Profile", logout: "Logout", login: "Login with Google", searchLang: "Search language...", upgClick: "Upgrade click", clickStats: "Your click", voteYes: "Yes", voteNo: "No", loading: "Loading...", notEnough: "Not enough crystals!", boostOn: "Clicker Boost Activated!", boostOff: "Clicker Boost Disabled", myVpn: "My VPN", connect: "Connect", disconnect: "Disconnect", dns: "DNS Server", adWait: "Wait", adGet: "Get 10,000", adWatching: "Watching ad..." },
-    ru: { crystals: "Кристаллы", clicker: "Кликер", casino: "Казино", stocks: "Акции", votes: "Голосования", ads: "Реклама", close: "Закрыть", settings: "Настройки", languages: "Языки", autoClicker: "Автокликер", profile: "Профиль", logout: "Выйти", login: "Войти через Google", searchLang: "Поиск языка...", upgClick: "Прокачать клик", clickStats: "Твой клик", voteYes: "Да", voteNo: "Нет", loading: "Загрузка...", notEnough: "Недостаточно кристаллов!", boostOn: "Буст кликера активирован!", boostOff: "Буст кликера отключен", myVpn: "Мой VPN", connect: "Подключить", disconnect: "Отключить", dns: "DNS Сервер", adWait: "Подождите", adGet: "Получить 10,000", adWatching: "Просмотр рекламы..." },
-    uk: { crystals: "Кристали", clicker: "Клікер", casino: "Казино", stocks: "Акції", votes: "Голосування", ads: "Реклама", close: "Закрити", settings: "Налаштування", languages: "Мови", autoClicker: "Автоклікер", profile: "Профіль", logout: "Вийти", login: "Увійти через Google", searchLang: "Пошук мови...", upgClick: "Прокачати клік", clickStats: "Твій клік", voteYes: "Так", voteNo: "Ні", loading: "Завантаження...", notEnough: "Недостатньо кристалів!", boostOn: "Буст клікера активовано!", boostOff: "Буст клікера вимкнено", myVpn: "Мій VPN", connect: "Підключити", disconnect: "Відключити", dns: "DNS Сервер", adWait: "Зачекайте", adGet: "Отримати 10,000", adWatching: "Перегляд реклами..." },
-    de: { crystals: "Kristalle", clicker: "Klicker", casino: "Casino", stocks: "Aktien", votes: "Abstimmungen", ads: "Werbung", close: "Schließen", settings: "Einstellungen", languages: "Sprachen", autoClicker: "AutoClicker", profile: "Profil", logout: "Abmelden", login: "Mit Google anmelden", searchLang: "Sprache suchen...", upgClick: "Klick verbessern", clickStats: "Dein Klick", voteYes: "Ja", voteNo: "Nein", loading: "Wird geladen...", notEnough: "Nicht genug Kristalle!", boostOn: "Klicker-Boost aktiviert!", boostOff: "Klicker-Boost deaktiviert", myVpn: "Mein VPN", connect: "Verbinden", disconnect: "Trennen", dns: "DNS-Server", adWait: "Warten", adGet: "10.000 erhalten", adWatching: "Werbung ansehen..." }
+  // ПОЛНЫЙ СЛОВАРЬ ДЛЯ ПЕРЕВОДА ВСЕХ ЭКРАНОВ
+  const uiTranslationDict = {
+    'en': {
+      // Навигация
+      "Главная": "Home",
+      "Входящие": "Inbox",
+      "Кристаллы": "Crystals",
+      "Аккаунт": "Account",
+      "РЕКОМЕНДАЦИИ": "RECOMMENDATIONS",
+      
+      // Профиль и авторизация
+      "Выйти": "Logout",
+      "Войти": "Login",
+      "Войти через Google": "Login with Google",
+      "подписчики": "subscribers",
+      "подписки": "subscriptions",
+      "кристаллы": "crystals",
+      "Мови": "Languages",
+      "Казино": "Casino",
+      "Мои стримы": "My Streams",
+      "Статистика": "Statistics",
+      "Настройки": "Settings",
+      
+      // Мои стримы
+      "МБ": "MB",
+      
+      // Казино
+      "Внести кристаллы": "Deposit Crystals",
+      "Сначала выберите сумму": "First select an amount",
+      "Крутить": "SPIN",
+      
+      // Стримы и Чаты
+      "Новый стрим": "New Stream",
+      "Публичный стрим": "Public Stream",
+      "Стрим 18+": "Stream 18+",
+      "Не публичный (только для себя)": "Private (Only for me)",
+      "Отмена": "Cancel",
+      "Создать чат": "Create Chat",
+      "Выбери тип чата": "Choose chat type",
+      "Публичный": "Public",
+      "50% подписчиков": "50% of subscribers",
+      "Приватный": "Private",
+      "выбрать участников вручную": "select members manually",
+      "Сообщения": "Messages",
+      "канал": "channel",
+      "Создать канал": "Create Channel",
+      "Мой канал": "My Channel",
+      "Участники": "Members",
+      "человек": "people",
+      "Владелец": "Owner",
+      "участник": "member",
+      "Добавить участников": "Add Members",
+      "Готово": "Done",
+      "Показать всех": "Show all",
+      "Мой чат": "My Chat",
+      "Администраторы": "Admins",
+      "Заблокированные": "Blocked",
+      "Удалить?": "Delete?",
+      "Удалить": "Delete",
+      "Чат создан.": "Chat created.",
+      "Сообщение...": "Message...",
+      
+      // Настройки профиля
+      "Изменить профиль": "Edit Profile",
+      "Загрузить фото": "Upload Photo",
+      "Аватар": "Avatar",
+      "Цвет фона": "Background Color",
+      "Цвет рамки": "Border Color",
+      "Цвет символа": "Symbol Color",
+      "Сохранить": "Save",
+      "Редактировать канал": "Edit Channel",
+      "Название": "Title",
+      "Символ аватарки": "Avatar Symbol",
+      "Быстрый выбор": "Quick Select",
+      "Эмодзи": "Emoji",
+      "Никнейм": "Nickname",
+      
+      // Статистика
+      "Всего стримов": "Total Streams",
+      "Сообщений": "Messages",
+      "Диалогов": "Dialogs",
+      "Донатов": "Donations",
+
+      // Системные сообщения
+      "подписался на канал": "subscribed to channel",
+      "задонатил": "donated",
+      "смотрю дальше": "watching further",
+      "подписался!": "subscribed!",
+      "новый подписчик": "new subscriber",
+
+      // Розыгрыш
+      "Розыгрыш": "Giveaway",
+      "Текст розыгрыша": "Giveaway Text",
+      "Например: Разыгрываю 1000 кристаллов!": "Example: Giving away 1000 crystals!",
+      "Кристаллов победителю": "Crystals to winner",
+      "Запустить": "Start"
+    },
+    'ru': {}, 'uk': {}, 'de': {}
   };
 
   window.currentLang = localStorage.getItem('appLang') || 'en';
 
+  // Функция «умного» перевода
+  window.translateUI = function() {
+      if (window.currentLang === 'ru') return; 
+      
+      const dict = uiTranslationDict[window.currentLang];
+      if (!dict || Object.keys(dict).length === 0) return;
+
+      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
+      let node;
+      while (node = walker.nextNode()) {
+          let text = node.nodeValue.trim();
+          if (dict[text]) {
+              node.nodeValue = node.nodeValue.replace(text, dict[text]);
+          }
+      }
+
+      document.querySelectorAll('input, textarea').forEach(el => {
+          let ph = el.getAttribute('placeholder');
+          if (ph && dict[ph]) {
+              el.setAttribute('placeholder', dict[ph]);
+          }
+      });
+  };
+
+  // Следим за появлением новых элементов и переводим их
+  const observer = new MutationObserver((mutations) => {
+      window.translateUI();
+  });
+  observer.observe(document.body, { childList: true, subtree: true });
+
   window.t = function(key) {
-      return (translations[window.currentLang] && translations[window.currentLang][key]) 
-             ? translations[window.currentLang][key] 
-             : translations['en'][key] || key;
+      const myDict = {
+        en: { crystals: "Crystals", clicker: "Clicker", casino: "Casino", stocks: "Stocks", votes: "Votes", ads: "Ads", close: "Close", settings: "Settings", languages: "Languages", autoClicker: "AutoClicker", profile: "Profile", logout: "Logout", login: "Login with Google", searchLang: "Search language...", upgClick: "Upgrade click", clickStats: "Your click", voteYes: "Yes", voteNo: "No", loading: "Loading...", notEnough: "Not enough crystals!", boostOn: "Clicker Boost Activated!", boostOff: "Clicker Boost Disabled", cmdsOff: "All commands disabled", cmdsOn: "Commands enabled" },
+        ru: { crystals: "Кристаллы", clicker: "Кликер", casino: "Казино", stocks: "Акции", votes: "Голосования", ads: "Реклама", close: "Закрыть", settings: "Настройки", languages: "Языки", autoClicker: "Автокликер", profile: "Профиль", logout: "Выйти", login: "Войти через Google", searchLang: "Поиск языка...", upgClick: "Прокачать клик", clickStats: "Твой клик", voteYes: "Да", voteNo: "Нет", loading: "Загрузка...", notEnough: "Недостаточно кристаллов!", boostOn: "Буст кликера активирован!", boostOff: "Буст кликера отключен", cmdsOff: "Все команды отключены", cmdsOn: "Команды включены" }
+      };
+      return (myDict[window.currentLang] && myDict[window.currentLang][key]) ? myDict[window.currentLang][key] : myDict['en'][key] || key;
   };
 
   window.changeLanguage = function(langCode) {
       window.currentLang = langCode;
       localStorage.setItem('appLang', langCode);
-      
-      // Мгновенное обновление всех текстов на странице
-      document.querySelectorAll('[data-i18n]').forEach(function(el) {
-          var key = el.getAttribute('data-i18n');
-          if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
-              el.placeholder = t(key);
-          } else {
-              el.innerText = t(key);
-          }
-      });
-
-      // Пересоздаем меню аккаунта с новым языком
-      var oldLangItem = document.getElementById('myLangMenuItem');
-      if (oldLangItem) oldLangItem.remove();
-      
-      alert(t('languages') + ' changed!');
-      location.reload(); // Оставляем перезагрузку для надежности работы всех динамических элементов
+      location.reload(); 
   };
 
   async function translateDynamicText(text, targetLang) {
@@ -2766,7 +2867,7 @@ window.addEventListener('load', function() {
   }, true); 
 
   // ==========================================
-  // 4. ОКНО КРИСТАЛЛОВ
+  // 4. ОКНО КРИСТАЛЛОВ (БЕЗ VPN)
   // ==========================================
   if (!document.getElementById('myCrystalModal')) {
     var mod = document.createElement('div');
@@ -2775,7 +2876,6 @@ window.addEventListener('load', function() {
     mod.innerHTML = `<div style="background:#1a1a2e;border-radius:20px;padding:22px;width:100%;max-width:360px;display:flex;flex-direction:column;gap:12px">
       <h3 style="font-size:18px;text-align:center;margin-bottom:8px;color:#fff">💎 <span data-i18n="crystals">${t('crystals')}</span></h3>
       <button id="myClickerBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-weight:800;background:linear-gradient(135deg,#3b82f6,#2dd4bf)">🎯 <span data-i18n="clicker">${t('clicker')}</span></button>
-      <button id="myVpnMenuBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-weight:800;background:linear-gradient(135deg,#10b981,#059669)">🛡️ <span data-i18n="myVpn">${t('myVpn')}</span></button>
       <button id="myCasinoBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-weight:800;background:linear-gradient(135deg,#ff2850,#ff5c8a)">🎰 <span data-i18n="casino">${t('casino')}</span></button>
       <button id="myStocksBtn" style="padding:18px;border-radius:14px;border:none;color:#000;font-weight:800;background:linear-gradient(135deg,#43e97b,#38f9d7)">📈 <span data-i18n="stocks">${t('stocks')}</span></button>
       <button id="myVotesBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-weight:800;background:linear-gradient(135deg,#8b5cf6,#c88cff)">🗳️ <span data-i18n="votes">${t('votes')}</span></button>
@@ -2858,154 +2958,7 @@ window.addEventListener('load', function() {
   }
 
   // ==========================================
-  // 6. НОВЫЙ VPN ИНТЕРФЕЙС (С DNS и ОПЛАТОЙ)
-  // ==========================================
-  
-  if (!document.getElementById('myVpnScreen')) {
-      var vpnScreen = document.createElement('div'); vpnScreen.id = 'myVpnScreen';
-      vpnScreen.style.cssText = 'position:fixed;inset:0;z-index:99998;background:#0a0a14;display:none;flex-direction:column;align-items:center;';
-      vpnScreen.innerHTML = `
-        <div style="display:flex;width:100%;align-items:center;padding:14px;border-bottom:1px solid #222;background:#000;">
-          <button id="vpnBackBtn" style="background:rgba(255,255,255,0.1);border:none;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;cursor:pointer;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
-          <div style="flex:1;text-align:center;color:#fff;font-weight:bold;font-size:18px;" data-i18n="myVpn">${t('myVpn')}</div>
-          <div style="width:36px;"></div>
-        </div>
-        
-        <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:25px; width:100%; padding: 20px;">
-          
-          <!-- Кнопка подключения -->
-          <div id="vpnPowerBtn" style="width:180px; height:180px; border-radius:50%; background:#222; border:4px solid #444; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:0.3s; box-shadow: 0 0 30px rgba(0,0,0,0.5);">
-            <svg id="vpnPowerIcon" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path><line x1="12" y1="2" x2="12" y2="12"></line></svg>
-          </div>
-          
-          <div style="color:#fff; font-size:16px; text-align:center;" id="vpnStatusText">Нажмите для подключения (10 000 💎)</div>
-
-          <!-- Выбор DNS -->
-          <div style="background:#1a1a2e; padding:15px; border-radius:12px; width:100%; max-width:300px; display:flex; justify-content:space-between; align-items:center;">
-            <span style="color:#fff; font-size:14px;" data-i18n="dns">${t('dns')}:</span>
-            <select id="vpnDnsSelect" style="background:#0f172a; color:#fff; border:none; padding:8px; border-radius:8px; outline:none;">
-              <option value="1.1.1.1">Cloudflare (1.1.1.1)</option>
-              <option value="8.8.8.8">Google (8.8.8.8)</option>
-              <option value="94.140.14.14">AdGuard (Без рекламы)</option>
-            </select>
-          </div>
-          
-          <div style="color:#888; font-size:11px; text-align:center; max-width:280px;">* Сервер настраивается. Ключ для v2rayTun/Incy будет доступен после подключения.</div>
-        </div>
-      `;
-      document.body.appendChild(vpnScreen);
-  }
-
-  var isVpnConnected = false;
-  var vpnConnecting = false;
-
-  window.openVpnScreen = function() {
-      document.getElementById('myCrystalModal').style.display = 'none';
-      document.getElementById('myVpnScreen').style.display = 'flex';
-  };
-
-  if (document.getElementById('vpnBackBtn')) {
-      document.getElementById('vpnBackBtn').onclick = function() { 
-          if (isVpnConnected) {
-              isVpnConnected = false;
-              document.getElementById('vpnPowerBtn').style.background = '#222';
-              document.getElementById('vpnPowerBtn').style.borderColor = '#444';
-              document.getElementById('vpnPowerIcon').setAttribute('stroke', '#888');
-              document.getElementById('vpnStatusText').innerText = 'Отключено';
-          }
-          document.getElementById('myVpnScreen').style.display = 'none'; 
-      };
-  }
-
-  if (document.getElementById('vpnPowerBtn')) {
-      document.getElementById('vpnPowerBtn').onclick = function() {
-          if (vpnConnecting) return;
-
-          // ОТКЛЮЧЕНИЕ (Бесплатно)
-          if (isVpnConnected) {
-              isVpnConnected = false;
-              this.style.background = '#222';
-              this.style.borderColor = '#444';
-              document.getElementById('vpnPowerIcon').setAttribute('stroke', '#888');
-              document.getElementById('vpnStatusText').innerText = 'Отключено';
-              return;
-          }
-
-          // ПОДКЛЮЧЕНИЕ
-          if (!window.S || S.crystals < 10000) {
-              // Если мало кристаллов - показываем рекламу
-              showAdForCrystals();
-              return;
-          }
-
-          // Списываем кристаллы
-          S.crystals -= 10000;
-          if (window.saveStats) saveStats();
-          if (window.updCrysUI) updCrysUI();
-
-          vpnConnecting = true;
-          var btn = this;
-          var status = document.getElementById('vpnStatusText');
-          
-          status.innerText = 'Подключение...';
-          btn.style.borderColor = '#f59e0b';
-          document.getElementById('vpnPowerIcon').setAttribute('stroke', '#f59e0b');
-
-          setTimeout(function() {
-              vpnConnecting = false;
-              isVpnConnected = true;
-              btn.style.background = '#10b981';
-              btn.style.borderColor = '#34d399';
-              document.getElementById('vpnPowerIcon').setAttribute('stroke', '#fff');
-              status.innerText = 'Подключено (Нажмите чтобы отключить)';
-              
-              var dnsVal = document.getElementById('vpnDnsSelect').value;
-              alert('VPN подключен!\nDNS: ' + dnsVal + '\n\n(Ключ для v2rayTun будет добавлен после Serv00)');
-          }, 2000);
-      };
-  }
-
-  // ==========================================
-  // 7. РЕКЛАМА ЗА КРИСТАЛЛЫ (ЕСЛИ МАЛО)
-  // ==========================================
-  window.showAdForCrystals = function() {
-      var adModal = document.createElement('div');
-      adModal.id = 'adModal';
-      adModal.style.cssText = 'position:fixed;inset:0;z-index:100000;background:rgba(0,0,0,0.95);display:flex;flex-direction:column;align-items:center;justify-content:center;';
-      adModal.innerHTML = `
-          <div style="color:#fff; font-size:20px; font-weight:bold; margin-bottom:20px;">Недостаточно кристаллов!</div>
-          <div style="color:#aaa; margin-bottom:30px; text-align:center; max-width:300px;">Посмотри рекламу, чтобы получить 10 000 💎 для подключения.</div>
-          <button id="watchAdBtn" style="padding:15px 30px; background:#3b82f6; color:#fff; border:none; border-radius:12px; font-size:16px; font-weight:bold; cursor:pointer;">Смотреть рекламу</button>
-          <button id="cancelAdBtn" style="margin-top:15px; padding:10px 20px; background:none; color:#888; border:none; cursor:pointer;">Отмена</button>
-      `;
-      document.body.appendChild(adModal);
-
-      document.getElementById('cancelAdBtn').onclick = function() { adModal.remove(); };
-
-      document.getElementById('watchAdBtn').onclick = function() {
-          this.innerText = 'Просмотр... 5 сек';
-          this.disabled = true;
-          var timeLeft = 5;
-          var btn = this;
-          var timer = setInterval(function() {
-              timeLeft--;
-              btn.innerText = 'Просмотр... ' + timeLeft + ' сек';
-              if (timeLeft <= 0) {
-                  clearInterval(timer);
-                  if (window.S) {
-                      S.crystals += 10000;
-                      if (window.saveStats) saveStats();
-                      if (window.updCrysUI) updCrysUI();
-                  }
-                  adModal.remove();
-                  alert('Вы получили 10 000 кристаллов! Теперь можете подключиться.');
-              }
-          }, 1000);
-      };
-  };
-
-  // ==========================================
-  // 8. АКЦИИ И ГОЛОСОВАНИЯ (ВОССТАНОВЛЕНО)
+  // 6. АКЦИИ И ГОЛОСОВАНИЯ (ВОССТАНОВЛЕНО)
   // ==========================================
   if (!document.getElementById('myStocksScreen')) {
       var stocksScreen = document.createElement('div'); stocksScreen.id = 'myStocksScreen';
@@ -3076,7 +3029,7 @@ window.addEventListener('load', function() {
   if (document.getElementById('votesBackBtn')) document.getElementById('votesBackBtn').onclick = function() { document.getElementById('myVotesScreen').style.display = 'none'; };
 
   // ==========================================
-  // 9. МЕНЮ АККАУНТА И ЯЗЫКИ
+  // 7. МЕНЮ АККАУНТА И ЯЗЫКИ
   // ==========================================
   function createMenuItem(text, iconSvg, onClick) {
       var item = document.createElement('div');
@@ -3163,7 +3116,7 @@ window.addEventListener('load', function() {
   };
 
   // ==========================================
-  // 10. ОБРАБОТЧИКИ КЛИКОВ
+  // 8. ОБРАБОТЧИКИ КЛИКОВ
   // ==========================================
   document.body.addEventListener('click', function(e) {
     var target = e.target; var text = target.innerText || "";
@@ -3179,7 +3132,6 @@ window.addEventListener('load', function() {
     }
     if (target.id === 'myCloseBtn') { document.getElementById('myCrystalModal').style.display = 'none'; }
     if (target.id === 'myClickerBtn') { document.getElementById('myCrystalModal').style.display = 'none'; document.getElementById('myClickerScreen').style.display = 'flex'; window.updateClickerUI(); }
-    if (target.id === 'myVpnMenuBtn') { window.openVpnScreen(); }
     if (target.id === 'myCasinoBtn') { document.getElementById('myCrystalModal').style.display = 'none'; if (window.openCasino) window.openCasino(); }
     if (target.id === 'myStocksBtn') { window.openStocks(); }
     if (target.id === 'myVotesBtn') { window.openVotes(); }
@@ -3198,7 +3150,11 @@ window.addEventListener('load', function() {
     else { btn.textContent = '🔐 ' + t('login'); btn.style.background = 'linear-gradient(135deg,#4285f4,#34a853)'; }
   });
 
-  setTimeout(function() { if(window.renderHome) window.renderHome(); }, 1000);
+  // Запускаем переводчик при загрузке
+  setTimeout(function() { 
+      window.translateUI(); 
+      if(window.renderHome) window.renderHome(); 
+  }, 1000);
 
 });
 </script>
