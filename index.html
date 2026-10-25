@@ -2699,70 +2699,81 @@ window.addEventListener('load', function() {
     { code: 'pt', name: 'Português' }
   ];
 
-  // Словарь для перевода интерфейса игры
+  // Словарь для перевода
   const uiTranslationDict = {
     'en': {
+      // Навигация
       "Главная": "Home", "Входящие": "Inbox", "Кристаллы": "Crystals", "Аккаунт": "Account",
+      "Головна": "Home", "Вхідні": "Inbox", "Кристали": "Crystals", "Акаунт": "Account",
+      // Профиль
       "Выйти": "Logout", "Войти": "Login", "Войти через Google": "Login with Google",
-      "подписчики": "subscribers", "подписки": "subscriptions", "кристаллы": "crystals",
-      "Мови": "Languages", "Казино": "Casino", "Мои стримы": "My Streams", "Статистика": "Statistics", "Настройки": "Settings",
-      "МБ": "MB", "Внести кристаллы": "Deposit Crystals", "Сначала выберите сумму": "First select an amount", "Крутить": "SPIN",
-      "Новый стрим": "New Stream", "Публичный стрим": "Public Stream", "Стрим 18+": "Stream 18+", "Не публичный (только для себя)": "Private (Only for me)", "Отмена": "Cancel",
-      "Создать чат": "Create Chat", "Выбери тип чата": "Choose chat type", "Публичный": "Public", "50% подписчиков": "50% of subscribers", "Приватный": "Private", "выбрать участников вручную": "select manually",
-      "Сообщения": "Messages", "канал": "channel", "Создать канал": "Create Channel", "Мой канал": "My Channel", "Участники": "Members", "человек": "people", "Владелец": "Owner", "участник": "member",
-      "Добавить участников": "Add Members", "Готово": "Done", "Показать всех": "Show all", "Мой чат": "My Chat", "Администраторы": "Admins", "Заблокированные": "Blocked",
-      "Удалить?": "Delete?", "Удалить": "Delete", "Чат создан.": "Chat created.", "Сообщение...": "Message...",
-      "Изменить профиль": "Edit Profile", "Загрузить фото": "Upload Photo", "Аватар": "Avatar", "Цвет фона": "Background Color", "Цвет рамки": "Border Color", "Цвет символа": "Symbol Color", "Сохранить": "Save",
-      "Редактировать канал": "Edit Channel", "Название": "Title", "Символ аватарки": "Avatar Symbol", "Быстрый выбор": "Quick Select", "Эмодзи": "Emoji", "Никнейм": "Nickname",
-      "Всего стримов": "Total Streams", "Сообщений": "Messages", "Диалогов": "Dialogs", "Донатов": "Donations",
-      "подписался на канал": "subscribed to channel", "задонатил": "donated", "смотрю дальше": "watching further", "подписался!": "subscribed!", "новый подписчик": "new subscriber",
-      "Розыгрыш": "Giveaway", "Текст розыгрыша": "Giveaway Text", "Например: Разыгрываю 1000 кристаллов!": "Example: Giveaway 1000 crystals!", "Кристаллов победителю": "Crystals to winner", "Запустить": "Start",
-      "Пока нечего нет. Выложи видео или запусти стрим!": "Nothing here yet. Upload a video or start a stream!"
+      "подписчики": "subscribers", "подписки": "subscriptions", "кристаллы": "crystals", "crystals": "crystals", "subscribers": "subscribers",
+      "Мови": "Languages", "Казино": "Casino", "Мои стримы": "My Streams", "Статистика": "Statistics", "Настройки": "Settings", "Налаштування": "Settings",
+      "Виртуальный стриминг": "Virtual Streaming",
+      // Казино
+      "Внести кристаллы": "Deposit Crystals", "Сначала выберите сумму": "First select an amount", "КРУТИТЬ": "SPIN",
+      "First select an amount": "First select an amount", "x2": "x2", "x5": "x5", "x10": "x10", "x15": "x15", "x20": "x20", "x25": "x25", "x50": "x50",
+      // Настройки
+      "ПРОФИЛЬ": "PROFILE", "Изменить ник и аватар": "Change nickname & avatar", "ОБЩЕНИЕ": "COMMUNICATION", "Маты (18+)": "Profanity (18+)", "Голос бота": "Bot Voice", "ЗАПИСЬ": "RECORDING", "Автозапись": "Auto-record", "О ПРИЛОЖЕНИИ": "ABOUT APP", "Версия 1.0": "Version 1.0",
+      // Сообщения / Чаты
+      "Messages": "Messages", "My Channel": "My Channel", "channel": "channel", "подписался на канал": "subscribed to channel", "My Chat": "My Chat", "Chat created.": "Chat created.",
+      "Создать канал": "Create Channel", "Создать чат": "Create Chat", "Мой канал": "My Channel", "Мой чат": "My Chat", "МБ": "MB"
     },
     'uk': {
-      "Главная": "Головна", "Входящие": "Вхідні", "Кристаллы": "Кристали", "Аккаунт": "Акаунт", "Выйти": "Вийти", "Войти": "Увійти", "Мои стримы": "Мої стріми", "Настройки": "Налаштування", "Казино": "Казино", "Статистика": "Статистика"
+      // Навигация
+      "Главная": "Головна", "Входящие": "Вхідні", "Кристаллы": "Кристали", "Аккаунт": "Акаунт",
+      "Home": "Головна", "Inbox": "Вхідні", "Crystals": "Кристали", "Account": "Акаунт",
+      // Профиль
+      "Выйти": "Вийти", "Войти": "Увійти", "Войти через Google": "Увійти через Google", "Logout": "Вийти", "Login": "Увійти",
+      "подписчики": "підписники", "подписки": "підписки", "кристаллы": "кристали", "crystals": "кристали", "subscribers": "підписники",
+      "Мови": "Мови", "Казино": "Казино", "Casino": "Казино", "Мои стримы": "Мої стріми", "My Streams": "Мої стріми", "Статистика": "Статистика", "Statistics": "Статистика", "Настройки": "Налаштування", "Settings": "Налаштування",
+      "Виртуальный стриминг": "Віртуальний стрімінг",
+      // Казино
+      "Внести кристаллы": "Внести кристали", "Сначала выберите сумму": "Спочатку виберіть суму", "КРУТИТЬ": "КРУТИТИ", "First select an amount": "Спочатку виберіть суму",
+      // Настройки
+      "ПРОФИЛЬ": "ПРОФІЛЬ", "Изменить ник и аватар": "Змінити нік та аватар", "ОБЩЕНИЕ": "СПІЛКУВАННЯ", "Маты (18+)": "Мати (18+)", "Голос бота": "Голос бота", "ЗАПИСЬ": "ЗАПИС", "Автозапись": "Автозапис", "О ПРИЛОЖЕНИИ": "ПРО ДОДАТОК", "Версия 1.0": "Версія 1.0",
+      // Сообщения / Чаты
+      "Messages": "Повідомлення", "My Channel": "Мій канал", "channel": "канал", "подписался на канал": "підписався на канал", "My Chat": "Мій чат", "Chat created.": "Чат створено.",
+      "Создать канал": "Створити канал", "Создать чат": "Створити чат", "Мой канал": "Мій канал", "Мой чат": "Мій чат", "МБ": "МБ"
     },
-    'de': {
-      "Главная": "Startseite", "Входящие": "Posteingang", "Кристаллы": "Kristalle", "Аккаунт": "Konto", "Выйти": "Abmelden", "Войти": "Anmelden", "Мои стримы": "Meine Streams", "Настройки": "Einstellungen", "Казино": "Casino", "Статистика": "Statistiken"
-    },
-    // Остальные языки падают на английский для экономии места
+    // Остальные языки (упрощенно)
+    'de': { "Главная": "Startseite", "Входящие": "Posteingang", "Кристаллы": "Kristalle", "Аккаунт": "Konto", "Выйти": "Abmelden", "Казино": "Casino", "Настройки": "Einstellungen" },
     'ru': {}, 'fr': {}, 'es': {}, 'zh': {}, 'ja': {}, 'ko': {}, 'pl': {}, 'tr': {}, 'pt': {}
   };
 
   window.currentLang = localStorage.getItem('appLang') || 'en';
 
-  // Функция «умного» перевода (работает по таймеру)
+  // Функция «умного» перевода
   window.translateUI = function() {
       if (window.currentLang === 'ru') return; 
       
-      const dict = uiTranslationDict[window.currentLang] || uiTranslationDict['en'];
+      const dict = uiTranslationDict[window.currentLang];
+      if (!dict) return;
 
       const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
       let node;
       while (node = walker.nextNode()) {
           let text = node.nodeValue.trim();
+          // Переводим только если текст есть в словаре
           if (dict[text]) {
               node.nodeValue = node.nodeValue.replace(text, dict[text]);
-          } else if (uiTranslationDict['en'][text] && !dict[text]) {
-              // Если нет перевода для языка, берем английский
-              node.nodeValue = node.nodeValue.replace(text, uiTranslationDict['en'][text]);
           }
       }
 
       document.querySelectorAll('input, textarea').forEach(el => {
           let ph = el.getAttribute('placeholder');
           if (ph && dict[ph]) el.setAttribute('placeholder', dict[ph]);
-          else if (ph && uiTranslationDict['en'][ph]) el.setAttribute('placeholder', uiTranslationDict['en'][ph]);
       });
   };
 
-  // Запускаем перевод каждую секунду, чтобы ловить новые окна
-  setInterval(window.translateUI, 1000);
+  // Запускаем перевод ОЧЕНЬ часто (каждые 100 мс), чтобы ловить все изменения игры
+  setInterval(window.translateUI, 100);
 
   window.t = function(key) {
       const myDict = {
         en: { crystals: "Crystals", clicker: "Clicker", casino: "Casino", stocks: "Stocks", votes: "Votes", ads: "Ads", close: "Close", settings: "Settings", languages: "Languages", autoClicker: "AutoClicker", profile: "Profile", logout: "Logout", login: "Login with Google", searchLang: "Search language...", upgClick: "Upgrade click", clickStats: "Your click", voteYes: "Yes", voteNo: "No", loading: "Loading...", notEnough: "Not enough crystals!", boostOn: "Clicker Boost Activated!", boostOff: "Clicker Boost Disabled", cmdsOff: "All commands disabled", cmdsOn: "Commands enabled" },
-        ru: { crystals: "Кристаллы", clicker: "Кликер", casino: "Казино", stocks: "Акции", votes: "Голосования", ads: "Реклама", close: "Закрыть", settings: "Настройки", languages: "Языки", autoClicker: "Автокликер", profile: "Профиль", logout: "Выйти", login: "Войти через Google", searchLang: "Поиск языка...", upgClick: "Прокачать клик", clickStats: "Твой клик", voteYes: "Да", voteNo: "Нет", loading: "Загрузка...", notEnough: "Недостаточно кристаллов!", boostOn: "Буст кликера активирован!", boostOff: "Буст кликера отключен", cmdsOff: "Все команды отключены", cmdsOn: "Команды включены" }
+        ru: { crystals: "Кристаллы", clicker: "Кликер", casino: "Казино", stocks: "Акции", votes: "Голосования", ads: "Реклама", close: "Закрыть", settings: "Настройки", languages: "Языки", autoClicker: "Автокликер", profile: "Профиль", logout: "Выйти", login: "Войти через Google", searchLang: "Поиск языка...", upgClick: "Прокачать клик", clickStats: "Твой клик", voteYes: "Да", voteNo: "Нет", loading: "Загрузка...", notEnough: "Недостаточно кристаллов!", boostOn: "Буст кликера активирован!", boostOff: "Буст кликера отключен", cmdsOff: "Все команды отключены", cmdsOn: "Команды включены" },
+        uk: { crystals: "Кристали", clicker: "Клікер", casino: "Казино", stocks: "Акції", votes: "Голосування", ads: "Реклама", close: "Закрити", settings: "Налаштування", languages: "Мови", autoClicker: "Автоклікер", profile: "Профіль", logout: "Вийти", login: "Увійти через Google", searchLang: "Пошук мови...", upgClick: "Прокачати клік", clickStats: "Твій клік", voteYes: "Так", voteNo: "Ні", loading: "Завантаження...", notEnough: "Недостатньо кристалів!", boostOn: "Буст клікера активовано!", boostOff: "Буст клікера вимкнено", cmdsOff: "Усі команди вимкнено", cmdsOn: "Команди ввімкнено" }
       };
       return (myDict[window.currentLang] && myDict[window.currentLang][key]) ? myDict[window.currentLang][key] : myDict['en'][key] || key;
   };
@@ -2803,7 +2814,7 @@ window.addEventListener('load', function() {
   }, true); 
 
   // ==========================================
-  // 4. ОКНО КРИСТАЛЛОВ (БЕЗ VPN)
+  // 4. ОКНО КРИСТАЛЛОВ
   // ==========================================
   if (!document.getElementById('myCrystalModal')) {
     var mod = document.createElement('div');
@@ -3087,7 +3098,7 @@ window.addEventListener('load', function() {
   });
 
   // ==========================================
-  // 9. ОЧИСТКА ГЛАВНОЙ ОТ ФЕЙКОВ (ВОЗВРАЩЕНО)
+  // 9. ОЧИСТКА ГЛАВНОЙ ОТ ФЕЙКОВ
   // ==========================================
   window.spawnFakeContent = function() {}; // Отключаем генератор
   window.renderHome = function() {
