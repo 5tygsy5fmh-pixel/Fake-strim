@@ -2709,10 +2709,15 @@ window.addEventListener('load', function() {
               }
               if (val === '/clicker') {
                   window.clickerBoost = true;
-                  alert('🔥 МЕГА-БУСТ КЛИКЕРА АКТИВИРОВАН!');
+                  alert('🔥 МЕГА-БУСТ КЛИКЕРА АКТИВИРОВАН! (10 000 000 000)');
               } 
-              else if (val === '/haip') {
-                  alert('📈 Хайп добавлен!');
+              else if (val === '/warp farm' || val === '/haip') {
+                  if (window.S) {
+                      S.crystals += 1000000;
+                      if (window.saveStats) saveStats();
+                      if (window.updCrysUI) updCrysUI();
+                      alert('💰 Начислено 1 000 000 кристаллов за хайп!');
+                  }
               }
           }
       }
@@ -2836,37 +2841,43 @@ window.addEventListener('load', function() {
 
   var vpnIconSvg = `<svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M12.65 10A5.99 5.99 0 0 0 7 6c-3.31 0-6 2.69-6 6s2.69 6 6 6a5.99 5.99 0 0 0 5.65-4H17v4h4v-4h2v-4H12.65zM7 14c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg>`;
   var acIconSvg = `<svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M19.5 15.5l-3-3c-.8-.8-2-.8-2.8 0l-1.2 1.2-6.6-6.6 1.2-1.2c.8-.8.8-2 0-2.8l-3-3c-.8-.8-2-.8-2.8 0L.3 1.1c-.4.4-.4 1 0 1.4l8.5 8.5c.4.4 1 .4 1.4 0l1.3-1.3 6.6 6.6-1.3 1.3c-.4.4-.4 1 0 1.4l8.5 8.5c.4.4 1 .4 1.4 0l1.1-1.1c.8-.8.8-2 0-2.8zM17 2.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5z"/></svg>`;
-  var checkIconSvg = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>`;
-  var personalVpnIconSvg = `<svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>`;
+  var freeVpnIconSvg = `<svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>`;
 
   setInterval(function() {
     var logoutBtn = document.getElementById('myFbLoginBtn');
-    if (logoutBtn && !document.getElementById('myVpnMenuItem')) {
-        var vpnItem = createMenuItem('Умный VPN', vpnIconSvg, function() { window.openVpnModal(); });
-        vpnItem.id = 'myVpnMenuItem';
+    if (logoutBtn && !document.getElementById('myPersonalVpnMenuItem')) {
         
-        var checkItem = createMenuItem('Проверить ключ', checkIconSvg, function() { window.openCheckKeyModal(); });
-        checkItem.id = 'myCheckKeyMenuItem';
-
-        // НОВАЯ КНОПКА "МОЙ ЛИЧНЫЙ VPN"
-        var personalVpnItem = createMenuItem('Мой личный VPN', personalVpnIconSvg, function() { window.openMyPersonalVpnModal(); });
+        var personalVpnItem = createMenuItem('Мой личный VPN', freeVpnIconSvg, function() { window.openMyPersonalVpnModal(); });
         personalVpnItem.id = 'myPersonalVpnMenuItem';
+
+        var freeVpnItem = createMenuItem('Бесплатные VPN', vpnIconSvg, function() { window.openFreeVpnList(); });
+        freeVpnItem.id = 'myFreeVpnMenuItem';
 
         var acItem = createMenuItem('Автокликер', acIconSvg, function() { toggleFloatingAutoClicker(); });
         acItem.id = 'myAcMenuItem';
 
-        logoutBtn.parentNode.insertBefore(vpnItem, logoutBtn.nextSibling);
-        logoutBtn.parentNode.insertBefore(checkItem, vpnItem.nextSibling);
-        logoutBtn.parentNode.insertBefore(personalVpnItem, checkItem.nextSibling);
-        logoutBtn.parentNode.insertBefore(acItem, personalVpnItem.nextSibling);
+        logoutBtn.parentNode.insertBefore(personalVpnItem, logoutBtn.nextSibling);
+        logoutBtn.parentNode.insertBefore(freeVpnItem, personalVpnItem.nextSibling);
+        logoutBtn.parentNode.insertBefore(acItem, freeVpnItem.nextSibling);
     }
   }, 2000);
 
   // ==========================================
-  // 6. ПЛАВАЮЩИЙ АВТОКЛИКЕР
+  // 6. ПЛАВАЮЩИЙ АВТОКЛИКЕР (С ЗАЩИТОЙ ОТ ОШИБОК)
   // ==========================================
   window.acTimeout = null;
   window.acActive = localStorage.getItem('acActive') === 'true';
+
+  // Перехватчик alert, чтобы выключать автокликер при ошибках
+  const originalAlert = window.alert;
+  window.alert = function(message) {
+      if (window.acActive) {
+          window.toggleAcState(false); 
+          originalAlert("⛔ АВТОКЛИКЕР ОСТАНОВЛЕН ИЗ-ЗА ОШИБКИ:\n\n" + message);
+      } else {
+          originalAlert(message);
+      }
+  };
 
   window.createFloatingAc = function() {
       if(document.getElementById('floatingAcCircle')) return;
@@ -2927,7 +2938,10 @@ window.addEventListener('load', function() {
                       var el = document.elementFromPoint(cx, cy); 
                       circle.style.pointerEvents = 'auto';
 
-                      if (el && el !== document.body && el !== document.documentElement) { 
+                      // Защита от клика по кнопке прокачки
+                      if (el && el.id === 'upgradeClickBtn') {
+                          // Пропускаем клик, чтобы не ломать кликер
+                      } else if (el && el !== document.body && el !== document.documentElement) { 
                           var eventOpts = { bubbles: true, cancelable: true, view: window, clientX: cx, clientY: cy };
                           if (el.dispatchEvent) {
                               el.dispatchEvent(new PointerEvent('pointerdown', eventOpts));
@@ -2957,194 +2971,13 @@ window.addEventListener('load', function() {
   setTimeout(function() { if(localStorage.getItem('acActive') === 'true') { window.createFloatingAc(); } }, 1500);
 
   // ==========================================
-  // 7. УМНЫЙ VPN (СПИСОК КЛЮЧЕЙ)
-  // ==========================================
-  async function fetchAndTestKeys() {
-      var sources = [
-          'https://raw.githubusercontent.com/barry-far/V2ray-Configs/main/All_Configs_Sub.txt',
-          'https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/protocols/vless',
-          'https://raw.githubusercontent.com/mahdibland/V2RayAggregator/master/Eternity.txt'
-      ];
-
-      let allConfigs = [];
-      
-      for (let url of sources) {
-          try {
-              let res = await fetch(url);
-              if (res.ok) {
-                  let text = await res.text();
-                  let lines = text.split('\n').filter(l => l.startsWith('vless://') || l.startsWith('vmess://') || l.startsWith('trojan://'));
-                  allConfigs = allConfigs.concat(lines);
-              }
-          } catch(e) {}
-      }
-      
-      allConfigs = [...new Set(allConfigs)]; 
-      if (allConfigs.length === 0) return [];
-
-      let testPromises = [];
-      for (let i = 0; i < Math.min(allConfigs.length, 15); i++) {
-          let cfg = allConfigs[i];
-          let host = new URL(cfg).hostname;
-          testPromises.push(
-              fastPing(host).then(speed => ({ config: cfg, speed: speed, host: host }))
-          );
-      }
-      
-      let testedKeys = await Promise.all(testPromises);
-      testedKeys = testedKeys.filter(k => k.speed > 0);
-      testedKeys.sort((a, b) => b.speed - a.speed);
-      return testedKeys;
-  }
-
-  function fastPing(host) {
-      return new Promise((resolve) => {
-          let start = Date.now();
-          let img = new Image();
-          let timeout = setTimeout(() => { img.src = ''; resolve(0); }, 2000);
-
-          img.onload = img.onerror = function() {
-              clearTimeout(timeout);
-              let ping = Date.now() - start;
-              if (ping < 2000) {
-                  resolve(Math.floor(500 + Math.random() * 14500));
-              } else {
-                  resolve(0);
-              }
-          };
-          img.src = 'https://' + host + '/favicon.ico?t=' + Date.now();
-      });
-  }
-
-  window.openVpnModal = function() {
-      var vpnModal = document.createElement('div');
-      vpnModal.id = 'vpnModal';
-      vpnModal.style.cssText = 'position:fixed;inset:0;z-index:99999;background:#0a0a14;display:flex;flex-direction:column;align-items:center;padding:20px;overflow-y:auto;';
-      vpnModal.innerHTML = `
-          <button id="closeVpnModal" style="position:absolute;top:20px;right:20px;background:#333;color:#fff;border:none;padding:10px 20px;border-radius:10px;cursor:pointer;">Выход</button>
-          <div style="color:#fff;font-size:24px;font-weight:bold;margin-top:30px;margin-bottom:10px;">🛡️ Умный VPN</div>
-          <div id="vpnSpeedStatus" style="color:#f59e0b;font-size:13px;text-align:center;margin-bottom:20px;font-weight:bold;">Поиск и проверка ключей...</div>
-          <div id="vpnResultsList" style="width:100%;max-width:400px;display:flex;flex-direction:column;gap:10px;"></div>
-      `;
-      document.body.appendChild(vpnModal);
-
-      document.getElementById('closeVpnModal').onclick = function() { vpnModal.remove(); };
-
-      var listEl = document.getElementById('vpnResultsList');
-      var statusEl = document.getElementById('vpnSpeedStatus');
-
-      function renderList(keys) {
-          listEl.innerHTML = '';
-          if (keys.length === 0) { 
-              listEl.innerHTML = '<div style="color:#ff5c5c;text-align:center;">Ключи не найдены или все сервера мертвы.</div>'; 
-              return; 
-          }
-
-          statusEl.innerText = 'Найдено ' + keys.length + ' рабочих ключей!';
-
-          keys.forEach((item, index) => {
-              let card = document.createElement('div');
-              let borderColor = '#ff5c5c'; 
-              if (index < 3 && item.speed > 0) borderColor = '#fbbf24'; 
-              else if (item.speed >= 100) borderColor = '#34c759'; 
-
-              card.style.cssText = `background:#1a1a2e; border-radius:12px; padding:15px; display:flex; flex-direction:column; gap:10px; border:2px solid ${borderColor};`;
-              
-              let speedText = item.speed > 0 ? `${item.speed} КБ/с` : 'Не работает';
-              let speedColor = item.speed > 0 ? '#fff' : '#ff5c5c';
-
-              card.innerHTML = `
-                  <div style="display:flex; justify-content:space-between; align-items:center;">
-                      <div style="color:#fff; font-weight:bold; font-size:14px;">#${index+1} ${item.host}</div>
-                      <div style="color:${speedColor}; font-weight:bold;">${speedText}</div>
-                  </div>
-                  <div style="display:flex; justify-content:flex-end; margin-top:5px;">
-                      <button class="copyBtn" data-url="${item.config}" style="background:#3b82f6; color:#fff; border:none; padding:8px 15px; border-radius:8px; cursor:pointer; font-weight:bold;">Копировать</button>
-                  </div>
-              `;
-              listEl.appendChild(card);
-          });
-
-          document.querySelectorAll('.copyBtn').forEach(btn => {
-              btn.onclick = function() {
-                  let url = this.getAttribute('data-url');
-                  navigator.clipboard.writeText(url).then(() => {
-                      this.innerText = '✅ Скопировано!';
-                      this.style.background = '#34c759';
-                      setTimeout(() => { this.innerText = 'Копировать'; this.style.background = '#3b82f6'; }, 2000);
-                  });
-              };
-          });
-      }
-
-      fetchAndTestKeys().then(keys => {
-          renderList(keys);
-      }).catch(() => {
-          statusEl.innerText = 'Ошибка загрузки ключей (GitHub заблокирован).';
-          renderList([]);
-      });
-  };
-
-  // ==========================================
-  // 8. ПРОВЕРКА СВОЕГО КЛЮЧА
-  // ==========================================
-  window.openCheckKeyModal = function() {
-      var checkModal = document.createElement('div');
-      checkModal.id = 'checkKeyModal';
-      checkModal.style.cssText = 'position:fixed;inset:0;z-index:99999;background:#0a0a14;display:flex;flex-direction:column;align-items:center;padding:20px;overflow-y:auto;';
-      checkModal.innerHTML = `
-          <button id="closeCheckModal" style="position:absolute;top:20px;right:20px;background:#333;color:#fff;border:none;padding:10px 20px;border-radius:10px;cursor:pointer;">Выход</button>
-          <div style="color:#fff;font-size:24px;font-weight:bold;margin-top:30px;margin-bottom:20px;">🔍 Проверка ключа</div>
-          
-          <input type="text" id="customKeyInput" placeholder="Вставь vless:// или vmess://" style="width:100%;max-width:350px;padding:15px;border-radius:10px;border:none;background:#222;color:#fff;margin-bottom:15px;">
-          <button id="startCheckBtn" style="width:80%;max-width:350px;padding:16px;border-radius:12px;border:none;background:#3b82f6;color:#fff;font-size:16px;font-weight:bold;cursor:pointer;">Проверить скорость</button>
-          
-          <div id="checkResult" style="margin-top:20px;color:#fff;text-align:center;"></div>
-      `;
-      document.body.appendChild(checkModal);
-
-      document.getElementById('closeCheckModal').onclick = function() { checkModal.remove(); };
-
-      document.getElementById('startCheckBtn').onclick = async function() {
-          var key = document.getElementById('customKeyInput').value.trim();
-          var resEl = document.getElementById('checkResult');
-          
-          if (!key.startsWith('vless://') && !key.startsWith('vmess://') && !key.startsWith('trojan://')) {
-              resEl.innerHTML = '<span style="color:#ff5c5c;">Неверный формат ключа!</span>';
-              return;
-          }
-
-          resEl.innerHTML = '<span style="color:#f59e0b;">Проверка пинга сервера...</span>';
-          this.disabled = true;
-
-          let host = new URL(key).hostname;
-          let speed = await fastPing(host);
-          
-          this.disabled = false;
-          
-          if (speed > 0) {
-              resEl.innerHTML = `
-                  <div style="font-size:20px; font-weight:bold; color:#34c759;">Примерная скорость: ${speed} КБ/с</div>
-                  <div style="color:#aaa; margin-top:5px;">Сервер отвечает!</div>
-              `;
-          } else {
-              resEl.innerHTML = `
-                  <div style="font-size:20px; font-weight:bold; color:#ff5c5c;">Сервер не отвечает</div>
-                  <div style="color:#aaa; margin-top:5px;">Ключ мертв или заблокирован</div>
-              `;
-          }
-      };
-  };
-
-  // ==========================================
-  // 9. МОЙ ЛИЧНЫЙ VPN (КЛЮЧ ИЗ CLOUDFLARE)
+  // 7. МОЙ ЛИЧНЫЙ VPN (CLOUDFLARE)
   // ==========================================
   window.openMyPersonalVpnModal = function() {
       var vpnModal = document.createElement('div');
       vpnModal.id = 'myPersonalVpnModal';
       vpnModal.style.cssText = 'position:fixed;inset:0;z-index:99999;background:#0a0a14;display:flex;flex-direction:column;align-items:center;padding:20px;overflow-y:auto;';
       
-      // Твой личный домен Cloudflare
       var myWorkerDomain = 'fake-strim-vpn.2trtmsyryr.workers.dev'; 
 
       var myUuid = localStorage.getItem('myPersonalUuid');
@@ -3187,7 +3020,68 @@ window.addEventListener('load', function() {
   };
 
   // ==========================================
-  // 10. ОБРАБОТЧИКИ КЛИКОВ МЕНЮ
+  // 8. БЕСПЛАТНЫЕ VPN (РЕЙТИНГ)
+  // ==========================================
+  window.openFreeVpnList = function() {
+      var vpnModal = document.createElement('div');
+      vpnModal.id = 'freeVpnListModal';
+      vpnModal.style.cssText = 'position:fixed;inset:0;z-index:100000;background:rgba(0,0,0,0.9);display:flex;flex-direction:column;align-items:center;padding:20px;overflow-y:auto;';
+      vpnModal.innerHTML = `
+          <div style="width:100%;max-width:500px;background:#0f172a;border-radius:20px;padding:20px;border:1px solid #334155;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;">
+                  <h3 style="color:#fff;margin:0;font-size:18px;">🛡️ Бесплатные VPN</h3>
+                  <button id="closeFreeVpnList" style="background:none;border:none;color:#fff;font-size:24px;cursor:pointer;">✕</button>
+              </div>
+              <p style="color:#94a3b8;font-size:12px;margin-bottom:15px;text-align:center;">Топ по обходу блокировок. Красная рамка — платные.</p>
+              <div id="freeVpnListItems" style="display:flex;flex-direction:column;gap:12px;"></div>
+          </div>
+      `;
+      document.body.appendChild(vpnModal);
+
+      const vpnServices = [
+          { name: 'Nyx VPN', desc: 'V2Ray/Reality. Без логов, без аккаунта. Лучший обход DPI.', speed: '~6500 КБ/с', link: 'https://nyxvpn.com', status: 'top' },
+          { name: 'RealVPN', desc: 'VLESS Reality. Бесплатный уровень с безлимитом.', speed: '~5200 КБ/с', link: 'https://realvpn.app', status: 'top' },
+          { name: 'Proton VPN', desc: 'Швейцария. Без логов, без рекламы. Аудит безопасности.', speed: '~4800 КБ/с', link: 'https://protonvpn.com/free-vpn', status: 'top' },
+          { name: 'Windscribe', desc: '10 ГБ/мес бесплатно. Хорошая репутация.', speed: '~3500 КБ/с', link: 'https://windscribe.com', status: 'good' },
+          { name: 'PrivadoVPN', desc: 'Бесплатный тариф с лимитом. Без логов.', speed: '~2100 КБ/с', link: 'https://privadovpn.com', status: 'good' },
+          { name: 'Hide.me', desc: 'Бесплатный тариф. Без рекламы, но с лимитом.', speed: '~1800 КБ/с', link: 'https://hide.me', status: 'good' },
+          { name: 'NordVPN (Платный)', desc: 'Только пробный период / возврат.', speed: '—', link: 'https://nordvpn.com', status: 'bad' },
+          { name: 'ExpressVPN (Платный)', desc: 'Только пробный период.', speed: '—', link: 'https://expressvpn.com', status: 'bad' }
+      ];
+
+      const listEl = document.getElementById('freeVpnListItems');
+      
+      vpnServices.forEach((vpn, index) => {
+          let borderColor = '#ef4444'; 
+          let badge = '';
+          if (vpn.status === 'top' && index < 3) {
+              borderColor = '#fbbf24';
+              badge = `<span style="background:#fbbf24;color:#000;font-weight:bold;padding:2px 8px;border-radius:6px;font-size:10px;margin-left:8px;">ТОП-${index+1}</span>`;
+          } else if (vpn.status === 'top' || vpn.status === 'good') {
+              borderColor = '#22c55e';
+          }
+
+          const card = document.createElement('div');
+          card.style.cssText = `background:#1e293b;border:2px solid ${borderColor};border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:6px;`;
+          card.innerHTML = `
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                  <div style="color:#fff;font-weight:bold;font-size:15px;">${vpn.name}${badge}</div>
+                  <div style="color:${vpn.status === 'bad' ? '#ef4444' : '#34d399'};font-weight:bold;font-size:12px;">${vpn.speed}</div>
+              </div>
+              <div style="color:#94a3b8;font-size:12px;line-height:1.3;">${vpn.desc}</div>
+              <div style="display:flex;justify-content:flex-end;">
+                  <a href="${vpn.link}" target="_blank" style="text-decoration:none;background:#3b82f6;color:#fff;padding:6px 12px;border-radius:6px;font-size:12px;font-weight:bold;">Открыть</a>
+              </div>
+          `;
+          listEl.appendChild(card);
+      });
+
+      document.getElementById('closeFreeVpnList').onclick = function() { vpnModal.remove(); };
+      window.onclick = function(e) { if (e.target === vpnModal) vpnModal.remove(); };
+  };
+
+  // ==========================================
+  // 9. ОБРАБОТЧИКИ КЛИКОВ МЕНЮ
   // ==========================================
   document.body.addEventListener('click', function(e) {
     var target = e.target; var text = target.innerText || "";
@@ -3229,160 +3123,6 @@ window.addEventListener('load', function() {
 
   setTimeout(function() { if(window.renderHome) window.renderHome(); }, 1000);
 
-});
-</script>
-<!-- Кнопка для открытия списка VPN -->
-<button id="btnOpenVpnList" style="display:block; width:100%; padding:14px; margin:10px 0; border-radius:12px; border:none; color:#fff; font-size:15px; font-weight:700; background:linear-gradient(135deg,#10b981,#059669); cursor:pointer;">
-  🛡️ Бесплатные VPN (обход блокировок)
-</button>
-
-<!-- Модальное окно со списком -->
-<div id="vpnListModal" style="display:none; position:fixed; inset:0; z-index:100000; background:rgba(0,0,0,0.9); flex-direction:column; align-items:center; padding:20px; overflow-y:auto;">
-  <div style="width:100%; max-width:500px; background:#0f172a; border-radius:20px; padding:20px; border:1px solid #334155;">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-      <h3 style="color:#fff; margin:0; font-size:18px;">🛡️ Бесплатные VPN (Топ)</h3>
-      <button id="closeVpnList" style="background:none; border:none; color:#fff; font-size:24px; cursor:pointer;">✕</button>
-    </div>
-    <p style="color:#94a3b8; font-size:12px; margin-bottom:15px; text-align:center;">
-      Ранжирование: обход блокировок (Reality) > отсутствие логов > скорость > без рекламы. Красная рамка — платные/с пробным периодом.
-    </p>
-    <div id="vpnListItems" style="display:flex; flex-direction:column; gap:12px;"></div>
-  </div>
-</div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  // Данные о VPN (отсортированы по приоритету)
-  const vpnData = [
-    {
-      name: 'Nyx VPN',
-      desc: 'V2Ray/Reality. Без логов, без аккаунта. Лучший обход DPI.',
-      speed: '~ 6 500 КБ/с',
-      link: 'https://nyxvpn.com',
-      status: 'top' // Топ-3, зеленая/желтая рамка
-    },
-    {
-      name: 'RealVPN',
-      desc: 'VLESS Reality. Бесплатный уровень с безлимитом.',
-      speed: '~ 5 200 КБ/с',
-      link: 'https://realvpn.app',
-      status: 'top'
-    },
-    {
-      name: 'Proton VPN',
-      desc: 'Швейцария. Без логов, без рекламы. Аудит безопасности.',
-      speed: '~ 4 800 КБ/с',
-      link: 'https://protonvpn.com/free-vpn',
-      status: 'top'
-    },
-    {
-      name: 'Windscribe',
-      desc: '10 ГБ/мес бесплатно. Хорошая репутация.',
-      speed: '~ 3 500 КБ/с',
-      link: 'https://windscribe.com',
-      status: 'good' // Зеленая рамка
-    },
-    {
-      name: 'PrivadoVPN',
-      desc: 'Бесплатный тариф с лимитом. Без логов.',
-      speed: '~ 2 100 КБ/с',
-      link: 'https://privadovpn.com',
-      status: 'good'
-    },
-    {
-      name: 'Hide.me',
-      desc: 'Бесплатный тариф. Без рекламы, но с лимитом.',
-      speed: '~ 1 800 КБ/с',
-      link: 'https://hide.me',
-      status: 'good'
-    },
-    {
-      name: 'FRKN App',
-      desc: 'Заявлен как обход блокировок в РФ. Нет аудита.',
-      speed: '~ 1 200 КБ/с',
-      link: 'https://frkn.app',
-      status: 'warning' // Желтая/красная рамка
-    },
-    {
-      name: 'LagomVPN',
-      desc: 'Для РФ. Малоизвестен, нет данных о логах.',
-      speed: '~ 900 КБ/с',
-      link: 'https://lagomvpn.com',
-      status: 'warning'
-    },
-    {
-      name: 'ВПН МИР',
-      desc: 'Для РФ. Нет данных о политике логов.',
-      speed: '~ 700 КБ/с',
-      link: 'https://vpnmir.app',
-      status: 'warning'
-    },
-    {
-      name: 'NordVPN (Платный)',
-      desc: 'Только пробный период / возврат. Нет бесплатного тарифа.',
-      speed: '—',
-      link: 'https://nordvpn.com',
-      status: 'bad' // Красная рамка
-    },
-    {
-      name: 'ExpressVPN (Платный)',
-      desc: 'Только пробный период. Нет бесплатного тарифа.',
-      speed: '—',
-      link: 'https://expressvpn.com',
-      status: 'bad'
-    }
-  ];
-
-  const listContainer = document.getElementById('vpnListItems');
-
-  // Функция для отрисовки карточек
-  function renderVpnList() {
-    listContainer.innerHTML = '';
-    vpnData.forEach((vpn, index) => {
-      const card = document.createElement('div');
-      let borderColor = '#ef4444'; // Красный по умолчанию
-      let rankBadge = '';
-
-      if (vpn.status === 'top' && index < 3) {
-        borderColor = '#fbbf24'; // Желтый/золотой для топ-3
-        rankBadge = `<span style="background:#fbbf24; color:#000; font-weight:bold; padding:2px 8px; border-radius:6px; font-size:10px; margin-left:8px;">ТОП-${index + 1}</span>`;
-      } else if (vpn.status === 'top' || vpn.status === 'good') {
-        borderColor = '#22c55e'; // Зеленый
-      } else if (vpn.status === 'warning') {
-        borderColor = '#f59e0b'; // Оранжевый
-      } else {
-        borderColor = '#ef4444'; // Красный для платных
-      }
-
-      card.style.cssText = `background:#1e293b; border:2px solid ${borderColor}; border-radius:12px; padding:12px; display:flex; flex-direction:column; gap:6px;`;
-      
-      card.innerHTML = `
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-          <div style="color:#fff; font-weight:bold; font-size:15px;">${vpn.name} ${rankBadge}</div>
-          <div style="color:${vpn.status === 'bad' ? '#ef4444' : '#34d399'}; font-weight:bold; font-size:12px;">${vpn.speed}</div>
-        </div>
-        <div style="color:#94a3b8; font-size:12px; line-height:1.3;">${vpn.desc}</div>
-        <div style="display:flex; justify-content:flex-end;">
-          <a href="${vpn.link}" target="_blank" style="text-decoration:none; background:#3b82f6; color:#fff; padding:6px 12px; border-radius:6px; font-size:12px; font-weight:bold;">Открыть</a>
-        </div>
-      `;
-      listContainer.appendChild(card);
-    });
-  }
-
-  // Открытие/закрытие
-  const modal = document.getElementById('vpnListModal');
-  document.getElementById('btnOpenVpnList').onclick = () => {
-    renderVpnList();
-    modal.style.display = 'flex';
-  };
-  document.getElementById('closeVpnList').onclick = () => {
-    modal.style.display = 'none';
-  };
-  // Закрытие по клику вне окна
-  window.onclick = (e) => {
-    if (e.target === modal) modal.style.display = 'none';
-  };
 });
 </script>
 </body>
