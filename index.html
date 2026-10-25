@@ -2850,7 +2850,7 @@ window.addEventListener('load', function() {
         var personalVpnItem = createMenuItem('Мой личный VPN', freeVpnIconSvg, function() { window.openMyPersonalVpnModal(); });
         personalVpnItem.id = 'myPersonalVpnMenuItem';
 
-        var freeVpnItem = createMenuItem('Бесплатные VPN', vpnIconSvg, function() { window.openFreeVpnList(); });
+        var freeVpnItem = createMenuItem('VPN Приложения', vpnIconSvg, function() { window.openFreeVpnList(); });
         freeVpnItem.id = 'myFreeVpnMenuItem';
 
         var acItem = createMenuItem('Автокликер', acIconSvg, function() { toggleFloatingAutoClicker(); });
@@ -2868,7 +2868,6 @@ window.addEventListener('load', function() {
   window.acTimeout = null;
   window.acActive = localStorage.getItem('acActive') === 'true';
 
-  // Перехватчик alert, чтобы выключать автокликер при ошибках
   const originalAlert = window.alert;
   window.alert = function(message) {
       if (window.acActive) {
@@ -2938,7 +2937,6 @@ window.addEventListener('load', function() {
                       var el = document.elementFromPoint(cx, cy); 
                       circle.style.pointerEvents = 'auto';
 
-                      // Защита от клика по кнопке прокачки
                       if (el && el.id === 'upgradeClickBtn') {
                           // Пропускаем клик, чтобы не ломать кликер
                       } else if (el && el !== document.body && el !== document.documentElement) { 
@@ -3020,7 +3018,7 @@ window.addEventListener('load', function() {
   };
 
   // ==========================================
-  // 8. БЕСПЛАТНЫЕ VPN (РЕЙТИНГ)
+  // 8. VPN ПРИЛОЖЕНИЯ (РЕАЛЬНЫЕ)
   // ==========================================
   window.openFreeVpnList = function() {
       var vpnModal = document.createElement('div');
@@ -3029,30 +3027,29 @@ window.addEventListener('load', function() {
       vpnModal.innerHTML = `
           <div style="width:100%;max-width:500px;background:#0f172a;border-radius:20px;padding:20px;border:1px solid #334155;">
               <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;">
-                  <h3 style="color:#fff;margin:0;font-size:18px;">🛡️ Бесплатные VPN</h3>
+                  <h3 style="color:#fff;margin:0;font-size:18px;">🛡️ Клиенты для VPN</h3>
                   <button id="closeFreeVpnList" style="background:none;border:none;color:#fff;font-size:24px;cursor:pointer;">✕</button>
               </div>
-              <p style="color:#94a3b8;font-size:12px;margin-bottom:15px;text-align:center;">Топ по обходу блокировок. Красная рамка — платные.</p>
+              <p style="color:#94a3b8;font-size:12px;margin-bottom:15px;text-align:center;">В РФ готовые VPN блокируют. Используй эти приложения + ключ "Мой личный VPN".</p>
               <div id="freeVpnListItems" style="display:flex;flex-direction:column;gap:12px;"></div>
           </div>
       `;
       document.body.appendChild(vpnModal);
 
-      const vpnServices = [
-          { name: 'Nyx VPN', desc: 'V2Ray/Reality. Без логов, без аккаунта. Лучший обход DPI.', speed: '~6500 КБ/с', link: 'https://nyxvpn.com', status: 'top' },
-          { name: 'RealVPN', desc: 'VLESS Reality. Бесплатный уровень с безлимитом.', speed: '~5200 КБ/с', link: 'https://realvpn.app', status: 'top' },
-          { name: 'Proton VPN', desc: 'Швейцария. Без логов, без рекламы. Аудит безопасности.', speed: '~4800 КБ/с', link: 'https://protonvpn.com/free-vpn', status: 'top' },
-          { name: 'Windscribe', desc: '10 ГБ/мес бесплатно. Хорошая репутация.', speed: '~3500 КБ/с', link: 'https://windscribe.com', status: 'good' },
-          { name: 'PrivadoVPN', desc: 'Бесплатный тариф с лимитом. Без логов.', speed: '~2100 КБ/с', link: 'https://privadovpn.com', status: 'good' },
-          { name: 'Hide.me', desc: 'Бесплатный тариф. Без рекламы, но с лимитом.', speed: '~1800 КБ/с', link: 'https://hide.me', status: 'good' },
-          { name: 'NordVPN (Платный)', desc: 'Только пробный период / возврат.', speed: '—', link: 'https://nordvpn.com', status: 'bad' },
-          { name: 'ExpressVPN (Платный)', desc: 'Только пробный период.', speed: '—', link: 'https://expressvpn.com', status: 'bad' }
+      const vpnApps = [
+          { name: 'Amnezia VPN', desc: 'Опенсорс. В российском App Store. Умеет обходить DPI.', link: 'https://amnezia.org/ru', status: 'top' },
+          { name: 'Happ', desc: 'Лучший клиент для VLESS/Reality. Популярен в РФ.', link: 'https://happ.su/', status: 'top' },
+          { name: 'v2rayTun', desc: 'Стабильный клиент для iOS и Android.', link: 'https://v2raytun.com/', status: 'top' },
+          { name: 'Hiddify', desc: 'Мощный опенсорс клиент с обходом цензуры.', link: 'https://hiddify.com/', status: 'good' },
+          { name: 'Proton VPN', desc: 'Настоящий швейцарский VPN. Может требовать зарубежный Apple ID.', link: 'https://protonvpn.com/', status: 'good' },
+          { name: 'Windscribe', desc: '10 ГБ/мес бесплатно. Требует зарубежный Apple ID.', link: 'https://windscribe.com/', status: 'good' },
+          { name: 'Cloudflare WARP (1.1.1.1)', desc: 'Бесплатный, но часто блокируется.', link: 'https://1.1.1.1/', status: 'warning' }
       ];
 
       const listEl = document.getElementById('freeVpnListItems');
       
-      vpnServices.forEach((vpn, index) => {
-          let borderColor = '#ef4444'; 
+      vpnApps.forEach((vpn, index) => {
+          let borderColor = '#f59e0b'; // warning
           let badge = '';
           if (vpn.status === 'top' && index < 3) {
               borderColor = '#fbbf24';
@@ -3066,7 +3063,6 @@ window.addEventListener('load', function() {
           card.innerHTML = `
               <div style="display:flex;justify-content:space-between;align-items:center;">
                   <div style="color:#fff;font-weight:bold;font-size:15px;">${vpn.name}${badge}</div>
-                  <div style="color:${vpn.status === 'bad' ? '#ef4444' : '#34d399'};font-weight:bold;font-size:12px;">${vpn.speed}</div>
               </div>
               <div style="color:#94a3b8;font-size:12px;line-height:1.3;">${vpn.desc}</div>
               <div style="display:flex;justify-content:flex-end;">
