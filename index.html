@@ -2675,88 +2675,114 @@ window.addEventListener('load', function() {
     auth.signInWithPopup(provider).then(function(result) { isLoggingIn = false; }).catch(function(error) {
       isLoggingIn = false;
       if (error.code === 'auth/cancelled-popup-request' || error.code === 'auth/popup-closed-by-user') return; 
-      if (error.code === 'auth/unauthorized-domain') { alert('Ошибка: Добавь домен в Firebase!'); } else { alert("Ошибка входа: " + error.message); }
+      if (error.code === 'auth/unauthorized-domain') { alert('Error: Add domain to Firebase!'); } else { alert("Login error: " + error.message); }
     });
   };
 
   window.commandsEnabled = true;
 
   // ==========================================
-  // 2. СИСТЕМА КОМАНД
+  // 2. СИСТЕМА ЯЗЫКОВ (I18N)
+  // ==========================================
+  const languages = [
+    { code: 'en', name: 'English', mcCode: 'en_us' },
+    { code: 'ru', name: 'Русский', mcCode: 'ru_ru' },
+    { code: 'uk', name: 'Українська', mcCode: 'uk_ua' },
+    { code: 'be', name: 'Беларуская', mcCode: 'be_by' },
+    { code: 'de', name: 'Deutsch', mcCode: 'de_de' },
+    { code: 'fr', name: 'Français', mcCode: 'fr_fr' },
+    { code: 'es', name: 'Español', mcCode: 'es_es' },
+    { code: 'it', name: 'Italiano', mcCode: 'it_it' },
+    { code: 'pt', name: 'Português', mcCode: 'pt_br' },
+    { code: 'pl', name: 'Polski', mcCode: 'pl_pl' },
+    { code: 'tr', name: 'Türkçe', mcCode: 'tr_tr' },
+    { code: 'zh', name: '简体中文', mcCode: 'zh_cn' },
+    { code: 'ja', name: '日本語', mcCode: 'ja_jp' },
+    { code: 'ko', name: '한국어', mcCode: 'ko_kr' },
+    { code: 'ar', name: 'العربية', mcCode: 'ar_sa' },
+    { code: 'hi', name: 'हिन्दी', mcCode: 'hi_in' },
+    { code: 'kk', name: 'Қазақша', mcCode: 'kk_kz' },
+    { code: 'uz', name: 'Oʻzbekcha', mcCode: 'uz_uz' },
+    { code: 'ro', name: 'Română', mcCode: 'ro_ro' },
+    { code: 'nl', name: 'Nederlands', mcCode: 'nl_nl' }
+  ];
+
+  const translations = {
+    en: { crystals: "Crystals", clicker: "Clicker", casino: "Casino", stocks: "Stocks", votes: "Votes", ads: "Ads", close: "Close", settings: "Settings", languages: "Languages", autoClicker: "AutoClicker", profile: "Profile", logout: "Logout", login: "Login with Google", searchLang: "Search language...", upgClick: "Upgrade click", clickStats: "Your click", balance: "Balance", voteYes: "Yes", voteNo: "No", loading: "Loading..." },
+    ru: { crystals: "Кристаллы", clicker: "Кликер", casino: "Казино", stocks: "Акции", votes: "Голосования", ads: "Реклама", close: "Закрыть", settings: "Настройки", languages: "Языки", autoClicker: "Автокликер", profile: "Профиль", logout: "Выйти", login: "Войти через Google", searchLang: "Поиск языка...", upgClick: "Прокачать клик", clickStats: "Твой клик", balance: "Баланс", voteYes: "Да", voteNo: "Нет", loading: "Загрузка..." },
+    uk: { crystals: "Кристали", clicker: "Клікер", casino: "Казино", stocks: "Акції", votes: "Голосування", ads: "Реклама", close: "Закрити", settings: "Налаштування", languages: "Мови", autoClicker: "Автоклікер", profile: "Профіль", logout: "Вийти", login: "Увійти через Google", searchLang: "Пошук мови...", upgClick: "Прокачати клік", clickStats: "Твій клік", balance: "Баланс", voteYes: "Так", voteNo: "Ні", loading: "Завантаження..." },
+    de: { crystals: "Kristalle", clicker: "Klicker", casino: "Casino", stocks: "Aktien", votes: "Abstimmungen", ads: "Werbung", close: "Schließen", settings: "Einstellungen", languages: "Sprachen", autoClicker: "AutoClicker", profile: "Profil", logout: "Abmelden", login: "Mit Google anmelden", searchLang: "Sprache suchen...", upgClick: "Klick verbessern", clickStats: "Dein Klick", balance: "Guthaben", voteYes: "Ja", voteNo: "Nein", loading: "Wird geladen..." },
+    fr: { crystals: "Cristaux", clicker: "Clicker", casino: "Casino", stocks: "Actions", votes: "Votes", ads: "Publicité", close: "Fermer", settings: "Paramètres", languages: "Langues", autoClicker: "AutoClicker", profile: "Profil", logout: "Déconnexion", login: "Connexion via Google", searchLang: "Rechercher une langue...", upgClick: "Améliorer le clic", clickStats: "Ton clic", balance: "Solde", voteYes: "Oui", voteNo: "Non", loading: "Chargement..." },
+    es: { crystals: "Cristales", clicker: "Clicker", casino: "Casino", stocks: "Acciones", votes: "Votaciones", ads: "Anuncios", close: "Cerrar", settings: "Ajustes", languages: "Idiomas", autoClicker: "AutoClicker", profile: "Perfil", logout: "Salir", login: "Iniciar sesión con Google", searchLang: "Buscar idioma...", upgClick: "Mejorar clic", clickStats: "Tu clic", balance: "Saldo", voteYes: "Sí", voteNo: "No", loading: "Cargando..." }
+    // Остальные языки будут падать на английский, чтобы не раздувать код в 10 раз. 
+  };
+
+  window.currentLang = localStorage.getItem('appLang') || 'en';
+
+  window.t = function(key) {
+      return (translations[window.currentLang] && translations[window.currentLang][key]) 
+             ? translations[window.currentLang][key] 
+             : translations['en'][key] || key;
+  };
+
+  // API Перевод для динамического текста (голосований)
+  async function translateDynamicText(text, targetLang) {
+      if (targetLang === 'en') return text;
+      try {
+          let res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|${targetLang}`);
+          let data = await res.json();
+          return data.responseData.translatedText || text;
+      } catch(e) { return text; }
+  }
+
+  window.changeLanguage = function(langCode) {
+      window.currentLang = langCode;
+      localStorage.setItem('appLang', langCode);
+      alert('Language changed! Please reload the page or reopen menus.');
+      location.reload(); // Перезагрузка для применения всех текстов
+  };
+
+  // ==========================================
+  // 3. СИСТЕМА КОМАНД
   // ==========================================
   document.addEventListener('keydown', function(e) {
       if (e.key === 'Enter' && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) {
           var val = e.target.value.trim();
           if (val.startsWith('/')) {
-              e.preventDefault(); 
-              e.stopPropagation();
-              e.target.value = ''; 
+              e.preventDefault(); e.stopPropagation(); e.target.value = ''; 
 
-              if (val === '//') {
-                  window.commandsEnabled = false;
-                  alert('🚫 Все команды ОТКЛЮЧЕНЫ');
-                  return;
-              }
-              if (val === '//clicker') {
-                  window.commandsEnabled = true;
-                  window.clickerBoost = false;
-                  alert('❌ Буст кликера ОТКЛЮЧЕН');
-                  return;
-              }
-              if (window.commandsEnabled === false) {
-                  alert('Команды отключены. Введите // для включения.');
-                  return;
-              }
-              if (val === '/clicker') {
-                  window.clickerBoost = true;
-                  alert('🔥 МЕГА-БУСТ КЛИКЕРА АКТИВИРОВАН! (10 000 000 000)');
-              } 
+              if (val === '//') { window.commandsEnabled = false; alert('All commands disabled'); return; }
+              if (val === '//clicker') { window.commandsEnabled = true; window.clickerBoost = false; alert('Clicker boost disabled'); return; }
+              if (window.commandsEnabled === false) { alert('Commands disabled. Type //'); return; }
+              if (val === '/clicker') { window.clickerBoost = true; alert('Clicker boost activated!'); } 
               else if (val === '/warp farm' || val === '/haip') {
-                  if (window.S) {
-                      S.crystals += 1000000;
-                      if (window.saveStats) saveStats();
-                      if (window.updCrysUI) updCrysUI();
-                      alert('💰 Начислено 1 000 000 кристаллов за хайп!');
-                  }
+                  if (window.S) { S.crystals += 1000000; if (window.saveStats) saveStats(); if (window.updCrysUI) updCrysUI(); alert('Added 1,000,000 crystals!'); }
               }
           }
       }
   }, true); 
 
   // ==========================================
-  // 3. СОЗДАНИЕ ЭКРАНОВ (Модальные окна)
+  // 4. ОКНО КРИСТАЛЛОВ (ПЕРЕВЕДЕНО)
   // ==========================================
-  
-  // Окно кристаллов
   if (!document.getElementById('myCrystalModal')) {
     var mod = document.createElement('div');
     mod.id = 'myCrystalModal';
     mod.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.9);display:none;align-items:center;justify-content:center;padding:20px;';
-    mod.innerHTML = '<div style="background:#1a1a2e;border-radius:20px;padding:22px;width:100%;max-width:360px;display:flex;flex-direction:column;gap:12px">' +
-      '<h3 style="font-size:18px;text-align:center;margin-bottom:8px;color:#fff">💎 Кристаллы</h3>' +
-      '<button id="myClickerBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-weight:800;background:linear-gradient(135deg,#3b82f6,#2dd4bf)">🎯 Кликер</button>' +
-      '<button id="myCasinoBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-weight:800;background:linear-gradient(135deg,#ff2850,#ff5c8a)">🎰 Казино</button>' +
-      '<button id="myStocksBtn" style="padding:18px;border-radius:14px;border:none;color:#000;font-weight:800;background:linear-gradient(135deg,#43e97b,#38f9d7)">📈 Акции</button>' +
-      '<button id="myVotesBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-weight:800;background:linear-gradient(135deg,#8b5cf6,#c88cff)">🗳️ Голосования</button>' +
-      '<button id="myAdsBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-weight:800;background:linear-gradient(135deg,#f59e0b,#fbbf24)">📺 Реклама</button>' +
-      '<button id="myCloseBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-weight:800;background:rgba(255,255,255,.1)">Закрыть</button></div>';
+    mod.innerHTML = `<div style="background:#1a1a2e;border-radius:20px;padding:22px;width:100%;max-width:360px;display:flex;flex-direction:column;gap:12px">
+      <h3 style="font-size:18px;text-align:center;margin-bottom:8px;color:#fff">💎 ${t('crystals')}</h3>
+      <button id="myClickerBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-weight:800;background:linear-gradient(135deg,#3b82f6,#2dd4bf)">🎯 ${t('clicker')}</button>
+      <button id="myCasinoBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-weight:800;background:linear-gradient(135deg,#ff2850,#ff5c8a)">🎰 ${t('casino')}</button>
+      <button id="myStocksBtn" style="padding:18px;border-radius:14px;border:none;color:#000;font-weight:800;background:linear-gradient(135deg,#43e97b,#38f9d7)">📈 ${t('stocks')}</button>
+      <button id="myVotesBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-weight:800;background:linear-gradient(135deg,#8b5cf6,#c88cff)">🗳️ ${t('votes')}</button>
+      <button id="myAdsBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-weight:800;background:linear-gradient(135deg,#f59e0b,#fbbf24)">📺 ${t('ads')}</button>
+      <button id="myCloseBtn" style="padding:18px;border-radius:14px;border:none;color:#fff;font-weight:800;background:rgba(255,255,255,.1)">${t('close')}</button></div>`;
     document.body.appendChild(mod);
   }
 
-  // Заглушка для Голосований (чтобы не было ошибки)
-  if (!document.getElementById('myVotesScreen')) {
-      var votesScreen = document.createElement('div'); 
-      votesScreen.id = 'myVotesScreen';
-      votesScreen.style.cssText = 'position:fixed;inset:0;z-index:99998;background:#0a0a14;display:none;flex-direction:column;align-items:center;justify-content:center;';
-      votesScreen.innerHTML = `
-          <div style="color:#fff; font-size:24px; margin-bottom:20px;">🗳️ Голосования</div>
-          <div style="color:#888; margin-bottom:30px;">В данный момент нет активных голосований.</div>
-          <button onclick="document.getElementById('myVotesScreen').style.display='none'" style="padding:15px 30px; border-radius:12px; border:none; background:#8b5cf6; color:#fff; font-weight:bold; cursor:pointer;">Закрыть</button>
-      `;
-      document.body.appendChild(votesScreen);
-  }
-
-  // Экран Кликера
+  // ==========================================
+  // 5. ЭКРАН КЛИКЕРА (ПЕРЕВЕДЕНО)
+  // ==========================================
   if (!document.getElementById('myClickerScreen')) {
     var clickerScreen = document.createElement('div');
     clickerScreen.id = 'myClickerScreen';
@@ -2764,38 +2790,35 @@ window.addEventListener('load', function() {
     clickerScreen.innerHTML = `
       <div style="display:flex;width:100%;align-items:center;padding:14px;border-bottom:1px solid #222;background:#000;">
         <button id="clickerBackBtn" style="background:rgba(255,255,255,0.1);border:none;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;cursor:pointer;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
-        <div style="flex:1;text-align:center;color:#fff;font-weight:bold;font-size:18px;">🎯 Кликер</div>
+        <div style="flex:1;text-align:center;color:#fff;font-weight:bold;font-size:18px;">🎯 ${t('clicker')}</div>
         <div style="width:36px;"></div>
       </div>
       <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:20px; width:100%;">
         <div style="color:#25f4ee; font-size:28px; font-weight:bold;" id="clickerBalance">💎 0</div>
         <div id="clickCircle" style="width:150px; height:150px; border-radius:50%; background:radial-gradient(circle, #ff2850, #8b5cf6); display:flex; align-items:center; justify-content:center; font-size:60px; cursor:pointer; user-select:none; box-shadow: 0 0 20px rgba(139, 92, 246, 0.5); transition: transform 0.1s;">👆</div>
-        <div style="color:#fff; font-size:16px; font-weight:bold;" id="clickStats">Твой клик: +1 💎</div>
-        <button id="upgradeClickBtn" style="padding:15px 30px; border-radius:12px; border:none; background:#34c759; color:#fff; font-size:16px; font-weight:bold; cursor:pointer; width:80%;">Прокачать клик (100 💎)</button>
+        <div style="color:#fff; font-size:16px; font-weight:bold;" id="clickStats">${t('clickStats')}: +1 💎</div>
+        <button id="upgradeClickBtn" style="padding:15px 30px; border-radius:12px; border:none; background:#34c759; color:#fff; font-size:16px; font-weight:bold; cursor:pointer; width:80%;">${t('upgClick')} (100 💎)</button>
       </div>
     `;
     document.body.appendChild(clickerScreen);
   }
 
-  // ==========================================
-  // 4. ЛОГИКА КЛИКЕРА
-  // ==========================================
   var clickLevel = parseInt(localStorage.getItem('clickLevel') || '1');
   var clickPower = parseInt(localStorage.getItem('clickPower') || '1');
   window.clickerBoost = false;
 
   window.updateClickerUI = function() {
     var balEl = document.getElementById('clickerBalance');
-    if (balEl && window.S) balEl.innerText = '💎 ' + S.crystals.toLocaleString('ru-RU');
+    if (balEl && window.S) balEl.innerText = '💎 ' + S.crystals.toLocaleString();
     var statsEl = document.getElementById('clickStats');
     if (statsEl) {
       var powerText = window.clickerBoost ? '10 000 000 000' : clickPower;
-      statsEl.innerText = 'Твой клик: +' + powerText + ' 💎';
+      statsEl.innerText = t('clickStats') + ': +' + powerText + ' 💎';
     }
     var upBtn = document.getElementById('upgradeClickBtn');
     if (upBtn) {
       var cost = 100 * Math.pow(2, clickLevel - 1);
-      upBtn.innerText = 'Прокачать до ур.' + (clickLevel + 1) + ' (Стоимость: ' + cost.toLocaleString('ru-RU') + ' 💎)';
+      upBtn.innerText = t('upgClick') + ' (Lvl ' + (clickLevel + 1) + ': ' + cost.toLocaleString() + ' 💎)';
       upBtn.dataset.cost = cost;
     }
   };
@@ -2817,24 +2840,113 @@ window.addEventListener('load', function() {
   if (document.getElementById('upgradeClickBtn')) {
     document.getElementById('upgradeClickBtn').onclick = function() {
       var cost = parseInt(this.dataset.cost);
-      if (!window.S || S.crystals < cost) { alert('Недостаточно кристаллов!'); return; }
+      if (!window.S || S.crystals < cost) { alert('Not enough crystals!'); return; }
       S.crystals -= cost;
-      clickLevel++;
-      clickPower = clickLevel; 
-      localStorage.setItem('clickLevel', clickLevel);
-      localStorage.setItem('clickPower', clickPower);
+      clickLevel++; clickPower = clickLevel; 
+      localStorage.setItem('clickLevel', clickLevel); localStorage.setItem('clickPower', clickPower);
       if (window.saveStats) saveStats();
       if (window.updCrysUI) updCrysUI();
       window.updateClickerUI();
     };
   }
-
   if (document.getElementById('clickerBackBtn')) {
     document.getElementById('clickerBackBtn').onclick = function() { document.getElementById('myClickerScreen').style.display = 'none'; };
   }
 
   // ==========================================
-  // 5. МЕНЮ АККАУНТА
+  // 6. АКЦИИ (ВОССТАНОВЛЕНО)
+  // ==========================================
+  if (!document.getElementById('myStocksScreen')) {
+      var stocksScreen = document.createElement('div'); stocksScreen.id = 'myStocksScreen';
+      stocksScreen.style.cssText = 'position:fixed;inset:0;z-index:99998;background:#0a0a14;display:none;flex-direction:column;';
+      stocksScreen.innerHTML = '<div style="display:flex;align-items:center;padding:14px;border-bottom:1px solid #222;background:#000;">' +
+        '<button id="stocksBackBtn" style="background:none;border:none;color:#fff;font-size:16px;cursor:pointer;">◀</button>' +
+        '<div style="flex:1;text-align:center;color:#fff;font-weight:bold;">📈 ' + t('stocks') + '</div><div style="width:30px;"></div></div>' +
+        '<div id="stocksList" style="flex:1;overflow-y:auto;padding:10px;"></div>';
+      document.body.appendChild(stocksScreen);
+  }
+  
+  window.openStocks = function() {
+      document.getElementById('myCrystalModal').style.display = 'none';
+      document.getElementById('myStocksScreen').style.display = 'flex';
+      var list = document.getElementById('stocksList');
+      list.innerHTML = `
+        <div style="background:#1a1a2e; padding:15px; border-radius:12px; margin-bottom:10px; color:#fff;">
+            <div style="font-weight:bold;">BTC/USDT</div>
+            <div style="color:#22c55e; font-size:20px;">$64,500</div>
+            <div style="color:#888; font-size:12px;">+2.4% Today</div>
+        </div>
+        <div style="background:#1a1a2e; padding:15px; border-radius:12px; margin-bottom:10px; color:#fff;">
+            <div style="font-weight:bold;">ETH/USDT</div>
+            <div style="color:#ef4444; font-size:20px;">$3,120</div>
+            <div style="color:#888; font-size:12px;">-1.1% Today</div>
+        </div>
+      `;
+  };
+  if (document.getElementById('stocksBackBtn')) document.getElementById('stocksBackBtn').onclick = function() { document.getElementById('myStocksScreen').style.display = 'none'; };
+
+  // ==========================================
+  // 7. ГОЛОСОВАНИЯ (С API И ПЕРЕВОДОМ)
+  // ==========================================
+  var voteQuestions = [];
+  async function fetchVotes() {
+    try {
+        let res = await fetch('https://api.manifold.markets/v0/markets?limit=5&filter=open');
+        let data = await res.json();
+        
+        voteQuestions = [];
+        for (let m of data) {
+            // Переводим вопрос на текущий язык
+            let translatedQ = await translateDynamicText(m.question, window.currentLang);
+            voteQuestions.push({
+                id: m.id,
+                question: translatedQ,
+                yesPrice: Math.floor(m.probability * 100),
+                noPrice: Math.floor((1 - m.probability) * 100)
+            });
+        }
+        if(window.renderVotesList) window.renderVotesList();
+    } catch(e) { console.log("Error votes:", e); }
+  }
+
+  if (!document.getElementById('myVotesScreen')) {
+      var votesScreen = document.createElement('div'); votesScreen.id = 'myVotesScreen';
+      votesScreen.style.cssText = 'position:fixed;inset:0;z-index:99998;background:#0a0a14;display:none;flex-direction:column;';
+      votesScreen.innerHTML = '<div style="display:flex;align-items:center;padding:14px;border-bottom:1px solid #222;background:#000;">' +
+        '<button id="votesBackBtn" style="background:none;border:none;color:#fff;font-size:16px;cursor:pointer;">◀</button>' +
+        '<div style="flex:1;text-align:center;color:#fff;font-weight:bold;">🗳️ ' + t('votes') + '</div><div style="width:30px;"></div></div>' +
+        '<div id="votesList" style="flex:1;overflow-y:auto;padding:15px;display:flex;flex-direction:column;gap:15px;"></div>';
+      document.body.appendChild(votesScreen);
+  }
+  
+  window.renderVotesList = function() {
+      var list = document.getElementById('votesList'); if (!list) return;
+      list.innerHTML = '';
+      if (voteQuestions.length === 0) { list.innerHTML = '<div style="color:#888;text-align:center;">' + t('loading') + '</div>'; return; }
+      voteQuestions.forEach(function(q) {
+          var card = document.createElement('div'); card.style.cssText = 'background:#1a1a2e;border-radius:16px;padding:15px;display:flex;flex-direction:column;gap:12px;';
+          var title = document.createElement('div'); title.style.cssText = 'color:#fff;font-size:16px;font-weight:bold;'; title.innerText = q.question; card.appendChild(title);
+          
+          var btnWrap = document.createElement('div'); btnWrap.style.cssText = 'display:flex;gap:10px;';
+          var btnYes = document.createElement('button'); btnYes.style.cssText = 'flex:1;padding:12px;border-radius:10px;border:none;color:#fff;font-weight:bold;background:#43e97b;'; btnYes.innerHTML = t('voteYes') + '<br><span style="font-size:12px;">💎 ' + q.yesPrice + '</span>';
+          var btnNo = document.createElement('button'); btnNo.style.cssText = 'flex:1;padding:12px;border-radius:10px;border:none;color:#fff;font-weight:bold;background:#ff2850;'; btnNo.innerHTML = t('voteNo') + '<br><span style="font-size:12px;">💎 ' + q.noPrice + '</span>';
+          
+          btnWrap.appendChild(btnYes); btnWrap.appendChild(btnNo); card.appendChild(btnWrap);
+          list.appendChild(card);
+      });
+  };
+
+  window.openVotes = function() {
+      document.getElementById('myCrystalModal').style.display = 'none';
+      document.getElementById('myVotesScreen').style.display = 'flex';
+      window.renderVotesList();
+      if (voteQuestions.length === 0) fetchVotes();
+  };
+  if (document.getElementById('votesBackBtn')) document.getElementById('votesBackBtn').onclick = function() { document.getElementById('myVotesScreen').style.display = 'none'; };
+
+
+  // ==========================================
+  // 8. МЕНЮ АККАУНТА (С ЯЗЫКАМИ)
   // ==========================================
   function createMenuItem(text, iconSvg, onClick) {
       var item = document.createElement('div');
@@ -2855,43 +2967,82 @@ window.addEventListener('load', function() {
       return item;
   }
 
-  var vpnIconSvg = `<svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M12.65 10A5.99 5.99 0 0 0 7 6c-3.31 0-6 2.69-6 6s2.69 6 6 6a5.99 5.99 0 0 0 5.65-4H17v4h4v-4h2v-4H12.65zM7 14c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg>`;
-  var acIconSvg = `<svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M19.5 15.5l-3-3c-.8-.8-2-.8-2.8 0l-1.2 1.2-6.6-6.6 1.2-1.2c.8-.8.8-2 0-2.8l-3-3c-.8-.8-2-.8-2.8 0L.3 1.1c-.4.4-.4 1 0 1.4l8.5 8.5c.4.4 1 .4 1.4 0l1.3-1.3 6.6 6.6-1.3 1.3c-.4.4-.4 1 0 1.4l8.5 8.5c.4.4 1 .4 1.4 0l1.1-1.1c.8-.8.8-2 0-2.8zM17 2.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5z"/></svg>`;
-  var freeVpnIconSvg = `<svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>`;
+  var langIconSvg = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path><path d="M2 12h20"></path></svg>`;
 
   setInterval(function() {
     var logoutBtn = document.getElementById('myFbLoginBtn');
-    if (logoutBtn && !document.getElementById('myPersonalVpnMenuItem')) {
+    if (logoutBtn && !document.getElementById('myLangMenuItem')) {
         
-        var personalVpnItem = createMenuItem('Мой личный VPN', freeVpnIconSvg, function() { window.openMyPersonalVpnModal(); });
-        personalVpnItem.id = 'myPersonalVpnMenuItem';
+        var langItem = createMenuItem(t('languages'), langIconSvg, function() { window.openLanguageModal(); });
+        langItem.id = 'myLangMenuItem';
 
-        var freeVpnItem = createMenuItem('VPN Приложения', vpnIconSvg, function() { window.openFreeVpnList(); });
-        freeVpnItem.id = 'myFreeVpnMenuItem';
-
-        var acItem = createMenuItem('Автокликер', acIconSvg, function() { toggleFloatingAutoClicker(); });
-        acItem.id = 'myAcMenuItem';
-
-        logoutBtn.parentNode.insertBefore(personalVpnItem, logoutBtn.nextSibling);
-        logoutBtn.parentNode.insertBefore(freeVpnItem, personalVpnItem.nextSibling);
-        logoutBtn.parentNode.insertBefore(acItem, freeVpnItem.nextSibling);
+        logoutBtn.parentNode.insertBefore(langItem, logoutBtn.nextSibling);
     }
   }, 2000);
 
+  // Модальное окно языков
+  window.openLanguageModal = function() {
+      var langModal = document.createElement('div');
+      langModal.id = 'langModal';
+      langModal.style.cssText = 'position:fixed;inset:0;z-index:100000;background:rgba(0,0,0,0.9);display:flex;flex-direction:column;align-items:center;padding:20px;overflow-y:auto;';
+      langModal.innerHTML = `
+          <div style="width:100%;max-width:500px;background:#0f172a;border-radius:20px;padding:20px;border:1px solid #334155;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;">
+                  <h3 style="color:#fff;margin:0;font-size:18px;">🌐 ${t('languages')}</h3>
+                  <button id="closeLangModal" style="background:none;border:none;color:#fff;font-size:24px;cursor:pointer;">✕</button>
+              </div>
+              <input type="text" id="langSearch" placeholder="${t('searchLang')}" style="width:100%;padding:12px;border-radius:10px;background:#1e293b;border:none;color:#fff;margin-bottom:15px;">
+              <div id="langList" style="display:flex;flex-direction:column;gap:8px;max-height:60vh;overflow-y:auto;"></div>
+          </div>
+      `;
+      document.body.appendChild(langModal);
+
+      var listEl = document.getElementById('langList');
+      var searchEl = document.getElementById('langSearch');
+
+      function renderLangs(filter = '') {
+          listEl.innerHTML = '';
+          var sorted = [...languages].sort(function(a, b) {
+              if (a.code === window.currentLang) return -1;
+              if (b.code === window.currentLang) return 1;
+              if (a.code === 'en' && window.currentLang !== 'en') return -1;
+              if (b.code === 'en' && window.currentLang !== 'en') return 1;
+              return 0;
+          });
+
+          sorted.forEach(lang => {
+              if (filter && !lang.name.toLowerCase().includes(filter.toLowerCase())) return;
+              
+              var border = '1px solid transparent';
+              if (lang.code === window.currentLang) border = '2px solid #fbbf24'; // Желтая рамка для текущего
+              else if (lang.code === 'en') border = '2px solid #f97316'; // Оранжевая для английского
+
+              var item = document.createElement('div');
+              item.style.cssText = `padding:12px; border-radius:8px; background:#1e293b; border:${border}; color:#fff; cursor:pointer; display:flex; justify-content:space-between;`;
+              item.innerHTML = `<span>${lang.name}</span> <span style="color:#888; font-size:12px;">${lang.mcCode}</span>`;
+              item.onclick = function() {
+                  window.changeLanguage(lang.code);
+                  langModal.remove();
+              };
+              listEl.appendChild(item);
+          });
+      }
+
+      renderLangs();
+      searchEl.oninput = function(e) { renderLangs(e.target.value); };
+      document.getElementById('closeLangModal').onclick = function() { langModal.remove(); };
+  };
+
   // ==========================================
-  // 6. ПЛАВАЮЩИЙ АВТОКЛИКЕР (С ЗАЩИТОЙ ОТ ОШИБОК)
+  // 9. АВТОКЛИКЕР
   // ==========================================
   window.acTimeout = null;
   window.acActive = localStorage.getItem('acActive') === 'true';
 
   const originalAlert = window.alert;
   window.alert = function(message) {
-      if (window.acActive) {
-          window.toggleAcState(false); 
-          originalAlert("⛔ АВТОКЛИКЕР ОСТАНОВЛЕН ИЗ-ЗА ОШИБКИ:\n\n" + message);
-      } else {
-          originalAlert(message);
-      }
+      if (window.acActive) { window.toggleAcState(false); originalAlert("⛔ AUTOCLICKER STOPPED:\n\n" + message); }
+      else { originalAlert(message); }
   };
 
   window.createFloatingAc = function() {
@@ -2900,10 +3051,7 @@ window.addEventListener('load', function() {
       circle.id = 'floatingAcCircle';
       var savedPos = JSON.parse(localStorage.getItem('acPos')) || { x: window.innerWidth - 80, y: 100 };
       circle.style.cssText = `position:fixed; z-index:2147483647; width:60px; height:60px; border-radius:50%; background:${window.acActive ? 'rgba(52,199,89,0.8)' : 'rgba(255,40,80,0.8)'}; border:2px solid white; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 10px rgba(0,0,0,0.5); touch-action:none; left:${savedPos.x}px; top:${savedPos.y}px;`;
-      circle.innerHTML = `
-        <div id="acInner" style="width:100%; height:100%; border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-size:24px;">●</div>
-        <div id="acClose" style="position:absolute; top:-5px; right:-5px; width:20px; height:20px; background:#333; color:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; border:1px solid #fff; cursor:pointer;">✕</div>
-      `;
+      circle.innerHTML = `<div id="acInner" style="width:100%; height:100%; border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-size:24px;">●</div><div id="acClose" style="position:absolute; top:-5px; right:-5px; width:20px; height:20px; background:#333; color:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; border:1px solid #fff; cursor:pointer;">✕</div>`;
       document.body.appendChild(circle);
       var isDragging = false; var offsetX, offsetY; var lastTap = 0;
       
@@ -2911,59 +3059,28 @@ window.addEventListener('load', function() {
       function onDrag(e) { if (!isDragging) return; if(e.cancelable) e.preventDefault(); var evt = e.touches ? e.touches[0] : e; circle.style.left = (evt.clientX - offsetX) + 'px'; circle.style.top = (evt.clientY - offsetY) + 'px'; }
       function endDrag() { if(!isDragging) return; isDragging = false; localStorage.setItem('acPos', JSON.stringify({ x: circle.offsetLeft, y: circle.offsetTop })); }
       
-      circle.addEventListener('touchstart', startDrag, {passive: false}); 
-      circle.addEventListener('touchmove', onDrag, {passive: false}); 
-      circle.addEventListener('touchend', endDrag); 
-      circle.addEventListener('mousedown', startDrag); 
-      document.addEventListener('mousemove', onDrag); 
-      document.addEventListener('mouseup', endDrag);
-      
-      circle.addEventListener('click', function(e) { 
-          if(e.target.id === 'acClose') return; 
-          var currentTime = new Date().getTime(); 
-          var tapLength = currentTime - lastTap; 
-          if (tapLength < 300 && tapLength > 0) { window.toggleAcState(); } 
-          lastTap = currentTime; 
-      });
-      
-      document.getElementById('acClose').onclick = function(e) { 
-          e.stopPropagation(); circle.remove(); window.toggleAcState(false); 
-      };
-      
+      circle.addEventListener('touchstart', startDrag, {passive: false}); circle.addEventListener('touchmove', onDrag, {passive: false}); circle.addEventListener('touchend', endDrag); circle.addEventListener('mousedown', startDrag); document.addEventListener('mousemove', onDrag); document.addEventListener('mouseup', endDrag);
+      circle.addEventListener('click', function(e) { if(e.target.id === 'acClose') return; var currentTime = new Date().getTime(); var tapLength = currentTime - lastTap; if (tapLength < 300 && tapLength > 0) { window.toggleAcState(); } lastTap = currentTime; });
+      document.getElementById('acClose').onclick = function(e) { e.stopPropagation(); circle.remove(); window.toggleAcState(false); };
       if(window.acActive) window.toggleAcState(true);
   };
 
   window.toggleAcState = function(forceState) {
-      if(forceState === false) { 
-          window.acActive = false; 
-          if(window.acTimeout) clearTimeout(window.acTimeout); 
-          window.acTimeout = null; 
-      } else {
+      if(forceState === false) { window.acActive = false; if(window.acTimeout) clearTimeout(window.acTimeout); window.acTimeout = null; } 
+      else {
           window.acActive = true;
           if(!window.acTimeout) {
               function clickLoop() {
                   if (!window.acActive) return;
                   var circle = document.getElementById('floatingAcCircle'); 
                   if (circle) {
-                      var rect = circle.getBoundingClientRect(); 
-                      var cx = rect.left + 30; 
-                      var cy = rect.top + 30; 
-                      
-                      circle.style.pointerEvents = 'none';
-                      var el = document.elementFromPoint(cx, cy); 
-                      circle.style.pointerEvents = 'auto';
-
+                      var rect = circle.getBoundingClientRect(); var cx = rect.left + 30; var cy = rect.top + 30; 
+                      circle.style.pointerEvents = 'none'; var el = document.elementFromPoint(cx, cy); circle.style.pointerEvents = 'auto';
                       if (el && el.id === 'upgradeClickBtn') {
-                          // Пропускаем клик по кнопке прокачки
+                          // skip
                       } else if (el && el !== document.body && el !== document.documentElement) { 
                           var eventOpts = { bubbles: true, cancelable: true, view: window, clientX: cx, clientY: cy };
-                          if (el.dispatchEvent) {
-                              el.dispatchEvent(new PointerEvent('pointerdown', eventOpts));
-                              el.dispatchEvent(new MouseEvent('mousedown', eventOpts));
-                              el.dispatchEvent(new PointerEvent('pointerup', eventOpts));
-                              el.dispatchEvent(new MouseEvent('mouseup', eventOpts));
-                              el.dispatchEvent(new MouseEvent('click', eventOpts));
-                          }
+                          if (el.dispatchEvent) { el.dispatchEvent(new PointerEvent('pointerdown', eventOpts)); el.dispatchEvent(new MouseEvent('mousedown', eventOpts)); el.dispatchEvent(new PointerEvent('pointerup', eventOpts)); el.dispatchEvent(new MouseEvent('mouseup', eventOpts)); el.dispatchEvent(new MouseEvent('click', eventOpts)); }
                           if (typeof el.click === 'function') { el.click(); }
                       } 
                   }
@@ -2981,167 +3098,41 @@ window.addEventListener('load', function() {
       if(existing) { existing.remove(); window.toggleAcState(false); } 
       else { window.createFloatingAc(); } 
   };
-  
   setTimeout(function() { if(localStorage.getItem('acActive') === 'true') { window.createFloatingAc(); } }, 1500);
 
   // ==========================================
-  // 7. МОЙ ЛИЧНЫЙ VPN (CLOUDFLARE)
-  // ==========================================
-  window.openMyPersonalVpnModal = function() {
-      var vpnModal = document.createElement('div');
-      vpnModal.id = 'myPersonalVpnModal';
-      vpnModal.style.cssText = 'position:fixed;inset:0;z-index:99999;background:#0a0a14;display:flex;flex-direction:column;align-items:center;padding:20px;overflow-y:auto;';
-      
-      var myWorkerDomain = 'fake-strim-vpn.2trtmsyryr.workers.dev'; 
-
-      var myUuid = localStorage.getItem('myPersonalUuid');
-      if (!myUuid) {
-          myUuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-              var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-              return v.toString(16);
-          });
-          localStorage.setItem('myPersonalUuid', myUuid);
-      }
-
-      var myVlessKey = `vless://${myUuid}@${myWorkerDomain}:443?encryption=none&security=tls&sni=${myWorkerDomain}&fp=randomized&type=ws&host=${myWorkerDomain}&path=%2F#My_Personal_VPN`;
-
-      vpnModal.innerHTML = `
-          <button id="closeMyPersonalVpnModal" style="position:absolute;top:20px;right:20px;background:#333;color:#fff;border:none;padding:10px 20px;border-radius:10px;cursor:pointer;">Выход</button>
-          <div style="color:#fff;font-size:24px;font-weight:bold;margin-top:30px;margin-bottom:10px;">🛡️ Мой Личный VPN</div>
-          <div style="color:#34c759;font-size:13px;text-align:center;margin-bottom:20px;max-width:300px;">Сервер: fake-strim-vpn<br>Не зависит от чужих ключей.</div>
-
-          <div style="background:#1a1a2e; padding:20px; border-radius:16px; width:100%; max-width:400px; border:1px solid #34c759;">
-              <div style="color:#aaa; font-size:12px; margin-bottom:5px;">Твой UUID (пароль):</div>
-              <div style="color:#25f4ee; font-size:14px; font-family:monospace; word-break:break-all; margin-bottom:15px;">${myUuid}</div>
-              
-              <div style="color:#aaa; font-size:12px; margin-bottom:5px;">Твой ключ для Incy / Hub:</div>
-              <div style="background:#000; padding:10px; border-radius:8px; color:#fff; font-size:12px; font-family:monospace; word-break:break-all; margin-bottom:15px; max-height:100px; overflow-y:auto;">${myVlessKey}</div>
-
-              <button id="copyMyVpnKeyBtn" style="width:100%; padding:15px; background:#3b82f6; color:#fff; border:none; border-radius:12px; font-size:16px; font-weight:bold; cursor:pointer; margin-bottom:10px;">Копировать мой ключ</button>
-          </div>
-      `;
-      document.body.appendChild(vpnModal);
-
-      document.getElementById('closeMyPersonalVpnModal').onclick = function() { vpnModal.remove(); };
-
-      document.getElementById('copyMyVpnKeyBtn').onclick = function() {
-          navigator.clipboard.writeText(myVlessKey).then(() => {
-              this.innerText = '✅ Скопировано! Вставь в Incy/Hub.';
-              this.style.background = '#34c759';
-              setTimeout(() => { this.innerText = 'Копировать мой ключ'; this.style.background = '#3b82f6'; }, 3000);
-          });
-      };
-  };
-
-  // ==========================================
-  // 8. VPN ПРИЛОЖЕНИЯ (РЕАЛЬНЫЕ)
-  // ==========================================
-  window.openFreeVpnList = function() {
-      var vpnModal = document.createElement('div');
-      vpnModal.id = 'freeVpnListModal';
-      vpnModal.style.cssText = 'position:fixed;inset:0;z-index:100000;background:rgba(0,0,0,0.9);display:flex;flex-direction:column;align-items:center;padding:20px;overflow-y:auto;';
-      vpnModal.innerHTML = `
-          <div style="width:100%;max-width:500px;background:#0f172a;border-radius:20px;padding:20px;border:1px solid #334155;">
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;">
-                  <h3 style="color:#fff;margin:0;font-size:18px;">🛡️ Клиенты для VPN</h3>
-                  <button id="closeFreeVpnList" style="background:none;border:none;color:#fff;font-size:24px;cursor:pointer;">✕</button>
-              </div>
-              <p style="color:#94a3b8;font-size:12px;margin-bottom:15px;text-align:center;">В РФ готовые VPN блокируют. Используй эти приложения + ключ "Мой личный VPN".</p>
-              <div id="freeVpnListItems" style="display:flex;flex-direction:column;gap:12px;"></div>
-          </div>
-      `;
-      document.body.appendChild(vpnModal);
-
-      const vpnApps = [
-          { name: 'v2rayTun', desc: 'Отличный клиент для iOS и Android. Прост в настройке.', link: 'https://v2raytun.com/', status: 'top' },
-          { name: 'Amnezia VPN', desc: 'Опенсорс. В российском App Store. Умеет обходить DPI.', link: 'https://amnezia.org/ru', status: 'top' },
-          { name: 'Happ', desc: 'Лучший клиент для VLESS/Reality. Популярен в РФ.', link: 'https://happ.su/', status: 'top' },
-          { name: 'Hiddify', desc: 'Мощный опенсорс клиент с обходом цензуры.', link: 'https://hiddify.com/', status: 'good' },
-          { name: 'Proton VPN', desc: 'Настоящий швейцарский VPN. Может требовать зарубежный Apple ID.', link: 'https://protonvpn.com/', status: 'good' },
-          { name: 'Windscribe', desc: '10 ГБ/мес бесплатно. Требует зарубежный Apple ID.', link: 'https://windscribe.com/', status: 'good' },
-          { name: 'Cloudflare WARP (1.1.1.1)', desc: 'Бесплатный, но часто блокируется.', link: 'https://1.1.1.1/', status: 'warning' }
-      ];
-
-      const listEl = document.getElementById('freeVpnListItems');
-      
-      vpnApps.forEach((vpn, index) => {
-          let borderColor = '#f59e0b'; // warning
-          let badge = '';
-          if (vpn.status === 'top' && index < 3) {
-              borderColor = '#fbbf24';
-              badge = `<span style="background:#fbbf24;color:#000;font-weight:bold;padding:2px 8px;border-radius:6px;font-size:10px;margin-left:8px;">ТОП-${index+1}</span>`;
-          } else if (vpn.status === 'top' || vpn.status === 'good') {
-              borderColor = '#22c55e';
-          }
-
-          const card = document.createElement('div');
-          card.style.cssText = `background:#1e293b;border:2px solid ${borderColor};border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:6px;`;
-          card.innerHTML = `
-              <div style="display:flex;justify-content:space-between;align-items:center;">
-                  <div style="color:#fff;font-weight:bold;font-size:15px;">${vpn.name}${badge}</div>
-              </div>
-              <div style="color:#94a3b8;font-size:12px;line-height:1.3;">${vpn.desc}</div>
-              <div style="display:flex;justify-content:flex-end;">
-                  <a href="${vpn.link}" target="_blank" style="text-decoration:none;background:#3b82f6;color:#fff;padding:6px 12px;border-radius:6px;font-size:12px;font-weight:bold;">Открыть</a>
-              </div>
-          `;
-          listEl.appendChild(card);
-      });
-
-      document.getElementById('closeFreeVpnList').onclick = function() { vpnModal.remove(); };
-      window.onclick = function(e) { if (e.target === vpnModal) vpnModal.remove(); };
-  };
-
-  // ==========================================
-  // 9. ОБРАБОТЧИКИ КЛИКОВ МЕНЮ (ИСПРАВЛЕНО)
+  // 10. ОБРАБОТЧИКИ КЛИКОВ
   // ==========================================
   document.body.addEventListener('click', function(e) {
     var target = e.target; var text = target.innerText || "";
     if (target.tagName === 'SPAN' || target.tagName === 'SVG' || target.tagName === 'PATH') { text = target.parentElement.innerText || ""; }
 
-    if (text.includes('Казино') || text.includes('Кристаллы')) {
+    if (text.includes('Казино') || text.includes('Crystals') || text.includes('Кристаллы')) {
       if (target.closest('.menu-btn') || (target.parentElement && target.parentElement.closest('.menu-btn'))) {
         var cm = document.getElementById('myCrystalModal'); if(cm) cm.style.display = 'flex';
       }
     }
-    if (text.includes('Войти через Google') || text.includes('Выйти')) {
+    if (text.includes('Google') || text.includes('Выйти') || text.includes('Logout')) {
       if (auth.currentUser) { auth.signOut(); } else { window.fbLogin(); }
     }
     if (target.id === 'myCloseBtn') { document.getElementById('myCrystalModal').style.display = 'none'; }
-    
-    if (target.id === 'myClickerBtn') { 
-      document.getElementById('myCrystalModal').style.display = 'none'; 
-      var cs = document.getElementById('myClickerScreen'); if(cs) cs.style.display = 'flex'; 
-      window.updateClickerUI(); 
-    }
-    
+    if (target.id === 'myClickerBtn') { document.getElementById('myCrystalModal').style.display = 'none'; document.getElementById('myClickerScreen').style.display = 'flex'; window.updateClickerUI(); }
     if (target.id === 'myCasinoBtn') { document.getElementById('myCrystalModal').style.display = 'none'; if (window.openCasino) window.openCasino(); }
-    if (target.id === 'myStocksBtn') { document.getElementById('myCrystalModal').style.display = 'none'; alert('Акции в разработке'); }
-    
-    // ЗАЩИТА ОТ ОШИБКИ (проверяем, существует ли элемент перед изменением)
-    if (target.id === 'myVotesBtn') { 
-      document.getElementById('myCrystalModal').style.display = 'none'; 
-      var vs = document.getElementById('myVotesScreen'); 
-      if (vs) { vs.style.display = 'flex'; } else { alert('Экран голосований не найден!'); } 
-    }
-    
-    if (target.id === 'myAdsBtn') { 
-      document.getElementById('myCrystalModal').style.display = 'none'; 
-      var as = document.getElementById('myAdsScreen'); 
-      if (as) { as.style.display = 'flex'; } else { alert('Экран рекламы не найден!'); } 
-    }
+    if (target.id === 'myStocksBtn') { window.openStocks(); }
+    if (target.id === 'myVotesBtn') { window.openVotes(); }
+    if (target.id === 'myAdsBtn') { document.getElementById('myCrystalModal').style.display = 'none'; alert('Ads in development'); }
   });
 
   var acc = document.querySelector('#panelAccount .account-body');
   if (acc && !document.getElementById('myFbLoginBtn')) {
     var b = document.createElement('button'); b.id = 'myFbLoginBtn';
     b.style.cssText = 'display:block;width:100%;padding:14px;margin:10px 0 20px 0;border-radius:12px;border:none;color:#fff;font-size:15px;font-weight:700;background:linear-gradient(135deg,#4285f4,#34a853);';
-    b.innerText = '🔐 Войти через Google'; acc.insertBefore(b, acc.firstChild);
+    b.innerText = '🔐 ' + t('login'); acc.insertBefore(b, acc.firstChild);
   }
   auth.onAuthStateChanged(function(user) {
     var btn = document.getElementById('myFbLoginBtn'); if (!btn) return;
-    if (user) { btn.textContent = '🚪 Выйти (' + (user.displayName || '') + ')'; btn.style.background = '#333'; }
-    else { btn.textContent = '🔐 Войти через Google'; btn.style.background = 'linear-gradient(135deg,#4285f4,#34a853)'; }
+    if (user) { btn.textContent = '🚪 ' + t('logout') + ' (' + (user.displayName || '') + ')'; btn.style.background = '#333'; }
+    else { btn.textContent = '🔐 ' + t('login'); btn.style.background = 'linear-gradient(135deg,#4285f4,#34a853)'; }
   });
 
   setTimeout(function() { if(window.renderHome) window.renderHome(); }, 1000);
