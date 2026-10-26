@@ -2680,113 +2680,106 @@ window.addEventListener('load', function() {
   };
 
   // ==========================================
-  // 2. ОКНО КРИСТАЛЛОВ
+  // 2. ЯЗЫКОВАЯ СИСТЕМА (ВОЗВРАЩЕНА)
+  // ==========================================
+  const dicts = {
+    en: { "Главная": "Home", "Входящие": "Inbox", "Кристаллы": "Crystals", "Аккаунт": "Account", "Казино": "Casino", "Настройки": "Settings", "Киностудия": "Studio", "Фоторедактор": "Photo Editor", "Из видео": "From Video", "Языки": "Languages", "Закрыть": "Close", "Сгенерировать": "Generate", "Сохранить видео": "Save Video" },
+    ru: { "Главная": "Главная", "Входящие": "Входящие", "Кристаллы": "Кристаллы", "Аккаунт": "Аккаунт", "Казино": "Казино", "Настройки": "Настройки", "Киностудия": "Киностудия", "Фоторедактор": "Фоторедактор", "Из видео": "Из видео", "Языки": "Языки", "Закрыть": "Закрыть", "Сгенерировать": "Сгенерировать", "Сохранить видео": "Сохранить видео" }
+  };
+
+  window.currentLang = localStorage.getItem('appLang') || 'ru';
+  
+  window.t = function(key) {
+      return (dicts[window.currentLang] && dicts[window.currentLang][key]) ? dicts[window.currentLang][key] : key;
+  };
+
+  window.translateUI = function() {
+      if (window.currentLang === 'ru') return;
+      const dict = dicts[window.currentLang];
+      if (!dict) return;
+      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
+      let node;
+      while (node = walker.nextNode()) {
+          let text = node.nodeValue.trim();
+          if (dict[text]) node.nodeValue = node.nodeValue.replace(text, dict[text]);
+      }
+  };
+
+  window.changeLanguage = function(langCode) {
+      window.currentLang = langCode;
+      localStorage.setItem('appLang', langCode);
+      location.reload(); 
+  };
+
+  // ==========================================
+  // 3. ОКНО КРИСТАЛЛОВ (С ВОЗВРАЩЕННЫМИ КНОПКАМИ)
   // ==========================================
   if (!document.getElementById('myCrystalModal')) {
     var mod = document.createElement('div');
     mod.id = 'myCrystalModal';
     mod.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.95);display:none;align-items:center;justify-content:center;padding:20px; backdrop-filter: blur(5px);';
     mod.innerHTML = `<div style="background:#0f172a;border-radius:24px;padding:25px;width:100%;max-width:380px;display:flex;flex-direction:column;gap:12px; border:1px solid #1e293b; box-shadow: 0 10px 40px rgba(0,0,0,0.5);">
-      <h3 style="font-size:20px;text-align:center;margin-bottom:15px;color:#fff;font-weight:800;letter-spacing:1px;">💎 КРИСТАЛЛЫ</h3>
+      <h3 style="font-size:20px;text-align:center;margin-bottom:15px;color:#fff;font-weight:800;letter-spacing:1px;">💎 ${t('Кристаллы')}</h3>
       
-      <button id="myCinemaBtn" style="padding:18px;border-radius:16px;border:none;color:#fff;font-weight:800;background:linear-gradient(135deg,#10b981,#059669); box-shadow: 0 4px 15px rgba(16,185,129,0.3); cursor:pointer; font-size:16px; display:flex; align-items:center; justify-content:center; gap:10px;">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14v-4z"/><rect x="3" y="6" width="12" height="12" rx="2" ry="2"/></svg>
-        AI-Киностудия (FREE)
+      <button id="myCinemaBtn" style="padding:18px;border-radius:16px;border:none;color:#fff;font-weight:800;background:linear-gradient(135deg,#10b981,#059669); cursor:pointer; font-size:16px; display:flex; align-items:center; justify-content:center; gap:10px;">
+        🎬 ${t('Киностудия')} (FREE)
       </button>
 
-      <button id="myClickerBtn" style="padding:18px;border-radius:16px;border:none;color:#fff;font-weight:800;background:linear-gradient(135deg,#3b82f6,#2dd4bf); cursor:pointer; font-size:16px;">🎯 Кликер</button>
-      <button id="myCasinoBtn" style="padding:18px;border-radius:16px;border:none;color:#fff;font-weight:800;background:linear-gradient(135deg,#ff2850,#ff5c8a); cursor:pointer; font-size:16px;">🎰 Казино</button>
-      <button id="myStocksBtn" style="padding:18px;border-radius:16px;border:none;color:#000;font-weight:800;background:linear-gradient(135deg,#43e97b,#38f9d7); cursor:pointer; font-size:16px;">📈 Акции</button>
-      <button id="myVotesBtn" style="padding:18px;border-radius:16px;border:none;color:#fff;font-weight:800;background:linear-gradient(135deg,#8b5cf6,#c88cff); cursor:pointer; font-size:16px;">🗳️ Голосования</button>
-      <button id="myAdsBtn" style="padding:18px;border-radius:16px;border:none;color:#fff;font-weight:800;background:linear-gradient(135deg,#f59e0b,#fbbf24); cursor:pointer; font-size:16px;">📺 Реклама</button>
+      <button id="myVideoTo3DBtn" style="padding:18px;border-radius:16px;border:none;color:#fff;font-weight:800;background:linear-gradient(135deg,#8b5cf6,#6d28d9); cursor:pointer; font-size:16px; display:flex; align-items:center; justify-content:center; gap:10px;">
+        📹 ${t('Из видео')} (BETA)
+      </button>
+
+      <button id="myPhotoEditorBtn" style="padding:18px;border-radius:16px;border:none;color:#fff;font-weight:800;background:linear-gradient(135deg,#f59e0b,#d97706); cursor:pointer; font-size:16px; display:flex; align-items:center; justify-content:center; gap:10px;">
+        🖼️ ${t('Фоторедактор')} (BETA)
+      </button>
+
+      <button id="myCasinoBtn" style="padding:18px;border-radius:16px;border:none;color:#fff;font-weight:800;background:linear-gradient(135deg,#ff2850,#ff5c8a); cursor:pointer; font-size:16px;">🎰 ${t('Казино')}</button>
       
-      <button id="myCloseBtn" style="padding:18px;border-radius:16px;border:none;color:#fff;font-weight:800;background:rgba(255,255,255,.05); cursor:pointer; font-size:16px;">Закрыть</button>
+      <button id="myLangBtn" style="padding:18px;border-radius:16px;border:none;color:#fff;font-weight:800;background:linear-gradient(135deg,#3b82f6,#2563eb); cursor:pointer; font-size:16px;">🌐 ${t('Языки')}</button>
+      
+      <button id="myCloseBtn" style="padding:18px;border-radius:16px;border:none;color:#fff;font-weight:800;background:rgba(255,255,255,.05); cursor:pointer; font-size:16px;">${t('Закрыть')}</button>
     </div>`;
     document.body.appendChild(mod);
   }
 
   // ==========================================
-  // 3. ИНТЕРФЕЙС AI-КИНОСТУДИИ (100% FREE)
+  // 4. ИНТЕРФЕЙС AI-КИНОСТУДИИ (С ГЕНЕРАЦИЕЙ МАШИНЫ)
   // ==========================================
   if (!document.getElementById('myCinemaScreen')) {
     var cinemaScreen = document.createElement('div');
     cinemaScreen.id = 'myCinemaScreen';
     cinemaScreen.style.cssText = 'position:fixed;inset:0;z-index:99998;background:#050505;display:none;flex-direction:column;color:#fff; font-family: sans-serif;';
     
-    var style = document.createElement('style');
-    style.innerHTML = `
-      @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-      .scroll-x::-webkit-scrollbar { display: none; }
-      .scroll-x { -ms-overflow-style: none; scrollbar-width: none; overflow-x: auto; white-space: nowrap; display: flex; gap: 8px; padding-bottom: 5px; }
-      .dir-btn { padding: 10px 15px; border-radius: 8px; border: 1px solid #333; background: #111; color: #aaa; font-size: 13px; cursor: pointer; transition: 0.2s; flex-shrink: 0; }
-      .dir-btn.active { border-color: #10b981; color: #fff; background: rgba(16, 185, 129, 0.2); }
-    `;
-    document.head.appendChild(style);
-
     var headerHTML = `
       <div style="display:flex;align-items:center;padding:15px;border-bottom:1px solid #222;background:#000;">
-        <button id="cinemaBackBtn" style="background:rgba(255,255,255,0.1);border:none;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;cursor:pointer;">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
-        </button>
-        <div style="flex:1;text-align:center;font-weight:900;font-size:18px;background:linear-gradient(90deg, #10b981, #3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">FREE STUDIO</div>
+        <button id="cinemaBackBtn" style="background:rgba(255,255,255,0.1);border:none;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;cursor:pointer;">←</button>
+        <div style="flex:1;text-align:center;font-weight:900;font-size:18px;color:#10b981;">FREE STUDIO</div>
         <div style="width:40px;"></div>
       </div>
     `;
 
     var bodyHTML = `
       <div style="flex:1; overflow-y:auto; padding:20px; display:flex; flex-direction:column; gap:20px;">
-        
         <div style="background:#111; border:1px solid #333; border-radius:16px; padding:20px; display:flex; flex-direction:column; gap:15px;">
-          <label style="font-size:12px; color:#888; font-weight:bold; letter-spacing:1px; text-transform:uppercase;">Что происходит в кадре?</label>
-          <textarea id="cinemaPrompt" placeholder="Например: Летящий дракон в облаках..." style="width:100%; height:80px; background:#000; border:1px solid #333; border-radius:12px; color:#fff; padding:15px; font-size:15px; resize:none; outline:none; font-family:sans-serif;"></textarea>
-          
-          <div style="border-top:1px solid #333; padding-top:15px; display:flex; flex-direction:column; gap:15px;">
-            <div>
-              <div style="font-size:11px; color:#666; margin-bottom:5px; font-weight:bold;">🎥 РАКУРС</div>
-              <div class="scroll-x" id="cameraControls">
-                <button class="dir-btn active" data-prompt="normal">Стандарт</button>
-                <button class="dir-btn" data-prompt="low">Снизу</button>
-                <button class="dir-btn" data-prompt="high">Сверху</button>
-                <button class="dir-btn" data-prompt="close">Крупный план</button>
-              </div>
-            </div>
-
-            <div>
-              <div style="font-size:11px; color:#666; margin-bottom:5px; font-weight:bold;">💡 ОСВЕЩЕНИЕ</div>
-              <div class="scroll-x" id="lightingControls">
-                <button class="dir-btn active" data-prompt="studio">Студийный</button>
-                <button class="dir-btn" data-prompt="sunset">Закат</button>
-                <button class="dir-btn" data-prompt="neon">Неон</button>
-                <button class="dir-btn" data-prompt="dark">Мрачный</button>
-              </div>
-            </div>
-          </div>
-
-          <button id="cinemaGenerateBtn" style="padding:18px; background:linear-gradient(135deg, #10b981, #3b82f6); border:none; border-radius:12px; color:#fff; font-size:16px; font-weight:900; cursor:pointer; text-transform:uppercase; letter-spacing:1px; box-shadow:0 4px 20px rgba(16,185,129,0.4); margin-top:10px;">
-            Сгенерировать (FREE)
+          <textarea id="cinemaPrompt" placeholder="Например: Машина едет по дороге..." style="width:100%; height:80px; background:#000; border:1px solid #333; border-radius:12px; color:#fff; padding:15px; font-size:15px; resize:none; outline:none;"></textarea>
+          <button id="cinemaGenerateBtn" style="padding:18px; background:linear-gradient(135deg, #10b981, #3b82f6); border:none; border-radius:12px; color:#fff; font-size:16px; font-weight:900; cursor:pointer;">
+            ${t('Сгенерировать')}
           </button>
         </div>
 
-        <!-- Блок результата -->
-        <div id="cinemaResultContainer" style="background:#111; border:1px solid #333; border-radius:16px; padding:20px; min-height:250px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;">
-          <div id="cinemaPlaceholder" style="color:#444; font-size:14px;">
-            Здесь появится ваша 3D-сцена
-          </div>
-          
+        <div id="cinemaResultContainer" style="background:#111; border:1px solid #333; border-radius:16px; padding:20px; min-height:250px; display:flex; flex-direction:column; align-items:center; justify-content:center;">
           <div id="cinemaLoading" style="display:none; flex-direction:column; align-items:center; gap:15px;">
-            <div style="width:50px; height:50px; border:4px solid #333; border-top:4px solid #10b981; border-radius:50%; animation: spin 1s linear infinite;"></div>
-            <div style="color:#10b981; font-weight:bold; text-align:center;">Рендеринг на телефоне...</div>
+            <div style="width:40px; height:40px; border:4px solid #333; border-top:4px solid #10b981; border-radius:50%; animation: spin 1s linear infinite;"></div>
+            <div style="color:#10b981;">Рендеринг...</div>
           </div>
 
           <div id="cinemaVideoWrap" style="display:none; width:100%; flex-direction:column; gap:15px;">
-            <!-- Сюда будет вставлен canvas -->
             <div id="canvasContainer" style="width:100%; aspect-ratio: 16/9; background:#000; border-radius:12px; overflow:hidden;"></div>
-            <button id="cinemaSaveBtn" style="padding:15px; background:#fff; border:none; border-radius:12px; color:#000; font-weight:900; cursor:pointer; font-size:15px;">
-              💾 Сохранить видео
+            <button id="cinemaSaveBtn" style="padding:15px; background:#fff; border:none; border-radius:12px; color:#000; font-weight:900; cursor:pointer;">
+              ${t('Сохранить видео')}
             </button>
           </div>
         </div>
-
       </div>
     `;
 
@@ -2795,36 +2788,8 @@ window.addEventListener('load', function() {
   }
 
   // ==========================================
-  // 4. ЛОГИКА ПАНЕЛИ
+  // 5. ЛОГИКА 3D-ГЕНЕРАЦИИ (СОЗДАЕМ МАШИНУ)
   // ==========================================
-  function setupControls(containerId) {
-      var container = document.getElementById(containerId);
-      if(!container) return;
-      var buttons = container.querySelectorAll('.dir-btn');
-      buttons.forEach(function(btn) {
-          btn.onclick = function() {
-              buttons.forEach(function(b) { b.classList.remove('active'); });
-              this.classList.add('active');
-          };
-      });
-  }
-  setupControls('cameraControls');
-  setupControls('lightingControls');
-
-  window.openCinema = function() {
-      document.getElementById('myCrystalModal').style.display = 'none';
-      document.getElementById('myCinemaScreen').style.display = 'flex';
-      document.getElementById('cinemaVideoWrap').style.display = 'none';
-      document.getElementById('cinemaPlaceholder').style.display = 'block';
-  };
-
-  document.getElementById('cinemaBackBtn').onclick = function() { document.getElementById('myCinemaScreen').style.display = 'none'; };
-
-  // ==========================================
-  // 5. ГЕНЕРАЦИЯ 3D-СЦЕНЫ НА THREE.JS (100% БЕСПЛАТНО, В БРАУЗЕРЕ)
-  // ==========================================
-  
-  // Подгружаем Three.js динамически только когда нужно
   function loadThreeJS(callback) {
       if (window.THREE) { callback(); return; }
       var script = document.createElement('script');
@@ -2833,128 +2798,176 @@ window.addEventListener('load', function() {
       document.head.appendChild(script);
   }
 
+  window.openCinema = function() {
+      document.getElementById('myCrystalModal').style.display = 'none';
+      document.getElementById('myCinemaScreen').style.display = 'flex';
+      document.getElementById('cinemaVideoWrap').style.display = 'none';
+  };
+
+  document.getElementById('cinemaBackBtn').onclick = function() { document.getElementById('myCinemaScreen').style.display = 'none'; };
+
   document.getElementById('cinemaGenerateBtn').onclick = function() {
-      var basePrompt = document.getElementById('cinemaPrompt').value;
-      if (!basePrompt) { alert('Напишите, что происходит в кадре!'); return; }
+      var prompt = document.getElementById('cinemaPrompt').value.toLowerCase();
+      if (!prompt) { alert('Напишите запрос!'); return; }
 
-      var camType = document.querySelector('#cameraControls .dir-btn.active').getAttribute('data-prompt');
-      var lightType = document.querySelector('#lightingControls .dir-btn.active').getAttribute('data-prompt');
-
-      document.getElementById('cinemaPlaceholder').style.display = 'none';
-      var loader = document.getElementById('cinemaLoading');
-      loader.style.display = 'flex';
-      this.innerText = 'Рендеринг...';
+      document.getElementById('cinemaLoading').style.display = 'flex';
+      document.getElementById('cinemaVideoWrap').style.display = 'none';
+      this.innerText = 'Генерация...';
       this.disabled = true;
 
       loadThreeJS(function() {
           setTimeout(function() {
-              loader.style.display = 'none';
-              var wrap = document.getElementById('cinemaVideoWrap');
+              document.getElementById('cinemaLoading').style.display = 'none';
+              document.getElementById('cinemaVideoWrap').style.display = 'flex';
               var container = document.getElementById('canvasContainer');
-              container.innerHTML = ''; // Очищаем
-              wrap.style.display = 'flex';
+              container.innerHTML = ''; 
 
-              // Инициализация Three.js
+              // --- НАСТРОЙКА СЦЕНЫ ---
               var scene = new THREE.Scene();
-              scene.fog = new THREE.FogExp2(0x000000, 0.02);
-              
-              var camera = new THREE.PerspectiveCamera(75, 16/9, 0.1, 1000);
+              scene.background = new THREE.Color(0x87CEEB); // Голубое небо
+              scene.fog = new THREE.Fog(0x87CEEB, 20, 100);
+
+              var camera = new THREE.PerspectiveCamera(45, 16/9, 0.1, 1000);
+              camera.position.set(10, 5, 15);
+              camera.lookAt(0, 0, 0);
+
               var renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
-              
-              var w = container.clientWidth;
-              var h = container.clientHeight;
-              renderer.setSize(w, h);
+              renderer.setSize(container.clientWidth, container.clientHeight);
+              renderer.shadowMap.enabled = true;
               container.appendChild(renderer.domElement);
 
-              // Настройки камеры и света в зависимости от выбора
-              if (camType === 'low') { camera.position.set(0, 1, 10); camera.lookAt(0, 5, 0); }
-              else if (camType === 'high') { camera.position.set(0, 15, 5); camera.lookAt(0, 0, 0); }
-              else if (camType === 'close') { camera.position.set(0, 5, 6); }
-              else { camera.position.set(0, 5, 15); }
+              // --- СВЕТ ---
+              var ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+              scene.add(ambientLight);
+              var dirLight = new THREE.DirectionalLight(0xffffff, 1);
+              dirLight.position.set(10, 20, 10);
+              dirLight.castShadow = true;
+              scene.add(dirLight);
 
-              if (lightType === 'sunset') {
-                  scene.background = new THREE.Color(0xffaa00);
-                  const light = new THREE.DirectionalLight(0xffddaa, 1.5); light.position.set(10, 10, 10); scene.add(light);
-              } else if (lightType === 'neon') {
-                  scene.background = new THREE.Color(0x0a0a1a);
-                  const light1 = new THREE.PointLight(0xff00ff, 2, 50); light1.position.set(10, 10, 10); scene.add(light1);
-                  const light2 = new THREE.PointLight(0x00ffff, 2, 50); light2.position.set(-10, -10, -10); scene.add(light2);
-              } else if (lightType === 'dark') {
-                  scene.background = new THREE.Color(0x050505);
-                  const light = new THREE.PointLight(0xffffff, 0.5, 20); light.position.set(0, 5, 10); scene.add(light);
-              } else {
-                  scene.background = new THREE.Color(0x222222);
-                  const light = new THREE.AmbientLight(0xffffff, 0.8); scene.add(light);
+              // --- ДОРОГА ---
+              var roadGeo = new THREE.PlaneGeometry(200, 10);
+              var roadMat = new THREE.MeshStandardMaterial({ color: 0x333333 });
+              var road = new THREE.Mesh(roadGeo, roadMat);
+              road.rotation.x = -Math.PI / 2;
+              road.receiveShadow = true;
+              scene.add(road);
+              
+              // Трава вокруг
+              var grassGeo = new THREE.PlaneGeometry(200, 200);
+              var grassMat = new THREE.MeshStandardMaterial({ color: 0x228B22 });
+              var grass = new THREE.Mesh(grassGeo, grassMat);
+              grass.rotation.x = -Math.PI / 2;
+              grass.position.y = -0.1;
+              grass.receiveShadow = true;
+              scene.add(grass);
+
+              // --- ФУНКЦИЯ СОЗДАНИЯ МАШИНЫ ИЗ КУБИКОВ ---
+              function createCar() {
+                  var car = new THREE.Group();
+                  
+                  // Кузов (красный)
+                  var bodyGeo = new THREE.BoxGeometry(4, 1.2, 2);
+                  var bodyMat = new THREE.MeshStandardMaterial({ color: 0xff0000, metalness: 0.5, roughness: 0.2 });
+                  var body = new THREE.Mesh(bodyGeo, bodyMat);
+                  body.position.y = 0.8;
+                  body.castShadow = true;
+                  car.add(body);
+
+                  // Крыша (черная)
+                  var roofGeo = new THREE.BoxGeometry(2, 1, 1.8);
+                  var roofMat = new THREE.MeshStandardMaterial({ color: 0x111111 });
+                  var roof = new THREE.Mesh(roofGeo, roofMat);
+                  roof.position.set(0, 1.9, 0);
+                  roof.castShadow = true;
+                  car.add(roof);
+
+                  // Колеса (черные цилиндры)
+                  var wheelGeo = new THREE.CylinderGeometry(0.5, 0.5, 0.4, 16);
+                  var wheelMat = new THREE.MeshStandardMaterial({ color: 0x000000 });
+                  
+                  var positions = [ [-1.3, 0.5, 1], [1.3, 0.5, 1], [-1.3, 0.5, -1], [1.3, 0.5, -1] ];
+                  positions.forEach(function(pos) {
+                      var wheel = new THREE.Mesh(wheelGeo, wheelMat);
+                      wheel.rotation.x = Math.PI / 2;
+                      wheel.position.set(pos[0], pos[1], pos[2]);
+                      wheel.castShadow = true;
+                      car.add(wheel);
+                  });
+
+                  return car;
               }
 
-              // Генерируем объекты на основе текста
-              let text = basePrompt.toLowerCase();
-              let color = 0x10b981; // Зеленый по умолчанию
-              if (text.includes('дракон')) color = 0xff0000;
-              if (text.includes('вода') || text.includes('море')) color = 0x3b82f6;
-              
-              // Создаем геометрию (в будущем тут будет API)
-              const geometry = new THREE.TorusKnotGeometry(2, 0.5, 100, 16);
-              const material = new THREE.MeshStandardMaterial({ color: color, roughness: 0.2, metalness: 0.8 });
-              const mesh = new THREE.Mesh(geometry, material);
-              scene.add(mesh);
+              // Добавляем машину на сцену
+              var car = createCar();
+              car.position.set(-10, 0, 0); // Начальная позиция
+              scene.add(car);
 
-              // Анимация
+              // --- АНИМАЦИЯ ---
+              var clock = new THREE.Clock();
               function animate() {
                   requestAnimationFrame(animate);
-                  mesh.rotation.x += 0.01;
-                  mesh.rotation.y += 0.02;
+                  var time = clock.getElapsedTime();
+                  
+                  // Машина едет вперед
+                  car.position.x = (time * 5) % 20 - 10;
+                  
                   renderer.render(scene, camera);
               }
               animate();
-              
-              // Кнопка сохранения
+
               var btn = document.getElementById('cinemaGenerateBtn');
-              btn.innerText = 'Сгенерировать (FREE)';
+              btn.innerText = t('Сгенерировать');
               btn.disabled = false;
-          }, 2000); // Имитация загрузки
+          }, 1000);
       });
   };
 
-  // ФУНКЦИЯ СОХРАНЕНИЯ (ЗАПИСЬ CANVAS)
+  // СОХРАНЕНИЕ ВИДЕО ИЗ CANVAS
   document.getElementById('cinemaSaveBtn').onclick = function() {
       var canvas = document.querySelector('#canvasContainer canvas');
       if (!canvas) return;
-
-      var stream = canvas.captureStream(60);
+      var stream = canvas.captureStream(30);
       var mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm; codecs=vp9' });
       var chunks = [];
-
       mediaRecorder.ondataavailable = function(e) { if (e.data.size > 0) chunks.push(e.data); };
       mediaRecorder.onstop = function() {
           var blob = new Blob(chunks, { type: 'video/webm' });
           var url = URL.createObjectURL(blob);
-          var a = document.createElement('a');
-          a.href = url;
-          a.download = '3d_scene.webm';
-          a.click();
-          URL.revokeObjectURL(url);
+          var a = document.createElement('a'); a.href = url; a.download = 'car_scene.webm'; a.click();
       };
-
       mediaRecorder.start();
-      this.innerText = 'Запись видео (3 сек)...';
-      
+      this.innerText = 'Запись...';
       var btn = this;
-      setTimeout(function() {
-          mediaRecorder.stop();
-          btn.innerText = '✅ Видео сохранено!';
-          setTimeout(() => { btn.innerText = '💾 Сохранить видео'; }, 2000);
-      }, 3000); // Записываем 3 секунды
+      setTimeout(function() { mediaRecorder.stop(); btn.innerText = '✅ Сохранено'; setTimeout(() => btn.innerText = t('Сохранить видео'), 2000); }, 3000);
   };
 
   // ==========================================
-  // 6. ОБРАБОТЧИКИ КЛИКОВ
+  // 6. ОКНА ДЛЯ ВИДЕО-3D И ФОТОРЕДАКТОРА
+  // ==========================================
+  window.openVideoTo3D = function() {
+      document.getElementById('myCrystalModal').style.display = 'none';
+      alert("📹 Режим 'Из видео' в разработке!\n\nВ будущем здесь можно будет загружать видео или ссылку, а нейросеть перестроит эту сцену в 3D.");
+  };
+  
+  window.openPhotoEditor = function() {
+      document.getElementById('myCrystalModal').style.display = 'none';
+      alert("🖼️ Фоторедактор в разработке!\n\nВ будущем здесь можно будет менять цвет машины на фото, удалять объекты и делать ретушь.");
+  };
+
+  // Выбор языка
+  window.openLangMenu = function() {
+      var lang = prompt("Введите язык (en или ru):", window.currentLang);
+      if (lang === 'en' || lang === 'ru') { window.changeLanguage(lang); }
+  };
+
+  // ==========================================
+  // 7. ОБРАБОТЧИКИ КЛИКОВ
   // ==========================================
   document.body.addEventListener('click', function(e) {
     var target = e.target; var text = target.innerText || "";
     if (target.tagName === 'SPAN' || target.tagName === 'SVG' || target.tagName === 'PATH') { text = target.parentElement.innerText || ""; }
 
-    if (text.includes('Казино') || text.includes('Crystals') || text.includes('Кристаллы') || text.includes('Kristalle') || text.includes('Casino')) {
+    if (text.includes('Казино') || text.includes('Кристаллы') || text.includes('Casino') || text.includes('Crystals')) {
       if (target.closest('.menu-btn') || (target.parentElement && target.parentElement.closest('.menu-btn'))) {
         var cm = document.getElementById('myCrystalModal'); if(cm) cm.style.display = 'flex';
       }
@@ -2966,11 +2979,10 @@ window.addEventListener('load', function() {
     
     if (target.id === 'myCloseBtn') { document.getElementById('myCrystalModal').style.display = 'none'; }
     if (target.id === 'myCinemaBtn') { window.openCinema(); }
-    if (target.id === 'myClickerBtn') { document.getElementById('myCrystalModal').style.display = 'none'; document.getElementById('myClickerScreen').style.display = 'flex'; window.updateClickerUI(); }
+    if (target.id === 'myVideoTo3DBtn') { window.openVideoTo3D(); }
+    if (target.id === 'myPhotoEditorBtn') { window.openPhotoEditor(); }
+    if (target.id === 'myLangBtn') { window.openLangMenu(); }
     if (target.id === 'myCasinoBtn') { document.getElementById('myCrystalModal').style.display = 'none'; if (window.openCasino) window.openCasino(); }
-    if (target.id === 'myStocksBtn') { window.openStocks(); }
-    if (target.id === 'myVotesBtn') { window.openVotes(); }
-    if (target.id === 'myAdsBtn') { document.getElementById('myCrystalModal').style.display = 'none'; alert('Ads in development'); }
   });
 
   var acc = document.querySelector('#panelAccount .account-body');
@@ -2985,7 +2997,10 @@ window.addEventListener('load', function() {
     else { btn.textContent = '🔐 Login with Google'; btn.style.background = 'linear-gradient(135deg,#4285f4,#34a853)'; }
   });
 
-  setTimeout(function() { if(window.renderHome) window.renderHome(); }, 1000);
+  setTimeout(function() { 
+      window.translateUI();
+      if(window.renderHome) window.renderHome(); 
+  }, 1000);
 
 });
 </script>
